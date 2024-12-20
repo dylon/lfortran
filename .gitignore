@@ -1,5 +1,6 @@
 # LFortran
 
+src/bin/cpptranslate
 src/bin/lfortran
 src/bin/parse
 src/bin/parse2
