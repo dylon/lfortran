@@ -283,7 +283,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Level5Expr> level5Expr;
   };
 
-  using ExprList = DelimitedList<Expr>;
+  struct ExprList : public DelimitedList<Expr> {};
 
   struct StructureConstructor {
     std::unique_ptr<TypeName> typeName;
@@ -332,7 +332,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  using ACValueList = DelimitedList<ACValue>;
+  struct ACValueList : public DelimitedList<ACValue> {};
 
   struct ArrayConstructor {
     // Constraint: Each ACValue expression in the ArrayConstructor must have the
@@ -365,44 +365,20 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<ExplicitShapeUpperBound> explicitShapeUpperBound;
   };
 
-  struct DelimitedExplicitShapeSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ExplicitShapeSpec> explicitShapeSpec;
-  };
-
-  struct ExplicitShapeSpecList {
-    std::unique_ptr<ExplicitShapeSpec> firstExplicitShapeSpec;
-    std::vector<std::unique_ptr<DelimitedExplicitShapeSpec>> restExplicitShapeSpecs;
-  };
+  struct ExplicitShapeSpecList : public DelimitedList<ExplicitShapeSpec> {};
 
   struct AssumedShapeSpec {
     std::optional<std::unique_ptr<ExplicitShapeLowerBound>> lowerBound;
     std::unique_ptr<Token> toToken;  // ":"
   };
 
-  struct DelimitedAssumedShapeSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<AssumedShapeSpec> assumedShapeSpec;
-  };
-
-  struct AssumedShapeSpecList {
-    std::unique_ptr<AssumedShapeSpec> firstAssumedShapeSpec;
-    std::vector<std::unique_ptr<DelimitedAssumedShapeSpec>> restAssumedShapeSpecs;
-  };
+  struct AssumedShapeSpecList : public DelimitedList<AssumedShapeSpec> {};
 
   struct DeferredShapeSpec {
     std::unique_ptr<Token> rangeToken;  // ":"
   };
 
-  struct DelimitedDeferredShapeSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<DeferredShapeSpec> deferredShapeSpec;
-  };
-
-  struct DeferredShapeSpecList {
-    std::unique_ptr<DeferredShapeSpec> firstDeferredShapeSpec;
-    std::vector<std::unique_ptr<DelimitedDeferredShapeSpec>> restDeferredShapeSpecs;
-  };
+  struct DeferredShapeSpecList : public DelimitedList<DeferredShapeSpec> {};
 
   struct ExplicitShapeSpecListDelimited {
     std::unique_ptr<ExplicitShapeSpecList> explicitShapeSpecList;
@@ -798,7 +774,75 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<ComponentDeclList> componentDeclList;
   };
 
+  struct Rename {
+    std::unique_ptr<Token> localNameToken;  // symbol
+    std::unique_ptr<Token> asToken;  // "=>"
+    std::unique_ptr<Token> useNameToken;  // symbol
+  };
+
+  struct RenameList : public DelimitedList<Rename> {};
+
+  struct DelimitedRenameList {
+    std::unique_ptr<Token> delimiterToken;  // ","
+    std::unique_ptr<RenameList> renameList;
+  }
+
+  struct UseAllStmt {
+    std::unique_ptr<Token> useToken;  // "USE"
+    std::unique_ptr<Token> moduleNameToken;  // symbol
+    std::optional<std::unique_ptr<DelimitedRenameList>> delimitedRenameList;
+  };
+
+  struct LocalNameAs {
+    std::unique_ptr<Token> localNameToken;  // symbol
+    std::unique_ptr<Token> asToken;  // "=>"
+  };
+
+  struct OptionalLocalNameAsUseName {
+    std::optional<std::unique_ptr<LocalNameAs>> localNameAs;
+    std::unique_ptr<Token> useNameToken;  // symbol
+  };
+
+  enum class OnlyType {
+    ACCESS_ID,
+    USE_NAME,
+  };
+
+  struct Only {
+    OnlyType type;
+    union {
+      std::unique_ptr<AccessId> accessId;
+      std::unique_ptr<OptionalLocalNameAsUseName> optionalLocalNameAsUseName;
+    };
+  };
+
+  struct OnlyList : public DelimitedList<Only> {};
+
+  struct UseOnlyStmt {
+    std::unique_ptr<Token> useToken;  // "USE"
+    std::unique_ptr<Token> moduleNameToken;  // symbol
+    std::unique_ptr<Token> delimiterToken;  // ","
+    std::unique_ptr<Token> onlyToken;  // "ONLY"
+    std::unique_ptr<Token> colonToken;  // ":"
+    std::optional<std::unique_ptr<OnlyList>> onlyList;
+  };
+
+  enum class UseStmtType {
+    USE_ALL,
+    USE_ONLY,
+  };
+
   struct UseStmt {
+    // Constraint: Each AccessId must be a public entity in the module.
+    // -------------------------------------------------------------------
+    // Constraint: Each UseName must be the name of a public entity in the
+    // module.
+    // -------------------------------------------------------------------
+    UseStmtType type;
+    union {
+      std::unique_ptr<UseAllStmt> useAllStmt;
+      std::unique_ptr<UseOnlyStmt> useOnlyStmt;
+    };
   };
 
   struct RangeUpperLetter {
@@ -811,15 +855,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::optional<std::unique_ptr<RangeUpperLetter>> rangeUpperLetter;
   };
 
-  struct DelimitedLetterSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<LetterSpec> letterSpec;
-  };
-
-  struct LetterSpecList {
-    std::unique_ptr<LetterSpec> firstLetterSpec;
-    std::vector<std::unique_ptr<DelimitedLetterSpec>> restLetterSpecs;
-  };
+  struct LetterSpecList : public DelimitedList<LetterSpec> {};
 
   struct ImplicitSpec {
     std::unique_ptr<TypeSpec> typeSpec;
@@ -828,15 +864,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Token> closingParenToken;  // ")"
   };
 
-  struct DelimitedImplicitSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ImplicitSpec> implicitSpec;
-  };
-
-  struct ImplicitSpecList {
-    std::unique_ptr<ImplicitSpec> firstImplicitSpec;
-    std::vector<std::unique_ptr<DelimitedImplicitSpec>> restImplicitSpecs;
-  };
+  struct ImplicitSpecList : public DelimitedList<ImplicitSpec> {};
 
   struct DeclaredImplicitSpecList {
     std::unique_ptr<Token> implicitToken;  // "IMPLICIT"
@@ -882,15 +910,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<InitializationExpr> initializationExpr;
   };
 
-  struct DelimitedNamedConstantDef {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<NamedConstantDef> namedConstantDef;
-  };
-
-  struct NamedConstantDefList {
-    std::unique_ptr<NamedConstantDef> firstNamedConstantDef;
-    std::vector<std::unique_ptr<DelimitedNamedConstantDef>> restNamedConstantDefs;
-  };
+  struct NamedConstantDefList : public DelimitedList<NamedConstantDef> {};
 
   struct ParameterStmt {
     std::unique_ptr<Token> parameterToken;  // "PARAMETER"
@@ -899,7 +919,344 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Token> closingParenToken;  // ")"
   };
 
+  struct R {
+    // Constraint: R must be positive.
+    // --------------------------------------------------------------
+    // Constraint: R must not have a kind parameter specified for it.
+    // --------------------------------------------------------------
+    std::unique_ptr<IntLiteralConstant> intLiteralConstant;
+  };
+
+  struct W {
+    std::unique_ptr<IntLiteralConstant> intLiteralConstant;
+  };
+
+  struct M {
+    std::unique_ptr<IntLiteralConstant> intLiteralConstant;
+  };
+
+  struct D {
+    std::unique_ptr<IntLiteralConstant> intLiteralConstant;
+  };
+
+  struct E {
+    std::unique_ptr<IntLiteralConstant> intLiteralConstant;
+  };
+
+  struct DotM {
+    std::unique_ptr<Token> dotToken;  // "."
+    std::unique_ptr<M> m;
+  };
+
+  struct Ee {
+    std::unique_ptr<Token> eToken;  // "E"
+    std::unique_ptr<E> e;
+  };
+
+  struct IDataEditDesc {
+    std::unique_ptr<Token> iToken;  // "I"
+    std::unique_ptr<W> w;
+    std::optional<std::unique_ptr<DotM>> dotM;
+  };
+
+  struct BDataEditDesc {
+    std::unique_ptr<Token> bToken;  // "B"
+    std::unique_ptr<W> w;
+    std::optional<std::unique_ptr<DotM>> dotM;
+  };
+
+  struct ODataEditDesc {
+    std::unique_ptr<Token> oToken;  // "O"
+    std::unique_ptr<W> w;
+    std::optional<std::unique_ptr<DotM>> dotM;
+  };
+
+  struct ZDataEditDesc {
+    std::unique_ptr<Token> zToken;  // "Z"
+    std::unique_ptr<W> w;
+    std::optional<std::unique_ptr<DotM>> dotM;
+  };
+
+  struct FDataEditDesc {
+    std::unique_ptr<Token> fToken;  // "F"
+    std::unique_ptr<W> w;
+    std::unique_ptr<Token> dotToken;  // "."
+    std::unique_ptr<D> d;
+  };
+
+  struct EDataEditDesc {
+    std::unique_ptr<Token> eToken;  // "E"
+    std::unique_ptr<W> w;
+    std::unique_ptr<Token> dotToken;  // "."
+    std::unique_ptr<D> d;
+    std::optional<std::unique_ptr<Ee>> ee;
+  };
+
+  struct ENDataEditDesc {
+    std::unique_ptr<Token> enToken;  // "EN"
+    std::unique_ptr<W> w;
+    std::unique_ptr<Token> dotToken;  // "."
+    std::unique_ptr<D> d;
+    std::optional<std::unique_ptr<Ee>> ee;
+  };
+
+  struct ESDataEditDesc {
+    std::unique_ptr<Token> esToken;  // "ES"
+    std::unique_ptr<W> w;
+    std::unique_ptr<Token> dotToken;  // "."
+    std::unique_ptr<D> d;
+    std::optional<std::unique_ptr<Ee>> ee;
+  };
+
+  struct GDataEditDesc {
+    std::unique_ptr<Token> gToken;  // "G"
+    std::unique_ptr<W> w;
+    std::unique_ptr<Token> dotToken;  // "."
+    std::unique_ptr<D> d;
+    std::optional<std::unique_ptr<Ee>> ee;
+  };
+
+  struct LDataEditDesc {
+    std::unique_ptr<Token> lToken;  // "L"
+    std::unique_ptr<W> w;
+  };
+
+  struct ADataEditDesc {
+    std::unique_ptr<Token> aToken;  // "A"
+    std::optional<std::unique_ptr<W>> w;
+  };
+
+  struct DDataEditDesc {
+    std::unique_ptr<Token> dToken;  // "D"
+    std::unique_ptr<W> w;
+    std::unique_ptr<Token> dotToken;  // "."
+    std::unique_ptr<D> d;
+  };
+
+  enum class DataEditDescType {
+    I,
+    B,
+    O,
+    Z,
+    F,
+    E,
+    EN,
+    ES,
+    G,
+    L,
+    A,
+    D,
+  };
+
+  struct DataEditDesc {
+    // Constraint: W and E must be positive.
+    // ----------------------------------------------------------------------
+    // Constraint: W, M, D, and E must not have kind parameters specified for
+    // them.
+    // ----------------------------------------------------------------------
+    DataEditDescType type;
+    union {
+      std::unique_ptr<IDataEditDesc> i;
+      std::unique_ptr<BDataEditDesc> b;
+      std::unique_ptr<ODataEditDesc> o;
+      std::unique_ptr<ZDataEditDesc> z;
+      std::unique_ptr<FDataEditDesc> f;
+      std::unique_ptr<EDataEditDesc> e;
+      std::unique_ptr<ENDataEditDesc> en;
+      std::unique_ptr<ESDataEditDesc> es;
+      std::unique_ptr<GDataEditDesc> g;
+      std::unique_ptr<LDataEditDesc> l;
+      std::unique_ptr<ADataEditDesc> a;
+      std::unique_ptr<DDataEditDesc> d;
+    };
+  };
+
+  struct RDataEditDesc {
+    std::optional<std::unique_ptr<R>> r;
+    std::unique_ptr<DataEditDesc> dataEditDesc;
+  };
+
+  struct K {
+    std::unique_ptr<SignedIntLiteralConstant> signedIntLiteralConstant;
+  };
+
+  struct N {
+    std::unique_ptr<IntLiteralConstant> intLiteralContant;
+  };
+
+  struct Tn {
+    std::unique_ptr<Token> tToken;  // "T"
+    std::unique_ptr<N> n;
+  };
+
+  struct TLn {
+    std::unique_ptr<Token> tlToken;  // "TL"
+    std::unique_ptr<N> n;
+  };
+
+  struct TRn {
+    std::unique_ptr<Token> trToken;  // "TR"
+    std::unique_ptr<N> n;
+  };
+
+  struct NX {
+    std::unique_ptr<N> n;
+    std::unique_ptr<Token> xToken;  // "X"
+  };
+
+  enum class PositionEditDescType {
+    T_N,
+    TL_N,
+    TR_N,
+    N_X,
+  };
+
+  struct PositionEditDesc {
+    // Constraint: N must be positive.
+    // --------------------------------------------------------------
+    // Constraint: N must not have a kind parameter specified for it.
+    // --------------------------------------------------------------
+    PositionEditDescType type;
+    union {
+      std::unique_ptr<Tn> tn;
+      std::unique_ptr<TLn> tln;
+      std::unique_ptr<TRn> trn;
+      std::unique_ptr<NX> nx;
+    };
+  };
+
+  struct RSlash {
+    std::optional<std::unique_ptr<R>> r;
+    std::unique_ptr<Token> slashToken;  // "/"
+  };
+
+  enum class SignEditDescType {
+    S,
+    SP,
+    SS,
+  };
+
+  struct SignEditDesc {
+    SignEditDescType type;
+    std::unique_ptr<Token> token;  // "S", "SP", or "SS"
+  };
+
+  struct KP {
+    std::unique_ptr<K> k;
+    std::unique_ptr<Token> pToken;  // "P"
+  };
+
+  enum class BlankInterpEditDescType {
+    BN,
+    BZ,
+  };
+
+  struct BlankInterpEditDesc {
+    BlankInterpEditDescType type;
+    std::unique_ptr<Token> token;  // "BN" or "BZ"
+  };
+
+  enum class ControlEditDescType {
+    POSITION_EDIT_DESC,
+    R_SLASH,
+    COLON,
+    SIGN_EDIT_DESC,
+    KP,
+    BLANK_INTERP_EDIT_DESC,
+  };
+
+  struct ControlEditDesc {
+    // Constraint: K must not have a kind parameter specified for it.
+    // --------------------------------------------------------------
+    ControlEditDescType type;
+    union {
+      std::unique_ptr<PositionEditDesc> positionEditDesc;
+      std::unique_ptr<RSlash> rSlash;
+      std::unique_ptr<Token> colonToken;  // ":"
+      std::unique_ptr<SignEditDesc> signEditDesc;
+      std::unique_ptr<KP> kP;
+      std::unique_ptr<BlankInterpEditDesc> blankInterpEditDesc;
+    };
+  };
+
+  struct C {
+    std::unique_ptr<IntLiteralConstant> intLiteralConstant;
+  };
+
+  struct CHRepChar {
+    std::unique_ptr<C> c;
+    std::unique_ptr<Token> hToken;  // "H"
+    std::unique_ptr<RepCharSeq> repChars;  // length > 0
+  };
+
+  enum class CharStringEditDescType {
+    CHAR_LITERAL_CONSTANT,
+    C_H_REP_CHAR,
+  };
+
+  struct CharStringEditDesc {
+    // Constraint: C must be positive.
+    // -------------------------------------------------------------------------
+    // Constraint: C must not have a kind parameter specified for it.
+    // -------------------------------------------------------------------------
+    // Constraint: The RepChar in the cH form must be of default character type.
+    // -------------------------------------------------------------------------
+    // Constraint: The CharLiteralConstant must not have a kind parameter
+    // specified for it.
+    // -------------------------------------------------------------------------
+    CharStringEditDescType type;
+    union {
+      std::unique_ptr<CharLiteralConstant> charLiteralConstant;
+      std::unique_ptr<CHRepChar> cHRepChar;
+    };
+  };
+
+  struct RFormatItemList {
+    std::optional<std::unique_ptr<R>> r;
+    std::unique_ptr<Token> openingParenToken;  // "("
+    std::unique_ptr<FormatItemList> formatItemList;
+    std::unique_ptr<Token> closingParenToken;  // ")"
+  };
+
+  enum class FormatItemType {
+    R_DATA_EDIT_DESC,
+    CONTROL_EDIT_DESC,
+    CHAR_STRING_EDIT_DESC,
+    R_FORMAT_ITEM_LIST,
+  };
+
+  struct FormatItem {
+    FormatItemType type;
+    union {
+      std::unique_ptr<RDataEditDesc> rDataEditDesc;
+      std::unique_ptr<ControlEditDesc> controlEditDesc;
+      std::unique_ptr<CharStringEditDesc> charStringEditDesc;
+      std::unique_ptr<RFormatItemList> rFormatItemList;
+    };
+  };
+
+  struct FormatItemList : public OptionallyDelimitedList<FormatItem> {};
+
+  struct FormatSpecification {
+    std::unique_ptr<Token> openingParenToken;  // "("
+    std::optional<std::unique_ptr<FormatItemList>> formatItemList;
+    std::unique_ptr<Token> closingParenToken;  // ")"
+  };
+
   struct FormatStmt {
+    // Constraint: The FormatStmt must be labeled.
+    // ------------------------------------------------------------------------
+    // Constraint: The comma used to separate FormatItems in a FormatItemList
+    // may be omitted as follows:
+    //   (1) Between a P edit descriptor and an immediately following F, E, EN,
+    //       ES, D, or G edit descriptor.
+    //   (2) Before a slash edit descriptor when the optional repeat
+    //       specification is not present.
+    //   (3) After a slash edit descriptor.
+    //   (4) Before or after a colon edit descriptor.
+    // ------------------------------------------------------------------------
+    std::unique_ptr<Token> formatToken;  // "FORMAT"
+    std::unique_ptr<FormatSpecification> formatSpecification;
   };
 
   struct EntryStmt {
@@ -998,20 +1355,9 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedEntityDecl {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<EntityDecl> entityDecl;
-  };
+  struct EntityDeclList : public DelimitedList<EntityDecl> {};
 
-  struct EntityDeclList {
-    std::unique_ptr<EntityDecl> firstEntityDecl;
-    std::vector<std::unique_ptr<DelimitedEntityDecl>> restEntityDecls;
-  };
-
-  struct DelimitedAttrSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<AttrSpec> attrSpec;
-  };
+  struct DelimitedAttrSpec : public DelimitedListElement<AttrSpec> {};
 
   struct TypeDecl {
     std::vector<std::unique_ptr<DelimitedAttrSpec>> separatedAttrSpecs;
@@ -1082,9 +1428,6 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<EntityDeclList> entityDeclList;
   };
 
-  struct UseName {
-  };
-
   struct GenericSpec {
   };
 
@@ -1096,20 +1439,12 @@ namespace LCompilers::LanguageServiceProvider::AST {
   struct AccessId {
     AccessIdType type;
     union {
-      std::unique_ptr<UseName> useName;
+      std::unique_ptr<Token> useNameToken;  // symbol
       std::unique_ptr<GenericSpec> genericSpec;
     };
   };
 
-  struct DelimitedAccessId {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<AccessId> accessId;
-  };
-
-  struct AccessIdList {
-    std::unique_ptr<AccessId> firstAccessId;
-    std::vector<std::unique_ptr<DelimitedAccessId>> restAccessIds;
-  };
+  struct AccessIdList : public DelimitedList<AccessId> {};
 
   struct DefinedAccessIdList {
     std::optional<std::unique_ptr<Token>> defineToken;  // "::"
@@ -1148,15 +1483,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::optional<std::unique_ptr<ParenthesizedDeferredShapeSpecList>> parenthesizedDeferredShapeSpecList;
   };
 
-  struct DelimitedArrayNameAndDeferredShapeSpecList {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ArrayNameAndDeferredShapeSpecList> arrayNameAndDeferredShapeSpecList;
-  };
-
-  struct ArrayNameAndDeferredShapeSpecLists {
-    std::unique_ptr<ArrayNameAndDeferredShapeSpecList> firstArrayNameAndDeferredShapeSpecList;
-    std::vector<std::unique_ptr<DelimitedArrayNameAndDeferredShapeSpecList>> restArrayNameAndDeferredShapeSpecList;
-  };
+  struct ArrayNameAndDeferredShapeSpecLists : public DelimitedList<ArrayNameAndDeferredShapeSpecList> {};
 
   struct AllocatableStmt {
     // Constraint: The ArrayName must not be a dummy argument or function
@@ -1209,33 +1536,18 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::optional<std::unique_ptr<ParenthesizedExplicitShapeSpecList>> parenthesizedExplicitShapeSpecList;
   };
 
-  struct DelimitedCommonBlockObject {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<CommonBlockObject> commonBlockObject;
-  };
-
-  struct CommonBlockObjectList {
-    // Constraint: Only one appearance of a given VariableName is permitted in
-    // all CommonBlockObjectLists within a scoping unit.
-    // -----------------------------------------------------------------------
-    std::unique_ptr<CommonBlockObject> firstCommonBlockObject;
-    std::vector<std::unique_ptr<DelimitedCommonBlockObject>> restCommonBlockObjects;
-  };
+  // Constraint: Only one appearance of a given VariableName is permitted in
+  // all CommonBlockObjectLists within a scoping unit.
+  // -----------------------------------------------------------------------
+  struct CommonBlockObjectList : public DelimitedList<CommonBlockObject> {};
 
   struct EmphasizedCommonBlockNameAndObjectList {
     std::unique_ptr<EmphasizedCommonBlockName> emphasizedCommonBlockName;
     std::unique_ptr<CommonBlockObjectList> commonBlockObjectList;
   };
 
-  struct DelimitedEmphasizedCommonBlockNameAndObjectList {
-    std::optional<std::unique_ptr<Token>> delimiterToken;  // ","
-    std::unique_ptr<EmphasizedCommonBlockNameAndObjectList> emphasizedCommonBlockNameAndObjectList;
-  };
-
-  struct EmphasizedCommonBlockNameAndObjectLists {
-    std::unique_ptr<EmphasizedCommonBlockNameAndObjectList> firstEmphasizedCommonBlockNameAndObjectList;
-    std::vector<std::unique_ptr<DelimitedEmphasizedCommonBlockNameAndObjectList>> restEmphasizedCommonBlockNameAndObjectLists;
-  };
+  struct EmphasizedCommonBlockNameAndObjectLists :
+    public OptionallyDelimitedListElement<EmphasizedCommonBlockNameAndObjectList> {};
 
   struct CommonStmt {
     std::unique_ptr<Token> commonToken;  // "COMMON"
@@ -1249,15 +1561,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Token> closingParenToken;  // ")"
   };
 
-  struct DelimitedArrayNameSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ArrayNameSpec> arrayNameSpec;
-  };
-
-  struct ArrayNameSpecList {
-    std::unique_ptr<ArrayNameSpec> firstArrayNameSpec;
-    std::vector<std::unique_ptr<DelimitedArrayNameSpec>> restArrayNameSpecs;
-  };
+  struct ArrayNameSpecList : public DelimitedList<ArrayNameSpec> {};
 
   struct DimensionStmt {
     std::unique_ptr<Token> dimensionToken;  // "DIMENSION"
@@ -1310,15 +1614,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedSectionSubscript {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<SectionSubscript> sectionSubscript;
-  };
-
-  struct SectionSubscriptList {
-    std::unique_ptr<SectionSubscript> firstSectionSubscript;
-    std::vector<std::unique_ptr<DelimitedSectionSubscript>> restSectionSubscripts;
-  };
+  struct SectionSubscriptList : public DelimitedList<SectionSubscript> {};
 
   struct ParenthesizedSectionSubscriptList {
     std::unique_ptr<Token> openingParenToken;  // "("
@@ -1464,10 +1760,8 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedEquivalenceObject {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<EquivalenceObject> equivalenceObject;
-  };
+  struct DelimitedEquivalenceObject :
+    public DelimitedListElement<EquivalenceObject> {};
 
   struct EquivalenceSet {
     std::unique_ptr<Token> openingParenToken;  // "("
@@ -1476,15 +1770,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Token> closingParenToken;  // ")"
   };
 
-  struct DelimitedEquivalenceSet {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<EquivalenceSet> equivalenceSet;
-  };
-
-  struct EquivalenceSetList {
-    std::unique_ptr<EquivalenceSet> firstEquivalenceSet;
-    std::vector<std::unique_ptr<DelimitedEquivalenceSet>> restEquivalenceSets;
-  };
+  struct EquivalenceSetList : public DelimitedList<EquivalenceSet> {};
 
   struct EquivalenceStmt {
     std::unique_ptr<Token> equivalenceToken;  // "EQUIVALENCE"
@@ -1498,15 +1784,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Token> token;  // ( name )
   };
 
-  struct DelimitedDummyArgName {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<DummyArgName> dummyArgName;
-  };
-
-  struct DummyArgNameList {
-    std::unique_ptr<DummyArgName> firstDummyArgName;
-    std::vector<std::unique_ptr<DelimitedDummyArgName>> restDummyArgNames;
-  };
+  struct DummyArgNameList : public DelimitedList<DummyArgName> {};
 
   struct IntentStmt {
     // Constraint: An IntentStmt may appear only in the SpecificationPart of a
@@ -1534,15 +1812,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<VariableName> variableName;
   };
 
-  struct DelimitedNamelistGroupObject {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<NamelistGroupObject> namelistGroupObject;
-  };
-
-  struct NamelistGroupObjectList {
-    std::unique_ptr<NamelistGroupObject> firstNamelistGroupObject;
-    std::vector<std::unique_ptr<DelimitedNamelistGroupObject>> restNamelistGroupObjects;
-  };
+  struct NamelistGroupObjectList : public DelimitedList<NamelistGroupObject> {};
 
   struct NamelistGroupName {
     std::unique_ptr<Token> token;  // ( name )
@@ -1558,15 +1828,8 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<NamelistGroupObjectList> namelistGroupObjects;
   };
 
-  struct DelimitedNamelistGroupNameAndObjectList {
-    std::optional<std::unique_ptr<Token>> delimiterToken;  // ","
-    std::unique_ptr<NamelistGroupNameAndObjectList> namelistGroupNameAndObjectList;
-  };
-
-  struct NamelistGroupNameAndObjectLists {
-    std::unique_ptr<NamelistGroupNameAndObjectList> firstNamelistGroupNameAndObjectList;
-    std::vector<std::unique_ptr<DelimitedNamelistGroupNameAndObjectList>> restNamelistGroupNameAndObjectLists;
-  };
+  struct NamelistGroupNameAndObjectLists :
+    public OptionallyDelimitedListElement<NamelistGroupNameAndObjectList> {};
 
   struct NamelistStmt {
     std::unique_ptr<Token> namelistToken;  // "NAMELIST"
@@ -1584,15 +1847,8 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::optional<std::unique_ptr<ParenthesizedDeferredShapeSpecList>> parenthesizedDeferredShapeSpecList;
   };
 
-  struct DelimitedObjectNameAndDeferredShapeSpecList {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ObjectNameAndDeferredShapeSpecList> objectNameAndDeferredShapeSpecList;
-  };
-
-  struct ObjectNameAndDeferredShapeSpecLists {
-    std::unique_ptr<ObjectNameAndDeferredShapeSpecList> firstObjectNameAndDeferredShapeSpecList;
-    std::vector<std::unique_ptr<DelimitedObjectNameAndDeferredShapeSpecList>> restObjectNameAndDeferredShapeSpecLists;
-  };
+  struct ObjectNameAndDeferredShapeSpecLists :
+    public DelimitedList<ObjectNameAndDeferredShapeSpecList> {};
 
   struct PointerStmt {
     // Constraint: The INTENT attribute must not be specified for an ObjectName.
@@ -1628,15 +1884,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedSavedEntity {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<SavedEntity> savedEntity;
-  };
-
-  struct SavedEntityList {
-    std::unique_ptr<SavedEntity> firstSavedEntity;
-    std::vector<std::unique_ptr<DelimitedSavedEntity>> restSavedEntities;
-  };
+  struct SavedEntityList : public DelimitedList<SavedEntity> {};
 
   struct DefinedSavedEntityList {
     std::optional<std::unique_ptr<Token>> defineToken;  // "::"
@@ -1653,15 +1901,8 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::optional<std::unique_ptr<ParenthesizedArraySpec>> parenthesizedArraySpec;
   };
 
-  struct DelimitedObjectNameAndParenthesizedArraySpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ObjectNameAndParenthesizedArraySpec> objectNameAndParenthesizedArraySpec;
-  };
-
-  struct ObjectNameAndParenthesizedArraySpecList {
-    std::unique_ptr<ObjectNameAndParenthesizedArraySpec> firstObjectNameAndParenthesizedArraySpec;
-    std::vector<std::unique_ptr<DelimitedObjectNameAndParenthesizedArraySpec>> restObjectNameAndParenthesizedArraySpecs;
-  };
+  struct ObjectNameAndParenthesizedArraySpecList :
+    public DelimitedList<ObjectNameAndParenthesizedArraySpec> {};
 
   struct TargetStmt {
     std::unique_ptr<Token> targetToken;  // "TARGET"
@@ -1776,10 +2017,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
   struct ScalarIntConstant {
   };
 
-  struct DelimitedScalarIntExpr {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ScalarIntExpr> scalarIntExpr;
-  };
+  struct DelimitedScalarIntExpr : public DelimitedListElement<ScalarIntExpr> {};
 
   struct DataIDoVariable {
     // Constraint: DataIDoVariable must be a named variable.
@@ -1801,15 +2039,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedDataIDoObject {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<DataIDoObject> dataIDoObject;
-  };
-
-  struct DataIDoObjectList {
-    std::unique_ptr<DataIDoObject> firstDataIDoObject;
-    std::vector<std::unique_ptr<DelimitedDataIDoObject>> restDataIDoObjects;
-  };
+  struct DataIDoObjectList : public DelimitedList<DataIDoObject> {};
 
   struct DataImpliedDo {
     // Constraint: A ScalarIntExpr of a DataImpliedDo must involve as primaries
@@ -1841,14 +2071,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedDataStmtObject {
-    std::unique_ptr<Token> delimiterToken;  // ","
-  };
-
-  struct DataStmtObjectList {
-    std::unique_ptr<DataStmtObject> firstDataStmtObject;
-    std::vector<std::unique_ptr<DelimitedDataStmtObject>> restDataStmtObjects;
-  };
+  struct DataStmtObjectList : public DelimitedList<DataStmtObject> {};
 
   struct DataStmtRepeat {
     // Constraint: The DATA statement repeat factor must be positive or zero. If
@@ -1891,14 +2114,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<DataStmtConstant> dataStmtConstant;
   };
 
-  struct DelimitedDataStmtValue {
-    std::unique_ptr<Token> delimiterToken;  // ","
-  };
-
-  struct DataStmtValueList {
-    std::unique_ptr<DataStmtValue> firstDataStmtValue;
-    std::vector<std::unique_ptr<DelimitedDataStmtValue>> restDataStmtValues;
-  };
+  struct DataStmtValueList : public DelimitedList<DataStmtValue> {};
 
   struct DataStmtSet {
     // Constraint: The ArrayElement must not have a constant parent.
@@ -1911,15 +2127,8 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Token> closingSlash;  // "/"
   };
 
-  struct DelimitedDataStmtSet {
-    std::optional<std::unique_ptr<Token>> delimiterToken;  // ","
-    std::unique_ptr<DataStmtSet> dataStmtSet;
-  };
-
-  struct DataStmtSets {
-    std::unique_ptr<DataStmtSet> firstDataStmtSet;
-    std::vector<std::unique_ptr<DelimitedDataStmtSet>> restDataStmtSets;
-  };
+  struct DataStmtSets :
+    public OptionallyDelimitedListElement<DataStmtSet> {};
 
   struct DataStmt {
     std::unique_ptr<Token> dataToken;  // "DATA"
@@ -2019,18 +2228,10 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<AllocateUpperBound> allocateUpperBound;
   };
 
-  struct DelimitedAllocateShapeSpec {
-    std::unique_ptr<Token> delimiterToken;
-    std::unique_ptr<AllocateShapeSpec> allocateShapeSpec;
-  };
-
-  struct AllocateShapeSpecList {
-    // Constraint: The number of AllocateShapeSpecs in an AllocateShapeSpecList
-    // must be the same as the rank of the pointer or allocatable array.
-    // ------------------------------------------------------------------------
-    std::unique_ptr<AllocateShapeSpec> firstAllocateShapeSpec;
-    std::vector<std::unique_ptr<DelimitedAllocateShapeSpec>> restAllocateShapeSpecs;
-  };
+  // Constraint: The number of AllocateShapeSpecs in an AllocateShapeSpecList
+  // must be the same as the rank of the pointer or allocatable array.
+  // ------------------------------------------------------------------------
+  struct AllocateShapeSpecList : public DelimitedList<AllocateShapeSpec> {};
 
   struct ParenthesizedAllocateShapeSpecList {
     std::unique_ptr<Token> openingParenToken;  // "("
@@ -2054,14 +2255,14 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  using AllocateObjectList = DelimitedList<AllocateObject>;
+  struct AllocateObjectList : public DelimitedList<AllocateObject> {};
 
   struct Allocation {
     std::unique_ptr<AllocateObject> allocateObject;
     std::optional<std::unique_ptr<ParenthesizedAllocateShapeSpecList>> parenthesizedAllocateShapeSpecList;
   };
 
-  using AllocationList = DelimitedList<Allocation>;
+  struct AllocationList : public DelimitedList<Allocation> {};
 
   struct DelimitedStatIsStatVariable {
     std::unique_ptr<Token> delimiterToken;  // ","
@@ -2129,7 +2330,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  using PositionSpecList = DelimitedList<PositionSpec>;
+  struct PositionSpecList : public DelimitedList<PositionSpec> {};
 
   struct BackspaceExternalFileUnit {
     std::unique_ptr<Token> backspaceToken;  // "BACKSPACE"
@@ -2200,15 +2401,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedCloseSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<CloseSpec> closeSpec;
-  };
-
-  struct CloseSpecList {
-    std::unique_ptr<CloseSpec> firstCloseSpec;
-    std::vector<std::unique_ptr<DelimitedCloseSpec>> restCloseSpecs;
-  };
+  struct CloseSpecList : public DelimitedList<CloseSpec> {};
 
   struct CloseStmt {
     // Constraint: If the optional characters "UNIT =" are omitted from the unit
@@ -2228,15 +2421,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<Token> closingParenToken;  // ")"
   };
 
-  struct DelimitedLabel {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<Label> label;
-  };
-
-  struct LabelList {
-    std::unique_ptr<Label> firstLabel;
-    std::vector<std::unique_ptr<DelimitedLabel>> restLabels;
-  };
+  struct LabelList : public DelimitedList<Label> {};
 
   struct ComputedGotoStmt {
     // Constraint: Each Label in a LabelList must be the statement label of a
@@ -2280,9 +2465,6 @@ namespace LCompilers::LanguageServiceProvider::AST {
   };
 
   struct EndFunctionStmt {
-  };
-
-  struct EndProgramStmt {
   };
 
   struct EndSubroutineStmt {
@@ -2459,7 +2641,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  using InquireSpecList = DelimitedList<InquireSpec>;
+  struct InquireSpecList : public DelimitedList<InquireSpec> {};
 
   struct InquireStmtWithInquireSpecList {
     std::unique_ptr<Token> inquireToken;  // "INQUIRE"
@@ -2496,15 +2678,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     // ---------------------------------------------------------------
   };
 
-  struct DelimitedPointerObject {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<PointerObject> pointerObject;
-  };
-
-  struct PointerObjectList {
-    std::unique_ptr<PointerObject> firstPointerObject;
-    std::vector<std::unique_ptr<DelimitedPointerObject>> restPointerObjects;
-  };
+  struct PointerObjectList : public DelimitedList<PointerObject> {};
 
   struct NullifyStmt {
     std::unique_ptr<Token> nullifyToken;  // "NULLIFY"
@@ -2640,15 +2814,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedConnectSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<ConnectSpec> connectSpec;
-  };
-
-  struct ConnectSpecList {
-    std::unique_ptr<ConnectSpec> firstConnectSpec;
-    std::vector<std::unique_ptr<DelimitedConnectSpec>> restConnectSpecs;
-  };
+  struct ConnectSpecList : public DelimitedList<ConnectSpec> {};
 
   struct OpenStmt {
     // Constraint: If the optional characters "UNIT =" are omitted from the unit
@@ -2861,18 +3027,10 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedIoControlSpec {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<IoControlSpec> ioControlSpec;
-  };
-
-  struct IoControlSpecList {
-    // Constraint: An IoControlSpecList must contain exactly one IoUnit and may
-    // contain at most one of each of the other specifiers.
-    // ------------------------------------------------------------------------
-    std::unique_ptr<IoControlSpec> firstIoControlSpec;
-    std::vector<std::unique_ptr<DelimitedIoControlSpec>> restIoControlSpecs;
-  };
+  // Constraint: An IoControlSpecList must contain exactly one IoUnit and may
+  // contain at most one of each of the other specifiers.
+  // ------------------------------------------------------------------------
+  struct IoControlSpecList : public DelimitedList<IoControlSpec> {};
 
   enum class IoImpliedDoObjectType {
     INPUT_ITEM,
@@ -2891,15 +3049,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedIoImpliedDoObject {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<IoImpliedDoObject> ioImpliedDoObject;
-  };
-
-  struct IoImpliedDoObjectList {
-    std::unique_ptr<IoImpliedDoObject> firstIoImpliedDoObject;
-    std::vector<std::unique_ptr<DelimitedIoImpliedDoObject>> restIoImpliedDoObjects;
-  };
+  struct IoImpliedDoObjectList : public DelimitedList<IoImpliedDoObject> {};
 
   struct IoImpliedDoControl {
     // Constraint: The DoVariable must be a named scalar variable of type
@@ -2953,12 +3103,10 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  using OutputItemList = DelimitedList<OutputItem>;
+  struct OutputItemList : public DelimitedList<OutputItem> {};
 
-  struct DelimitedOutputItemList {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<OutputItemList> outputItemList;
-  };
+  struct DelimitedOutputItemList :
+    public DelimitedListElement<OutputItemList> {};
 
   struct PrintStmt {
     std::unique_ptr<Token> printToken;  // "PRINT"
@@ -3247,15 +3395,7 @@ namespace LCompilers::LanguageServiceProvider::AST {
     };
   };
 
-  struct DelimitedCaseValueRange {
-    std::unique_ptr<Token> delimiterToken;  // ","
-    std::unique_ptr<CaseValueRange> caseValueRange;
-  };
-
-  struct CaseValueRangeList {
-    std::unique_ptr<CaseValueRange> firstCaseValueRange;
-    std::vector<std::unique_ptr<DelimitedCaseValueRange>> restCaseValueRanges;
-  };
+  struct CaseValueRangeList : public DelimitedList<CaseValueRange> {};
 
   struct ParenthesizedCaseValueRangeList {
     std::unique_ptr<Token> openingParenToken;  // "("
@@ -3467,9 +3607,6 @@ namespace LCompilers::LanguageServiceProvider::AST {
     std::unique_ptr<LabelDoStmt> labelDoStmt;
     std::unique_ptr<DoBody> doBody;
     std::unique_ptr<DoTermActionStmt> doTermActionStmt;
-  };
-
-  struct OuterSharedDoConstruct {
   };
 
   struct DoTermSharedStmt {
@@ -3722,9 +3859,31 @@ namespace LCompilers::LanguageServiceProvider::AST {
   };
 
   struct ProgramStmt {
+    std::unique_ptr<Token> programToken;  // "PROGRAM"
+    std::unique_ptr<Token> programNameToken;  // symbol
+  };
+
+  struct OptionalProgramName {
+    std::unique_ptr<Token> programToken;  // "PROGRAM"
+    std::optional<std::unique_ptr<Token>> programNameToken;  // symbol
+  };
+
+  struct EndProgramStmt {
+    std::unique_ptr<Token> endToken;  // "END"
+    std::optional<std::unique_ptr<OptionalProgramName>> optionalProgramName;
   };
 
   struct MainProgram {
+    // Constraint: In a MainProgram, the ExecutionPart must not contain a RETURN
+    // statement or an ENTRY statement.
+    // -------------------------------------------------------------------------
+    // Constraint: The programNameToken may be included in the EndProgramStmt
+    // only if the optional ProgramStmt is used and, if included, must be
+    // identical to the programNameToken specified in the ProgramStmt.
+    // -------------------------------------------------------------------------
+    // Constraint: An automatic object must not appear in the SpecificationPart
+    // of a MainProgram.
+    // -------------------------------------------------------------------------
     std::optional<std::unique_ptr<ProgramStmt>> programStmt;
     std::optional<std::unique_ptr<SpecificationPart>> specificationPart;
     std::optional<std::unique_ptr<ExecutionPart>> executionPart;
@@ -3765,12 +3924,30 @@ namespace LCompilers::LanguageServiceProvider::AST {
   };
 
   struct ModuleStmt {
+    std::unique_ptr<Token> moduleToken;  // "MODULE"
+    std::unique_ptr<Token> moduleNameToken;  // symbol
+  };
+
+  struct OptionalModuleName {
+    std::unique_ptr<Token> moduleToken;  // "MODULE"
+    std::optional<std::unique_ptr<Token>> moduleNameToken;  // symbol
   };
 
   struct EndModuleStmt {
+    std::unique_ptr<Token> endToken;  // "END"
+    std::optional<std::unique_ptr<OptionalModuleName>> optionalModuleName:
   };
 
   struct Module {
+    // Constraint: If the moduleNameToken is specified in the EndModuleStmt, it
+    // must be identical to the moduleNameToken specified in the ModuleStmt.
+    // ------------------------------------------------------------------------
+    // Constraint: A module SpecificationPart must not contain a
+    // StmtFunctionStmt, an EntryStmt, or a FormatStmt.
+    // ------------------------------------------------------------------------
+    // Constraint: An automatic object must not appear in the SpecificationPart
+    // of a module.
+    // ------------------------------------------------------------------------
     std::unique_ptr<ModuleStmt> moduleStmt;
     std::optional<std::unique_ptr<SpecificationPart>> specificationPart;
     std::optional<std::unique_ptr<ModuleSubprogramPart>> moduleSubprogramPart;
@@ -3778,12 +3955,32 @@ namespace LCompilers::LanguageServiceProvider::AST {
   };
 
   struct BlockDataStmt {
+    std::unique_ptr<Token> blockToken;  // "BLOCK"
+    std::unique_ptr<Token> dataToken;  // "DATA"
+    std::optional<std::unique_ptr<Token>> blockDataNameToken;  // symbol
   };
 
   struct EndBlockDataStmt {
+    std::unique_ptr<Token> endToken;  // "END"
+    std::optional<std::unique_ptr<BlockDataStmt>> blockDataStmt;
   };
 
   struct BlockData {
+    // Constraint: The blockDataNameToken may be included in the
+    // EndBlockDataStmt only if it was provided in the BlockDataStmt and, if
+    // included, must be identical to the blockDataNameToken in the
+    // BlockDataStmt.
+    // -------------------------------------------------------------------------
+    // Constraint: A BlockData SpecificationPart may contain only USE
+    // statements, type declaration statements, IMPLICIT statements, PARAMETER
+    // statements, derived-type definitions, and the following
+    // specificationstatements: COMMON, DATA, DIMENSION, EQUIVALENCE, INTRINSIC,
+    // POINTER, SAVE, and TARGET.
+    // -------------------------------------------------------------------------
+    // Constraint: A type declaration statement in a BlockData SpecificationPart
+    // must not contain ALLOCATABLE, EXTERNAL, INTENT, OPTIONAL, PRIVATE, or
+    // PUBLIC attribute specifiers.
+    // -------------------------------------------------------------------------
     std::unique_ptr<BlockDataStmt> blockDataStmt;
     std::optional<std::unique_ptr<SpecificationPart>> specificationPart;
     std::unique_ptr<EndBlockDataStmt> endBlockDataStmt;
