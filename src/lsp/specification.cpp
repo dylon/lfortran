@@ -110,4 +110,61 @@ namespace LCompilers::LanguageServiceProvider {
     throw std::invalid_argument("Invalid TraceValue name: " + name);
   }
 
+  std::map<InitializeErrorCodes, std::string> InitializeErrorCodesNames {
+    {InitializeErrorCodes::unknownProtocolVersion, "unknownProtocolVersion"},
+  }
+
+  auto initializeErrorCodes(const std::string &name) -> InitializeErrorCodes {
+    for (const auto &[key, value] : InitializeErrorCodesNames) {
+      if (name == value) {
+        return key;
+      }
+    }
+    throw std::invalid_argument("Invalid InitializeErrorCodes name: " + name);
+  }
+
+  std::map<TextDocumentSyncKind, std::string> TextDocumentSyncKindNames = {
+    {TextDocumentSyncKind::None, "None"},
+    {TextDocumentSyncKind::Full, "Full"},
+    {TextDocumentSyncKind::Incremental, "Incremental"},
+  };
+
+  auto textDocumentSyncKind(const std::string &name) -> TextDocumentSyncKind {
+    for (const auto &[key, value] : TextDocumentSyncKindNames) {
+      if (name == value) {
+        return key;
+      }
+    }
+    throw std::invalid_argument("Invalid TextDocumentSyncKind name: " + name);
+  }
+
+  std::map<TextDocumentSaveReason, std::string> TextDocumentSaveReasonNames = {
+    {TextDocumentSaveReason::Manual, "Manual"},
+    {TextDocumentSaveReason::AfterDelay, "AfterDelay"},
+    {TextDocumentSaveReason::FocusOut, "FocusOut"},
+  };
+
+  auto textDocumentSaveReason(const std::string &name) -> TextDocumentSaveReason {
+    for (const auto &[key, value] : TextDocumentSaveReasonNames) {
+      if (name == value) {
+        return key;
+      }
+    }
+    throw std::invalid_argument("Invalid TextDocumentSaveReason name: " + name);
+  }
+
+  std::map<NotebookCellKind, std::string> NotebookCellKindNames = {
+    {NotebookCellKind::Markup, "Markup"},
+    {NotebookCellKind::Code, "Code"},
+  };
+
+  auto notebookCellKind(const std::string &name) -> NotebookCellKind {
+    for (const auto &[key, value] : NotebookCellKindNames) {
+      if (name == value) {
+        return key;
+      }
+    }
+    throw std::invalid_argument("Invalid NotebookCellKind name: " + name);
+  }
+
 } // namespace LCompilers::LanguageServiceProvider
