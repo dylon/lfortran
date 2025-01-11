@@ -8,8 +8,7 @@ if(CMAKE_VERSION VERSION_LESS 3.31.4)
   string(REPLACE "--generate-object-code" "" CMAKE_Fortran_COMPILE_OBJECT "${CMAKE_Fortran_COMPILE_OBJECT}")
 endif()
 
-add_executable(project1
-    project1.f90
+add_executable(project3
     a.f90
     b.f90
 )

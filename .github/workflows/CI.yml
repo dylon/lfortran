@@ -503,12 +503,15 @@ jobs:
         run: |
             git clone https://github.com/Pranavchiku/prima.git
             cd prima
-            git checkout -t origin/lf-bobyqa_1-newuoa_1-newuoa_2-1
-            git checkout 35795f35387d0d0301d97cc550dc76b2fe5dd348
+            git checkout -t origin/lf-b_1-b_2-n_1-n_2-u_1-u_2-1
+            git checkout 6d8e0a560db09312122f43cb98248ae571f88133
             FC="$(pwd)/../src/bin/lfortran --cpp" cmake -S . -B build -DCMAKE_INSTALL_PREFIX=$(pwd)/install -DCMAKE_Fortran_FLAGS=""  -DCMAKE_SHARED_LIBRARY_CREATE_Fortran_FLAGS=""  -DCMAKE_MACOSX_RPATH=OFF -DCMAKE_SKIP_INSTALL_RPATH=ON  -DCMAKE_SKIP_RPATH=ON && cmake --build build --target install
             ./build/fortran/example_bobyqa_fortran_1_exe
             ./build/fortran/example_newuoa_fortran_1_exe
             ./build/fortran/example_newuoa_fortran_2_exe
+            ./build/fortran/example_bobyqa_fortran_2_exe
+            ./build/fortran/example_uobyqa_fortran_1_exe
+            ./build/fortran/example_uobyqa_fortran_2_exe
 
       - name: Test POT3D
         shell: bash -e -l {0}
@@ -855,6 +858,30 @@ jobs:
             make clean
             make -j8 FORTRAN=lfortran FFLAGS="--fast --skip-pass=promote_allocatable_to_nonallocatable --no-experimental-simplifier" MPI=no OPENMP=no
             ./gsnap ../qasnap/sample/inp out
+
+      # The below projects are tested with a higher CMake version, so replace the current installed version
+      - name: Override cmake version to 3.31.2
+        if: contains(matrix.os, 'ubuntu')
+        run: micromamba install -y -n lf cmake=3.31.2
+
+      - name: Test Examples/Project 1
+        shell: bash -e -l {0}
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+            cd ./examples/project1
+            FC=../../src/bin/lfortran cmake .
+            cmake --build . -v
+            ./project1
+
+      - name: Test Examples/Project 2
+        shell: bash -e -l {0}
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+            cd ./examples/project2
+            FC=../../src/bin/lfortran cmake .
+            cmake --build . -v
+            ./doconcurrent
+
 
 # Commented out to save CI runners:
 #  test-pixi:
