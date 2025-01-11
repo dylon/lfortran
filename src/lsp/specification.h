@@ -13,7 +13,7 @@
  * Interface definitions from the LSP 3.17 specification.
  * See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification
  */
-namespace LCompilers::LanguageServiceProvider {
+namespace LCompilers::LanguageServiceProtocol {
 
   template <typename T>
   using ptr_vector = std::vector<std::unique_ptr<T>>;
@@ -15512,6 +15512,6 @@ namespace LCompilers::LanguageServiceProvider {
   // one passed in the initialize parameters. The command line argument to use
   // is --clientProcessId.
 
-} // namespace LCompilers::LanguageServiceProvider
+} // namespace LCompilers::LanguageServiceProtocol
 
 #endif // LCOMPILERS_LSP_SPECIFICATION_H

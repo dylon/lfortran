@@ -14,7 +14,7 @@ endif ()
 
 set(SRC
   specification.cpp
-  server.cpp
+  lfortran_language_server.cpp
 )
 
 add_library(lfortran_lsp STATIC ${SRC})
