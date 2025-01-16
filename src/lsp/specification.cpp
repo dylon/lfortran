@@ -2,7 +2,7 @@
 
 #include <lsp/specification.h>
 
-namespace LCompilers::LanguageServiceProtocol {
+namespace LCompilers::LanguageServerProtocol {
 
   std::map<PositionEncodingKind, std::string> PositionEncodingKindNames = {
     {PositionEncodingKind::UTF8, "UTF8"},
@@ -835,4 +835,4 @@ namespace LCompilers::LanguageServiceProtocol {
     throw std::invalid_argument("Invalid MessageType name: " + name);
   }
 
-} // namespace LCompilers::LanguageServiceProtocol
+} // namespace LCompilers::LanguageServerProtocol

@@ -7,13 +7,14 @@
 #include <optional>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 /**
  * Interface definitions from the LSP 3.17 specification.
  * See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification
  */
-namespace LCompilers::LanguageServiceProtocol {
+namespace LCompilers::LanguageServerProtocol {
 
   template <typename T>
   using ptr_vector = std::vector<std::unique_ptr<T>>;
@@ -123,15 +124,16 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct LSPAny {
     LSPAnyType type;
-    union {
-      std::unique_ptr<LSPObject> objectValue;
-      std::unique_ptr<LSPArray> arrayValue;
-      string stringValue;
-      integer integerValue;
-      uinteger uintegerValue;
-      decimal decimalValue;
-      null nullValue;
-    };
+    std::variant<
+      std::unique_ptr<LSPObject>,
+      std::unique_ptr<LSPArray>,
+      string,
+      integer,
+      uinteger,
+      decimal,
+      boolean,
+      null
+    > value;
   };
 
   /**
@@ -153,10 +155,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct RequestId {
     RequestIdType type;
-    union {
-      integer integervalue;
-      string stringvalue;
-    };
+    std::variant<
+      integer,
+      string
+    > value;
   };
 
   enum class RequestParamsType {
@@ -166,10 +168,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct RequestParams {
     RequestParamsType type;
-    union {
-      ptr_vector_ptr<void> arrayValue;
-      std::unique_ptr<void> objectValue;
-    };
+    std::variant<
+      std::unique_ptr<LSPArray>,
+      std::unique_ptr<LSPObject>
+    > value;
   };
 
   /**
@@ -421,11 +423,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct ResponseId {
     ResponseIdType type;
-    union {
-      integer integerValue;
-      string stringValue;
-      null nullValue;
-    };
+    std::variant<
+      integer,
+      string,
+      null
+    > value;
   };
 
   /**
@@ -467,10 +469,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct NotificationParams {
     NotificationParamsType type;
-    union {
-      ptr_vector_ptr<void> arrayValue;
-      std::unique_ptr<void> objectValue;
-    };
+    std::variant<
+      std::unique_ptr<LSPArray>,
+      std::unique_ptr<LSPObject>
+    > value;
   };
 
   /**
@@ -547,10 +549,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct ProgressToken {
     ProgressTokenType type;
-    union {
-      integer integerValue;
-      string stringValue;
-    };
+    std::variant<
+      integer,
+      string
+    > value;
   };
 
   /**
@@ -1086,10 +1088,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct OptionalAnnotatedTextEdit {
     OptionalAnnotatedTextEditType type;
-    union {
-      std::unique_ptr<TextEdit> textEdit;
-      std::unique_ptr<AnnotatedTextEdit> annotatedTextEdit;
-    };
+    std::variant<
+      std::unique_ptr<TextEdit>,
+      std::unique_ptr<AnnotatedTextEdit>
+    > value;
   };
 
   /**
@@ -1334,10 +1336,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DiagnosticCode {
     DiagnosticCodeType type;
-    union {
-      integer integerValue;
-      string stringValue;
-    };
+    std::variant<
+      integer,
+      string
+    > value;
   };
 
   /**
@@ -1817,12 +1819,12 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DocumentChange {
     DocumentChangeType type;
-    union {
-      std::unique_ptr<TextDocumentEdit> textDocumentEdit;
-      std::unique_ptr<CreateFile> createFile;
-      std::unique_ptr<RenameFile> renameFile;
-      std::unique_ptr<DeleteFile> deleteFile;
-    };
+    std::variant<
+      std::unique_ptr<TextDocumentEdit>,
+      std::unique_ptr<CreateFile>,
+      std::unique_ptr<RenameFile>,
+      std::unique_ptr<DeleteFile>
+    > value;
   };
 
   /**
@@ -4112,10 +4114,10 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct MarkedString {
     MarkedStringType type;
-    union {
-      string stringValue;
-      std::unique_ptr<MarkedStringWithLanguage> markedStringWithLanguage;
-    };
+    std::variant<
+      string,
+      std::unique_ptr<MarkedStringWithLanguage>
+    > value;
   };
 
   enum class HoverContentsType {
@@ -4126,11 +4128,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct HoverContents {
     HoverContentsType type;
-    union {
-      std::unique_ptr<MarkedString> markedString;
-      ptr_vector_ptr<MarkedString> markedStrings;
-      std::unique_ptr<MarkupContent> markupContent;
-    };
+    std::variant<
+      std::unique_ptr<MarkedString>,
+      ptr_vector_ptr<MarkedString>,
+      std::unique_ptr<MarkupContent>
+    > value;
   };
 
   /**
@@ -5059,10 +5061,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct OptionalRangeCapabilities {
     OptionalRangeCapabilitiesType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<RangeCapabilities> rangeCapabilities;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<RangeCapabilities>
+    > value;
   };
 
   struct FullCapabilities {
@@ -5076,10 +5078,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct OptionalFullCapabilities {
     OptionalFullCapabilitiesType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<FullCapabilities> optionalDelta;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<FullCapabilities>
+    > value;
   };
 
   struct SemanticTokensClientRequestCapabilities {
@@ -5679,10 +5681,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct StringOrMarkupContent {
     StringOrMarkupContentType type;
-    union {
-      string stringValue;
-      std::unique_ptr<MarkupContent> markupContent;
-    };
+    std::variant<
+      string,
+      std::unique_ptr<MarkupContent>
+    > value;
   };
 
   /**
@@ -5775,10 +5777,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct StringOrInlayHintLabelParts {
     StringOrInlayHintLabelPartsType type;
-    union {
-      string stringValue;
-      ptr_vector_ptr<InlayHintLabelPart> inlayHintLabelParts;
-    };
+    std::variant<
+      string,
+      ptr_vector_ptr<InlayHintLabelPart>
+    > value;
   };
 
   /**
@@ -6219,11 +6221,11 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct InlineValue {
     InlineValueType type;
-    union {
-      std::unique_ptr<InlineValueText> inlineValueText;
-      std::unique_ptr<InlineValueVariableLookup> inlineValueVariableLookup;
-      std::unique_ptr<InlineValueEvaluatableExpression> inlineValueEvaluatableExpression;
-    };
+    std::variant<
+      std::unique_ptr<InlineValueText>,
+      std::unique_ptr<InlineValueVariableLookup>,
+      std::unique_ptr<InlineValueEvaluatableExpression>
+    > value;
   };
 
   /**
@@ -7178,10 +7180,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct TextEditOrInsertReplaceEdit {
     TextEditOrInsertReplaceEditType type;
-    union {
-      std::unique_ptr<TextEdit> textEdit;
-      std::unique_ptr<InsertReplaceEdit> insertReplaceEdit;
-    };
+    std::variant<
+      std::unique_ptr<TextEdit>,
+      std::unique_ptr<InsertReplaceEdit>
+    > value;
   };
 
   struct CompletionItem {
@@ -7414,10 +7416,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct RangeOrInsertReplace {
     RangeOrInsertReplaceType type;
-    union {
-      std::unique_ptr<Range> range;
-      std::unique_ptr<InsertReplace> insertReplace;
-    };
+    std::variant<
+      std::unique_ptr<Range>,
+      std::unique_ptr<InsertReplace>
+    > value;
   };
 
   struct CompletionListItemDefaults {
@@ -7970,10 +7972,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct FullOrUnchangedDocumentDiagnosticReport {
     FullOrUnchangedDocumentDiagnosticReportType type;
-    union {
-      std::unique_ptr<FullDocumentDiagnosticReport> fullDocumentDiagnosticReport;
-      std::unique_ptr<UnchangedDocumentDiagnosticReport> unchangedDocumentDiagnosticReport;
-    };
+    std::variant<
+      std::unique_ptr<FullDocumentDiagnosticReport>,
+      std::unique_ptr<UnchangedDocumentDiagnosticReport>
+    > value;
   };
 
   /**
@@ -8078,10 +8080,10 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct DocumentDiagnosticReport {
     DocumentDiagnosticReportType type;
-    union {
-      std::unique_ptr<RelatedFullDocumentDiagnosticReport> relatedFullDocumentDiagnosticReport;
-      std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport> relatedUnchangedDocumentDiagnosticReport;
-    };
+    std::variant<
+      std::unique_ptr<RelatedFullDocumentDiagnosticReport>,
+      std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport>
+    > value;
   };
 
   /**
@@ -8227,10 +8229,10 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct WorkspaceDocumentDiagnosticReport {
     WorkspaceDocumentDiagnosticReportType type;
-    union {
-      std::unique_ptr<WorkspaceFullDocumentDiagnosticReport> workspaceFullDocumentDiagnosticReport;
-      std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport> workspaceUnchangedDocumentDiagnosticReport;
-    };
+    std::variant<
+      std::unique_ptr<WorkspaceFullDocumentDiagnosticReport>,
+      std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport>
+    > value;
   };
 
   /**
@@ -8587,10 +8589,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct StringOrUintegerPair {
     StringOrUintegerPairType type;
-    union {
-      string stringValue;
-      std::unique_ptr<std::pair<uinteger, uinteger>> uintegerPair;
-    };
+    std::variant<
+      string,
+      std::unique_ptr<std::pair<uinteger, uinteger>>
+    > value;
   };
 
   /**
@@ -9712,11 +9714,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct BooleanOrIntegerOrString {
     BooleanOrIntegerOrStringType type;
-    union {
-      boolean booleanValue;
-      integer integerValue;
-      string stringValue;
-    };
+    std::variant<
+      boolean,
+      integer,
+      string
+    > value;
   };
 
   /**
@@ -10465,10 +10467,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct LocationOrDocumentUri {
     LocationOrDocumentUriType type;
-    union {
-      std::unique_ptr<Location> location;
-      std::unique_ptr<DocumentUriLocation> documentUri;
-    };
+    std::variant<
+      std::unique_ptr<Location>,
+      std::unique_ptr<DocumentUriLocation>
+    > value;
   };
 
   /**
@@ -10690,10 +10692,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct StringOrBoolean {
     StringOrBooleanType type;
-    union {
-      string stringValue;
-      boolean booleanValue;
-    };
+    std::variant<
+      string,
+      boolean
+    > value;
   };
 
   /**
@@ -11361,10 +11363,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct WorkspaceFolderOrUri {
     WorkspaceFolderOrUriType type;
-    union {
-      std::unique_ptr<WorkspaceFolder> workspaceFolder;
-      URI uri;
-    };
+    std::variant<
+      std::unique_ptr<WorkspaceFolder>,
+      URI
+    > value;
   };
 
   /**
@@ -11447,10 +11449,10 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct GlobPattern {
     GlobPatternType type;
-    union {
-      Pattern pattern;
-      std::unique_ptr<RelativePattern> relativePattern;
-    };
+    std::variant<
+      Pattern,
+      std::unique_ptr<RelativePattern>
+    > value;
   };
 
   /**
@@ -12673,11 +12675,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct NotebookDocumentFilter {
     NotebookDocumentFilterType type;
-    union {
-      std::unique_ptr<NotebookTypeDocumentFilter> notebookTypeDocumentFilter;
-      std::unique_ptr<NotebookSchemeDocumentFilter> notebookSchemeDocumentFilter;
-      std::unique_ptr<NotebookPatternDocumentFilter> notebookPatternDocumentFilter;
-    };
+    std::variant<
+      std::unique_ptr<NotebookTypeDocumentFilter>,
+      std::unique_ptr<NotebookSchemeDocumentFilter>,
+      std::unique_ptr<NotebookPatternDocumentFilter>
+    > value;
   };
 
   enum class StringOrNotebookDocumentFilterType {
@@ -12687,10 +12689,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct StringOrNotebookDocumentFilter {
     StringOrNotebookDocumentFilterType type;
-    union {
-      string stringValue;
-      std::unique_ptr<NotebookDocumentFilter> notebookDocumentFilter;
-    };
+    std::variant<
+      string,
+      std::unique_ptr<NotebookDocumentFilter>
+    > value;
   };
 
   /**
@@ -13365,10 +13367,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct SaveOrOptions {
     SaveOrOptionsType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<SaveOptions> saveOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<SaveOptions>
+    > value;
   };
 
   /**
@@ -13438,10 +13440,10 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct TextDocumentSync {
     TextDocumentSyncType type;
-    union {
-      std::unique_ptr<TextDocumentSyncOptions> textDocumentSyncOptions;
-      std::unique_ptr<TextDocumentSyncKind> textDocumentSyncKind;
-    };
+    std::variant<
+      std::unique_ptr<TextDocumentSyncOptions>,
+      std::unique_ptr<TextDocumentSyncKind>
+    > value;
   };
 
   struct PartialTextDocumentContentChangeEvent {
@@ -13491,10 +13493,10 @@ namespace LCompilers::LanguageServiceProtocol {
    */
   struct TextDocumentContentChangeEvent {
     TextDocumentContentChangeEventType type;
-    union {
-      std::unique_ptr<PartialTextDocumentContentChangeEvent> partialTextDocumentContentChangeEvent;
-      std::unique_ptr<WholeTextDocumentContentChangeEvent> wholeTextDocumentContentChangeEvent;
-    };
+    std::variant<
+      std::unique_ptr<PartialTextDocumentContentChangeEvent>,
+      std::unique_ptr<WholeTextDocumentContentChangeEvent>
+    > value;
   };
 
   struct NotebookSelectorCell {
@@ -13544,10 +13546,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct NotebookSelector {
     NotebookSelectorType type;
-    union {
-      std::unique_ptr<NotebookRequiredNotebookSelector> notebookRequiredNotebookSelector;
-      std::unique_ptr<CellsRequiredNotebookSelector> cellsRequiredNotebookSelector;
-    };
+    std::variant<
+      std::unique_ptr<NotebookRequiredNotebookSelector>,
+      std::unique_ptr<CellsRequiredNotebookSelector>
+    > value;
   };
 
   /**
@@ -13963,10 +13965,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct NotebookDocumentSync {
     NotebookDocumentSyncType type;
-    union {
-      std::unique_ptr<NotebookDocumentSyncOptions> notebookDocumentSyncOptions;
-      std::unique_ptr<NotebookDocumentSyncRegistrationOptions> notebookDocumentSyncRegistrationOptions;
-    };
+    std::variant<
+      std::unique_ptr<NotebookDocumentSyncOptions>,
+      std::unique_ptr<NotebookDocumentSyncRegistrationOptions>
+    > value;
   };
 
   enum class HoverProviderType {
@@ -13976,10 +13978,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct HoverProvider {
     HoverProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<HoverOptions> hoverOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<HoverOptions>
+    > value;
   };
 
   enum class DeclarationProviderType {
@@ -13990,11 +13992,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DeclarationProvider {
     DeclarationProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<DeclarationOptions> declarationOptions;
-      std::unique_ptr<DeclarationRegistrationOptions> declarationRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<DeclarationOptions>,
+      std::unique_ptr<DeclarationRegistrationOptions>
+    > value;
   };
 
   enum class DefinitionProviderType {
@@ -14004,10 +14006,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DefinitionProvider {
     DefinitionProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<DefinitionOptions> definitionOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<DefinitionOptions>
+    > value;
   };
 
   enum class TypeDefinitionProviderType {
@@ -14018,11 +14020,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct TypeDefinitionProvider {
     TypeDefinitionProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<TypeDefinitionOptions> typeDefinitionOptions;
-      std::unique_ptr<TypeDefinitionRegistrationOptions> typeDefinitionRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<TypeDefinitionOptions>,
+      std::unique_ptr<TypeDefinitionRegistrationOptions>
+    > value;
   };
 
   enum class ImplementationProviderType {
@@ -14033,11 +14035,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct ImplementationProvider {
     ImplementationProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<ImplementationOptions> implementationOptions;
-      std::unique_ptr<ImplementationRegistrationOptions> implementationRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<ImplementationOptions>,
+      std::unique_ptr<ImplementationRegistrationOptions>
+    > value;
   };
 
   enum class ReferencesProviderType {
@@ -14047,10 +14049,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct ReferencesProvider {
     ReferencesProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<ReferenceOptions> referenceOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<ReferenceOptions>
+    > value;
   };
 
   enum class DocumentHighlightProviderType {
@@ -14060,10 +14062,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DocumentHighlightProvider {
     DocumentHighlightProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<DocumentHighlightOptions> documentHighlightOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<DocumentHighlightOptions>
+    > value;
   };
 
   enum class DocumentSymbolProviderType {
@@ -14073,10 +14075,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DocumentSymbolProvider {
     DocumentSymbolProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<DocumentSymbolOptions> documentSymbolOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<DocumentSymbolOptions>
+    > value;
   };
 
   enum class CodeActionProviderType {
@@ -14086,10 +14088,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct CodeActionProvider {
     CodeActionProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<CodeActionOptions> codeActionOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<CodeActionOptions>
+    > value;
   };
 
   enum class ColorProviderType {
@@ -14100,11 +14102,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct ColorProvider {
     ColorProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<DocumentColorOptions> documentColorOptions;
-      std::unique_ptr<DocumentColorRegistrationOptions> documentColorRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<DocumentColorOptions>,
+      std::unique_ptr<DocumentColorRegistrationOptions>
+    > value;
   };
 
   enum class DocumentFormattingProviderType {
@@ -14114,10 +14116,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DocumentFormattingProvider {
     DocumentFormattingProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<DocumentFormattingOptions> documentFormattingOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<DocumentFormattingOptions>
+    > value;
   };
 
   enum class DocumentRangeFormattingProviderType {
@@ -14127,10 +14129,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DocumentRangeFormattingProvider {
     DocumentRangeFormattingProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<DocumentRangeFormattingOptions> documentRangeFormattingOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<DocumentRangeFormattingOptions>
+    > value;
   };
 
   enum class RenameProviderType {
@@ -14140,10 +14142,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct RenameProvider {
     RenameProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<RenameOptions> renameOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<RenameOptions>
+    > value;
   };
 
   enum class FoldingRangeProviderType {
@@ -14154,11 +14156,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct FoldingRangeProvider {
     FoldingRangeProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<FoldingRangeOptions> foldingRangeOptions;
-      std::unique_ptr<FoldingRangeRegistrationOptions> foldingRangeRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<FoldingRangeOptions>,
+      std::unique_ptr<FoldingRangeRegistrationOptions>
+    > value;
   };
 
   enum class SelectionRangeProviderType {
@@ -14169,11 +14171,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct SelectionRangeProvider {
     SelectionRangeProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<SelectionRangeOptions> selectionRangeOptions;
-      std::unique_ptr<SelectionRangeRegistrationOptions> selectionRangeRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<SelectionRangeOptions>,
+      std::unique_ptr<SelectionRangeRegistrationOptions>
+    > value;
   };
 
   enum class LinkedEditingRangeProviderType {
@@ -14184,11 +14186,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct LinkedEditingRangeProvider {
     LinkedEditingRangeProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<LinkedEditingRangeOptions> linkedEditingRangeOptions;
-      std::unique_ptr<LinkedEditingRangeRegistrationOptions> linkedEditingRangeRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<LinkedEditingRangeOptions>,
+      std::unique_ptr<LinkedEditingRangeRegistrationOptions>
+    > value;
   };
 
   enum class CallHierarchyProviderType {
@@ -14199,11 +14201,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct CallHierarchyProvider {
     CallHierarchyProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<CallHierarchyOptions> callHierarchyOptions;
-      std::unique_ptr<CallHierarchyRegistrationOptions> callHierarchyRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<CallHierarchyOptions>,
+      std::unique_ptr<CallHierarchyRegistrationOptions>
+    > value;
   };
 
   enum class SemanticTokensProviderType {
@@ -14213,10 +14215,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct SemanticTokensProvider {
     SemanticTokensProviderType type;
-    union {
-      std::unique_ptr<SemanticTokensOptions> semanticTokensOptions;
-      std::unique_ptr<SemanticTokensRegistrationOptions> semanticTokensRegistrationOptions;
-    };
+    std::variant<
+      std::unique_ptr<SemanticTokensOptions>,
+      std::unique_ptr<SemanticTokensRegistrationOptions>
+    > value;
   };
 
   enum class MonikerProviderType {
@@ -14227,11 +14229,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct MonikerProvider {
     MonikerProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<MonikerOptions> monikerOptions;
-      std::unique_ptr<MonikerRegistrationOptions> monikerRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<MonikerOptions>,
+      std::unique_ptr<MonikerRegistrationOptions>
+    > value;
   };
 
   enum class TypeHierarchyProviderType {
@@ -14242,11 +14244,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct TypeHierarchyProvider {
     TypeHierarchyProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<TypeHierarchyOptions> typeHierarchyOptions;
-      std::unique_ptr<TypeHierarchyRegistrationOptions> typeHierarchyRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<TypeHierarchyOptions>,
+      std::unique_ptr<TypeHierarchyRegistrationOptions>
+    > value;
   };
 
   enum class InlineValueProviderType {
@@ -14257,11 +14259,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct InlineValueProvider {
     InlineValueProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<InlineValueOptions> inlineValueOptions;
-      std::unique_ptr<InlineValueRegistrationOptions> inlineValueRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<InlineValueOptions>,
+      std::unique_ptr<InlineValueRegistrationOptions>
+    > value;
   };
 
   enum class InlayHintProviderType {
@@ -14272,11 +14274,11 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct InlayHintProvider {
     InlayHintProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<InlayHintOptions> inlayHintOptions;
-      std::unique_ptr<InlayHintRegistrationOptions> inlayHintRegistrationOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<InlayHintOptions>,
+      std::unique_ptr<InlayHintRegistrationOptions>
+    > value;
   };
 
   enum class DiagnosticProviderType {
@@ -14286,10 +14288,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct DiagnosticProvider {
     DiagnosticProviderType type;
-    union {
-      std::unique_ptr<DiagnosticOptions> diagnosticOptions;
-      std::unique_ptr<DiagnosticRegistrationOptions> diagnosticRegistrationOptions;
-    };
+    std::variant<
+      std::unique_ptr<DiagnosticOptions>,
+      std::unique_ptr<DiagnosticRegistrationOptions>
+    > value;
   };
 
   enum class WorkspaceSymbolProviderType {
@@ -14299,10 +14301,10 @@ namespace LCompilers::LanguageServiceProtocol {
 
   struct WorkspaceSymbolProvider {
     WorkspaceSymbolProviderType type;
-    union {
-      boolean booleanValue;
-      std::unique_ptr<WorkspaceSymbolOptions> workspaceSymbolOptions;
-    };
+    std::variant<
+      boolean,
+      std::unique_ptr<WorkspaceSymbolOptions>
+    > value;
   };
 
   struct FileOperations {
@@ -15512,6 +15514,6 @@ namespace LCompilers::LanguageServiceProtocol {
   // one passed in the initialize parameters. The command line argument to use
   // is --clientProcessId.
 
-} // namespace LCompilers::LanguageServiceProtocol
+} // namespace LCompilers::LanguageServerProtocol
 
 #endif // LCOMPILERS_LSP_SPECIFICATION_H
