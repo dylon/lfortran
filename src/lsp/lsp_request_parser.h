@@ -23,6 +23,7 @@ namespace LCompilers::LanguageServerProtocol {
 
     bool escaped = false;
 
+    auto parseStartLine(unsigned char c) -> bool;
     auto parseHeader(unsigned char c) -> bool;
     auto parseBody(unsigned char c) -> bool;
   };

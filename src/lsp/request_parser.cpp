@@ -2,6 +2,10 @@
 
 namespace LCompilers::LanguageServer {
 
+  auto RequestParser::startLine() -> const std::string & {
+    return _startLine;
+  }
+
   auto RequestParser::headers() -> const std::map<std::string, std::string> & {
     return _headers;
   }

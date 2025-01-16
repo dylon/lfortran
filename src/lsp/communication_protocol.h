@@ -53,9 +53,17 @@ namespace LCompilers::LanguageServer {
     RequestParser &parser;
   };
 
-  auto tcpDispatch(RequestParser &parser, tcp::socket socket) -> awaitable<void>;
+  auto tcpDispatch(
+    LanguageServer &languageServer,
+    RequestParser &parser,
+    tcp::socket socket
+  ) -> awaitable<void>;
 
-  auto tcpListener(short unsigned int port) -> awaitable<void>;
+  auto tcpListener(
+    LanguageServer &languageServer,
+    RequestParser &parser,
+    short unsigned int port
+  ) -> awaitable<void>;
 
   class TcpCommunicationProtocol : public CommunicationProtocol {
   public:
