@@ -12,8 +12,9 @@ if (NOT LFORTRAN_VERSION)
     CACHE STRING "LFortran version" FORCE)
 endif ()
 
-set(SRC
+set(LFORTRAN_LSP_SRC
   specification.cpp
+  thread_pool.cpp
   serializer.cpp
   lsp_serializer.cpp
   lfortran_lsp_language_server.cpp
@@ -22,13 +23,17 @@ set(SRC
   communication_protocol.cpp
 )
 
-add_library(lfortran_lsp STATIC ${SRC})
+add_library(lfortran_lsp STATIC ${LFORTRAN_LSP_SRC})
 target_include_directories(lfortran_lsp BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_include_directories(lfortran_lsp BEFORE PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/..)
 target_link_libraries(lfortran_lsp asr p::rapidjson)
 target_compile_definitions(lfortran_lsp PRIVATE ASIO_NO_TYPEID)
 
-add_executable(llanguage_server main.cpp)
+set(LLANGUAGE_SERVER_SRC
+  main.cpp
+)
+
+add_executable(llanguage_server ${LLANGUAGE_SERVER_SRC})
 target_include_directories(llanguage_server BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_include_directories(llanguage_server BEFORE PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/..)
 target_link_libraries(llanguage_server lfortran_lsp)

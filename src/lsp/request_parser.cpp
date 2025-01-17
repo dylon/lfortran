@@ -18,6 +18,10 @@ namespace LCompilers::LanguageServer {
     return _state;
   }
 
+  auto RequestParser::error() -> const std::string & {
+    return _error;
+  }
+
   void RequestParser::reset() {
     _state = RequestParserState::RESET;
     headerState = RequestHeaderParserState::RESET;

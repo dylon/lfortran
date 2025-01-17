@@ -2,6 +2,7 @@
 #define LCOMPILERS_LS_TCP_REQUEST_PARSER_H
 
 #include <map>
+#include <memory>
 #include <string>
 
 namespace LCompilers::LanguageServer {
@@ -51,6 +52,7 @@ namespace LCompilers::LanguageServer {
     auto headers() -> const std::map<std::string, std::string> &;
     auto body() -> const std::string &;
     auto state() -> RequestParserState;
+    auto error() -> const std::string &;
 
     void reset();
 
@@ -60,11 +62,17 @@ namespace LCompilers::LanguageServer {
     std::string _startLine = "";
     std::map<std::string, std::string> _headers;
     std::string _body = "";
+    std::string _error = "";
     RequestParserState _state = RequestParserState::INITIAL;
     RequestStartLineParserState startLineState =
       RequestStartLineParserState::INITIAL;
     RequestHeaderParserState headerState = RequestHeaderParserState::INITIAL;
     RequestBodyParserState bodyState = RequestBodyParserState::INITIAL;
+  };
+
+  class RequestParserFactory {
+  public:
+    virtual std::unique_ptr<RequestParser> build() = 0;
   };
 
 } // namespace LCompilers::LanguageServer

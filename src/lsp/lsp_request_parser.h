@@ -21,11 +21,23 @@ namespace LCompilers::LanguageServerProtocol {
     std::stringstream ss;
     std::string header = "";
 
+    std::size_t line = 0;
+    std::size_t column = 0;
+    unsigned char b = '\0';
+
     bool escaped = false;
 
     auto parseStartLine(unsigned char c) -> bool;
     auto parseHeader(unsigned char c) -> bool;
     auto parseBody(unsigned char c) -> bool;
+  };
+
+  class LspRequestParserFactory : public ls::RequestParserFactory {
+  public:
+    LspRequestParserFactory(bool interactive);
+    std::unique_ptr<ls::RequestParser> build() override;
+  private:
+    bool interactive;
   };
 
 } // namespace LCompilers::LanguageServerProtocol

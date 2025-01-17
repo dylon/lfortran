@@ -1,9 +1,9 @@
 #include <format>
 #include <iostream>
-
-#include "lsp/specification.h"
-#include <lsp/lfortran_lsp_language_server.h>
 #include <stdexcept>
+
+#include <lsp/specification.h>
+#include <lsp/lfortran_lsp_language_server.h>
 
 namespace LCompilers::LanguageServerProtocol {
 

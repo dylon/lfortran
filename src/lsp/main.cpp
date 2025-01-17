@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <format>
 #include <iostream>
 #include <memory>
@@ -12,9 +13,11 @@
 #include <lsp/request_parser.h>
 #include <lsp/lsp_request_parser.h>
 #include <lsp/communication_protocol.h>
+#include <lsp/thread_pool.h>
 
 namespace ls = LCompilers::LanguageServer;
 namespace lsp = LCompilers::LanguageServerProtocol;
+namespace lst = LCompilers::LanguageServer::Threading;
 
 enum class ExitCode {
   SUCCESS = 0,
@@ -48,6 +51,7 @@ struct CommandLineOptions {
   ServerProtocol serverProtocol;
   short unsigned int tcpPort;
   bool interactive;
+  std::size_t numThreads;
 };
 
 ExitCode validateAndSetLanguage(
@@ -164,6 +168,14 @@ ExitCode validateAndSetInteractive(
   return ExitCode::BAD_ARG_COMBO;
 }
 
+ExitCode validateAndSetNumThreads(
+  CommandLineOptions &opts,
+  std::size_t numThreads
+) {
+  opts.numThreads = numThreads;
+  return ExitCode::SUCCESS;
+}
+
 /**
  * Parses command-line arguments and stores their values in global variables.
  * @param argc Number of command-line arguments.
@@ -177,6 +189,7 @@ int parse(CommandLineOptions &opts, int argc, char *argv[]) {
   short unsigned int tcpPort = 2078;
   std::string serverProtocol = "lsp";
   bool interactive;
+  std::size_t numThreads = 5;
 
   CLI::App app {
     "LCompilers Language Server: Serves requests from language extensions in supported editors."
@@ -212,6 +225,11 @@ int parse(CommandLineOptions &opts, int argc, char *argv[]) {
     "Whether to serve stdio requests from an interactive shell (REPL)."
   );
 
+  app.add_option(
+    "--num-threads", numThreads,
+    "Number of pooled threads (for applicable communication protocols)."
+  )->capture_default_str();
+
   CLI11_PARSE(app, argc, argv);
 
   ExitCode exitCode = validateAndSetLanguage(opts, language);
@@ -222,22 +240,23 @@ int parse(CommandLineOptions &opts, int argc, char *argv[]) {
     exitCode = validateAndSetCommunicationProtocol(opts, communicationProtocol);
   }
   if (exitCode == ExitCode::SUCCESS) {
-    exitCode =
-      validateAndSetTcpPort(opts, tcpPort);
+    exitCode = validateAndSetTcpPort(opts, tcpPort);
   }
   if (exitCode == ExitCode::SUCCESS) {
-    exitCode =
-      validateAndSetServerProtocol(opts, serverProtocol);
+    exitCode = validateAndSetServerProtocol(opts, serverProtocol);
+  }
+  if (exitCode == ExitCode::SUCCESS) {
+    exitCode = validateAndSetNumThreads(opts, numThreads);
   }
   return static_cast<int>(exitCode);
 }
 
-std::unique_ptr<ls::RequestParser> buildRequestParser(
+std::unique_ptr<ls::RequestParserFactory> buildRequestParserFactory(
   CommandLineOptions &opts
 ) {
   switch (opts.serverProtocol) {
   case ServerProtocol::LSP: {
-    return std::make_unique<lsp::LspRequestParser>(opts.interactive);
+    return std::make_unique<lsp::LspRequestParserFactory>(opts.interactive);
   }
   default: {
     throw std::runtime_error(
@@ -283,22 +302,28 @@ std::unique_ptr<ls::LanguageServer> buildLanguageServer(
   }
 }
 
+std::unique_ptr<lst::ThreadPool> buildThreadPool(CommandLineOptions &opts) {
+  return std::make_unique<lst::ThreadPool>(opts.numThreads);
+}
+
 std::unique_ptr<ls::CommunicationProtocol> buildCommunicationProtocol(
   CommandLineOptions &opts,
   ls::LanguageServer &languageServer,
-  ls::RequestParser &requestParser
+  ls::RequestParserFactory &requestParserFactory
 ) {
   switch (opts.communicationProtocol) {
   case CommunicationProtocol::STDIO: {
+    std::unique_ptr<lst::ThreadPool> threadPool = buildThreadPool(opts);
     return std::make_unique<ls::StdIOCommunicationProtocol>(
       languageServer,
-      requestParser
+      requestParserFactory,
+      std::move(threadPool)
     );
   }
   case CommunicationProtocol::TCP: {
     return std::make_unique<ls::TcpCommunicationProtocol>(
       languageServer,
-      requestParser,
+      requestParserFactory,
       opts.tcpPort
     );
   }
@@ -325,12 +350,11 @@ int main(int argc, char *argv[]) {
   }
 
   try {
-    std::unique_ptr<ls::RequestParser> requestParser = buildRequestParser(opts);
+    std::unique_ptr<ls::RequestParserFactory> requestParserFactory =
+      buildRequestParserFactory(opts);
     std::unique_ptr<ls::LanguageServer> languageServer = buildLanguageServer(opts);
     std::unique_ptr<ls::CommunicationProtocol> communicationProtocol =
-      buildCommunicationProtocol(
-        opts, *languageServer, *requestParser
-      );
+      buildCommunicationProtocol(opts, *languageServer, *requestParserFactory);
     communicationProtocol->serve();
   } catch (std::exception &e) {
     std::cerr

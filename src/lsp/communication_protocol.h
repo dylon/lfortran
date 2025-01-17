@@ -15,6 +15,7 @@
 #include <asio/write.hpp>
 #include <asio/read_until.hpp>
 
+#include <lsp/thread_pool.h>
 #include <lsp/language_server.h>
 #include <lsp/request_parser.h>
 
@@ -25,23 +26,30 @@ namespace LCompilers::LanguageServer {
   using asio::detached;
   using asio::use_awaitable;
 
+  namespace lst = LCompilers::LanguageServer::Threading;
+
   class CommunicationProtocol {
   public:
     CommunicationProtocol(
-      LanguageServer &languageServer);
+      LanguageServer &languageServer,
+      RequestParserFactory &parserFactory);
     virtual void serve() = 0;
   protected:
     LanguageServer &languageServer;
+    RequestParserFactory &parserFactory;
   };
 
   class StdIOCommunicationProtocol : public CommunicationProtocol {
   public:
     StdIOCommunicationProtocol(
       LanguageServer &languageServer,
-      RequestParser &parser);
+      RequestParserFactory &parserFactory,
+      std::unique_ptr<lst::ThreadPool> threadPool);
     void serve() override;
   private:
-    RequestParser &parser;
+    std::unique_ptr<lst::ThreadPool> threadPool;
+
+    auto dispatch(const std::string &request) -> void;
   };
 
   class TcpRequestMatchCondition {
@@ -53,34 +61,31 @@ namespace LCompilers::LanguageServer {
     RequestParser &parser;
   };
 
-  auto tcpDispatch(
-    LanguageServer &languageServer,
-    RequestParser &parser,
-    tcp::socket socket
-  ) -> awaitable<void>;
-
-  auto tcpListener(
-    LanguageServer &languageServer,
-    RequestParser &parser,
-    short unsigned int port
-  ) -> awaitable<void>;
-
   class TcpCommunicationProtocol : public CommunicationProtocol {
   public:
     TcpCommunicationProtocol(
       LanguageServer &languageServer,
-      RequestParser &parser,
+      RequestParserFactory &parserFactory,
       short unsigned int port);
     void serve() override;
   private:
-    RequestParser &parser;
     short unsigned int port;
+
+    auto listener() -> awaitable<void>;
+    auto dispatch(tcp::socket socket) -> awaitable<void>;
+    auto prepareResponse(
+      std::stringstream &ss,
+      int statusCode,
+      const std::string &statusText,
+      const std::string &error
+    ) -> void;
   };
 
   class WebSocketCommunicationProtocol : public CommunicationProtocol {
   public:
     WebSocketCommunicationProtocol(
-      LanguageServer &languageServer);
+      LanguageServer &languageServer,
+      RequestParserFactory &parserFactory);
     void serve() override;
   };
 
