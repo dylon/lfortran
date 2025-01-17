@@ -13,42 +13,27 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspRequestParser::parse(unsigned char c) -> bool {
-    switch (c) {
-    case '\n': {
-      if (b != '\r') {
-        ++line;
-        column = 0;
-      }
-      break;
-    }
-    case '\r': {
-      ++line;
-      column = 0;
-      break;
-    }
-    default: {
-      ++column;
-    }
-    }
-
-    b = c;
-
+    bool done = false;
     switch (_state) {
     case ls::RequestParserState::PARSING_START_LINE: {
       if ((startLineState != ls::RequestStartLineParserState::INITIAL)
           || (c != '{')) {
-        return parseStartLine(c);
+        done = parseStartLine(c);
+      } else {
+        _state = ls::RequestParserState::PARSING_BODY;
+        done = parseBody(c);
       }
-      _state = ls::RequestParserState::PARSING_BODY;
-      return parseBody(c);
+      break;
     }
     case ls::RequestParserState::PARSING_HEADER: {
       if ((headerState != ls::RequestHeaderParserState::INITIAL)
           || (c != '{')) {
-        return parseHeader(c);
+        done = parseHeader(c);
+      } else {
+        _state = ls::RequestParserState::PARSING_BODY;
+        done = parseBody(c);
       }
-      _state = ls::RequestParserState::PARSING_BODY;
-      return parseBody(c);
+      break;
     }
     case ls::RequestParserState::PARSING_SEPARATOR: {
       _state = ls::RequestParserState::PARSING_BODY;
@@ -60,7 +45,8 @@ namespace LCompilers::LanguageServerProtocol {
       }
     } // fallthrough
     case ls::RequestParserState::PARSING_BODY: {
-      return parseBody(c);
+      done = parseBody(c);
+      break;
     }
     case ls::RequestParserState::ERROR: /*{
       _state = ls::RequestParserState::RESET;
@@ -83,17 +69,38 @@ namespace LCompilers::LanguageServerProtocol {
       if (c == '{') {
         if (numBytes == 0) {
           _state = ls::RequestParserState::COMPLETE;
-          return true;
+          done = true;
+        } else {
+          _state = ls::RequestParserState::PARSING_BODY;
+          done = parseBody(c);
         }
-        _state = ls::RequestParserState::PARSING_BODY;
-        return parseBody(c);
+      } else {
+        _state = ls::RequestParserState::PARSING_START_LINE;
+        done = parseStartLine(c);
       }
-      _state = ls::RequestParserState::PARSING_START_LINE;
-      return parseStartLine(c);
     }
     }
-    // NOTE: Should not be reachable ...
-    return false;
+
+    switch (c) {
+    case '\n': {
+      if (b != '\r') {
+        ++line;
+        column = 0;
+      }
+      break;
+    }
+    case '\r': {
+      ++line;
+      column = 0;
+      break;
+    }
+    default: {
+      ++column;
+    }
+    }
+    b = c;
+
+    return done;
   }
 
   auto LspRequestParser::parseStartLine(unsigned char c) -> bool {
@@ -471,6 +478,13 @@ namespace LCompilers::LanguageServerProtocol {
       bodyState = ls::RequestBodyParserState::PARSING_BODY;
     } // fallthrough
     case ls::RequestBodyParserState::PARSING_BODY: {
+      if (numBytes == 0) {
+        _error = std::format(
+          "line={}, column={}: No bytes to read.",
+          line, column
+        );
+        goto error;
+      }
       if (readBytes < numBytes) {
         ss << c;
         readBytes++;
@@ -480,13 +494,16 @@ namespace LCompilers::LanguageServerProtocol {
         ss.str("");
         _state = ls::RequestParserState::COMPLETE;
         bodyState = ls::RequestBodyParserState::COMPLETE;
-        return true;
+        goto done;
       }
-      return false;
     }
     }
-    // NOTE: Should not be reachable.
     return false;
+  error:
+    _state = ls::RequestParserState::ERROR;
+    bodyState = ls::RequestBodyParserState::ERROR;
+  done:
+    return true;
   }
 
   LspRequestParserFactory::LspRequestParserFactory(bool interactive)

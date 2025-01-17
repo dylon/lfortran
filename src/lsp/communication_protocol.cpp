@@ -79,52 +79,50 @@ namespace LCompilers::LanguageServer {
               std::unique_lock<std::mutex> stderrLock(stderrMutex);
               std::cerr << "request.body = '" << body << "'" << std::endl;
             }
-            threadPool->execute([this,
-                                body,
-                                &stdoutMutex,
-                                &stderrMutex,
-                                &pendingId,
-                                requestId,
-                                &responsePrinted,
-                                &printMutex](const std::size_t threadId) {
-              try {
-                const std::string response = languageServer.serve(body);
-                {
-                  std::unique_lock<std::mutex> stderrLock(stderrMutex);
-                  std::cerr
-                    << "[thread.id=" << threadId << "] "
-                    << "response = '" << response << "'"
-                    << std::endl;
-                }
-                // ----------------------------------------------------------------
-                // NOTE: The LSP spec requires responses to be returned in roughly
-                // the same order of receipt of their corresponding requests. Some
-                // types of responses may be returned out-of-order, but in order to
-                // support those we will need to implement a sort of dependency
-                // graph. Without knowledge of their dependencies, we must respond
-                // to all requests in order of receipt.
-                // ----------------------------------------------------------------
-                while (pendingId < requestId) {
-                  std::unique_lock<std::mutex> printLock(printMutex);
-                  responsePrinted.wait_for(
-                    printLock, 100ms, [&pendingId, &requestId]() {
-                      return pendingId == requestId;
-                    }
-                  );
-                }
-                if (pendingId == requestId) {
+            if (body.length() > 0) {
+              threadPool->execute([this,
+                                  body,
+                                  &stdoutMutex,
+                                  &stderrMutex,
+                                  &pendingId,
+                                  requestId,
+                                  &responsePrinted,
+                                  &printMutex](const std::size_t threadId) {
+                try {
+                  const std::string response = languageServer.serve(body);
                   {
-                    std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
-                    std::cout << response << std::flush;
+                    std::unique_lock<std::mutex> stderrLock(stderrMutex);
+                    std::cerr
+                      << "[thread.id=" << threadId << "] "
+                      << "response = '" << response << "'"
+                      << std::endl;
+                  }
+                  // ----------------------------------------------------------------
+                  // NOTE: The LSP spec requires responses to be returned in roughly
+                  // the same order of receipt of their corresponding requests. Some
+                  // types of responses may be returned out-of-order, but in order to
+                  // support those we will need to implement a sort of dependency
+                  // graph. Without knowledge of their dependencies, we must respond
+                  // to all requests in order of receipt.
+                  // ----------------------------------------------------------------
+                  while (pendingId < requestId) {
+                    std::unique_lock<std::mutex> printLock(printMutex);
+                    responsePrinted.wait_for(
+                      printLock, 100ms, [&pendingId, &requestId]() {
+                        return pendingId == requestId;
+                      }
+                    );
+                  }
+                  if (pendingId == requestId) {
                     {
+                      std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
                       std::unique_lock<std::mutex> stderrLock(stderrMutex);
+                      std::cout << response << std::flush;
                       std::cerr << std::endl;
                     }
+                    ++pendingId;
                   }
-                  ++pendingId;
-                }
-              } catch (std::exception &e) {
-                {
+                } catch (std::exception &e) {
                   std::unique_lock<std::mutex> stderrLock(stderrMutex);
                   std::cerr
                     << "[thread.id=" << threadId << "] "
@@ -135,10 +133,14 @@ namespace LCompilers::LanguageServer {
                     << "Caught unhandled exception: " << e.what()
                     << std::endl;
                 }
-              }
-            });
+              });
+            } else {
+              std::unique_lock<std::mutex> stderrLock(stderrMutex);
+              std::cerr << "Cannot parse an empty request body." << std::endl;
+            }
           } else {
             const std::string &error = parser->error();
+            std::unique_lock<std::mutex> stderrLock(stderrMutex);
             std::cerr << "Failed to parse request: " << error << std::endl;
           }
           parser->reset();
