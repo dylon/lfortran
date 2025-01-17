@@ -54,10 +54,9 @@ namespace LCompilers::LanguageServer {
     std::mutex printMutex;
     std::condition_variable responsePrinted;
     std::size_t requestId = 0;
-    std::size_t pendingId = 1;
+    std::size_t pendingId = 0;
     try {
       while (std::getline(std::cin, request)) {
-        ++requestId;
         {
           std::unique_lock<std::mutex> stderrLock(stderrMutex);
           std::cerr << "request = " << request << std::endl;
@@ -105,7 +104,7 @@ namespace LCompilers::LanguageServer {
                 // graph. Without knowledge of their dependencies, we must respond
                 // to all requests in order of receipt.
                 // ----------------------------------------------------------------
-                while ((pendingId < requestId) && threadPool->running()) {
+                while (pendingId < requestId) {
                   std::unique_lock<std::mutex> printLock(printMutex);
                   responsePrinted.wait_for(
                     printLock, 100ms, [&pendingId, &requestId]() {
@@ -113,7 +112,7 @@ namespace LCompilers::LanguageServer {
                     }
                   );
                 }
-                if ((pendingId == requestId) && threadPool->running()) {
+                if (pendingId == requestId) {
                   {
                     std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
                     std::cout << response << std::flush;
@@ -143,6 +142,7 @@ namespace LCompilers::LanguageServer {
             std::cerr << "Failed to parse request: " << error << std::endl;
           }
           parser->reset();
+          ++requestId;
         } else {
           parser->parse('\r');
           parser->parse('\n');

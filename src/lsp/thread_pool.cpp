@@ -35,9 +35,9 @@ namespace LCompilers::LanguageServer::Threading {
   }
 
   auto ThreadPool::execute(Task task) -> bool {
-    if (_running) {
+    if (!_stop) {
       std::unique_lock<std::mutex> taskLock(taskMutex);
-      if (_running) {
+      if (!_stop) {
         tasks.push(task);
         taskAvailable.notify_one();
         return true;
@@ -47,29 +47,42 @@ namespace LCompilers::LanguageServer::Threading {
   }
 
   auto ThreadPool::stop() -> void {
-    if (_running) {
-      _running = false;
-      {
-        std::unique_lock<std::mutex> taskLock(taskMutex);
-        taskAvailable.notify_all();
-      }
+    {
+      std::unique_lock<std::mutex> stderrLock(_stderrMutex);
+      std::cerr
+        << "Thread pool will no longer accept new tasks and will shut down "
+        << "once those pending have returned."
+        << std::endl;
     }
+    _stop = true;
+  }
+
+  auto ThreadPool::stopNow() -> void {
+    {
+      std::unique_lock<std::mutex> stderrLock(_stderrMutex);
+      std::cerr
+        << "Stopping thread pool as quickly as possible."
+        << std::endl;
+    }
+    _stop = true;
+    _stopNow = true;
   }
 
   auto ThreadPool::join() -> void {
     for (auto &worker : workers) {
       worker.join();
     }
+    _running = false;
   }
 
   auto ThreadPool::run(const std::size_t threadId) -> void {
     try {
-      while (_running) {
+      while (!_stopNow) {
         std::unique_lock<std::mutex> taskLock(taskMutex);
-        if (taskAvailable.wait_for(taskLock, 5s, [this]() {
+        if (taskAvailable.wait_for(taskLock, 200ms, [this]() {
           return tasks.size() > 0;
         })) {
-          if (_running) {
+          if (!_stopNow) {
             Task task = tasks.front();
             tasks.pop();
             taskLock.unlock();
@@ -83,6 +96,8 @@ namespace LCompilers::LanguageServer::Threading {
                 << std::endl;
             }
           }
+        } else if (_stop) {
+          break;
         }
       }
       {

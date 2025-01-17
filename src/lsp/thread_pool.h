@@ -21,6 +21,7 @@ namespace LCompilers::LanguageServer::Threading {
     auto numThreads() -> std::size_t;
     auto running() -> bool;
     auto stop() -> void;
+    auto stopNow() -> void;
     auto join() -> void;
     auto stdoutMutex() -> std::mutex &;
     auto stderrMutex() -> std::mutex &;
@@ -30,6 +31,8 @@ namespace LCompilers::LanguageServer::Threading {
     std::mutex _stderrMutex;
     std::vector<std::thread> workers;
     std::atomic_bool _running = true;
+    std::atomic_bool _stop = false;
+    std::atomic_bool _stopNow = false;
     std::mutex taskMutex;
     std::condition_variable taskAvailable;
     std::queue<Task> tasks;
