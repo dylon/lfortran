@@ -39,6 +39,13 @@ namespace LCompilers::LanguageServerProtocol {
       const NotificationMessage &notification,
       ResponseMessage &response
     ) const -> void;
+
+    auto lspToAny(
+      const InitializeResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const ServerCapabilities &capabilities
+    ) const -> std::unique_ptr<LSPAny>;
   };
 
 } // namespace LCompilers::LanguageServerProtocol

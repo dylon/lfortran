@@ -27,6 +27,7 @@ src/lfortran/tests/print_integer
 src/lfortran/tests/cmp32
 src/lfortran/tests/x
 src/lfortran/tests/ref_pickle.txt.new
+src/lsp/llanguage_server
 
 # fortran_parser
 

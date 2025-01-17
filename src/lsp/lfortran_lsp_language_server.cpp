@@ -82,15 +82,7 @@ namespace LCompilers::LanguageServerProtocol {
     const InitializeResult &result
   ) const -> ResponseMessage {
     ResponseMessage response;
-    response.result = std::make_unique<LSPAny>();
-    (*response.result)->type = LSPAnyType::LSP_OBJECT;
-    (*response.result)->value = std::make_unique<LSPObject>();
-    LSPObject &lspObject =
-      *std::get<std::unique_ptr<LSPObject>>((*response.result)->value);
-    lspObject["capabilities"] = std::make_unique<LSPAny>();
-    LSPAny &lspAny = *lspObject.at("capabilities");
-    lspAny.type = LSPAnyType::LSP_OBJECT;
-    lspAny.value = std::make_unique<LSPObject>();
+    response.result = lspToAny(result);
     return response;
   }
 
@@ -132,6 +124,9 @@ namespace LCompilers::LanguageServerProtocol {
     const InitializeParams &params
   ) -> InitializeResult {
     InitializeResult result;
+    std::unique_ptr<ServerCapabilities> capabilities =
+      std::make_unique<ServerCapabilities>();
+    result.capabilities = std::move(capabilities);
     return result;
   }
 
@@ -140,6 +135,27 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> ResponseMessage {
     ResponseMessage response;
     return response;
+  }
+
+  auto LFortranLspLanguageServer::lspToAny(
+    const InitializeResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->type = LSPAnyType::LSP_OBJECT;
+    std::unique_ptr<LSPObject> value = std::make_unique<LSPObject>();
+    (*value)["capabilities"] = lspToAny(*result.capabilities);
+    any->value = std::move(value);
+    return any;
+  }
+
+  auto LFortranLspLanguageServer::lspToAny(
+    const ServerCapabilities &capabilities
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->type = LSPAnyType::LSP_OBJECT;
+    std::unique_ptr<LSPObject> value = std::make_unique<LSPObject>();
+    any->value = std::move(value);
+    return any;
   }
 
 } // namespace LCompilers::LanguageServerProtocol
