@@ -14,9 +14,11 @@ endif ()
 
 set(LFORTRAN_LSP_SRC
   specification.cpp
+  text_document.cpp
   thread_pool.cpp
   serializer.cpp
   lsp_serializer.cpp
+  lsp_language_server.cpp
   lfortran_lsp_language_server.cpp
   request_parser.cpp
   lsp_request_parser.cpp

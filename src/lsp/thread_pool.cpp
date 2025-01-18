@@ -8,9 +8,9 @@ namespace LCompilers::LanguageServer::Threading {
   using namespace std::literals::chrono_literals;
 
   ThreadPool::ThreadPool(std::size_t numThreads)
-    : _numThreads(numThreads)
+    : numThreads(numThreads)
   {
-    for (std::size_t threadId = 0; threadId < _numThreads; ++threadId) {
+    for (std::size_t threadId = 0; threadId < numThreads; ++threadId) {
       std::cerr << "Starting thread with id=" << threadId << std::endl;
       workers.emplace_back([this, threadId]() {
         run(threadId);
@@ -18,26 +18,26 @@ namespace LCompilers::LanguageServer::Threading {
     }
   }
 
-  auto ThreadPool::numThreads() -> std::size_t {
-    return _numThreads;
+  auto ThreadPool::getNumThreads() -> std::size_t {
+    return numThreads;
   }
 
-  auto ThreadPool::running() -> bool {
-    return _running;
+  auto ThreadPool::isRunning() -> bool {
+    return running;
   }
 
-  auto ThreadPool::stdoutMutex() -> std::mutex & {
-    return _stdoutMutex;
+  auto ThreadPool::getStdoutMutex() -> std::mutex & {
+    return stdoutMutex;
   }
 
-  auto ThreadPool::stderrMutex() -> std::mutex & {
-    return _stderrMutex;
+  auto ThreadPool::getStderrMutex() -> std::mutex & {
+    return stderrMutex;
   }
 
   auto ThreadPool::execute(Task task) -> bool {
-    if (!_stop) {
+    if (!stopRunning) {
       std::unique_lock<std::mutex> taskLock(taskMutex);
-      if (!_stop) {
+      if (!stopRunning) {
         tasks.push(task);
         taskAvailable.notify_one();
         return true;
@@ -48,67 +48,67 @@ namespace LCompilers::LanguageServer::Threading {
 
   auto ThreadPool::stop() -> void {
     {
-      std::unique_lock<std::mutex> stderrLock(_stderrMutex);
+      std::unique_lock<std::mutex> stderrLock(stderrMutex);
       std::cerr
         << "Thread pool will no longer accept new tasks and will shut down "
         << "once those pending have returned."
         << std::endl;
     }
-    _stop = true;
+    stopRunning = true;
   }
 
   auto ThreadPool::stopNow() -> void {
     {
-      std::unique_lock<std::mutex> stderrLock(_stderrMutex);
+      std::unique_lock<std::mutex> stderrLock(stderrMutex);
       std::cerr
         << "Stopping thread pool as quickly as possible."
         << std::endl;
     }
-    _stop = true;
-    _stopNow = true;
+    stopRunning = true;
+    stopRunningNow = true;
   }
 
   auto ThreadPool::join() -> void {
     for (auto &worker : workers) {
       worker.join();
     }
-    _running = false;
+    running = false;
   }
 
   auto ThreadPool::run(const std::size_t threadId) -> void {
     try {
-      while (!_stopNow) {
+      while (!stopRunningNow) {
         std::unique_lock<std::mutex> taskLock(taskMutex);
         if (taskAvailable.wait_for(taskLock, 200ms, [this]() {
           return tasks.size() > 0;
         })) {
-          if (!_stopNow) {
+          if (!stopRunningNow) {
             Task task = tasks.front();
             tasks.pop();
             taskLock.unlock();
             try {
               task(threadId);
             } catch (std::exception &e) {
-              std::unique_lock<std::mutex> stderrLock(_stderrMutex);
+              std::unique_lock<std::mutex> stderrLock(stderrMutex);
               std::cerr
                 << "[thread.id=" << threadId << "] "
                 << "Failed to execute task: " << e.what()
                 << std::endl;
             }
           }
-        } else if (_stop) {
+        } else if (stopRunning) {
           break;
         }
       }
       {
-        std::unique_lock<std::mutex> stdoutLock(_stdoutMutex);
+        std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
         std::cerr
           << "[thread.id=" << threadId << "] "
           << "Shutting down thread."
           << std::endl;
       }
     } catch (std::exception &e) {
-      std::unique_lock<std::mutex> stderrLock(_stderrMutex);
+      std::unique_lock<std::mutex> stderrLock(stderrMutex);
       std::cerr
         << "[thread.id=" << threadId << "] "
         << "Unhandled exception caught: " << e.what()

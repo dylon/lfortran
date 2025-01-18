@@ -83,10 +83,14 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> void {
     rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
     rapidjson::Value value(rapidjson::kObjectType);
-    value["code"].SetInt(error.code);
-    value["message"].SetString(
-      error.message.c_str(),
-      error.message.length(),
+    value.AddMember("code", error.code, allocator);
+    value.AddMember(
+      "message",
+      rapidjson::Value(
+        error.message.c_str(),
+        error.message.length(),
+        allocator
+      ),
       allocator
     );
     if (error.data.has_value()) {

@@ -18,21 +18,21 @@ namespace LCompilers::LanguageServer::Threading {
   public:
     ThreadPool(std::size_t numThreads);
     auto execute(Task task) -> bool;
-    auto numThreads() -> std::size_t;
-    auto running() -> bool;
+    auto getNumThreads() -> std::size_t;
+    auto isRunning() -> bool;
     auto stop() -> void;
     auto stopNow() -> void;
     auto join() -> void;
-    auto stdoutMutex() -> std::mutex &;
-    auto stderrMutex() -> std::mutex &;
+    auto getStdoutMutex() -> std::mutex &;
+    auto getStderrMutex() -> std::mutex &;
   protected:
-    std::size_t _numThreads;
-    std::mutex _stdoutMutex;
-    std::mutex _stderrMutex;
+    std::size_t numThreads;
+    std::mutex stdoutMutex;
+    std::mutex stderrMutex;
     std::vector<std::thread> workers;
-    std::atomic_bool _running = true;
-    std::atomic_bool _stop = false;
-    std::atomic_bool _stopNow = false;
+    std::atomic_bool running = true;
+    std::atomic_bool stopRunning = false;
+    std::atomic_bool stopRunningNow = false;
     std::mutex taskMutex;
     std::condition_variable taskAvailable;
     std::queue<Task> tasks;

@@ -20,22 +20,16 @@ namespace LCompilers::LanguageServerProtocol {
   using ptr_vector = std::vector<std::unique_ptr<T>>;
 
   template <typename T>
-  using vector_ptr = std::unique_ptr<std::vector<T>>;
-
-  template <typename T>
-  using ptr_vector_ptr = std::unique_ptr<ptr_vector<T>>;
-
-  template <typename T>
   using optional_ptr = std::optional<std::unique_ptr<T>>;
 
   template <typename T>
-  using optional_vector_ptr = std::optional<vector_ptr<T>>;
+  using optional_vector = std::optional<std::vector<T>>;
 
   template <typename T>
   using optional_ptr_vector = std::optional<ptr_vector<T>>;
 
   template <typename T>
-  using optional_ptr_vector_ptr = std::optional<ptr_vector_ptr<T>>;
+  using optional_ptr_vector = std::optional<ptr_vector<T>>;
 
   template <typename T>
   struct ValueSet {
@@ -382,6 +376,10 @@ namespace LCompilers::LanguageServerProtocol {
      */
     lspReservedErrorRangeEnd = -32800,
   };
+
+  extern std::map<ErrorCodes, std::string> ErrorCodeNames;
+
+  auto errorCodeByName(const std::string &name) -> ErrorCodes;
 
   /**
    * interface ResponseError {
@@ -1130,7 +1128,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * edits: (TextEdit | AnnotatedTextEdit)[];
      */
-    ptr_vector_ptr<OptionalAnnotatedTextEdit> edits;
+    ptr_vector<OptionalAnnotatedTextEdit> edits;
   };
 
   /**
@@ -1415,7 +1413,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.15.0
      */
-    optional_ptr_vector_ptr<DiagnosticTag> tags;
+    optional_ptr_vector<DiagnosticTag> tags;
 
     /**
      * An array of related diagnostic information, e.g. when symbol-names within
@@ -1423,7 +1421,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * relatedInformation?: DiagnosticRelatedInformation[];
      */
-    optional_ptr_vector_ptr<DiagnosticRelatedInformation> relatedInformation;
+    optional_ptr_vector<DiagnosticRelatedInformation> relatedInformation;
 
     /**
      * A data entry field that is preserved between a
@@ -1473,7 +1471,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * arguments?: LSPAny[];
      */
-    optional_ptr_vector_ptr<LSPAny> arguments;
+    optional_ptr_vector<LSPAny> arguments;
   };
 
   /**
@@ -1883,7 +1881,7 @@ namespace LCompilers::LanguageServerProtocol {
      *   (TextDocumentEdit | CreateFile | RenameFile | DeleteFile)[]
      * );
      */
-    optional_ptr_vector_ptr<DocumentChange> documentChanges;
+    optional_ptr_vector<DocumentChange> documentChanges;
 
     /**
      * A map of change annotations that can be referenced in
@@ -2052,7 +2050,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.13.0
      */
-    optional_ptr_vector_ptr<ResourceOperationKind> resourceOperations;
+    optional_ptr_vector<ResourceOperationKind> resourceOperations;
 
     /**
      * The failure handling strategy of a client if applying the workspace edit
@@ -3328,7 +3326,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tags?: SymbolTag[];
      */
-    optional_ptr_vector_ptr<SymbolTag> tags;
+    optional_ptr_vector<SymbolTag> tags;
 
     /**
      * More detail for this item, e.g. the signature of a function.
@@ -3423,7 +3421,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * fromRanges: Range[];
      */
-    ptr_vector_ptr<Range> fromRanges;
+    ptr_vector<Range> fromRanges;
   };
 
   /**
@@ -3479,7 +3477,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * fromRanges: Range[];
      */
-    ptr_vector_ptr<Range> fromRanges;
+    ptr_vector<Range> fromRanges;
   };
 
   /**
@@ -3595,7 +3593,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tags?: SymbolTag[];
      */
-    optional_ptr_vector_ptr<SymbolTag> tags;
+    optional_ptr_vector<SymbolTag> tags;
 
     /**
      * More detail for this item, e.g. the signature of a function.
@@ -4032,7 +4030,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * contentFormat?: MarkupKind[];
      */
-    optional_ptr_vector_ptr<MarkupKind> contentFormat;
+    optional_ptr_vector<MarkupKind> contentFormat;
   };
 
   /**
@@ -4130,7 +4128,7 @@ namespace LCompilers::LanguageServerProtocol {
     HoverContentsType type;
     std::variant<
       std::unique_ptr<MarkedString>,
-      ptr_vector_ptr<MarkedString>,
+      ptr_vector<MarkedString>,
       std::unique_ptr<MarkupContent>
     > value;
   };
@@ -4561,7 +4559,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * positions: Position[];
      */
-    ptr_vector_ptr<Position> positions;
+    ptr_vector<Position> positions;
   };
 
   /**
@@ -5167,21 +5165,21 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tokenTypes: string[];
      */
-    ptr_vector_ptr<string> tokenTypes;
+    ptr_vector<string> tokenTypes;
 
     /**
      * The token modifiers that the client supports.
      *
      * tokenModifiers: string[];
      */
-    vector_ptr<string> tokenModifiers;
+    std::vector<string> tokenModifiers;
 
     /**
      * The formats the clients supports.
      *
      * formats: TokenFormat[];
      */
-    vector_ptr<TokenFormat> formats;
+    std::vector<TokenFormat> formats;
 
     /**
      * Whether the client supports tokens that can overlap each other.
@@ -5341,7 +5339,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * data: uinteger[];
      */
-    vector_ptr<uinteger> data;
+    std::vector<uinteger> data;
   };
 
   /**
@@ -5354,7 +5352,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * data: uinteger[];
      */
-    vector_ptr<uinteger> data;
+    std::vector<uinteger> data;
   };
 
   /**
@@ -5428,7 +5426,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * data?: uinteger[];
      */
-    optional_vector_ptr<uinteger> data;
+    optional_vector<uinteger> data;
   };
 
   struct SemanticTokensDelta {
@@ -5444,7 +5442,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * edits: SemanticTokensEdit[];
      */
-    ptr_vector_ptr<SemanticTokensEdit> edits;
+    ptr_vector<SemanticTokensEdit> edits;
   };
 
   struct SemanticTokensDeltaPartialResult {
@@ -5452,7 +5450,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * edits: SemanticTokensEdit[];
      */
-    ptr_vector_ptr<SemanticTokensEdit> edits;
+    ptr_vector<SemanticTokensEdit> edits;
   };
 
   /**
@@ -5559,7 +5557,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * properties: string[];
      */
-    vector_ptr<string> properties;
+    std::vector<string> properties;
   };
 
   /**
@@ -5779,7 +5777,7 @@ namespace LCompilers::LanguageServerProtocol {
     StringOrInlayHintLabelPartsType type;
     std::variant<
       string,
-      ptr_vector_ptr<InlayHintLabelPart>
+      ptr_vector<InlayHintLabelPart>
     > value;
   };
 
@@ -5847,7 +5845,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * textEdits?: TextEdit[];
      */
-    optional_ptr_vector_ptr<TextEdit> textEdits;
+    optional_ptr_vector<TextEdit> textEdits;
 
     /**
      * The tooltip text when you hover over this item.
@@ -6580,7 +6578,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * documentationFormat?: MarkupKind[];
      */
-    optional_vector_ptr<MarkupKind> documentationFormat;
+    optional_vector<MarkupKind> documentationFormat;
 
     /**
      * Client supports the deprecated property on a completion item.
@@ -6670,7 +6668,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_vector_ptr<string> itemDefaults;
+    optional_vector<string> itemDefaults;
   };
 
   /**
@@ -6947,7 +6945,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * triggerCharacters?: string[];
      */
-    optional_vector_ptr<string> triggerCharacters;
+    optional_vector<string> triggerCharacters;
 
     /**
      * The list of all possible characters that commit a completion. This field
@@ -6962,7 +6960,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.2.0
      */
-    optional_vector_ptr<string> allCommitCharacters;
+    optional_vector<string> allCommitCharacters;
 
     /**
      * The server provides support to resolve additional information for a
@@ -7226,7 +7224,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.15.0
      */
-    optional_vector_ptr<CompletionItemTag> tags;
+    optional_vector<CompletionItemTag> tags;
 
     /**
      * A human-readable string with additional information about this item, like
@@ -7374,7 +7372,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * additionalTextEdits?: TextEdit[];
      */
-    optional_ptr_vector_ptr<TextEdit> additionalTextEdits;
+    optional_ptr_vector<TextEdit> additionalTextEdits;
 
     /**
      * An optional set of characters that when pressed while this completion is
@@ -7384,7 +7382,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * commitCharacters?: string[];
      */
-    optional_vector_ptr<string> commitCharacters;
+    optional_vector<string> commitCharacters;
 
     /**
      * An optional command that is executed *after* inserting this completion.
@@ -7431,7 +7429,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_vector_ptr<string> commitCharacters;
+    optional_vector<string> commitCharacters;
 
     /**
      * A default edit range
@@ -7549,7 +7547,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * items: CompletionItem[];
      */
-    ptr_vector_ptr<CompletionItem> items;
+    ptr_vector<CompletionItem> items;
   };
 
   // -----------------------------------------------------------------------
@@ -7696,7 +7694,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * diagnostics: Diagnostic[];
      */
-    ptr_vector_ptr<Diagnostic> diagnostics;
+    ptr_vector<Diagnostic> diagnostics;
   };
 
   /**
@@ -7932,7 +7930,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * items: Diagnostic[];
      */
-    ptr_vector_ptr<Diagnostic> items;
+    ptr_vector<Diagnostic> items;
   };
 
   /**
@@ -8262,7 +8260,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * items: WorkspaceDocumentDiagnosticReport[];
      */
-    ptr_vector_ptr<WorkspaceDocumentDiagnosticReport> items;
+    ptr_vector<WorkspaceDocumentDiagnosticReport> items;
   };
 
   /**
@@ -8279,7 +8277,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * items: WorkspaceDocumentDiagnosticReport[];
      */
-    ptr_vector_ptr<WorkspaceDocumentDiagnosticReport> items;
+    ptr_vector<WorkspaceDocumentDiagnosticReport> items;
   };
 
   /**
@@ -8332,7 +8330,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * previousResultIds: PreviousResultId[];
      */
-    ptr_vector_ptr<PreviousResultId> previousResultIds;
+    ptr_vector<PreviousResultId> previousResultIds;
   };
 
   /**
@@ -8417,7 +8415,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * documentationFormat?: MarkupKind[];
      */
-    optional_vector_ptr<MarkupKind> documentationFormat;
+    optional_vector<MarkupKind> documentationFormat;
 
     /**
      * Client capabilities specific to parameter information.
@@ -8512,7 +8510,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * triggerCharacters?: string[];
      */
-    optional_vector_ptr<string> triggerCharacters;
+    optional_vector<string> triggerCharacters;
 
     /**
      * List of characters that re-trigger signature help.
@@ -8525,7 +8523,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.15.0
      */
-    optional_vector_ptr<string> retriggerCharacters;
+    optional_vector<string> retriggerCharacters;
   };
 
   /**
@@ -8664,7 +8662,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * parameters?: ParameterInformation[];
      */
-    optional_ptr_vector_ptr<ParameterInformation> parameters;
+    optional_ptr_vector<ParameterInformation> parameters;
 
     /**
      * The index of the active parameter.
@@ -8702,7 +8700,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * signatures: SignatureInformation[];
      */
-    ptr_vector_ptr<SignatureInformation> signatures;
+    ptr_vector<SignatureInformation> signatures;
 
     /**
      * The active signature. If omitted or the value lies outside the range of
@@ -9120,7 +9118,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * codeActionKinds?: CodeActionKind[];
      */
-    optional_vector_ptr<CodeActionKind> codeActionKinds;
+    optional_vector<CodeActionKind> codeActionKinds;
 
     /**
      * The server provides support to resolve additional information for a code
@@ -9203,7 +9201,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * diagnostics: Diagnostic[];
      */
-    ptr_vector_ptr<Diagnostic> diagnostics;
+    ptr_vector<Diagnostic> diagnostics;
 
     /**
      * Requested kind of actions to return.
@@ -9213,7 +9211,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * only?: CodeActionKind[];
      */
-    optional_vector_ptr<CodeActionKind> only;
+    optional_vector<CodeActionKind> only;
 
     /**
      * The reason why code actions were requested.
@@ -9328,7 +9326,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * diagnostics?: Diagnostic[];
      */
-    ptr_vector_ptr<Diagnostic> diagnostics;
+    ptr_vector<Diagnostic> diagnostics;
 
     /**
      * Marks this as a preferred action. Preferred actions are used by the `auto
@@ -9657,7 +9655,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * additionalTextEdits?: TextEdit[];
      */
-    optional_ptr_vector_ptr<TextEdit> additionalTextEdits;
+    optional_ptr_vector<TextEdit> additionalTextEdits;
   };
 
   /**
@@ -9956,7 +9954,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * moreTriggerCharacter?: string[];
      */
-    optional_vector_ptr<string> moreTriggerCharacter;
+    optional_vector<string> moreTriggerCharacter;
   };
 
   /**
@@ -10300,7 +10298,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * ranges: Range[];
      */
-    ptr_vector_ptr<Range> ranges;
+    ptr_vector<Range> ranges;
 
     /**
      * An optional word pattern (regular expression) that describes valid
@@ -10520,7 +10518,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tags?: SymbolTag[];
      */
-    optional_vector_ptr<SymbolTag> tags;
+    optional_vector<SymbolTag> tags;
 
     /**
      * The name of the symbol containing this symbol. This information is for
@@ -10638,7 +10636,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * items: ConfigurationItem[];
      */
-    ptr_vector_ptr<ConfigurationItem> items;
+    ptr_vector<ConfigurationItem> items;
   };
 
   /**
@@ -10800,14 +10798,14 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * added: WorkspaceFolder[];
      */
-    ptr_vector_ptr<WorkspaceFolder> added;
+    ptr_vector<WorkspaceFolder> added;
 
     /**
      * The array of the removed workspace folders
      *
      * removed: WorkspaceFolder[];
      */
-    ptr_vector_ptr<WorkspaceFolder> removed;
+    ptr_vector<WorkspaceFolder> removed;
   };
 
   /**
@@ -11010,7 +11008,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * filters: FileOperationFilter[];
      */
-    ptr_vector_ptr<FileOperationFilter> filters;
+    ptr_vector<FileOperationFilter> filters;
   };
 
   /**
@@ -11062,7 +11060,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * files: FileCreate[];
      */
-    ptr_vector_ptr<FileCreate> files;
+    ptr_vector<FileCreate> files;
   };
 
   // -----------------------------------------------------------------------
@@ -11163,7 +11161,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * files: FileRename[];
      */
-    ptr_vector_ptr<FileRename> files;
+    ptr_vector<FileRename> files;
   };
 
   // -----------------------------------------------------------------------
@@ -11259,7 +11257,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * files: FileDelete[];
      */
-    ptr_vector_ptr<FileDelete> files;
+    ptr_vector<FileDelete> files;
   };
 
   // -----------------------------------------------------------------------
@@ -11499,7 +11497,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * watchers: FileSystemWatcher[];
      */
-    ptr_vector_ptr<FileSystemWatcher> watchers;
+    ptr_vector<FileSystemWatcher> watchers;
   };
 
   /**
@@ -11581,7 +11579,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * changes: FileEvent[];
      */
-    ptr_vector_ptr<FileEvent> changes;
+    ptr_vector<FileEvent> changes;
   };
 
   /**
@@ -11625,7 +11623,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * commands: string[];
      */
-    vector_ptr<string> commands;
+    std::vector<string> commands;
   };
 
   /**
@@ -11674,7 +11672,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * arguments?: LSPAny[];
      */
-    optional_ptr_vector_ptr<LSPAny> arguments;
+    optional_ptr_vector<LSPAny> arguments;
   };
 
   /**
@@ -11936,7 +11934,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * actions?: MessageActionItem[];
      */
-    optional_ptr_vector_ptr<MessageActionItem> actions;
+    optional_ptr_vector<MessageActionItem> actions;
   };
 
   /**
@@ -12592,7 +12590,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * cells: NotebookCell[];
      */
-    ptr_vector_ptr<NotebookCell> cells;
+    ptr_vector<NotebookCell> cells;
   };
 
   enum class NotebookDocumentFilterType {
@@ -13096,7 +13094,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr_vector_ptr<PositionEncodingKind> positionEncodings;
+    optional_ptr_vector<PositionEncodingKind> positionEncodings;
   };
 
   /**
@@ -13442,7 +13440,7 @@ namespace LCompilers::LanguageServerProtocol {
     TextDocumentSyncType type;
     std::variant<
       std::unique_ptr<TextDocumentSyncOptions>,
-      std::unique_ptr<TextDocumentSyncKind>
+      TextDocumentSyncKind
     > value;
   };
 
@@ -13518,7 +13516,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * cells?: { language: string }[];
      */
-    optional_ptr_vector_ptr<NotebookSelectorCell> cells;
+    optional_ptr_vector<NotebookSelectorCell> cells;
   };
 
   struct CellsRequiredNotebookSelector {
@@ -13536,7 +13534,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * cells?: { language: string }[];
      */
-    ptr_vector_ptr<NotebookSelectorCell> cells;
+    ptr_vector<NotebookSelectorCell> cells;
   };
 
   enum class NotebookSelectorType {
@@ -13588,7 +13586,7 @@ namespace LCompilers::LanguageServerProtocol {
      *   cells: { language: string }[];
      * })[];
      */
-    ptr_vector_ptr<NotebookSelector> notebookSelector;
+    ptr_vector<NotebookSelector> notebookSelector;
 
     /**
      * Whether save notification should be forwarded to the server. Will only be
@@ -13645,7 +13643,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * cellTextDocuments: TextDocumentItem[];
      */
-    ptr_vector_ptr<TextDocumentItem> cellTextDocuments;
+    ptr_vector<TextDocumentItem> cellTextDocuments;
   };
 
   /**
@@ -13726,7 +13724,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * cells?: NotebookCell[];
      */
-    optional_ptr_vector_ptr<NotebookCell> cells;
+    optional_ptr_vector<NotebookCell> cells;
   };
 
   struct NotebookDocumentChangeEventCellsStructure {
@@ -13743,14 +13741,14 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * didOpen?: TextDocumentItem[];
      */
-    optional_ptr_vector_ptr<TextDocumentItem> didOpen;
+    optional_ptr_vector<TextDocumentItem> didOpen;
 
     /**
      * Additional closed cell text documents.
      *
      * didClose?: TextDocumentIdentifier[];
      */
-    optional_ptr_vector_ptr<TextDocumentIdentifier> didClose;
+    optional_ptr_vector<TextDocumentIdentifier> didClose;
   };
 
   struct NotebookDocumentChangeEventCellsTextContent {
@@ -13763,7 +13761,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * changes: TextDocumentContentChangeEvent[];
      */
-    ptr_vector_ptr<TextDocumentContentChangeEvent> changes;
+    ptr_vector<TextDocumentContentChangeEvent> changes;
   };
 
   struct NotebookDocumentChangeEventCells {
@@ -13785,7 +13783,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * data?: NotebookCell[];
      */
-    optional_ptr_vector_ptr<NotebookCell> data;
+    optional_ptr_vector<NotebookCell> data;
 
     /**
      * Changes to the text content of notebook cells.
@@ -13795,7 +13793,7 @@ namespace LCompilers::LanguageServerProtocol {
      *   changes: TextDocumentContentChangeEvent[];
      * }[];
      */
-    optional_ptr_vector_ptr<NotebookDocumentChangeEventCellsTextContent> textContent;
+    optional_ptr_vector<NotebookDocumentChangeEventCellsTextContent> textContent;
   };
 
   /**
@@ -13955,7 +13953,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * cellTextDocuments: TextDocumentIdentifier[];
      */
-    ptr_vector_ptr<TextDocumentIdentifier> cellTextDocuments;
+    ptr_vector<TextDocumentIdentifier> cellTextDocuments;
   };
 
   enum class NotebookDocumentSyncType {
@@ -14844,7 +14842,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * registrations: Registration[];
      */
-    ptr_vector_ptr<Registration> registrations;
+    ptr_vector<Registration> registrations;
   };
 
   /**
@@ -14894,7 +14892,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * unregisterations: Unregistration[];
      */
-    ptr_vector_ptr<Unregistration> unregisterations;  //<- Typo is part of spec!
+    ptr_vector<Unregistration> unregisterations;  //<- Typo is part of spec!
   };
 
   /**
@@ -15169,7 +15167,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.6.0
      */
-    optional_ptr_vector_ptr<WorkspaceFolder> workspaceFolders;
+    optional_ptr_vector<WorkspaceFolder> workspaceFolders;
   };
 
   /**
@@ -15285,7 +15283,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * contentChanges: TextDocumentContentChangeEvent[];
      */
-    ptr_vector_ptr<TextDocumentContentChangeEvent> contentChanges;
+    ptr_vector<TextDocumentContentChangeEvent> contentChanges;
   };
 
   /**
@@ -15460,6 +15458,34 @@ namespace LCompilers::LanguageServerProtocol {
      */
     std::unique_ptr<TextDocumentIdentifier> textDocument;
   };
+
+  enum class RequestMethod {
+    INITIALIZE,
+  };
+
+  extern std::map<RequestMethod, std::string> RequestMethodNames;
+
+  extern std::map<RequestMethod, std::string> RequestMethodValues;
+
+  auto requestMethodByName(const std::string &name) -> RequestMethod;
+
+  auto requestMethodByValue(const std::string &value) -> RequestMethod;
+
+  enum class NotificationMethod {
+    INITIALIZED,
+    DID_OPEN_TEXT_DOCUMENT,
+    DID_CHANGE_TEXT_DOCUMENT,
+    DID_SAVE_TEXT_DOCUMENT,
+    DID_CLOSE_TEXT_DOCUMENT,
+  };
+
+  extern std::map<NotificationMethod, std::string> NotificationMethodNames;
+
+  extern std::map<NotificationMethod, std::string> NotificationMethodValues;
+
+  auto notificationMethodByName(const std::string &name) -> NotificationMethod;
+
+  auto notificationMethodByValue(const std::string &value) -> NotificationMethod;
 
   // Implementation Considerations
   // Language servers usually run in a separate process and clients communicate

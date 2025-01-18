@@ -4,6 +4,35 @@
 
 namespace LCompilers::LanguageServerProtocol {
 
+  std::map<ErrorCodes, std::string> ErrorCodeNames = {
+    {ErrorCodes::ParseError, "ParseError"},
+    {ErrorCodes::InvalidRequest, "InvalidRequest"},
+    {ErrorCodes::MethodNotFound, "MethodNotFound"},
+    {ErrorCodes::InvalidParams, "InvalidParams"},
+    {ErrorCodes::InternalError, "InternalError"},
+    {ErrorCodes::jsonrpcReservedErrorRangeStart, "jsonrpcReservedErrorRangeStart"},
+    {ErrorCodes::serverErrorStart, "serverErrorStart"},
+    {ErrorCodes::ServerNotInitialized, "ServerNotInitialized"},
+    {ErrorCodes::UnknownErrorCode, "UnknownErrorCode"},
+    {ErrorCodes::jsonrpcReservedErrorRangeEnd, "jsonrpcReservedErrorRangeEnd"},
+    {ErrorCodes::serverErrorEnd, "serverErrorEnd"},
+    {ErrorCodes::lspReservedErrorRangeStart, "lspReservedErrorRangeStart"},
+    {ErrorCodes::RequestFailed, "RequestFailed"},
+    {ErrorCodes::ServerCancelled, "ServerCancelled"},
+    {ErrorCodes::ContentModified, "ContentModified"},
+    {ErrorCodes::RequestCancelled, "RequestCancelled"},
+    {ErrorCodes::lspReservedErrorRangeEnd, "lspReservedErrorRangeEnd"},
+  };
+
+  auto errorCodeByName(const std::string &name) -> ErrorCodes {
+    for (const auto &[enum_key, enum_value] : ErrorCodeNames) {
+      if (name == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid ErrorCode name: " + name);
+  }
+
   std::map<PositionEncodingKind, std::string> PositionEncodingKindNames = {
     {PositionEncodingKind::UTF8, "UTF8"},
     {PositionEncodingKind::UTF16, "UTF16"},
@@ -833,6 +862,66 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument("Invalid MessageType name: " + name);
+  }
+
+  std::map<RequestMethod, std::string> RequestMethodNames = {
+    {RequestMethod::INITIALIZE, "INITIALIZE"},
+  };
+
+  std::map<RequestMethod, std::string> RequestMethodValues = {
+    {RequestMethod::INITIALIZE, "initialize"},
+  };
+
+  auto requestMethodByName(const std::string &name) -> RequestMethod {
+    for (const auto &[enum_key, enum_value] : RequestMethodNames) {
+      if (name == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid RequestMethod name: " + name);
+  }
+
+  auto requestMethodByValue(const std::string &value) -> RequestMethod {
+    for (const auto &[enum_key, enum_value] : RequestMethodValues) {
+      if (value == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid RequestMethod value: " + value);
+  }
+
+  std::map<NotificationMethod, std::string> NotificationMethodNames = {
+    {NotificationMethod::INITIALIZED, "INITIALIZED"},
+    {NotificationMethod::DID_OPEN_TEXT_DOCUMENT, "DID_OPEN_TEXT_DOCUMENT"},
+    {NotificationMethod::DID_CHANGE_TEXT_DOCUMENT, "DID_CHANGE_TEXT_DOCUMENT"},
+    {NotificationMethod::DID_SAVE_TEXT_DOCUMENT, "DID_SAVE_TEXT_DOCUMENT"},
+    {NotificationMethod::DID_CLOSE_TEXT_DOCUMENT, "DID_CLOSE_TEXT_DOCUMENT"},
+  };
+
+  std::map<NotificationMethod, std::string> NotificationMethodValues = {
+    {NotificationMethod::INITIALIZED, "initialized"},
+    {NotificationMethod::DID_OPEN_TEXT_DOCUMENT, "textDocument/didOpen"},
+    {NotificationMethod::DID_CHANGE_TEXT_DOCUMENT, "textDocument/didChange"},
+    {NotificationMethod::DID_SAVE_TEXT_DOCUMENT, "textDocument/didSave"},
+    {NotificationMethod::DID_CLOSE_TEXT_DOCUMENT, "textDocument/didClose"},
+  };
+
+  auto notificationMethodByName(const std::string &name) -> NotificationMethod {
+    for (const auto &[enum_key, enum_value] : NotificationMethodNames) {
+      if (name == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid NotificationMethod name: " + name);
+  }
+
+  auto notificationMethodByValue(const std::string &value) -> NotificationMethod {
+    for (const auto &[enum_key, enum_value] : NotificationMethodValues) {
+      if (value == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid NotificationMethod value: " + value);
   }
 
 } // namespace LCompilers::LanguageServerProtocol

@@ -45,12 +45,12 @@ namespace LCompilers::LanguageServer {
 
   void StdIOCommunicationProtocol::serve() {
     std::cerr
-      << "Serving stdio requests with " << threadPool->numThreads() << " threads."
+      << "Serving stdio requests with " << threadPool->getNumThreads() << " threads."
       << std::endl;
     std::unique_ptr<RequestParser> parser = parserFactory.build();
     std::string request;
-    std::mutex &stdoutMutex = threadPool->stdoutMutex();
-    std::mutex &stderrMutex = threadPool->stderrMutex();
+    std::mutex &stdoutMutex = threadPool->getStdoutMutex();
+    std::mutex &stderrMutex = threadPool->getStderrMutex();
     std::mutex printMutex;
     std::condition_variable responsePrinted;
     std::size_t requestId = 0;
