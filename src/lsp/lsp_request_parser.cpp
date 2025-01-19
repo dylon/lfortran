@@ -1,4 +1,5 @@
 #include <format>
+#include <iostream>
 
 #include "lsp/request_parser.h"
 
@@ -10,11 +11,6 @@ namespace LCompilers::LanguageServerProtocol {
     : interactive(interactive)
   {
     // empty
-  }
-
-  void LspRequestParser::finish() {
-    _state = ls::RequestParserState::ERROR;
-    _error = "Finished prematurely.";
   }
 
   auto LspRequestParser::parse(unsigned char c) -> bool {
@@ -99,6 +95,11 @@ namespace LCompilers::LanguageServerProtocol {
       column = 0;
       break;
     }
+    case '\\': {
+      if (interactive && escaped) {
+        break;
+      }
+    } // fallthrough
     default: {
       ++column;
     }
@@ -131,7 +132,7 @@ namespace LCompilers::LanguageServerProtocol {
       case ':': {
         _state = ls::RequestParserState::PARSING_HEADER;
         headerState = ls::RequestHeaderParserState::PARSING_NAME;
-        return parseHeader(c);
+        return parse(c);
       }
       case '\\': {
         if (interactive) {
@@ -147,11 +148,11 @@ namespace LCompilers::LanguageServerProtocol {
           escaped = false;
           switch (c) {
           case 'n': {
-            return parseStartLine('\n');
+            return parse('\n');
             break;
           }
           case 'r': {
-            return parseStartLine('\r');
+            return parse('\r');
             break;
           }
           case 't': {
@@ -207,12 +208,10 @@ namespace LCompilers::LanguageServerProtocol {
           escaped = false;
           switch (c) {
           case 'n': {
-            return parseHeader('\n');
-            break;
+            return parse('\n');
           }
           case 'r': {
-            return parseHeader('\r');
-            break;
+            return parse('\r');
           }
           }
         }
@@ -254,9 +253,11 @@ namespace LCompilers::LanguageServerProtocol {
     } // fallthrough
     case ls::RequestHeaderParserState::PARSING_NAME: {
       switch (c) {
-      case '\r': // fallthrough
+      case '\r': {
+        break;
+      }
       case '\n': {
-        if (column == 0) {
+        if ((column == 0) || (interactive && (column == 1))) {
           _state = ls::RequestParserState::PARSING_SEPARATOR;
           headerState = ls::RequestHeaderParserState::COMPLETE;
           break;
@@ -288,12 +289,10 @@ namespace LCompilers::LanguageServerProtocol {
           escaped = false;
           switch (c) {
           case 'n': {
-            return parseHeader('\n');
-            break;
+            return parse('\n');
           }
           case 'r': {
-            return parseHeader('\r');
-            break;
+            return parse('\r');
           }
           case 't': {
             ss << '\t';
@@ -376,12 +375,10 @@ namespace LCompilers::LanguageServerProtocol {
           escaped = false;
           switch (c) {
           case 'n': {
-            return parseHeader('\n');
-            break;
+            return parse('\n');
           }
           case 'r': {
-            return parseHeader('\r');
-            break;
+            return parse('\r');
           }
           case 't': {
             ss << '\t';
@@ -435,12 +432,10 @@ namespace LCompilers::LanguageServerProtocol {
           escaped = false;
           switch (c) {
           case 'n': {
-            return parseHeader('\n');
-            break;
+            return parse('\n');
           }
           case 'r': {
-            return parseHeader('\r');
-            break;
+            return parse('\r');
           }
           }
         }

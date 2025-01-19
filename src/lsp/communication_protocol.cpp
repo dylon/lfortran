@@ -58,10 +58,6 @@ namespace LCompilers::LanguageServer {
     try {
       bool pending = true;
       while (std::getline(std::cin, line)) {
-        {
-          std::unique_lock<std::mutex> stderrLock(stderrMutex);
-          std::cerr << "line = '" << line << "'" << std::endl;
-        }
         for (std::size_t i = 0; (i < line.length()) && pending; i++) {
           unsigned char c = line[i];
           pending = !parser->parse(c);
@@ -138,15 +134,20 @@ namespace LCompilers::LanguageServer {
               std::unique_lock<std::mutex> stderrLock(stderrMutex);
               std::cerr << "Cannot parse an empty request body." << std::endl;
             }
-          } else {
+          } else if (parser->state() == RequestParserState::ERROR) {
             const std::string &error = parser->error();
             std::unique_lock<std::mutex> stderrLock(stderrMutex);
             std::cerr << "Failed to parse request: " << error << std::endl;
+          } else {
+            std::unique_lock<std::mutex> stderrLock(stderrMutex);
+            std::cerr
+              << "Parser in unexpected state: " << static_cast<int>(parser->state())
+              << std::endl;
           }
           parser->reset();
           ++requestId;
+          pending = true;
         } else {
-          parser->parse('\r');
           parser->parse('\n');
         }
       }
@@ -168,8 +169,12 @@ namespace LCompilers::LanguageServer {
           std::unique_lock<std::mutex> stderrLock(stderrMutex);
           std::cerr << "response = " << response << std::endl;
         }
-        std::cout << response << std::flush;
-        std::cerr << std::endl;
+        {
+          std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
+          std::unique_lock<std::mutex> stderrLock(stderrMutex);
+          std::cout << response << std::flush;
+          std::cerr << std::endl;
+        }
       }
     } catch (std::exception &e) {
       std::cerr

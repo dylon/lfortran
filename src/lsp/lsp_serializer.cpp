@@ -5,6 +5,7 @@
 #include <rapidjson/rapidjson.h>
 
 #include <lsp/specification.h>
+#include <lsp/lsp_exception.h>
 #include <lsp/lsp_serializer.h>
 
 namespace LCompilers::LanguageServerProtocol {
@@ -190,7 +191,8 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      throw std::runtime_error(
+      throw LspException(
+        ErrorCodes::InvalidParams,
         std::format(
           "Unsupported RequestId type: {}",
           static_cast<int>(jsonId.GetType())
@@ -242,7 +244,8 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      throw std::logic_error(
+      throw LspException(
+        ErrorCodes::InvalidParams,
         std::format(
           "Unsupported RequestParams type: {}",
           static_cast<int>(jsonParams.GetType())
@@ -282,7 +285,8 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      throw std::logic_error(
+      throw LspException(
+        ErrorCodes::InvalidParams,
         std::format(
           "Unsupported NotificationParams type: {}",
           static_cast<int>(jsonParams.GetType())
@@ -347,7 +351,8 @@ namespace LCompilers::LanguageServerProtocol {
         lspAny->type = LSPAnyType::LSP_UINTEGER;
         lspAny->value = json.GetUint();
       } else {
-        throw std::logic_error(
+        throw LspException(
+          ErrorCodes::InvalidParams,
           std::format(
             "Unsupported JSON number type: {}",
             static_cast<int>(json.GetType())

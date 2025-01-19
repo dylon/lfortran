@@ -13,7 +13,6 @@ namespace LCompilers::LanguageServerProtocol {
   class LspRequestParser : public ls::RequestParser {
   public:
     LspRequestParser(bool interactive);
-    void finish() override;
     bool parse(unsigned char c) override;
   private:
     bool interactive;

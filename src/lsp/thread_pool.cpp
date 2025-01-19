@@ -55,6 +55,7 @@ namespace LCompilers::LanguageServer::Threading {
         << std::endl;
     }
     stopRunning = true;
+    taskAvailable.notify_all();
   }
 
   auto ThreadPool::stopNow() -> void {
@@ -66,6 +67,7 @@ namespace LCompilers::LanguageServer::Threading {
     }
     stopRunning = true;
     stopRunningNow = true;
+    taskAvailable.notify_all();
   }
 
   auto ThreadPool::join() -> void {
@@ -77,31 +79,28 @@ namespace LCompilers::LanguageServer::Threading {
 
   auto ThreadPool::run(const std::size_t threadId) -> void {
     try {
-      while (!stopRunningNow) {
+      while (!stopRunningNow && (!stopRunning || !tasks.empty())) {
         std::unique_lock<std::mutex> taskLock(taskMutex);
-        if (taskAvailable.wait_for(taskLock, 200ms, [this]() {
-          return tasks.size() > 0;
-        })) {
-          if (!stopRunningNow) {
-            Task task = tasks.front();
-            tasks.pop();
-            taskLock.unlock();
-            try {
-              task(threadId);
-            } catch (std::exception &e) {
-              std::unique_lock<std::mutex> stderrLock(stderrMutex);
-              std::cerr
-                << "[thread.id=" << threadId << "] "
-                << "Failed to execute task: " << e.what()
-                << std::endl;
-            }
+        taskAvailable.wait(taskLock, [this]() {
+          return !tasks.empty() || stopRunning;
+        });
+        if (!stopRunningNow && !tasks.empty()) {
+          Task task = tasks.front();
+          tasks.pop();
+          taskLock.unlock();
+          try {
+            task(threadId);
+          } catch (std::exception &e) {
+            std::unique_lock<std::mutex> stderrLock(stderrMutex);
+            std::cerr
+              << "[thread.id=" << threadId << "] "
+              << "Failed to execute task: " << e.what()
+              << std::endl;
           }
-        } else if (stopRunning) {
-          break;
         }
       }
       {
-        std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
+        std::unique_lock<std::mutex> stderrLock(stderrMutex);
         std::cerr
           << "[thread.id=" << threadId << "] "
           << "Shutting down thread."

@@ -26,4 +26,16 @@ namespace LCompilers::LanguageServer {
     _state = RequestParserState::RESET;
   }
 
+  void RequestParser::finish() {
+    switch (_state) {
+    case RequestParserState::INITIAL: break;
+    case RequestParserState::COMPLETE: break;
+    case RequestParserState::ERROR: break;
+    default: {
+      _state = RequestParserState::ERROR;
+      _error = "Finished prematurely.";
+    }
+    }
+  }
+
 } // LCompilers::LanguageServer
