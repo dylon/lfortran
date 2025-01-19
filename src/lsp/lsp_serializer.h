@@ -18,11 +18,13 @@ namespace LCompilers::LanguageServerProtocol {
   private:
     auto setResponseId(
       rapidjson::Document &document,
-      const ResponseId &id
+      const ResponseId &id,
+      rapidjson::Document::AllocatorType &allocator
     ) const -> void;
     auto setResponseError(
       const ResponseError &error,
-      rapidjson::Document &document
+      rapidjson::Document &document,
+      rapidjson::Document::AllocatorType &allocator
     ) const -> void;
     auto lspToJson(
       const LSPAny &lspAny,

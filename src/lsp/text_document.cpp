@@ -1,9 +1,10 @@
 #include <algorithm>
 #include <format>
-#include <fstream>
+#include <iostream>
 #include <mutex>
 #include <stdexcept>
 
+#include <lsp/lsp_exception.h>
 #include <lsp/specification.h>
 #include <lsp/text_document.h>
 
@@ -16,23 +17,11 @@ namespace LCompilers::LanguageServerProtocol {
     , _text(text)
   {
     validateUriAndSetPath();
-  }
-
-  auto TextDocument::load() -> void {
-    validateUriAndSetPath();
-
-    std::ifstream file(_path);
-    if (!file.is_open()) {
-      throw std::runtime_error(
-        std::format("Cannot open file for reading: {}", _path.string())
-      );
-    }
-
-    ss.str("");
-    ss << file.rdbuf();
-    file.close();
-    std::string text = ss.str();
-    setText(text);
+    // std::cerr  // DEBUG
+    //   << "================================================================================" << std::endl
+    //   << _text
+    //   << "================================================================================" << std::endl;
+    indexLines();
   }
 
   auto TextDocument::validateUriAndSetPath() -> void {
@@ -55,6 +44,10 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::setText(const std::string &text) -> void {
     std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
     _text = text;
+    // std::cerr  // DEBUG
+    //   << "================================================================================" << std::endl
+    //   << _text
+    //   << "================================================================================" << std::endl;
     indexLines();
   }
 
@@ -79,11 +72,28 @@ namespace LCompilers::LanguageServerProtocol {
         std::size_t k;
         std::string patch;
         decompose(*change, j, k, patch);
-        ss << _text.substr(i, j);
+        if (i < _text.length()) {
+          // std::cerr
+          //   << "text[" << i << ":" << j << "] "
+          //   << "= text.substr(" << i << ", " << (j - i) << ") "
+          //   << "= \"" << _text.substr(i, (j - i)) << "\""
+          //   << std::endl;
+          ss << _text.substr(i, (j - i));
+        }
+        // std::cerr
+        //   << "text[" << j << ":" << k << "] = \"" << patch << "\""
+        //   << std::endl;
         ss << patch;
         i = k;
       }
-      ss << _text.substr(i, _text.length());
+      if (i < _text.length()) {
+        // std::cerr
+        //   << "text[" << i << ":" << _text.length() << "] "
+        //   << "= text.substr(" << i << ", " << (_text.length() - i) << ") "
+        //   << "= \"" << _text.substr(i, (_text.length() - i)) << "\""
+        //   << std::endl;
+        ss << _text.substr(i, (_text.length() - i));
+      }
       std::string text = ss.str();
       setText(text);
     }
@@ -92,6 +102,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::indexLines() -> void {
     lineIndices.clear();
     lineIndices.push_back(0);
+    // std::cerr << "lineIndices[0] = 0" << std::endl;
     for (std::size_t index = 0; index < _text.length(); ++index) {
       unsigned char c = _text[index];
       switch (c) {
@@ -101,7 +112,8 @@ namespace LCompilers::LanguageServerProtocol {
         }
       } // fallthrough
       case '\n': {
-        lineIndices.push_back(index);
+        // std::cerr << "lineIndices[" << lineIndices.size() << "] = " << (index + 1) << std::endl;
+        lineIndices.push_back(index + 1);
       }
       }
     }
@@ -179,8 +191,50 @@ namespace LCompilers::LanguageServerProtocol {
     const Range &range = *event.range;
     const Position &start = *range.start;
     const Position &end = *range.end;
-    j = lineIndices[start.line] + start.character;
-    k = lineIndices[end.line] + start.character;
+
+    if (start.line > end.line) {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        std::format(
+          "start.line must be <= end.line, but {} > {}",
+          start.line,
+          end.line
+        )
+      );
+    }
+
+    if ((start.line == end.line) && (start.character > end.character)) {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        std::format(
+          "start.character must be <= end.character when colinear, but {} > {}",
+          start.character,
+          end.character
+        )
+      );
+    }
+
+    if (start.line < lineIndices.size()) {
+      j = lineIndices[start.line] + start.character;
+    } else if (start.line == lineIndices[lineIndices.size() - 1] + 1) {
+      j = _text.length();
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        std::format(
+          "start.line must be <= {} but was: {}",
+          lineIndices[lineIndices.size() - 1] + 1,
+          start.line
+        )
+      );
+    }
+
+    if (end.line < lineIndices.size()) {
+      k = lineIndices[end.line] + end.character;
+    } else {
+      k = j + event.text.length();
+    }
+
     patch = event.text;
   }
 

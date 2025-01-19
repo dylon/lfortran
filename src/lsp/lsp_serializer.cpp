@@ -1,5 +1,5 @@
 #include <format>
-#include <stdexcept>
+#include <iostream>
 #include <utility>
 
 #include <rapidjson/rapidjson.h>
@@ -25,25 +25,25 @@ namespace LCompilers::LanguageServerProtocol {
       ),
       allocator
     );
-    setResponseId(document, *response.id);
+    setResponseId(document, *response.id, allocator);
     if (response.result.has_value()) {
       rapidjson::Value result = lspToJson(
         *response.result.value(),
-        document.GetAllocator()
+        allocator
       );
-      document.AddMember("result", result, document.GetAllocator());
+      document.AddMember("result", result, allocator);
     }
     if (response.error.has_value()) {
-      setResponseError(*response.error.value(), document);
+      setResponseError(*response.error.value(), document, allocator);
     }
     return serialize(document);
   }
 
   auto JsonRpcLspSerializer::setResponseId(
     rapidjson::Document &document,
-    const ResponseId &id
+    const ResponseId &id,
+    rapidjson::Document::AllocatorType &allocator
   ) const -> void {
-    rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
     switch (id.type) {
     case ResponseIdType::LSP_INTEGER: {
       document.AddMember(
@@ -79,9 +79,9 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto JsonRpcLspSerializer::setResponseError(
     const ResponseError &error,
-    rapidjson::Document &document
+    rapidjson::Document &document,
+    rapidjson::Document::AllocatorType &allocator
   ) const -> void {
-    rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
     rapidjson::Value value(rapidjson::kObjectType);
     value.AddMember("code", error.code, allocator);
     value.AddMember(

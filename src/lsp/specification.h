@@ -92,14 +92,14 @@ namespace LCompilers::LanguageServerProtocol {
   typedef std::vector<std::unique_ptr<LSPAny>> LSPArray;
 
   enum class LSPAnyType {
-    LSP_OBJECT,
-    LSP_ARRAY,
-    LSP_STRING,
-    LSP_INTEGER,
-    LSP_UINTEGER,
-    LSP_DECIMAL,
-    LSP_BOOLEAN,
-    LSP_NULL,
+    LSP_OBJECT = 0,
+    LSP_ARRAY = 1,
+    LSP_STRING = 2,
+    LSP_INTEGER = 3,
+    LSP_UINTEGER = 4,
+    LSP_DECIMAL = 5,
+    LSP_BOOLEAN = 6,
+    LSP_NULL = 7,
   };
 
   /**

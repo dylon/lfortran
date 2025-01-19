@@ -1,3 +1,4 @@
+#include <cmath>
 #include <format>
 #include <iostream>
 #include <mutex>
@@ -124,6 +125,9 @@ namespace LCompilers::LanguageServerProtocol {
     } catch (std::invalid_argument &e) {
       goto invalidMethod;
     }
+    if (method != RequestMethod::INITIALIZE) {
+      assertInitialized();
+    }
     switch (method) {
     case RequestMethod::INITIALIZE: {
       const RequestParams &requestParams =
@@ -131,7 +135,7 @@ namespace LCompilers::LanguageServerProtocol {
       InitializeParams params =
         asInitializeParams(requestParams);
       InitializeResult result = initialize(params);
-      response = resultToResponseMessage(result);
+      resultToResponseMessage(response, result);
       break;
     }
     default: {
@@ -151,6 +155,8 @@ namespace LCompilers::LanguageServerProtocol {
     ResponseMessage &response,
     const NotificationMessage &notification
   ) -> void {
+    assertInitialized();
+
     NotificationMethod method;
     try {
       method = notificationMethodByValue(notification.method);
@@ -209,10 +215,19 @@ namespace LCompilers::LanguageServerProtocol {
     }
   }
 
+  void LspLanguageServer::assertInitialized() {
+    if (!_initialized) {
+      throw LspException(
+        ErrorCodes::ServerNotInitialized,
+        "Request method=\"initialize\" has not been called yet!"
+      );
+    }
+  }
+
   // request: "initialize"
-  InitializeResult LspLanguageServer::initialize(
+  auto LspLanguageServer::initialize(
     const InitializeParams &params
-  ) {
+  ) -> InitializeResult {
     InitializeResult result;
     std::unique_ptr<ServerCapabilities> capabilities =
       std::make_unique<ServerCapabilities>();
@@ -237,6 +252,9 @@ namespace LCompilers::LanguageServerProtocol {
     capabilities->textDocumentSync = std::move(textDocumentSync);
 
     result.capabilities = std::move(capabilities);
+
+    _initialized = true;
+
     return result;
   }
 
@@ -313,11 +331,10 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspLanguageServer::resultToResponseMessage(
+    ResponseMessage &response,
     const InitializeResult &result
-  ) const -> ResponseMessage {
-    ResponseMessage response;
+  ) const -> void {
     response.result = lspToAny(result);
-    return response;
   }
 
   auto LspLanguageServer::asInitializeParams(
@@ -327,9 +344,9 @@ namespace LCompilers::LanguageServerProtocol {
     if (requestParams.type == RequestParamsType::LSP_OBJECT) {
       LSPObject &lspObject =
         *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
-      if (lspObject.contains("capabilities")) {
-        initializeParams.capabilities =
-          anyToClientCapabilities(*lspObject.at("capabilities"));
+      auto iter = lspObject.find("capabilities");
+      if (iter != lspObject.end()) {
+        initializeParams.capabilities = anyToClientCapabilities(*iter->second);
       } else {
         throw LspException(
           ErrorCodes::InvalidParams,
@@ -364,10 +381,47 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject &value = *std::get<std::unique_ptr<LSPObject>>(any.value);
     std::unique_ptr<TextDocumentItem> textDocumentItem =
       std::make_unique<TextDocumentItem>();
-    textDocumentItem->uri = anyToString(*value.at("uri"));
-    textDocumentItem->languageId = anyToString(*value.at("languageId"));
-    textDocumentItem->version = anyToInt(*value.at("version"));
-    textDocumentItem->text = anyToString(*value.at("text"));
+
+    auto iter = value.find("uri");
+    if (iter != value.end()) {
+      textDocumentItem->uri = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required TextDocumentItem attribute: uri"
+      );
+    }
+
+    iter = value.find("languageId");
+    if (iter != value.end()) {
+      textDocumentItem->languageId = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required TextDocumentItem attribute: languageId"
+      );
+    }
+
+    iter = value.find("version");
+    if (iter != value.end()) {
+      textDocumentItem->version = anyToInt(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required TextDocumentItem attribute: version"
+      );
+    }
+
+    iter = value.find("text");
+    if (iter != value.end()) {
+      textDocumentItem->text = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required TextDocumentItem attribute: text"
+      );
+    }
+
     return textDocumentItem;
   }
 
@@ -381,7 +435,17 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
     std::unique_ptr<TextDocumentIdentifier> textDocumentId =
       std::make_unique<TextDocumentIdentifier>();
-    textDocumentId->uri = anyToString(*object.at("uri"));
+
+    auto iter = object.find("uri");
+    if (iter != object.end()) {
+      textDocumentId->uri = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required TextDocumentIdentifier attribute: uri"
+      );
+    }
+
     return textDocumentId;
   }
 
@@ -392,11 +456,31 @@ namespace LCompilers::LanguageServerProtocol {
       "VersionedTextDocumentIdentifier",
       any, LSPAnyType::LSP_OBJECT
     );
+
     LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
     std::unique_ptr<VersionedTextDocumentIdentifier> textDocumentId =
       std::make_unique<VersionedTextDocumentIdentifier>();
-    textDocumentId->uri = anyToString(*object.at("uri"));
-    textDocumentId->version = anyToInt(*object.at("version"));
+
+    auto iter = object.find("uri");
+    if (iter != object.end()) {
+      textDocumentId->uri = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required VersionedTextDocumentIdentifier attribute: uri"
+      );
+    }
+
+    iter = object.find("version");
+    if (iter != object.end()) {
+      textDocumentId->version = anyToInt(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required VersionedTextDocumentIdentifier attribute: version"
+      );
+    }
+
     return textDocumentId;
   }
 
@@ -405,9 +489,115 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> std::unique_ptr<TextDocumentContentChangeEvent> {
     assertAnyType("TextDocumentContentChangeEvent", any, LSPAnyType::LSP_OBJECT);
     LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
+
     std::unique_ptr<TextDocumentContentChangeEvent> change =
       std::make_unique<TextDocumentContentChangeEvent>();
+
+    auto iter = object.find("range");
+    if (iter != object.end()) {
+      change->type = TextDocumentContentChangeEventType::PARTIAL_TEXT_DOCUMENT;
+
+      std::unique_ptr<PartialTextDocumentContentChangeEvent> value =
+        std::make_unique<PartialTextDocumentContentChangeEvent>();
+      value->range = anyToRange(*iter->second);
+
+      iter = object.find("text");
+      if (iter != object.end()) {
+        value->text = anyToString(*iter->second);
+      } else {
+        throw LspException(
+          ErrorCodes::InvalidParams,
+          "Missing required TextDocumentContentChangeEvent attribute: text"
+        );
+      }
+
+      iter = object.find("rangeLength");
+      if (iter != object.end()) {
+        value->rangeLength = anyToInt(*iter->second);
+      }
+
+      change->value = std::move(value);
+    } else {
+      change->type = TextDocumentContentChangeEventType::WHOLE_TEXT_DOCUMENT;
+
+      std::unique_ptr<WholeTextDocumentContentChangeEvent> value =
+        std::make_unique<WholeTextDocumentContentChangeEvent>();
+      iter = object.find("text");
+      if (iter != object.end()) {
+        value->text = anyToString(*iter->second);
+      } else {
+        throw LspException(
+          ErrorCodes::InvalidParams,
+          "Missing required TextDocumentContentChangeEvent attribute: text"
+        );
+      }
+
+      change->value = std::move(value);
+    }
+
     return change;
+  }
+
+  auto LspLanguageServer::anyToRange(
+    const LSPAny &any
+  ) const -> std::unique_ptr<Range> {
+    assertAnyType("Range", any, LSPAnyType::LSP_OBJECT);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
+
+    std::unique_ptr<Range> range = std::make_unique<Range>();
+
+    auto iter = object.find("start");
+    if (iter != object.end()) {
+      range->start = anyToPosition(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required Range attribute: start"
+      );
+    }
+
+    iter = object.find("end");
+    if (iter != object.end()) {
+      range->end = anyToPosition(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required Range attribute: end"
+      );
+    }
+
+    return range;
+  }
+
+  auto LspLanguageServer::anyToPosition(
+    const LSPAny &any
+  ) const -> std::unique_ptr<Position> {
+    assertAnyType("Position", any, LSPAnyType::LSP_OBJECT);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
+
+    std::unique_ptr<Position> position = std::make_unique<Position>();
+
+    auto iter = object.find("line");
+    if (iter != object.end()) {
+      position->line = anyToUnsignedInt(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required Position attribute: line"
+      );
+    }
+
+    iter = object.find("character");
+    if (iter != object.end()) {
+      position->character = anyToUnsignedInt(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required Position attribute: character"
+      );
+    }
+
+    return position;
   }
 
   auto LspLanguageServer::anyToString(
@@ -420,8 +610,78 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::anyToInt(
     const LSPAny &any
   ) const -> int {
-    assertAnyType("int", any, LSPAnyType::LSP_INTEGER);
-    return std::get<int>(any.value);
+    switch (any.type) {
+    case LSPAnyType::LSP_INTEGER: {
+      return std::get<int>(any.value);
+    }
+    case LSPAnyType::LSP_UINTEGER: {
+      unsigned int value = std::get<unsigned int>(any.value);
+      return static_cast<int>(value);
+    }
+    case LSPAnyType::LSP_DECIMAL: {
+      double value = std::get<double>(any.value);
+      if (std::floor(value) != value) {
+        throw LspException(
+          ErrorCodes::InvalidParams,
+          std::format(
+            "loss of precision converting decimal to integer: {}",
+            value
+          )
+        );
+      }
+      return static_cast<int>(value);
+    }
+    default: {
+      // This will throw an exception
+      assertAnyType("int", any, LSPAnyType::LSP_INTEGER);
+    }
+    }
+    throw std::runtime_error(
+      "LspLanguageServer::anyToInt: This should not be reached."
+    );
+  }
+
+  auto LspLanguageServer::anyToUnsignedInt(
+    const LSPAny &any
+  ) const -> unsigned int {
+    switch (any.type) {
+    case LSPAnyType::LSP_UINTEGER: {
+      return std::get<unsigned int>(any.value);
+    }
+    case LSPAnyType::LSP_INTEGER: {
+      int value = std::get<int>(any.value);
+      if (value < 0) {
+        throw LspException(
+          ErrorCodes::InvalidParams,
+          std::format(
+            "unsigned int must be greater than 0, but received: {}",
+            value
+          )
+        );
+      }
+      return static_cast<unsigned int>(value);
+    }
+    case LSPAnyType::LSP_DECIMAL: {
+      double value = std::get<double>(any.value);
+      if ((std::floor(value) != value) || (value < 0.0)) {
+        throw LspException(
+          ErrorCodes::InvalidParams,
+          std::format(
+            "unsigned int must be a non-negative integer, but received: {}",
+            value
+          )
+        );
+      }
+      return static_cast<unsigned int>(value);
+    }
+    default: {
+      // This will throw an exception
+      assertAnyType("unsigned int", any, LSPAnyType::LSP_UINTEGER);
+    }
+    }
+    throw std::runtime_error(
+      "LspLanguageServer::anyToUnsignedInt: This should not be reached."
+    );
   }
 
   auto LspLanguageServer::assertAnyType(
@@ -433,7 +693,7 @@ namespace LCompilers::LanguageServerProtocol {
       throw LspException(
         ErrorCodes::InvalidParams,
         std::format(
-          "LSPAny.type for a {} must be of type {} but received type {}",
+          "LSPAny.type for a(n) {} must be of type {} but received type {}",
           name,
           static_cast<int>(type),
           static_cast<int>(any.type)
@@ -479,12 +739,22 @@ namespace LCompilers::LanguageServerProtocol {
       NotificationParamsType::LSP_OBJECT
     );
 
+    DidOpenTextDocumentParams params;
+
     const LSPObject &value =
       *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
-    const LSPAny &textDocumentItem = *value.at("textDocumentItem");
 
-    DidOpenTextDocumentParams params;
-    params.textDocument = anyToTextDocumentItem(textDocumentItem);
+    auto iter = value.find("textDocumentItem");
+    if (iter != value.end()) {
+      const LSPAny &textDocumentItem = *iter->second;
+      params.textDocument = anyToTextDocumentItem(textDocumentItem);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DidOpenTextDocumentParams attribute: textDocumentItem"
+      );
+    }
+
     return params;
   }
 
@@ -504,17 +774,33 @@ namespace LCompilers::LanguageServerProtocol {
 
     DidChangeTextDocumentParams params;
 
-    const LSPAny &textDocument = *value.at("textDocument");
-    params.textDocument = anyToVersionedTextDocumentIdentifier(textDocument);
+    auto iter = value.find("textDocument");
+    if (iter != value.end()) {
+      const LSPAny &textDocument = *iter->second;
+      params.textDocument = anyToVersionedTextDocumentIdentifier(textDocument);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DidChangeTextDocumentParams attribute: textDocument"
+      );
+    }
 
-    const LSPAny &anyContentChanges = *value.at("contentChanges");
-    assertAnyType("std::vector", anyContentChanges, LSPAnyType::LSP_ARRAY);
-    LSPArray &anyChanges =
-      *std::get<std::unique_ptr<LSPArray>>(anyContentChanges.value);
-    for (const auto &anyChange : anyChanges) {
-      std::unique_ptr<TextDocumentContentChangeEvent> change =
-        anyToTextDocumentContentChangeEvent(*anyChange);
-      params.contentChanges.push_back(std::move(change));
+    iter = value.find("contentChanges");
+    if (iter != value.end()) {
+      const LSPAny &anyContentChanges = *iter->second;
+      assertAnyType("std::vector", anyContentChanges, LSPAnyType::LSP_ARRAY);
+      LSPArray &anyChanges =
+        *std::get<std::unique_ptr<LSPArray>>(anyContentChanges.value);
+      for (const auto &anyChange : anyChanges) {
+        std::unique_ptr<TextDocumentContentChangeEvent> change =
+          anyToTextDocumentContentChangeEvent(*anyChange);
+        params.contentChanges.push_back(std::move(change));
+      }
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DidChangeTextDocumentParams attribute: contentChanges"
+      );
     }
 
     return params;
@@ -536,11 +822,27 @@ namespace LCompilers::LanguageServerProtocol {
 
     DidSaveTextDocumentParams params;
 
-    const LSPAny &textDocument = *value.at("textDocument");
-    params.textDocument = anyToTextDocumentIdentifier(textDocument);
+    auto iter = value.find("textDocument");
+    if (iter != value.end()) {
+      const LSPAny &textDocument = *iter->second;
+      params.textDocument = anyToTextDocumentIdentifier(textDocument);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DidSaveTextDocumentParams attribute: textDocument"
+      );
+    }
 
-    const LSPAny &text = *value.at("text");
-    params.text = anyToString(text);
+    iter = value.find("text");
+    if (iter != value.end()) {
+      const LSPAny &text = *iter->second;
+      params.text = anyToString(text);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DidSaveTextDocumentParams attribute: text"
+      );
+    }
 
     return params;
   }
@@ -561,8 +863,16 @@ namespace LCompilers::LanguageServerProtocol {
 
     DidCloseTextDocumentParams params;
 
-    const LSPAny &textDocument = *value.at("textDocument");
-    params.textDocument = anyToTextDocumentIdentifier(textDocument);
+    auto iter = value.find("textDocument");
+    if (iter != value.end()) {
+      const LSPAny &textDocument = *iter->second;
+      params.textDocument = anyToTextDocumentIdentifier(textDocument);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DidCloseTextDocumentParams attribute: textDocument"
+      );
+    }
 
     return params;
   }

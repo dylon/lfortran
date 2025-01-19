@@ -22,7 +22,6 @@ namespace LCompilers::LanguageServerProtocol {
   class TextDocument {
   public:
     TextDocument(const std::string &uri, const std::string &text);
-    auto load() -> void;
     auto uri() -> const DocumentUri &;
     auto path() -> const fs::path &;
     auto text() -> const std::string &;
