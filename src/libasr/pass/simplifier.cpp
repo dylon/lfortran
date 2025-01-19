@@ -127,6 +127,44 @@ ASR::expr_t* create_temporary_variable_for_array(Allocator& al,
     /* Figure out the type of the temporary array variable */
     ASR::dimension_t* value_m_dims = nullptr;
     size_t value_n_dims = ASRUtils::extract_dimensions_from_ttype(value_type, value_m_dims);
+
+    if (ASR::is_a<ASR::IntegerCompare_t>(*value)) {
+        ASR::IntegerCompare_t* integer_compare = ASR::down_cast<ASR::IntegerCompare_t>(value);
+        ASR::ttype_t* logical_type = ASRUtils::TYPE(ASR::make_Logical_t(al, value->base.loc, 4));
+
+        ASR::ttype_t* left_type = ASRUtils::expr_type(integer_compare->m_left);
+        ASR::ttype_t* right_type = ASRUtils::expr_type(integer_compare->m_right);
+
+        if (ASR::is_a<ASR::Array_t>(*left_type)) {
+            ASR::Array_t* left_array_type = ASR::down_cast<ASR::Array_t>(left_type);
+            ASR::dimension_t* left_m_dims = nullptr;
+            size_t left_n_dims = ASRUtils::extract_dimensions_from_ttype(left_type, left_m_dims);
+            value_m_dims = left_m_dims;
+            value_n_dims = left_n_dims;
+
+            if (left_array_type->m_physical_type == ASR::array_physical_typeType::FixedSizeArray) {
+                ASR::ttype_t* logical_array_type = ASRUtils::TYPE(ASR::make_Array_t(al, value->base.loc, logical_type, left_m_dims, left_n_dims, ASR::array_physical_typeType::FixedSizeArray));
+                value_type = logical_array_type;
+            } else {
+                ASR::ttype_t* logical_array_type = ASRUtils::TYPE(ASR::make_Array_t(al, value->base.loc, logical_type, left_m_dims, left_n_dims, ASR::array_physical_typeType::PointerToDataArray));
+                value_type = logical_array_type;
+            }
+        } else if (ASR::is_a<ASR::Array_t>(*right_type)) {
+            ASR::Array_t* right_array_type = ASR::down_cast<ASR::Array_t>(right_type);
+            ASR::dimension_t* right_m_dims = nullptr;
+            size_t right_n_dims = ASRUtils::extract_dimensions_from_ttype(right_type, right_m_dims);
+            value_m_dims = right_m_dims;
+            value_n_dims = right_n_dims;
+
+            if (right_array_type->m_physical_type == ASR::array_physical_typeType::FixedSizeArray) {
+                ASR::ttype_t* logical_array_type = ASRUtils::TYPE(ASR::make_Array_t(al, value->base.loc, logical_type, right_m_dims, right_n_dims, ASR::array_physical_typeType::FixedSizeArray));
+                value_type = logical_array_type;
+            } else {
+                ASR::ttype_t* logical_array_type = ASRUtils::TYPE(ASR::make_Array_t(al, value->base.loc, logical_type, right_m_dims, right_n_dims, ASR::array_physical_typeType::PointerToDataArray));
+                value_type = logical_array_type;
+            }
+        }
+    }
     // dimensions can be different for an ArrayConstructor e.g. [1, a], where `a` is an
     // ArrayConstructor like [5, 2, 1]
     if (ASR::is_a<ASR::ArrayConstructor_t>(*value)) {
@@ -1566,7 +1604,11 @@ class ReplaceExprWithTemporary: public ASR::BaseExprReplacer<ReplaceExprWithTemp
             exprs_with_target[*current_expr].second == targetType::OriginalTarget) ||
             (is_current_expr_linked_to_target &&
                 exprs_with_target[*current_expr].second ==
-                    targetType::GeneratedTargetPointerForArraySection)
+                    targetType::GeneratedTargetPointerForArraySection) ||
+            (is_current_expr_linked_to_target && ((
+             ASRUtils::is_array(ASRUtils::expr_type(exprs_with_target[*current_expr].first)) ||
+             ASRUtils::is_array(x->m_type)) &&
+             is_common_symbol_present_in_lhs_and_rhs(exprs_with_target[*current_expr].first, *current_expr)))
         ) {
             // x = transpose(x), where 'x' is user-variable
             // needs have a temporary, there might be more

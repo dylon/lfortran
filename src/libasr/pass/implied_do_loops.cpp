@@ -122,6 +122,24 @@ class ReplaceArrayConstant: public ASR::BaseExprReplacer<ReplaceArrayConstant> {
                     array_size = builder.Add(array_size,
                                     element_array_size);
                 }
+            } else if ( ASR::is_a<ASR::ArrayItem_t>(*element) ) {
+                ASR::ArrayItem_t* array_item = ASR::down_cast<ASR::ArrayItem_t>(element);
+                if ( ASR::is_a<ASR::Array_t>(*array_item->m_type) ) {
+                    if ( ASRUtils::is_fixed_size_array(array_item->m_type) ) {
+                        ASR::Array_t* array_type = ASR::down_cast<ASR::Array_t>(array_item->m_type);
+                        constant_size += ASRUtils::get_fixed_size_of_array(array_type->m_dims, array_type->n_dims);
+                    } else {
+                        ASR::expr_t* element_array_size = ASRUtils::get_size(element, al, false);
+                        if( array_size == nullptr ) {
+                            array_size = element_array_size;
+                        } else {
+                            array_size = builder.Add(array_size,
+                                            element_array_size);
+                        }
+                    }
+                } else {
+                    constant_size += 1;
+                }
             } else if( ASR::is_a<ASR::Var_t>(*element) ) {
                 ASR::ttype_t* element_type = ASRUtils::type_get_past_allocatable(
                     ASRUtils::expr_type(element));
@@ -452,10 +470,15 @@ class ReplaceArrayConstant: public ASR::BaseExprReplacer<ReplaceArrayConstant> {
     }
 
     void replace_ArrayPhysicalCast(ASR::ArrayPhysicalCast_t* x) {
+        [[maybe_unused]] bool is_arr_construct_arg = ASR::is_a<ASR::ArrayConstructor_t>(*x->m_arg);
         ASR::BaseExprReplacer<ReplaceArrayConstant>::replace_ArrayPhysicalCast(x);
         if( ASRUtils::use_experimental_simplifier ) {
             if( x->m_old != ASRUtils::extract_physical_type(ASRUtils::expr_type(x->m_arg)) ) {
                 x->m_old = ASRUtils::extract_physical_type(ASRUtils::expr_type(x->m_arg));
+            }
+            if( (is_arr_construct_arg && ASRUtils::is_fixed_size_array(ASRUtils::expr_type(x->m_arg))) ){
+                *current_expr = x->m_arg;
+                return;
             }
         }
 

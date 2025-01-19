@@ -4102,7 +4102,7 @@ public:
     void instantiate_function(const ASR::Function_t &x){
         uint32_t h = get_hash((ASR::asr_t*)&x);
         llvm::Function *F = nullptr;
-        llvm::DISubprogram *SP;
+        llvm::DISubprogram *SP = nullptr;
         std::string sym_name = x.m_name;
         if (sym_name == "main") {
             sym_name = "_xx_lcompilers_changed_main_xx";
@@ -4177,6 +4177,50 @@ public:
                     }
                     if (!interface_as_arg) {
                         instantiate_function(*v);
+                    }
+                } else if ( ASR::is_a<ASR::Variable_t>(*item.second) && is_function_variable(item.second) ) {
+                    ASR::Variable_t *v = down_cast<ASR::Variable_t>(item.second);
+                    bool interface_as_arg = false;
+                    for (size_t i=0; i<x.n_args; i++) {
+                        if (is_a<ASR::Var_t>(*x.m_args[i])) {
+                            ASR::Var_t *arg = down_cast<ASR::Var_t>(x.m_args[i]);
+                            if ( arg->m_v == item.second ) {
+                                interface_as_arg = true;
+                            }
+                        }
+                    }
+                    if ( interface_as_arg ) {
+                        continue;
+                    }
+                    ASR::Function_t *var = ASR::down_cast<ASR::Function_t>(
+                            ASRUtils::symbol_get_past_external(v->m_type_declaration));
+                    uint32_t h = get_hash((ASR::asr_t*)v);
+                    if (llvm_symtab_fn.find(h) != llvm_symtab_fn.end()) {
+                        continue;
+                    }
+                    llvm::FunctionType* function_type = llvm_utils->get_function_type(*var, module.get());
+                    std::string fn_name;
+                    std::string sym_name = v->m_name;
+                    if (ASRUtils::get_FunctionType(*var)->m_abi == ASR::abiType::BindC) {
+                        if (ASRUtils::get_FunctionType(*var)->m_bindc_name) {
+                            fn_name = ASRUtils::get_FunctionType(*var)->m_bindc_name;
+                        } else {
+                            fn_name = sym_name;
+                        }
+                    } else if (ASRUtils::get_FunctionType(*var)->m_deftype == ASR::deftypeType::Interface &&
+                        ASRUtils::get_FunctionType(*var)->m_abi != ASR::abiType::Intrinsic) {
+                        fn_name = sym_name;
+                    } else {
+                        fn_name = mangle_prefix + sym_name;
+                    }
+                    if (llvm_symtab_fn_names.find(fn_name) == llvm_symtab_fn_names.end()) {
+                        llvm_symtab_fn_names[fn_name] = h;
+                        llvm::Function* F = llvm::Function::Create(function_type,
+                            llvm::Function::ExternalLinkage, fn_name, module.get());
+                        llvm_symtab_fn[h] = F;
+                    } else {
+                        uint32_t old_h = llvm_symtab_fn_names[fn_name];
+                        llvm_symtab_fn[h] = llvm_symtab_fn[old_h];
                     }
                 }
             }
@@ -5897,7 +5941,7 @@ public:
                 break;
             }
             case (ASR::cmpopType::NotEq) : {
-                tmp = builder->CreateFCmpONE(left, right);
+                tmp = builder->CreateFCmpUNE(left, right);
                 break;
             }
             default : {
@@ -8436,7 +8480,7 @@ public:
             }
             args.push_back(tmp);
         } else if (ASRUtils::is_real(*t)) {
-            llvm::Value *d;
+            llvm::Value *d = tmp;
             switch( a_kind ) {
                 case 4 : {
                     // Cast float to double as a workaround for the fact that
@@ -8535,7 +8579,7 @@ public:
                                         loc);
                 }
             }
-            llvm::Value *d;
+            llvm::Value *d = tmp;
             if(add_type_as_int){
                 if(!is_array){
                     type_as_int = llvm::ConstantInt::get(context, llvm::APInt(32, number_of_type));
@@ -9442,7 +9486,7 @@ public:
                 if (args.size() > 1)
                     builder->CreateStore(tmp, args[1]);
                 return;
-            } else if (sub_name == "execute_command_line") {
+            } else if (sub_name == "_lcompilers_execute_command_line_") {
                 llvm::Function *fn = module->getFunction("_lfortran_exec_command");
                 if (!fn) {
                     llvm::FunctionType *function_type = llvm::FunctionType::get(
@@ -9482,6 +9526,7 @@ public:
         } else if (llvm_symtab_fn.find(h) == llvm_symtab_fn.end()) {
             throw CodeGenError("Subroutine code not generated for '"
                 + std::string(s->m_name) + "'");
+            return;
         } else {
             llvm::Function *fn = llvm_symtab_fn[h];
             std::string m_name = ASRUtils::symbol_name(x.m_name);
