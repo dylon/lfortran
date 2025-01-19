@@ -1,48 +1,123 @@
 #include <format>
+#include <iostream>
+#include <mutex>
 #include <stdexcept>
 
 #include <lsp/specification.h>
+#include <lsp/lsp_exception.h>
 #include <lsp/lsp_language_server.h>
 
 namespace LCompilers::LanguageServerProtocol {
 
   std::string LspLanguageServer::serve(const std::string &request) {
-    rapidjson::Document document = deserializer.deserialize(request);
     ResponseMessage response;
-    if (document.HasMember("id")) {
-      RequestMessage request = deserializer.deserializeRequest(document);
-      response = dispatch(request);
-      response.jsonrpc = request.jsonrpc;
-      std::unique_ptr<ResponseId> responseId = std::make_unique<ResponseId>();
-      switch (request.id->type) {
-      case RequestIdType::LSP_INTEGER: {
-        responseId->type = ResponseIdType::LSP_INTEGER;
-        responseId->value = std::get<integer>(request.id->value);
-        break;
-      }
-      case RequestIdType::LSP_STRING: {
-        responseId->type = ResponseIdType::LSP_STRING;
-        responseId->value = std::get<string>(request.id->value);
-        break;
-      }
-      }
-      response.id = std::move(responseId);
-    } else {
-      NotificationMessage notification =
-        deserializer.deserializeNotification(document);
-      response = dispatch(notification);
-      response.jsonrpc = notification.jsonrpc;
+    try {
+      // The language server protocol always uses “2.0” as the jsonrpc version.
+      response.jsonrpc = "2.0";
+
       response.id = std::make_unique<ResponseId>();
       response.id->type = ResponseIdType::LSP_NULL;
       response.id->value = nullptr;
+
+      rapidjson::Document document = deserializer.deserialize(request);
+      if (document.HasParseError()) {
+        throw LspException(
+          ErrorCodes::ParseError,
+          std::format(
+            "Invalid JSON request (error={}): {}",
+            static_cast<int>(document.GetParseError()),
+            request
+          )
+        );
+      }
+
+      if (document.HasMember("id")) {
+        const rapidjson::Value &idValue = document["id"];
+        if (idValue.IsString()) {
+          response.id->type = ResponseIdType::LSP_STRING;
+          response.id->value = idValue.GetString();
+        } else if (idValue.IsInt()) {
+          response.id->type = ResponseIdType::LSP_INTEGER;
+          response.id->value = idValue.GetInt();
+        } else if (!idValue.IsNull()) { // null => notification
+          throw LspException(
+            ErrorCodes::InvalidParams,
+            std::format(
+              "Unsupported type for id attribute: {}",
+              static_cast<int>(idValue.GetType())
+            )
+          );
+        }
+      }
+
+      if (document.HasMember("method")) {
+        const std::string &method = document["method"].GetString();
+        if (isRequestMethod(method)) {
+          if (response.id->type == ResponseIdType::LSP_NULL) {
+            throw LspException(
+              ErrorCodes::InvalidParams,
+              std::format(
+                "Missing request method=\"{}\" attribute: id",
+                method
+              )
+            );
+          }
+          RequestMessage request = deserializer.deserializeRequest(document);
+          response.jsonrpc = request.jsonrpc;
+          dispatch(response, request);
+        } else if (isNotificationMethod(method)) {
+          if (response.id->type != ResponseIdType::LSP_NULL) {
+            throw LspException(
+              ErrorCodes::InvalidParams,
+              std::format(
+                "Notification method=\"{}\" must not contain the attribute: id",
+                method
+              )
+            );
+          }
+          NotificationMessage notification =
+            deserializer.deserializeNotification(document);
+          response.jsonrpc = notification.jsonrpc;
+          dispatch(response, notification);
+        } else {
+          throw LspException(
+            ErrorCodes::InvalidRequest,
+            std::format("Unsupported method: {}", method)
+          );
+        }
+      } else {
+        throw LspException(
+          ErrorCodes::InvalidRequest,
+          "Missing required attribute: method"
+        );
+      }
+    } catch (const LspException &e) {
+      const std::source_location &where = e.where();
+      std::cerr
+        << "[" << where.file_name() << ":" << where.line() << ":" << where.column() << "] "
+        << e.what()
+        << std::endl;
+      std::unique_ptr<ResponseError> error =
+        std::make_unique<ResponseError>();
+      error->code = static_cast<int>(e.code());
+      error->message = e.what();
+      response.error = std::move(error);
+    } catch (const std::exception &e) {
+      std::cerr << "Caught unhandled exception: " << e.what() << std::endl;
+      std::unique_ptr<ResponseError> error =
+        std::make_unique<ResponseError>();
+      error->code = static_cast<int>(ErrorCodes::InternalError);
+      error->message =
+        "An unexpected exception occurred. If it continues, please file a ticket.";
+      response.error = std::move(error);
     }
     return serializer.serializeResponse(response);
   }
 
   auto LspLanguageServer::dispatch(
+    ResponseMessage &response,
     const RequestMessage &request
-  ) -> ResponseMessage {
-    ResponseMessage response;
+  ) -> void {
     RequestMethod method;
     try {
       method = requestMethodByValue(request.method);
@@ -61,23 +136,21 @@ namespace LCompilers::LanguageServerProtocol {
     }
     default: {
     invalidMethod:
-      std::unique_ptr<ResponseError> error =
-        std::make_unique<ResponseError>();
-      error->code = static_cast<int>(ErrorCodes::MethodNotFound);
-      error->message = std::format(
-        "Unsupported request method: \"{}\"",
-        request.method
+      throw LspException(
+        ErrorCodes::MethodNotFound,
+        std::format(
+          "Unsupported request method: \"{}\"",
+          request.method
+        )
       );
-      response.error = std::move(error);
     }
     }
-    return response;
   }
 
   auto LspLanguageServer::dispatch(
+    ResponseMessage &response,
     const NotificationMessage &notification
-  ) -> ResponseMessage {
-    ResponseMessage response;
+  ) -> void {
     NotificationMethod method;
     try {
       method = notificationMethodByValue(notification.method);
@@ -125,17 +198,15 @@ namespace LCompilers::LanguageServerProtocol {
     }
     default: {
     invalidMethod:
-      std::unique_ptr<ResponseError> error =
-        std::make_unique<ResponseError>();
-      error->code = static_cast<int>(ErrorCodes::MethodNotFound);
-      error->message = std::format(
-        "Unsupported notification method: \"{}\"",
-        notification.method
+      throw LspException(
+        ErrorCodes::MethodNotFound,
+        std::format(
+          "Unsupported notification method: \"{}\"",
+          notification.method
+        )
       );
-      response.error = std::move(error);
     }
     }
-    return response;
   }
 
   // request: "initialize"
@@ -183,7 +254,14 @@ namespace LCompilers::LanguageServerProtocol {
     const TextDocumentItem &textDocumentItem = *params.textDocument;
     const DocumentUri &uri = textDocumentItem.uri;
     const std::string &text = textDocumentItem.text;
-    textDocuments.insert({uri, TextDocument(uri, text)});
+    {
+      std::unique_lock<std::shared_mutex> writeLock(readWriteMutex);
+      textDocuments.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(uri),
+        std::forward_as_tuple(uri, text)
+      );
+    }
   }
 
   // notification: "textDocument/didChange"
@@ -191,8 +269,12 @@ namespace LCompilers::LanguageServerProtocol {
     DidChangeTextDocumentParams &params
   ) {
     const DocumentUri &uri = params.textDocument->uri;
-    TextDocument &textDocument = textDocuments.at(uri);
-    textDocument.apply(params.contentChanges);
+    {
+      std::shared_lock<std::shared_mutex> readLock(readWriteMutex);
+      TextDocument &textDocument = textDocuments.at(uri);
+      readLock.unlock();
+      textDocument.apply(params.contentChanges);
+    }
   }
 
   // notification: "textDocument/didSave"
@@ -202,8 +284,12 @@ namespace LCompilers::LanguageServerProtocol {
     if (params.text.has_value()) {
       const std::string &text = params.text.value();
       const DocumentUri &uri = params.textDocument->uri;
-      TextDocument &textDocument = textDocuments.at(uri);
-      textDocument.setText(text);
+      {
+        std::shared_lock<std::shared_mutex> readLock(readWriteMutex);
+        TextDocument &textDocument = textDocuments.at(uri);
+        readLock.unlock();
+        textDocument.setText(text);
+      }
     }
   }
 
@@ -212,9 +298,17 @@ namespace LCompilers::LanguageServerProtocol {
     const DidCloseTextDocumentParams &params
   ) {
     const DocumentUri &uri = params.textDocument->uri;
-    auto pos = textDocuments.find(uri);
-    if (pos != textDocuments.end()) {
-      textDocuments.erase(pos);
+    {
+      std::shared_lock<std::shared_mutex> readLock(readWriteMutex);
+      auto pos = textDocuments.find(uri);
+      readLock.unlock();
+      if (pos != textDocuments.end()) {
+        std::unique_lock<std::shared_mutex> writeLock(readWriteMutex);
+        pos = textDocuments.find(uri);
+        if (pos != textDocuments.end()) {
+          textDocuments.erase(pos);
+        }
+      }
     }
   }
 
@@ -237,14 +331,17 @@ namespace LCompilers::LanguageServerProtocol {
         initializeParams.capabilities =
           anyToClientCapabilities(*lspObject.at("capabilities"));
       } else {
-        throw std::logic_error(
-          "Missing required attribute: InitializeParams.capabilities"
+        throw LspException(
+          ErrorCodes::InvalidParams,
+          "Missing required attribute: capabilities"
         );
       }
     } else {
-      throw std::logic_error(
+      throw LspException(
+        ErrorCodes::InvalidParams,
         std::format(
-          "Unsupported RequestParams.type: {}",
+          "Expected request parameters to be of type {} but received {}",
+          static_cast<int>(RequestParamsType::LSP_OBJECT),
           static_cast<int>(requestParams.type)
         )
       );
@@ -333,7 +430,8 @@ namespace LCompilers::LanguageServerProtocol {
     LSPAnyType type
   ) const -> void {
     if (any.type != type) {
-      throw std::logic_error(
+      throw LspException(
+        ErrorCodes::InvalidParams,
         std::format(
           "LSPAny.type for a {} must be of type {} but received type {}",
           name,
@@ -350,7 +448,8 @@ namespace LCompilers::LanguageServerProtocol {
     NotificationParamsType type
   ) const -> void {
     if (params.type != type) {
-      throw std::logic_error(
+      throw LspException(
+        ErrorCodes::InvalidParams,
         std::format(
           "NotificationParams.type must be {} for method=\"{}\" but received type {}",
           static_cast<int>(type),
@@ -587,7 +686,8 @@ namespace LCompilers::LanguageServerProtocol {
     if (request.params.has_value()) {
       return *request.params.value();
     }
-    throw std::logic_error(
+    throw LspException(
+      ErrorCodes::InvalidParams,
       std::format(
         "RequestMessage.params must be defined for method=\"{}\"",
         request.method
@@ -601,7 +701,8 @@ namespace LCompilers::LanguageServerProtocol {
     if (notification.params.has_value()) {
       return *notification.params.value();
     }
-    throw std::logic_error(
+    throw LspException(
+      ErrorCodes::InvalidParams,
       std::format(
         "NotificationMessage.params must be defined for method=\"{}\"",
         notification.method

@@ -12,6 +12,11 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   }
 
+  void LspRequestParser::finish() {
+    _state = ls::RequestParserState::ERROR;
+    _error = "Finished prematurely.";
+  }
+
   auto LspRequestParser::parse(unsigned char c) -> bool {
     bool done = false;
     switch (_state) {

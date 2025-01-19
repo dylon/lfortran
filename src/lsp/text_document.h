@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <filesystem>
+#include <mutex>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -20,22 +21,22 @@ namespace LCompilers::LanguageServerProtocol {
 
   class TextDocument {
   public:
-    TextDocument(const std::string &uri);
     TextDocument(const std::string &uri, const std::string &text);
     auto load() -> void;
-    auto getUri() -> const DocumentUri &;
-    auto getPath() -> const fs::path &;
-    auto getText() -> const std::string &;
+    auto uri() -> const DocumentUri &;
+    auto path() -> const fs::path &;
+    auto text() -> const std::string &;
     auto setText(const std::string &text) -> void;
     auto apply(
       ptr_vector<TextDocumentContentChangeEvent> &changes
     ) -> void;
   private:
-    DocumentUri uri;
-    fs::path path;
-    std::string text;
+    DocumentUri _uri;
+    fs::path _path;
+    std::string _text;
     std::stringstream ss;
     std::vector<std::size_t> lineIndices;
+    std::recursive_mutex reentrantMutex;
 
     auto validateUriAndSetPath() -> void;
     auto indexLines() -> void;

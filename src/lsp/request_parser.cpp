@@ -24,7 +24,6 @@ namespace LCompilers::LanguageServer {
 
   void RequestParser::reset() {
     _state = RequestParserState::RESET;
-    headerState = RequestHeaderParserState::RESET;
   }
 
 } // LCompilers::LanguageServer

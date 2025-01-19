@@ -15487,6 +15487,10 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto notificationMethodByValue(const std::string &value) -> NotificationMethod;
 
+  auto isRequestMethod(const std::string &name) -> bool;
+
+  auto isNotificationMethod(const std::string &name) -> bool;
+
   // Implementation Considerations
   // Language servers usually run in a separate process and clients communicate
   // with them in an asynchronous fashion. Additionally clients usually allow

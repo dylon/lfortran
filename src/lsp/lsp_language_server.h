@@ -2,6 +2,7 @@
 #define LCOMPILERS_LSP_LANGUAGE_SERVER_H
 
 #include <map>
+#include <shared_mutex>
 
 #include <lsp/language_server.h>
 #include <lsp/lsp_serializer.h>
@@ -19,9 +20,16 @@ namespace LCompilers::LanguageServerProtocol {
     JsonRpcLspSerializer serializer;
     JsonRpcLspDeserializer deserializer;
     std::map<DocumentUri, TextDocument> textDocuments;
+    std::shared_mutex readWriteMutex;
 
-    auto dispatch(const RequestMessage &request) -> ResponseMessage;
-    auto dispatch(const NotificationMessage &notification) -> ResponseMessage;
+    auto dispatch(
+      ResponseMessage &response,
+      const RequestMessage &request
+    ) -> void;
+    auto dispatch(
+      ResponseMessage &response,
+      const NotificationMessage &notification
+    ) -> void;
 
     InitializeResult initialize(const InitializeParams &params);
 

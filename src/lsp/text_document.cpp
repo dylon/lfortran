@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <format>
 #include <fstream>
+#include <mutex>
 #include <stdexcept>
 
 #include <lsp/specification.h>
@@ -8,17 +9,11 @@
 
 namespace LCompilers::LanguageServerProtocol {
 
-  TextDocument::TextDocument(const std::string &uri)
-    : uri(uri)
-  {
-    // empty
-  }
-
   TextDocument::TextDocument(
     const DocumentUri &uri,
     const std::string &text
-  ) : uri(uri)
-    , text(text)
+  ) : _uri(uri)
+    , _text(text)
   {
     validateUriAndSetPath();
   }
@@ -26,10 +21,10 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::load() -> void {
     validateUriAndSetPath();
 
-    std::ifstream file(path);
+    std::ifstream file(_path);
     if (!file.is_open()) {
       throw std::runtime_error(
-        std::format("Cannot open file for reading: {}", path.string())
+        std::format("Cannot open file for reading: {}", _path.string())
       );
     }
 
@@ -41,24 +36,25 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::validateUriAndSetPath() -> void {
-    std::string path = std::regex_replace(uri, RE_FILE_URI, "");
-    this->path = fs::canonical(path);
+    std::string path = std::regex_replace(_uri, RE_FILE_URI, "");
+    _path = fs::canonical(path);
   }
 
-  auto TextDocument::getUri() -> const DocumentUri & {
-    return uri;
+  auto TextDocument::uri() -> const DocumentUri & {
+    return _uri;
   }
 
-  auto TextDocument::getPath() -> const fs::path & {
-    return path;
+  auto TextDocument::path() -> const fs::path & {
+    return _path;
   }
 
-  auto TextDocument::getText() -> const std::string & {
-    return text;
+  auto TextDocument::text() -> const std::string & {
+    return _text;
   }
 
   auto TextDocument::setText(const std::string &text) -> void {
-    this->text = text;
+    std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
+    _text = text;
     indexLines();
   }
 
@@ -73,30 +69,34 @@ namespace LCompilers::LanguageServerProtocol {
       }
     );
 
-    ss.str("");
-    std::size_t i = 0;
-    for (const auto &change : changes) {
-      std::size_t j;
-      std::size_t k;
-      std::string patch;
-      decompose(*change, j, k, patch);
-      ss << text.substr(i, j);
-      ss << patch;
-      i = k;
+    {
+      std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
+
+      ss.str("");
+      std::size_t i = 0;
+      for (const auto &change : changes) {
+        std::size_t j;
+        std::size_t k;
+        std::string patch;
+        decompose(*change, j, k, patch);
+        ss << _text.substr(i, j);
+        ss << patch;
+        i = k;
+      }
+      ss << _text.substr(i, _text.length());
+      std::string text = ss.str();
+      setText(text);
     }
-    ss << text.substr(i, text.length());
-    std::string text = ss.str();
-    setText(text);
   }
 
   auto TextDocument::indexLines() -> void {
     lineIndices.clear();
     lineIndices.push_back(0);
-    for (std::size_t index = 0; index < text.length(); ++index) {
-      unsigned char c = text[index];
+    for (std::size_t index = 0; index < _text.length(); ++index) {
+      unsigned char c = _text[index];
       switch (c) {
       case '\r': {
-        if (((index + 1) < text.length()) && (text[index + 1] == '\n')) {
+        if (((index + 1) < _text.length()) && (_text[index + 1] == '\n')) {
           ++index;
         }
       } // fallthrough
@@ -191,7 +191,7 @@ namespace LCompilers::LanguageServerProtocol {
     std::string &patch
   ) const -> void {
     j = 0;
-    k = text.length();
+    k = _text.length();
     patch = event.text;
   }
 

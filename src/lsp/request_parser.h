@@ -55,7 +55,7 @@ namespace LCompilers::LanguageServer {
     auto error() -> const std::string &;
 
     void reset();
-
+    virtual void finish() = 0;
     virtual bool parse(unsigned char c) = 0;
 
   protected:

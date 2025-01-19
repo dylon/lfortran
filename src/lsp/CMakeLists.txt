@@ -14,6 +14,7 @@ endif ()
 
 set(LFORTRAN_LSP_SRC
   specification.cpp
+  lsp_exception.cpp
   text_document.cpp
   thread_pool.cpp
   serializer.cpp

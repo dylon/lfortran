@@ -924,4 +924,22 @@ namespace LCompilers::LanguageServerProtocol {
     throw std::invalid_argument("Invalid NotificationMethod value: " + value);
   }
 
+  auto isRequestMethod(const std::string &name) -> bool {
+    for (const auto &[enum_key, enum_value] : RequestMethodValues) {
+      if (name == enum_value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  auto isNotificationMethod(const std::string &name) -> bool {
+    for (const auto &[enum_key, enum_value] : NotificationMethodValues) {
+      if (name == enum_value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 } // namespace LCompilers::LanguageServerProtocol

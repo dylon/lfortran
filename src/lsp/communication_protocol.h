@@ -48,8 +48,6 @@ namespace LCompilers::LanguageServer {
     void serve() override;
   private:
     std::unique_ptr<lst::ThreadPool> threadPool;
-
-    auto dispatch(const std::string &request) -> void;
   };
 
   class TcpRequestMatchCondition {

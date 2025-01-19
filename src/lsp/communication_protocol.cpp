@@ -48,7 +48,7 @@ namespace LCompilers::LanguageServer {
       << "Serving stdio requests with " << threadPool->getNumThreads() << " threads."
       << std::endl;
     std::unique_ptr<RequestParser> parser = parserFactory.build();
-    std::string request;
+    std::string line;
     std::mutex &stdoutMutex = threadPool->getStdoutMutex();
     std::mutex &stderrMutex = threadPool->getStderrMutex();
     std::mutex printMutex;
@@ -56,17 +56,17 @@ namespace LCompilers::LanguageServer {
     std::size_t requestId = 0;
     std::size_t pendingId = 0;
     try {
-      while (std::getline(std::cin, request)) {
+      bool pending = true;
+      while (std::getline(std::cin, line)) {
         {
           std::unique_lock<std::mutex> stderrLock(stderrMutex);
-          std::cerr << "request = " << request << std::endl;
+          std::cerr << "line = '" << line << "'" << std::endl;
         }
-        bool done = false;
-        for (std::size_t i = 0; (i < request.length()) && !done; i++) {
-          unsigned char c = request[i];
-          done = parser->parse(c);
+        for (std::size_t i = 0; (i < line.length()) && pending; i++) {
+          unsigned char c = line[i];
+          pending = !parser->parse(c);
         }
-        if (done) {
+        if (!pending) {
           if (parser->state() == RequestParserState::COMPLETE) {
             for (auto const &[header, value] : parser->headers()) {
               std::unique_lock<std::mutex> stderrLock(stderrMutex);
@@ -74,14 +74,14 @@ namespace LCompilers::LanguageServer {
                 << "request.headers[\"" << header << "\"] = \"" << value << "\""
                 << std::endl;
             }
-            const std::string &body = parser->body();
+            const std::string &request = parser->body();
             {
               std::unique_lock<std::mutex> stderrLock(stderrMutex);
-              std::cerr << "request.body = '" << body << "'" << std::endl;
+              std::cerr << "request.body = '" << request << "'" << std::endl;
             }
-            if (body.length() > 0) {
+            if (request.length() > 0) {
               threadPool->execute([this,
-                                  body,
+                                  request,
                                   &stdoutMutex,
                                   &stderrMutex,
                                   &pendingId,
@@ -89,7 +89,7 @@ namespace LCompilers::LanguageServer {
                                   &responsePrinted,
                                   &printMutex](const std::size_t threadId) {
                 try {
-                  const std::string response = languageServer.serve(body);
+                  const std::string response = languageServer.serve(request);
                   {
                     std::unique_lock<std::mutex> stderrLock(stderrMutex);
                     std::cerr
@@ -126,7 +126,7 @@ namespace LCompilers::LanguageServer {
                   std::unique_lock<std::mutex> stderrLock(stderrMutex);
                   std::cerr
                     << "[thread.id=" << threadId << "] "
-                    << "Failed to serve request: " << body
+                    << "Failed to serve request: " << request
                     << std::endl;
                   std::cerr
                     << "[thread.id=" << threadId << "] "
@@ -149,6 +149,27 @@ namespace LCompilers::LanguageServer {
           parser->parse('\r');
           parser->parse('\n');
         }
+      }
+      if (pending) {
+        parser->finish();
+        for (auto const &[header, value] : parser->headers()) {
+          std::unique_lock<std::mutex> stderrLock(stderrMutex);
+          std::cerr
+            << "request.headers[\"" << header << "\"] = \"" << value << "\""
+            << std::endl;
+        }
+        const std::string &request = parser->body();
+        {
+          std::unique_lock<std::mutex> stderrLock(stderrMutex);
+          std::cerr << "request.body = " << request << std::endl;
+        }
+        const std::string response = languageServer.serve(request);
+        {
+          std::unique_lock<std::mutex> stderrLock(stderrMutex);
+          std::cerr << "response = " << response << std::endl;
+        }
+        std::cout << response << std::flush;
+        std::cerr << std::endl;
       }
     } catch (std::exception &e) {
       std::cerr
