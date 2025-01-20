@@ -1,6 +1,7 @@
 #ifndef LCOMPILERS_LSP_LANGUAGE_SERVER_H
 #define LCOMPILERS_LSP_LANGUAGE_SERVER_H
 
+#include "lsp/lsp_transformer.h"
 #include <atomic>
 #include <map>
 #include <shared_mutex>
@@ -17,12 +18,19 @@ namespace LCompilers::LanguageServerProtocol {
   class LspLanguageServer : public ls::LanguageServer {
   public:
     std::string serve(const std::string &request) override;
+    auto isInitialized() const -> bool;
+    auto isShutdown() const -> bool;
+    bool isTerminated() const override;
+    auto isRunning() const -> bool;
   protected:
     JsonRpcLspSerializer serializer;
     JsonRpcLspDeserializer deserializer;
+    LspTransformer transformer;
     std::map<DocumentUri, TextDocument> textDocuments;
     std::shared_mutex readWriteMutex;
-    std::atomic_bool _initialized;
+    std::atomic_bool _initialized = false;
+    std::atomic_bool _shutdown = false;
+    std::atomic_bool _exit = false;
 
     auto dispatch(
       ResponseMessage &response,
@@ -33,107 +41,47 @@ namespace LCompilers::LanguageServerProtocol {
       const NotificationMessage &notification
     ) -> void;
 
+    // request: client -> server
     auto initialize(const InitializeParams &params) -> InitializeResult;
+    auto willSaveWaitUntil(
+      const WillSaveTextDocumentParams &params
+    ) -> WillSaveWaitUntilResult;
+    auto gotoDeclaration(
+      const DeclarationParams &params
+    ) -> GotoDeclarationResult;
+    auto gotoDefinition(
+      const DefinitionParams &params
+    ) -> GotoDefinitionResult;
+    auto shutdown() -> void;
+
+    // notification: client -> server
+    auto exit() -> void;
+    auto cancelRequest(const CancelParams &params) -> void;
+    auto initialized(const InitializedParams &params) -> void;
+    auto setTrace(const SetTraceParams &params) -> void;
+    auto didOpenTextDocument(const DidOpenTextDocumentParams &params) -> void;
+    auto didChangeTextDocument(DidChangeTextDocumentParams &params) -> void;
+    auto didSaveTextDocument(const DidSaveTextDocumentParams &params) -> void;
+    auto didCloseTextDocument(const DidCloseTextDocumentParams &params) -> void;
+    auto didOpenNotebookDocument(
+      const DidOpenNotebookDocumentParams &params
+    ) -> void;
+    auto didChangeNotebookDocument(
+      const DidChangeNotebookDocumentParams &params
+    ) -> void;
+    auto didSaveNotebookDocument(
+      const DidSaveNotebookDocumentParams &params
+    ) -> void;
+    auto didCloseNotebookDocument(
+      const DidCloseNotebookDocumentParams &params
+    ) -> void;
+
+    // request: server -> client
+
+    // notification: server -> client
 
     void assertInitialized();
-
-    void initialized(const InitializedParams &params);
-    void didOpenTextDocument(const DidOpenTextDocumentParams &params);
-    void didChangeTextDocument(DidChangeTextDocumentParams &params);
-    void didSaveTextDocument(const DidSaveTextDocumentParams &params);
-    void didCloseTextDocument(const DidCloseTextDocumentParams &params);
-
-    auto asInitializeParams(
-      const RequestParams &requestParams
-    ) const -> InitializeParams;
-
-    auto asInitializedParams(
-      const optional_ptr<NotificationParams> &notificationParams
-    ) const -> InitializedParams;
-    auto asDidOpenTextDocumentParams(
-      const NotificationParams &notificationParams
-    ) const -> DidOpenTextDocumentParams;
-    auto asDidChangeTextDocumentParams(
-      const NotificationParams &notificationParams
-    ) const -> DidChangeTextDocumentParams;
-    auto asDidSaveTextDocumentParams(
-      const NotificationParams &notificationParams
-    ) const -> DidSaveTextDocumentParams;
-    auto asDidCloseTextDocumentParams(
-      const NotificationParams &notificationParams
-    ) const -> DidCloseTextDocumentParams;
-
-    auto resultToResponseMessage(
-      ResponseMessage &response,
-      const InitializeResult &result
-    ) const -> void;
-
-    auto anyToClientCapabilities(
-      const LSPAny &any
-    ) const -> std::unique_ptr<ClientCapabilities>;
-    auto anyToTextDocumentItem(
-      const LSPAny &any
-    ) const -> std::unique_ptr<TextDocumentItem>;
-    auto anyToTextDocumentIdentifier(
-      const LSPAny &any
-    ) const -> std::unique_ptr<TextDocumentIdentifier>;
-    auto anyToVersionedTextDocumentIdentifier(
-      const LSPAny &any
-    ) const -> std::unique_ptr<VersionedTextDocumentIdentifier>;
-    auto anyToTextDocumentContentChangeEvent(
-      const LSPAny &any
-    ) const -> std::unique_ptr<TextDocumentContentChangeEvent>;
-    auto anyToRange(
-      const LSPAny &any
-    ) const -> std::unique_ptr<Range>;
-    auto anyToPosition(
-      const LSPAny &any
-    ) const -> std::unique_ptr<Position>;
-    auto anyToString(
-      const LSPAny &any
-    ) const -> const std::string &;
-    auto anyToInt(
-      const LSPAny &any
-    ) const -> int;
-    auto anyToUnsignedInt(
-      const LSPAny &any
-    ) const -> unsigned int;
-
-    auto assertAnyType(
-      const std::string &name,
-      const LSPAny &any,
-      LSPAnyType type
-    ) const -> void;
-
-    auto assertNotificationType(
-      const std::string &method,
-      const NotificationParams &params,
-      NotificationParamsType type
-    ) const -> void;
-
-    auto lspToAny(
-      const InitializeResult &result
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const ServerCapabilities &capabilities
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const TextDocumentSync &textDocumentSync
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToObject(
-      const TextDocumentSyncOptions &options
-    ) const -> std::unique_ptr<LSPObject>;
-    auto lspToObject(
-      const SaveOptions &options
-    ) const -> std::unique_ptr<LSPObject>;
-
-    auto requireRequestParams(
-      const RequestMessage &request
-    ) const -> const RequestParams &;
-
-    auto requireNotificationParams(
-      const NotificationMessage &notification
-    ) const -> const NotificationParams &;
+    void assertRunning();
   };
 
 } // namespace LCompilers::LanguageServerProtocol

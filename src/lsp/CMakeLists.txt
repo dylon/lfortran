@@ -19,6 +19,7 @@ set(LFORTRAN_LSP_SRC
   thread_pool.cpp
   serializer.cpp
   lsp_serializer.cpp
+  lsp_transformer.cpp
   lsp_language_server.cpp
   lfortran_lsp_language_server.cpp
   request_parser.cpp

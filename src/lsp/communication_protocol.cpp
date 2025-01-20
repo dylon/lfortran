@@ -57,7 +57,11 @@ namespace LCompilers::LanguageServer {
     std::size_t pendingId = 0;
     try {
       bool pending = true;
-      while (std::getline(std::cin, line)) {
+      while (!languageServer.isTerminated()
+             && std::getline(std::cin, line)
+             // NOTE: This double-check logic is intentional because of
+             // how conditionals are short-circuited.
+             && !languageServer.isTerminated()) {
         for (std::size_t i = 0; (i < line.length()) && pending; i++) {
           unsigned char c = line[i];
           pending = !parser->parse(c);
@@ -186,8 +190,10 @@ namespace LCompilers::LanguageServer {
   }
 
   TcpRequestMatchCondition::TcpRequestMatchCondition(
-    RequestParser &parser)
-    : parser(parser)
+    RequestParser &parser,
+    LanguageServer &languageServer
+  ) : parser(parser)
+    , languageServer(languageServer)
   {
     // empty
   }
@@ -197,7 +203,7 @@ namespace LCompilers::LanguageServer {
     Iterator begin,
     Iterator end) -> std::pair<Iterator, bool> {
     Iterator iter = begin;
-    for (; iter != end; iter++) {
+    for (; (iter != end) && !languageServer.isTerminated(); iter++) {
       unsigned char c = *iter;
       if (parser.parse(c)) {
         iter++;
@@ -235,9 +241,9 @@ namespace LCompilers::LanguageServer {
   ) -> awaitable<void> {
     try {
       std::unique_ptr<RequestParser> parser = parserFactory.build();
-      TcpRequestMatchCondition matchCondition(*parser);
+      TcpRequestMatchCondition matchCondition(*parser, languageServer);
       std::stringstream ss;
-      for (std::string buffer;;) {
+      for (std::string buffer; !languageServer.isTerminated();) {
         std::size_t n =
           co_await asio::async_read_until(
             socket,
@@ -245,6 +251,10 @@ namespace LCompilers::LanguageServer {
             matchCondition,
             use_awaitable
           );
+
+        if (languageServer.isTerminated()) {
+          break;
+        }
 
         const std::string message = buffer.substr(0, n);
         buffer.erase(0, n);
@@ -322,7 +332,7 @@ namespace LCompilers::LanguageServer {
   auto TcpCommunicationProtocol::listener() -> awaitable<void> {
     auto executor = co_await this_coro::executor;
     tcp::acceptor acceptor(executor, {tcp::v4(), port});
-    for (;;) {
+    for (; !languageServer.isTerminated();) {
       tcp::socket socket = co_await acceptor.async_accept(use_awaitable);
       co_spawn(executor, dispatch(std::move(socket)), detached);
     }

@@ -52,11 +52,12 @@ namespace LCompilers::LanguageServer {
 
   class TcpRequestMatchCondition {
   public:
-    TcpRequestMatchCondition(RequestParser &parser);
+    TcpRequestMatchCondition(RequestParser &parser, LanguageServer &languageServer);
     template <typename Iterator>
     auto operator()(Iterator begin, Iterator end) -> std::pair<Iterator, bool>;
   private:
     RequestParser &parser;
+    LanguageServer &languageServer;
   };
 
   class TcpCommunicationProtocol : public CommunicationProtocol {

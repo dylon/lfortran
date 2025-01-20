@@ -1,3 +1,4 @@
+#include <format>
 #include <stdexcept>
 
 #include <lsp/specification.h>
@@ -256,6 +257,20 @@ namespace LCompilers::LanguageServerProtocol {
     throw std::invalid_argument("Invalid TextDocumentSaveReason name: " + name);
   }
 
+  auto textDocumentSaveReasonByValue(int value) -> TextDocumentSaveReason {
+    for (const auto &[enum_key, enum_value] : TextDocumentSaveReasonNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format(
+        "Invalid TextDocumentSaveReason value: {}",
+        value
+      )
+    );
+  }
+
   std::map<NotebookCellKind, std::string> NotebookCellKindNames = {
     {NotebookCellKind::Markup, "Markup"},
     {NotebookCellKind::Code, "Code"},
@@ -268,6 +283,20 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument("Invalid NotebookCellKind name: " + name);
+  }
+
+  auto notebookCellKindByValue(int value) -> NotebookCellKind {
+    for (const auto &[enum_key, enum_value] : NotebookCellKindNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format(
+        "Invalid NotebookCellKind value: {}",
+        value
+      )
+    );
   }
 
   std::map<DocumentHighlightKind, std::string> DocumentHighlightKindNames = {
@@ -866,10 +895,34 @@ namespace LCompilers::LanguageServerProtocol {
 
   std::map<RequestMethod, std::string> RequestMethodNames = {
     {RequestMethod::INITIALIZE, "INITIALIZE"},
+    {RequestMethod::SHUTDOWN, "SHUTDOWN"},
+    {RequestMethod::WILL_SAVE_WAIT_UNTIL, "WILL_SAVE_WAIT_UNTIL"},
+    {RequestMethod::GOTO_DECLARATION, "GOTO_DECLARATION"},
+    {RequestMethod::GOTO_DEFINITION, "GOTO_DEFINITION"},
+    {RequestMethod::TYPE_HIERARCHY_PREPARE, "TYPE_HIERARCHY_PREPARE"},
+    {RequestMethod::TYPE_HIERARCHY_SUPERTYPES, "TYPE_HIERARCHY_SUPERTYPES"},
+    {RequestMethod::TYPE_HIERARCHY_SUBTYPES, "TYPE_HIERARCHY_SUBTYPES"},
+    {RequestMethod::WORKSPACE_SYMBOL, "WORKSPACE_SYMBOL"},
+    {RequestMethod::RESOLVE_WORKSPACE_SYMBOL, "WORKSPACE"},
+    {RequestMethod::CREATE_FILES, "CREATE_FILES"},
+    {RequestMethod::RENAME_FILES, "RENAME_FILES"},
+    {RequestMethod::EXECUTE_COMMAND, "EXECUTE_COMMAND"},
   };
 
   std::map<RequestMethod, std::string> RequestMethodValues = {
     {RequestMethod::INITIALIZE, "initialize"},
+    {RequestMethod::SHUTDOWN, "shutdown"},
+    {RequestMethod::WILL_SAVE_WAIT_UNTIL, "textDocument/willSaveWaitUntil"},
+    {RequestMethod::GOTO_DECLARATION, "textDocument/declaration"},
+    {RequestMethod::GOTO_DEFINITION, "textDocument/definition"},
+    {RequestMethod::TYPE_HIERARCHY_PREPARE, "textDocument/prepareTypeHierarchy"},
+    {RequestMethod::TYPE_HIERARCHY_SUPERTYPES, "typeHierarchy/supertypes"},
+    {RequestMethod::TYPE_HIERARCHY_SUBTYPES, "typeHierarchy/subtypes"},
+    {RequestMethod::WORKSPACE_SYMBOL, "workspace/symbol"},
+    {RequestMethod::RESOLVE_WORKSPACE_SYMBOL, "workspaceSymbol/resolve"},
+    {RequestMethod::CREATE_FILES, "workspace/willCreateFiles"},
+    {RequestMethod::RENAME_FILES, "workspace/willRenameFiles"},
+    {RequestMethod::EXECUTE_COMMAND, "workspace/executeCommand"},
   };
 
   auto requestMethodByName(const std::string &name) -> RequestMethod {
@@ -890,20 +943,57 @@ namespace LCompilers::LanguageServerProtocol {
     throw std::invalid_argument("Invalid RequestMethod value: " + value);
   }
 
+  auto isRequestMethod(const std::string &name) -> bool {
+    for (const auto &[enum_key, enum_value] : RequestMethodValues) {
+      if (name == enum_value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   std::map<NotificationMethod, std::string> NotificationMethodNames = {
     {NotificationMethod::INITIALIZED, "INITIALIZED"},
+    {NotificationMethod::DID_OPEN_NOTEBOOK_DOCUMENT, "DID_OPEN_NOTEBOOK_DOCUMENT"},
+    {NotificationMethod::DID_CHANGE_NOTEBOOK_DOCUMENT, "DID_CHANGE_NOTEBOOK_DOCUMENT"},
+    {NotificationMethod::DID_SAVE_NOTEBOOK_DOCUMENT, "DID_SAVE_NOTEBOOK_DOCUMENT"},
+    {NotificationMethod::DID_CLOSE_NOTEBOOK_DOCUMENT, "DID_CLOSE_NOTEBOOK_DOCUMENT"},
     {NotificationMethod::DID_OPEN_TEXT_DOCUMENT, "DID_OPEN_TEXT_DOCUMENT"},
     {NotificationMethod::DID_CHANGE_TEXT_DOCUMENT, "DID_CHANGE_TEXT_DOCUMENT"},
     {NotificationMethod::DID_SAVE_TEXT_DOCUMENT, "DID_SAVE_TEXT_DOCUMENT"},
     {NotificationMethod::DID_CLOSE_TEXT_DOCUMENT, "DID_CLOSE_TEXT_DOCUMENT"},
+    {NotificationMethod::CANCEL_REQUEST, "CANCEL_REQUEST"},
+    {NotificationMethod::SET_TRACE, "SET_TRACE"},
+    {NotificationMethod::EXIT, "EXIT"},
+    {NotificationMethod::DID_CHANGE_CONFIGURATION, "DID_CHANGE_CONFIGURATION"},
+    {NotificationMethod::DID_CHANGE_WORKSPACE_FOLDERS, "DID_CHANGE_WORKSPACE_FOLDERS"},
+    {NotificationMethod::DID_CREATE_FILES, "DID_CREATE_FILES"},
+    {NotificationMethod::DID_RENAME_FILES, "DID_RENAME_FILES"},
+    {NotificationMethod::DID_DELETE_FILES, "DID_DELETE_FILES"},
+    {NotificationMethod::DID_CHANGE_WATCHED_FILES, "DID_CHANGE_WATCHED_FILES"},
+    {NotificationMethod::WORK_DONE_PROGRESS_CANCEL, "WORK_DONE_PROGRESS_CANCEL"},
   };
 
   std::map<NotificationMethod, std::string> NotificationMethodValues = {
     {NotificationMethod::INITIALIZED, "initialized"},
+    {NotificationMethod::DID_OPEN_NOTEBOOK_DOCUMENT, "notebookDocument/didOpen"},
+    {NotificationMethod::DID_CHANGE_NOTEBOOK_DOCUMENT, "notebookDocument/didChange"},
+    {NotificationMethod::DID_SAVE_NOTEBOOK_DOCUMENT, "notebookDocument/didSave"},
+    {NotificationMethod::DID_CLOSE_NOTEBOOK_DOCUMENT, "notebookDocument/didClose"},
     {NotificationMethod::DID_OPEN_TEXT_DOCUMENT, "textDocument/didOpen"},
     {NotificationMethod::DID_CHANGE_TEXT_DOCUMENT, "textDocument/didChange"},
     {NotificationMethod::DID_SAVE_TEXT_DOCUMENT, "textDocument/didSave"},
     {NotificationMethod::DID_CLOSE_TEXT_DOCUMENT, "textDocument/didClose"},
+    {NotificationMethod::CANCEL_REQUEST, "$/cancelRequest"},
+    {NotificationMethod::SET_TRACE, "$/setTrace"},
+    {NotificationMethod::EXIT, "exit"},
+    {NotificationMethod::DID_CHANGE_CONFIGURATION, "workspace/didChangeConfiguration"},
+    {NotificationMethod::DID_CHANGE_WORKSPACE_FOLDERS, "workspace/didChangeWorkspaceFolders"},
+    {NotificationMethod::DID_CREATE_FILES, "workspace/didCreateFiles"},
+    {NotificationMethod::DID_RENAME_FILES, "workspace/didRenameFiles"},
+    {NotificationMethod::DID_DELETE_FILES, "workspace/didDeleteFiles"},
+    {NotificationMethod::DID_CHANGE_WATCHED_FILES, "workspace/didChangeWatchedFiles"},
+    {NotificationMethod::WORK_DONE_PROGRESS_CANCEL, "window/workDoneProgress/cancel"},
   };
 
   auto notificationMethodByName(const std::string &name) -> NotificationMethod {
@@ -924,8 +1014,8 @@ namespace LCompilers::LanguageServerProtocol {
     throw std::invalid_argument("Invalid NotificationMethod value: " + value);
   }
 
-  auto isRequestMethod(const std::string &name) -> bool {
-    for (const auto &[enum_key, enum_value] : RequestMethodValues) {
+  auto isNotificationMethod(const std::string &name) -> bool {
+    for (const auto &[enum_key, enum_value] : NotificationMethodValues) {
       if (name == enum_value) {
         return true;
       }
@@ -933,8 +1023,89 @@ namespace LCompilers::LanguageServerProtocol {
     return false;
   }
 
-  auto isNotificationMethod(const std::string &name) -> bool {
-    for (const auto &[enum_key, enum_value] : NotificationMethodValues) {
+  std::map<ServerRequestMethod, std::string> ServerRequestMethodNames = {
+    {ServerRequestMethod::REGISTER_CAPABILITY, "REGISTER_CAPABILITY"},
+    {ServerRequestMethod::UNREGISTER_CAPABILITY, "UNREGISTER_CAPABILITY"},
+    {ServerRequestMethod::WORKSPACE_CONFIGURATION, "WORKSPACE_CONFIGURATION"},
+    {ServerRequestMethod::APPLY_WORKSPACE_EDIT, "APPLY_WORKSPACE_EDIT"},
+    {ServerRequestMethod::SHOW_MESSAGE_REQUEST, "SHOW_MESSAGE_REQUEST"},
+    {ServerRequestMethod::SHOW_DOCUMENT, "SHOW_DOCUMENT"},
+    {ServerRequestMethod::LOG_MESSAGE, "LOG_MESSAGE"},
+    {ServerRequestMethod::WORK_DONE_PROGRESS_CREATE, "WORK_DONE_PROGRESS_CREATE"},
+  };
+
+  std::map<ServerRequestMethod, std::string> ServerRequestMethodValues = {
+    {ServerRequestMethod::REGISTER_CAPABILITY, "client/registerCapability"},
+    {ServerRequestMethod::UNREGISTER_CAPABILITY, "client/unregisterCapability"},
+    {ServerRequestMethod::WORKSPACE_CONFIGURATION, "workspace/configuration"},
+    {ServerRequestMethod::APPLY_WORKSPACE_EDIT, "workspace/applyEdit"},
+    {ServerRequestMethod::SHOW_MESSAGE_REQUEST, "window/showMessageRequest"},
+    {ServerRequestMethod::SHOW_DOCUMENT, "window/showDocument"},
+    {ServerRequestMethod::LOG_MESSAGE, "window/logMessage"},
+    {ServerRequestMethod::WORK_DONE_PROGRESS_CREATE, "window/workDoneProgress/create"},
+  };
+
+  auto serverRequestMethodByName(const std::string &name) -> ServerRequestMethod {
+    for (const auto &[enum_key, enum_value] : ServerRequestMethodNames) {
+      if (name == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid ServerRequestMethod name: " + name);
+  }
+
+  auto serverRequestMethodByValue(const std::string &value) -> ServerRequestMethod {
+    for (const auto &[enum_key, enum_value] : ServerRequestMethodValues) {
+      if (value == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid ServerRequestMethod value: " + value);
+  }
+
+  auto isServerRequestMethod(const std::string &name) -> bool {
+    for (const auto &[enum_key, enum_value] : ServerRequestMethodValues) {
+      if (name == enum_value) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  std::map<ServerNotificationMethod, std::string> ServerNotificationMethodNames = {
+    {ServerNotificationMethod::PROGRESS, "PROGRESS"},
+    {ServerNotificationMethod::LOG_TRACE, "LOG_TRACE"},
+    {ServerNotificationMethod::SHOW_MESSAGE, "SHOW_MESSAGE"},
+    {ServerNotificationMethod::TELEMETRY_EVENT, "TELEMETRY_EVENT"},
+  };
+
+  std::map<ServerNotificationMethod, std::string> ServerNotificationMethodValues = {
+    {ServerNotificationMethod::PROGRESS, "$/progress"},
+    {ServerNotificationMethod::LOG_TRACE, "$/logTrace"},
+    {ServerNotificationMethod::SHOW_MESSAGE, "window/showMessage"},
+    {ServerNotificationMethod::TELEMETRY_EVENT, "telemetry/event"},
+  };
+
+  auto serverNotificationMethodByName(const std::string &name) -> ServerNotificationMethod {
+    for (const auto &[enum_key, enum_value] : ServerNotificationMethodNames) {
+      if (name == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid ServerNotificationMethod name: " + name);
+  }
+
+  auto serverNotificationMethodByValue(const std::string &value) -> ServerNotificationMethod {
+    for (const auto &[enum_key, enum_value] : ServerNotificationMethodValues) {
+      if (value == enum_value) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument("Invalid ServerNotificationMethod value: " + value);
+  }
+
+  auto isServerNotificationMethod(const std::string &name) -> bool {
+    for (const auto &[enum_key, enum_value] : ServerNotificationMethodValues) {
       if (name == enum_value) {
         return true;
       }

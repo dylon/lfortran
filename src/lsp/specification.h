@@ -2583,6 +2583,23 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   };
 
+  enum class GotoDeclarationResultType {
+    LOCATION,
+    LOCATION_ARRAY,
+    LOCATION_LINK_ARRAY,
+    LSP_NULL
+  };
+
+  struct GotoDeclarationResult {
+    GotoDeclarationResultType type;
+    std::variant<
+      std::unique_ptr<Location>,
+      ptr_vector<Location>,
+      ptr_vector<LocationLink>,
+      null
+    > value;
+  };
+
   /**
    * Request:
    * - method: textDocument/declaration
@@ -2666,6 +2683,23 @@ namespace LCompilers::LanguageServerProtocol {
     : public TextDocumentRegistrationOptions
     , public DefinitionOptions {
     //empty
+  };
+
+  enum class GotoDefinitionResultType {
+    LOCATION,
+    LOCATION_ARRAY,
+    LOCATION_LINK_ARRAY,
+    LSP_NULL
+  };
+
+  struct GotoDefinitionResult {
+    GotoDefinitionResultType type;
+    std::variant<
+      std::unique_ptr<Location>,
+      ptr_vector<Location>,
+      ptr_vector<LocationLink>,
+      null
+    > value;
   };
 
   /**
@@ -12470,6 +12504,8 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto notebookCellKindByName(const std::string &name) -> NotebookCellKind;
 
+  auto notebookCellKindByValue(int value) -> NotebookCellKind;
+
   /**
    * export interface ExecutionSummary {
    *   executionOrder: uinteger;
@@ -15325,6 +15361,8 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto textDocumentSaveReasonByName(const std::string &name) -> TextDocumentSaveReason;
 
+  auto textDocumentSaveReasonByValue(int value) -> TextDocumentSaveReason;
+
   /**
    * The document will save notification is sent from the client to the server
    * before the document is actually saved. If a server has registered for open
@@ -15371,7 +15409,56 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * reason: TextDocumentSaveReason;
      */
-    std::unique_ptr<TextDocumentSaveReason> reason;
+    TextDocumentSaveReason reason;
+  };
+
+  enum class WillSaveWaitUntilResultType {
+    TEXT_EDITS,
+    LSP_NULL,
+  };
+
+  /**
+   * The document will save request is sent from the client to the server before
+   * the document is actually saved. The request can return an array of
+   * TextEdits which will be applied to the text document before it is saved.
+   * Please note that clients might drop results if computing the text edits
+   * took too long or if a server constantly fails on this request. This is done
+   * to keep the save fast and reliable. If a server has registered for open /
+   * close events clients should ensure that the document is open before a
+   * willSaveWaitUntil notification is sent since clients can’t change the
+   * content of a file without ownership transferal.
+   *
+   * Client Capability:
+   * - property name (optional): textDocument.synchronization.willSaveWaitUntil
+   * - property type: boolean
+   *
+   * The capability indicates that the client supports
+   * textDocument/willSaveWaitUntil requests.
+   *
+   * Server Capability:
+   * - property name (optional): textDocumentSync.willSaveWaitUntil
+   * - property type: boolean
+   *
+   * The capability indicates that the server is interested in
+   * textDocument/willSaveWaitUntil requests.
+   *
+   * Registration Options: TextDocumentRegistrationOptions
+   *
+   * Request:
+   * - method: textDocument/willSaveWaitUntil
+   * - params: WillSaveTextDocumentParams
+   *
+   * Response:
+   * - result: TextEdit[] | null
+   * - error: code and message set in case an exception happens during the
+   *   textDocument/willSaveWaitUntil request.
+   */
+  struct WillSaveWaitUntilResult {
+    WillSaveWaitUntilResultType type;
+    std::variant<
+      ptr_vector<TextEdit>,
+      null
+    > value;
   };
 
   /**
@@ -15461,6 +15548,18 @@ namespace LCompilers::LanguageServerProtocol {
 
   enum class RequestMethod {
     INITIALIZE,
+    SHUTDOWN,
+    WILL_SAVE_WAIT_UNTIL,
+    GOTO_DECLARATION,
+    GOTO_DEFINITION,
+    TYPE_HIERARCHY_PREPARE,
+    TYPE_HIERARCHY_SUPERTYPES,
+    TYPE_HIERARCHY_SUBTYPES,
+    WORKSPACE_SYMBOL,
+    RESOLVE_WORKSPACE_SYMBOL,
+    CREATE_FILES,
+    RENAME_FILES,
+    EXECUTE_COMMAND,
   };
 
   extern std::map<RequestMethod, std::string> RequestMethodNames;
@@ -15471,12 +15570,28 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto requestMethodByValue(const std::string &value) -> RequestMethod;
 
+  auto isRequestMethod(const std::string &name) -> bool;
+
   enum class NotificationMethod {
     INITIALIZED,
+    DID_OPEN_NOTEBOOK_DOCUMENT,
+    DID_CHANGE_NOTEBOOK_DOCUMENT,
+    DID_SAVE_NOTEBOOK_DOCUMENT,
+    DID_CLOSE_NOTEBOOK_DOCUMENT,
     DID_OPEN_TEXT_DOCUMENT,
     DID_CHANGE_TEXT_DOCUMENT,
     DID_SAVE_TEXT_DOCUMENT,
     DID_CLOSE_TEXT_DOCUMENT,
+    CANCEL_REQUEST,
+    SET_TRACE,
+    EXIT,
+    DID_CHANGE_CONFIGURATION,
+    DID_CHANGE_WORKSPACE_FOLDERS,
+    DID_CREATE_FILES,
+    DID_RENAME_FILES,
+    DID_DELETE_FILES,
+    DID_CHANGE_WATCHED_FILES,
+    WORK_DONE_PROGRESS_CANCEL,
   };
 
   extern std::map<NotificationMethod, std::string> NotificationMethodNames;
@@ -15487,9 +15602,47 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto notificationMethodByValue(const std::string &value) -> NotificationMethod;
 
-  auto isRequestMethod(const std::string &name) -> bool;
-
   auto isNotificationMethod(const std::string &name) -> bool;
+
+  // Requests from the server to the client
+  enum class ServerRequestMethod {
+    REGISTER_CAPABILITY,
+    UNREGISTER_CAPABILITY,
+    WORKSPACE_CONFIGURATION,
+    APPLY_WORKSPACE_EDIT,
+    SHOW_MESSAGE_REQUEST,
+    SHOW_DOCUMENT,
+    LOG_MESSAGE,
+    WORK_DONE_PROGRESS_CREATE,
+  };
+
+  extern std::map<ServerRequestMethod, std::string> ServerRequestMethodNames;
+
+  extern std::map<ServerRequestMethod, std::string> ServerRequestMethodValues;
+
+  auto serverRequestMethodByName(const std::string &name) -> ServerRequestMethod;
+
+  auto serverRequestMethodByValue(const std::string &value) -> ServerRequestMethod;
+
+  auto isServerRequestMethod(const std::string &name) -> bool;
+
+  // Notifications from the server to the client
+  enum class ServerNotificationMethod {
+    PROGRESS,
+    LOG_TRACE,
+    SHOW_MESSAGE,
+    TELEMETRY_EVENT,
+  };
+
+  extern std::map<ServerNotificationMethod, std::string> ServerNotificationMethodNames;
+
+  extern std::map<ServerNotificationMethod, std::string> ServerNotificationMethodValues;
+
+  auto serverNotificationMethodByName(const std::string &name) -> ServerNotificationMethod;
+
+  auto serverNotificationMethodByValue(const std::string &value) -> ServerNotificationMethod;
+
+  auto isServerNotificationMethod(const std::string &name) -> bool;
 
   // Implementation Considerations
   // Language servers usually run in a separate process and clients communicate

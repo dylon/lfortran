@@ -8,6 +8,7 @@ namespace LCompilers::LanguageServer {
   class LanguageServer {
   public:
     virtual std::string serve(const std::string &request) = 0;
+    virtual bool isTerminated() const = 0;
   };
 
 } // namespace LCompilers::LanguageServer
