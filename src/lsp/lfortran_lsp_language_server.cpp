@@ -4,6 +4,13 @@
 
 namespace LCompilers::LanguageServerProtocol {
 
+  LFortranLspLanguageServer::LFortranLspLanguageServer(
+    ls::MessageQueue &outgoingMessages
+  ) : LspLanguageServer(outgoingMessages)
+  {
+    // empty
+  }
+
   // request: "initialize"
   auto LFortranLspLanguageServer::initialize(
     const InitializeParams &params

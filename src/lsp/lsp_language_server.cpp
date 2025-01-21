@@ -10,11 +10,28 @@
 
 namespace LCompilers::LanguageServerProtocol {
 
+  LspLanguageServer::LspLanguageServer(ls::MessageQueue &outgoingMessages)
+    : ls::LanguageServer(outgoingMessages)
+  {
+    // empty
+  }
+
+  auto LspLanguageServer::nextId() -> int {
+    return serialId++;
+  }
+
+  auto LspLanguageServer::nextRequestId() -> std::unique_ptr<RequestId> {
+    std::unique_ptr<RequestId> requestId = std::make_unique<RequestId>();
+    requestId->type = RequestIdType::LSP_INTEGER;
+    requestId->value = nextId();
+    return requestId;
+  }
+
   std::string LspLanguageServer::serve(const std::string &request) {
     ResponseMessage response;
     try {
       // The language server protocol always uses “2.0” as the jsonrpc version.
-      response.jsonrpc = "2.0";
+      response.jsonrpc = JSON_RPC_VERSION;
 
       response.id = std::make_unique<ResponseId>();
       response.id->type = ResponseIdType::LSP_NULL;
@@ -131,6 +148,15 @@ namespace LCompilers::LanguageServerProtocol {
     return !_shutdown;
   }
 
+  auto LspLanguageServer::initializeParams() const -> const InitializeParams & {
+    if (_initializeParams.has_value()) {
+      return _initializeParams.value();
+    }
+    throw std::logic_error(
+      "LspLanguageServer::initialize must be called before LspLanguageServer::initializeParams"
+    );
+  }
+
   auto LspLanguageServer::dispatch(
     ResponseMessage &response,
     const RequestMessage &request
@@ -144,23 +170,27 @@ namespace LCompilers::LanguageServerProtocol {
     assertRunning();
     if (method != RequestMethod::INITIALIZE) {
       assertInitialized();
-    } else if (_initialized) {
-      throw LspException(
-        ErrorCodes::InvalidRequest,
-        "Server may be initialized only once."
-      );
+    } else {
+      bool expected = false;  // a reference is required ...
+      if (!_initialized.compare_exchange_strong(expected, true)) {
+        throw LspException(
+          ErrorCodes::InvalidRequest,
+          "Server may be initialized only once."
+        );
+      }
     }
     switch (method) {
     case RequestMethod::INITIALIZE: {
-      const RequestParams &requestParams = transformer.requireRequestParams(request);
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
       _initializeParams = transformer.asInitializeParams(requestParams);
-      InitializeResult result = initialize(_initializeParams);
+      InitializeResult result = initialize(_initializeParams.value());
       response.result = transformer.lspToAny(result);
-      _initialized = true;
       break;
     }
     case RequestMethod::WILL_SAVE_WAIT_UNTIL: {
-      const RequestParams &requestParams = transformer.requireRequestParams(request);
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
       WillSaveTextDocumentParams params =
         transformer.asWillSaveTextDocumentParams(requestParams);
       WillSaveWaitUntilResult result = willSaveWaitUntil(params);
@@ -168,7 +198,8 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case RequestMethod::GOTO_DECLARATION: {
-      const RequestParams &requestParams = transformer.requireRequestParams(request);
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
       DeclarationParams params =
         transformer.asDeclarationParams(requestParams);
       GotoDeclarationResult result = gotoDeclaration(params);
@@ -176,10 +207,47 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case RequestMethod::GOTO_DEFINITION: {
-      const RequestParams &requestParams = transformer.requireRequestParams(request);
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
       DefinitionParams params =
         transformer.asDefinitionParams(requestParams);
       GotoDefinitionResult result = gotoDefinition(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::GOTO_TYPE_DEFINITION: {
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
+      TypeDefinitionParams params =
+        transformer.asTypeDefinitionParams(requestParams);
+      GotoTypeDefinitionResult result = gotoTypeDefinition(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::GOTO_IMPLEMENTATION: {
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
+      ImplementationParams params =
+        transformer.asImplementationParams(requestParams);
+      GotoImplementationResult result = gotoImplementation(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::FIND_REFERENCES: {
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
+      ReferenceParams params =
+        transformer.asReferenceParams(requestParams);
+      FindReferencesResult result = findReferences(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::PREPARE_CALL_HIERARCHY: {
+      const RequestParams &requestParams =
+        transformer.requireRequestParams(request);
+      CallHierarchyPrepareParams params =
+        transformer.asCallHierarchyPrepareParams(requestParams);
+      PrepareCallHierarchyResult result = prepareCallHierarchy(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -318,6 +386,26 @@ namespace LCompilers::LanguageServerProtocol {
     }
   }
 
+  auto LspLanguageServer::prepare(
+    std::ostream &os,
+    const std::string &response
+  ) const -> void {
+    os << "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
+       << "Content-Length: " << response.length() << "\r\n"
+       << "\r\n"
+       << response;
+  }
+
+  auto LspLanguageServer::prepare(
+    std::stringstream &ss,
+    const std::string &response
+  ) const -> void {
+    ss << "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
+       << "Content-Length: " << response.length() << "\r\n"
+       << "\r\n"
+       << response;
+  }
+
   auto LspLanguageServer::assertInitialized() -> void{
     if (!_initialized) {
       throw LspException(
@@ -335,6 +423,10 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
   }
+
+  // ========================= //
+  // request: client -> server //
+  // ========================= //
 
   // request: "initialize"
   auto LspLanguageServer::initialize(
@@ -407,11 +499,67 @@ namespace LCompilers::LanguageServerProtocol {
     );
   }
 
+  // request: "textDocument/typeDefinition"
+  auto LspLanguageServer::gotoTypeDefinition(
+    const TypeDefinitionParams &params
+  ) -> GotoTypeDefinitionResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::GOTO_TYPE_DEFINITION)
+      )
+    );
+  }
+
+  // request: "textDocument/implementation"
+  auto LspLanguageServer::gotoImplementation(
+    const ImplementationParams &params
+  ) -> GotoImplementationResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::GOTO_IMPLEMENTATION)
+      )
+    );
+  }
+
+  // request: "textDocument/references"
+  auto LspLanguageServer::findReferences(
+    const ReferenceParams &params
+  ) -> FindReferencesResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::FIND_REFERENCES)
+      )
+    );
+  }
+
+  // request: "textDocument/prepareCallHierarchy"
+  auto LspLanguageServer::prepareCallHierarchy(
+    const CallHierarchyPrepareParams &params
+  ) -> PrepareCallHierarchyResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::PREPARE_CALL_HIERARCHY)
+      )
+    );
+  }
+
   // request: "shutdown"
   auto LspLanguageServer::shutdown() -> void {
     std::cerr << "Shutting down server." << std::endl;
     _shutdown = true;
   }
+
+  // ============================== //
+  // notification: client -> server //
+  // ============================== //
 
   // notification: "exit"
   auto LspLanguageServer::exit() -> void {
@@ -577,6 +725,64 @@ namespace LCompilers::LanguageServerProtocol {
         )
       )
     );
+  }
+
+  // ========================= //
+  // request: server -> client //
+  // ========================= //
+
+  // request: "client/registerCapability"
+  auto LspLanguageServer::registerCapability(
+    const RegistrationParams &params
+  ) -> void {
+    RequestMessage request;
+    request.jsonrpc = JSON_RPC_VERSION;
+    request.id = nextRequestId();
+    request.method = "client/registerCapability";
+    request.params = transformer.asRequestParams(params);
+    const std::string message = serializer.serializeRequest(request);
+    outgoingMessages.enqueue(message);
+  }
+
+  // request: "client/unregisterCapability"
+  auto LspLanguageServer::unregisterCapability(
+    const UnregistrationParams &params
+  ) -> void {
+    RequestMessage request;
+    request.jsonrpc = JSON_RPC_VERSION;
+    request.id = nextRequestId();
+    request.method = "client/unregisterCapability";
+    request.params = transformer.asRequestParams(params);
+    const std::string message = serializer.serializeRequest(request);
+    outgoingMessages.enqueue(message);
+  }
+
+  // ============================== //
+  // notification: server -> client //
+  // ============================== //
+
+  // notification: "$/progress"
+  auto LspLanguageServer::reportProgress(
+    const ProgressParams &params
+  ) -> void {
+    NotificationMessage notification;
+    notification.jsonrpc = JSON_RPC_VERSION;
+    notification.method = "$/progress";
+    notification.params = transformer.asNotificationParams(params);
+    const std::string message = serializer.serializeNotification(notification);
+    outgoingMessages.enqueue(message);
+  }
+
+  // notification: "$/logTrace"
+  auto LspLanguageServer::logTrace(
+    const LogTraceParams &params
+  ) -> void {
+    NotificationMessage notification;
+    notification.jsonrpc = JSON_RPC_VERSION;
+    notification.method = "$/logTrace";
+    notification.params = transformer.asNotificationParams(params);
+    const std::string message = serializer.serializeNotification(notification);
+    outgoingMessages.enqueue(message);
   }
 
 } // namespace LCompilers::LanguageServerProtocol

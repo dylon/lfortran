@@ -513,7 +513,8 @@ namespace LCompilers::LanguageServerProtocol {
   // ---------------------------------------------------------------------------
 
   /**
-   * The base protocol offers support for request cancellation. To cancel a request, a notification message with the following properties is sent:
+   * The base protocol offers support for request cancellation. To cancel a
+   * request, a notification message with the following properties is sent:
    *
    *  Notification:
    *    method: ‘$/cancelRequest’
@@ -589,7 +590,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * value: T;
      */
-    std::unique_ptr<void> value;
+    std::unique_ptr<LSPAny> value;
   };
 
   /**
@@ -2794,6 +2795,23 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   };
 
+  enum class GotoTypeDefinitionResultType {
+    LOCATION,
+    LOCATION_ARRAY,
+    LOCATION_LINK_ARRAY,
+    LSP_NULL
+  };
+
+  struct GotoTypeDefinitionResult {
+    GotoTypeDefinitionResultType type;
+    std::variant<
+      std::unique_ptr<Location>,
+      ptr_vector<Location>,
+      ptr_vector<LocationLink>,
+      null
+    > value;
+  };
+
   /**
    * Request:
    * - method: textDocument/typeDefinition
@@ -2884,6 +2902,23 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   };
 
+  enum class GotoImplementationResultType {
+    LOCATION,
+    LOCATION_ARRAY,
+    LOCATION_LINK_ARRAY,
+    LSP_NULL
+  };
+
+  struct GotoImplementationResult {
+    GotoImplementationResultType type;
+    std::variant<
+      std::unique_ptr<Location>,
+      ptr_vector<Location>,
+      ptr_vector<LocationLink>,
+      null
+    > value;
+  };
+
   /**
    * Request:
    * - method: textDocument/implementation
@@ -2968,6 +3003,19 @@ namespace LCompilers::LanguageServerProtocol {
      * includeDeclaration: boolean;
      */
     boolean includeDeclaration;
+  };
+
+  enum class FindReferencesResultType {
+    LOCATION_ARRAY,
+    LSP_NULL
+  };
+
+  struct FindReferencesResult {
+    FindReferencesResultType type;
+    std::variant<
+      ptr_vector<Location>,
+      null
+    > value;
   };
 
   /**
@@ -3366,7 +3414,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tags?: SymbolTag[];
      */
-    optional_ptr_vector<SymbolTag> tags;
+    optional_vector<SymbolTag> tags;
 
     /**
      * More detail for this item, e.g. the signature of a function.
@@ -3406,6 +3454,19 @@ namespace LCompilers::LanguageServerProtocol {
      * data?: LSPAny;
      */
     optional_ptr<LSPAny> data;
+  };
+
+  enum class PrepareCallHierarchyResultType {
+    CALL_HIERARCHY_ITEM_ARRAY,
+    LSP_NULL,
+  };
+
+  struct PrepareCallHierarchyResult {
+    PrepareCallHierarchyResultType type;
+    std::variant<
+      ptr_vector<CallHierarchyItem>,
+      null
+    > value;
   };
 
   /**
@@ -15566,7 +15627,11 @@ namespace LCompilers::LanguageServerProtocol {
     WILL_SAVE_WAIT_UNTIL,
     GOTO_DECLARATION,
     GOTO_DEFINITION,
-    TYPE_HIERARCHY_PREPARE,
+    GOTO_TYPE_DEFINITION,
+    GOTO_IMPLEMENTATION,
+    FIND_REFERENCES,
+    PREPARE_CALL_HIERARCHY,
+    PREPARE_TYPE_HIERARCHY,
     TYPE_HIERARCHY_SUPERTYPES,
     TYPE_HIERARCHY_SUBTYPES,
     WORKSPACE_SYMBOL,

@@ -1,6 +1,8 @@
 #ifndef LCOMPILERS_LSP_TRANSFORMER_H
 #define LCOMPILERS_LSP_TRANSFORMER_H
 
+#include <memory>
+
 #include <lsp/specification.h>
 
 namespace LCompilers::LanguageServerProtocol {
@@ -19,6 +21,18 @@ namespace LCompilers::LanguageServerProtocol {
     auto asDefinitionParams(
       const RequestParams &requestParams
     ) const -> DefinitionParams;
+    auto asTypeDefinitionParams(
+      const RequestParams &requestParams
+    ) const -> TypeDefinitionParams;
+    auto asImplementationParams(
+      const RequestParams &requestParams
+    ) const -> ImplementationParams;
+    auto asReferenceParams(
+      const RequestParams &requestParams
+    ) const -> ReferenceParams;
+    auto asCallHierarchyPrepareParams(
+      const RequestParams &requestParams
+    ) const -> CallHierarchyPrepareParams;
 
     auto asCancelParams(
       const NotificationParams &notificationParams
@@ -54,6 +68,23 @@ namespace LCompilers::LanguageServerProtocol {
       const NotificationParams &notificationParams
     ) const -> DidCloseNotebookDocumentParams;
 
+    auto asRequestParams(
+      const RegistrationParams &registrationParams
+    ) const -> std::unique_ptr<RequestParams>;
+    auto asRequestParams(
+      const UnregistrationParams &unregistrationParams
+    ) const -> std::unique_ptr<RequestParams>;
+
+    auto asNotificationParams(
+      const ProgressParams &progressParams
+    ) const -> std::unique_ptr<NotificationParams>;
+    auto asNotificationParams(
+      const LogTraceParams &logTraceParams
+    ) const -> std::unique_ptr<NotificationParams>;
+
+    auto anyToReferenceContext(
+      const LSPAny &any
+    ) const -> std::unique_ptr<ReferenceContext>;
     auto anyToPositionEncodingKind(
       const LSPAny &any
     ) const -> PositionEncodingKind;
@@ -401,6 +432,21 @@ namespace LCompilers::LanguageServerProtocol {
     ) const -> bool;
 
     auto lspToAny(
+      const CallHierarchyItem &item
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const PrepareCallHierarchyResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const FindReferencesResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const ProgressToken &token
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const ProgressParams &params
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
       const InitializeResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
@@ -411,6 +457,12 @@ namespace LCompilers::LanguageServerProtocol {
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const GotoDefinitionResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const GotoTypeDefinitionResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const GotoImplementationResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const ServerCapabilities &capabilities
@@ -433,14 +485,47 @@ namespace LCompilers::LanguageServerProtocol {
     auto lspToAny(
       const Position &position
     ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const Registration &registration
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const Unregistration &unregistration
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const LogTraceParams &logTraceParams
+    ) const -> std::unique_ptr<LSPAny>;
 
-    auto uintegerToAny(
+    auto intToAny(
+      int value
+    ) const -> std::unique_ptr<LSPAny>;
+    auto unsignedIntToAny(
       uinteger value
     ) const -> std::unique_ptr<LSPAny>;
     auto stringToAny(
       const string &value
     ) const -> std::unique_ptr<LSPAny>;
 
+    auto lspToObject(
+      const CallHierarchyItem &item
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const LogTraceParams &logTraceParams
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const Unregistration &unregistration
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const UnregistrationParams &unregistrationParams
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const Registration &registration
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const RegistrationParams &registrationParams
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const ProgressParams &params
+    ) const -> std::unique_ptr<LSPObject>;
     auto lspToObject(
       const TextEdit &edit
     ) const -> std::unique_ptr<LSPObject>;

@@ -26,9 +26,11 @@ namespace LCompilers::LanguageServer {
 
   CommunicationProtocol::CommunicationProtocol(
     LanguageServer &languageServer,
-    RequestParserFactory &parserFactory)
+    RequestParserFactory &parserFactory,
+    MessageQueue &incomingMessages)
     : languageServer(languageServer)
     , parserFactory(parserFactory)
+    , incomingMessages(incomingMessages)
   {
     // empty
   }
@@ -36,11 +38,28 @@ namespace LCompilers::LanguageServer {
   StdIOCommunicationProtocol::StdIOCommunicationProtocol(
     LanguageServer &languageServer,
     RequestParserFactory &parserFactory,
-    std::unique_ptr<lst::ThreadPool> threadPool)
-    : CommunicationProtocol(languageServer, parserFactory)
+    std::unique_ptr<lst::ThreadPool> threadPool,
+    MessageQueue &incomingMessages)
+    : CommunicationProtocol(languageServer, parserFactory, incomingMessages)
     , threadPool(std::move(threadPool))
+    , messageListener([this]() {
+      listen();
+    })
   {
     // empty
+  }
+
+  auto StdIOCommunicationProtocol::listen() -> void {
+    std::mutex &stdoutMutex = threadPool->getStdoutMutex();
+    std::mutex &stderrMutex = threadPool->getStderrMutex();
+    do {
+      const std::string message = incomingMessages.dequeue();
+      std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
+      std::unique_lock<std::mutex> stderrLock(stderrMutex);
+      languageServer.prepare(std::cout, message);
+      std::cout << std::flush;
+      std::cerr << std::endl;
+    } while (running);
   }
 
   void StdIOCommunicationProtocol::serve() {
@@ -117,7 +136,8 @@ namespace LCompilers::LanguageServer {
                     {
                       std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
                       std::unique_lock<std::mutex> stderrLock(stderrMutex);
-                      std::cout << response << std::flush;
+                      languageServer.prepare(std::cout, response);
+                      std::cout << std::flush;
                       std::cerr << std::endl;
                     }
                     ++pendingId;
@@ -185,8 +205,11 @@ namespace LCompilers::LanguageServer {
         << "Caught unhandled exception while serving requests: " << e.what()
         << std::endl;
     }
+    running = false;
+    incomingMessages.stop();
     threadPool->stop();
     threadPool->join();
+    messageListener.join();
   }
 
   TcpRequestMatchCondition::TcpRequestMatchCondition(
@@ -216,11 +239,26 @@ namespace LCompilers::LanguageServer {
   TcpCommunicationProtocol::TcpCommunicationProtocol(
     LanguageServer &languageServer,
     RequestParserFactory &parserFactory,
-    short unsigned int port)
-    : CommunicationProtocol(languageServer, parserFactory)
+    short unsigned int port,
+    MessageQueue &incomingMessages)
+    : CommunicationProtocol(languageServer, parserFactory, incomingMessages)
     , port(port)
+    , messageListener([this]() {
+      listen();
+    })
   {
     // empty
+  }
+
+  auto TcpCommunicationProtocol::listen() -> void {
+    std::stringstream ss;
+    do {
+      const std::string message = incomingMessages.dequeue();
+      ss.str("");
+      prepareResponse(ss, 200, "OK", message);
+      const std::string output = ss.str();
+      std::cout << output << std::endl;
+    } while (running);
   }
 
   auto TcpCommunicationProtocol::prepareResponse(
@@ -230,10 +268,7 @@ namespace LCompilers::LanguageServer {
     const std::string &response
   ) -> void {
     ss << "HTTP/1.1 " << statusCode << " " << statusText << "\r\n";
-    ss << "Content-Type: application/json\r\n";
-    ss << "Content-Length: " << response.length() << "\r\n";
-    ss << "\r\n";
-    ss << response;
+    languageServer.prepare(ss, response);
   }
 
   auto TcpCommunicationProtocol::dispatch(
@@ -353,6 +388,10 @@ namespace LCompilers::LanguageServer {
       co_spawn(io_context, listener(), detached);
 
       io_context.run();
+
+      running = false;
+      incomingMessages.stop();
+      messageListener.join();
     } catch (std::exception &e) {
       std::fprintf(
         stderr,
@@ -364,8 +403,9 @@ namespace LCompilers::LanguageServer {
 
   WebSocketCommunicationProtocol::WebSocketCommunicationProtocol(
     LanguageServer &languageServer,
-    RequestParserFactory &parserFactory)
-    : CommunicationProtocol(languageServer, parserFactory)
+    RequestParserFactory &parserFactory,
+    MessageQueue &incomingMessages)
+    : CommunicationProtocol(languageServer, parserFactory, incomingMessages)
   {
     // empty
   }

@@ -1,3 +1,4 @@
+#include "lsp/message_queue.h"
 #include <cstddef>
 #include <format>
 #include <iostream>
@@ -14,6 +15,7 @@
 #include <lsp/lsp_request_parser.h>
 #include <lsp/communication_protocol.h>
 #include <lsp/thread_pool.h>
+#include <lsp/message_queue.h>
 
 namespace ls = LCompilers::LanguageServer;
 namespace lsp = LCompilers::LanguageServerProtocol;
@@ -270,12 +272,13 @@ std::unique_ptr<ls::RequestParserFactory> buildRequestParserFactory(
 }
 
 std::unique_ptr<ls::LanguageServer> buildLanguageServer(
-  CommandLineOptions &opts
+  CommandLineOptions &opts,
+  ls::MessageQueue &outgoingMessages
 ) {
   if (opts.language == Language::FORTRAN) {
     if (opts.dataFormat == DataFormat::JSON_RPC) {
       if (opts.serverProtocol == ServerProtocol::LSP) {
-        return std::make_unique<lsp::LFortranLspLanguageServer>();
+        return std::make_unique<lsp::LFortranLspLanguageServer>(outgoingMessages);
       } else {
         throw std::runtime_error(
           std::format(
@@ -302,29 +305,34 @@ std::unique_ptr<ls::LanguageServer> buildLanguageServer(
   }
 }
 
-std::unique_ptr<lst::ThreadPool> buildThreadPool(CommandLineOptions &opts) {
+auto buildThreadPool(
+  CommandLineOptions &opts
+) -> std::unique_ptr<lst::ThreadPool> {
   return std::make_unique<lst::ThreadPool>(opts.numThreads);
 }
 
-std::unique_ptr<ls::CommunicationProtocol> buildCommunicationProtocol(
+auto buildCommunicationProtocol(
   CommandLineOptions &opts,
   ls::LanguageServer &languageServer,
-  ls::RequestParserFactory &requestParserFactory
-) {
+  ls::RequestParserFactory &requestParserFactory,
+  ls::MessageQueue &incomingMessages
+) -> std::unique_ptr<ls::CommunicationProtocol> {
   switch (opts.communicationProtocol) {
   case CommunicationProtocol::STDIO: {
     std::unique_ptr<lst::ThreadPool> threadPool = buildThreadPool(opts);
     return std::make_unique<ls::StdIOCommunicationProtocol>(
       languageServer,
       requestParserFactory,
-      std::move(threadPool)
+      std::move(threadPool),
+      incomingMessages
     );
   }
   case CommunicationProtocol::TCP: {
     return std::make_unique<ls::TcpCommunicationProtocol>(
       languageServer,
       requestParserFactory,
-      opts.tcpPort
+      opts.tcpPort,
+      incomingMessages
     );
   }
   case CommunicationProtocol::WEBSOCKET: {
@@ -341,6 +349,12 @@ std::unique_ptr<ls::CommunicationProtocol> buildCommunicationProtocol(
   }
 }
 
+auto buildMessageQueue(
+  CommandLineOptions &opts
+) -> std::unique_ptr<ls::MessageQueue> {
+  return std::make_unique<ls::MessageQueue>();
+}
+
 int main(int argc, char *argv[]) {
   CommandLineOptions opts;
   int retval = parse(opts, argc, argv);
@@ -352,9 +366,10 @@ int main(int argc, char *argv[]) {
   try {
     std::unique_ptr<ls::RequestParserFactory> requestParserFactory =
       buildRequestParserFactory(opts);
-    std::unique_ptr<ls::LanguageServer> languageServer = buildLanguageServer(opts);
+    std::unique_ptr<ls::MessageQueue> messageQueue = buildMessageQueue(opts);
+    std::unique_ptr<ls::LanguageServer> languageServer = buildLanguageServer(opts, *messageQueue);
     std::unique_ptr<ls::CommunicationProtocol> communicationProtocol =
-      buildCommunicationProtocol(opts, *languageServer, *requestParserFactory);
+      buildCommunicationProtocol(opts, *languageServer, *requestParserFactory, *messageQueue);
     communicationProtocol->serve();
   } catch (std::exception &e) {
     std::cerr

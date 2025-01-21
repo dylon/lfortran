@@ -2,7 +2,9 @@
 #define LCOMPILERS_LSP_LANGUAGE_SERVER_H
 
 #include <atomic>
+#include <cstddef>
 #include <map>
+#include <optional>
 #include <shared_mutex>
 
 #include <lsp/language_server.h>
@@ -15,8 +17,11 @@ namespace LCompilers::LanguageServerProtocol {
 
   namespace ls = LCompilers::LanguageServer;
 
+  const std::string JSON_RPC_VERSION = "2.0";
+
   class LspLanguageServer : public ls::LanguageServer {
   public:
+    LspLanguageServer(ls::MessageQueue &outgoingMessages);
     std::string serve(const std::string &request) override;
     auto isInitialized() const -> bool;
     auto isShutdown() const -> bool;
@@ -27,11 +32,15 @@ namespace LCompilers::LanguageServerProtocol {
     JsonRpcLspDeserializer deserializer;
     LspTransformer transformer;
     std::map<DocumentUri, TextDocument> textDocuments;
-    InitializeParams _initializeParams;
+    std::optional<InitializeParams> _initializeParams;
     std::shared_mutex readWriteMutex;
     std::atomic_bool _initialized = false;
     std::atomic_bool _shutdown = false;
     std::atomic_bool _exit = false;
+    std::atomic_int serialId = 0;
+
+    auto nextId() -> int;
+    auto nextRequestId() -> std::unique_ptr<RequestId>;
 
     auto dispatch(
       ResponseMessage &response,
@@ -41,6 +50,15 @@ namespace LCompilers::LanguageServerProtocol {
       ResponseMessage &response,
       const NotificationMessage &notification
     ) -> void;
+
+    void prepare(
+      std::ostream &os,
+      const std::string &response
+    ) const override;
+    void prepare(
+      std::stringstream &ss,
+      const std::string &response
+    ) const override;
 
     auto initializeParams() const -> const InitializeParams &;
 
@@ -55,6 +73,18 @@ namespace LCompilers::LanguageServerProtocol {
     auto gotoDefinition(
       const DefinitionParams &params
     ) -> GotoDefinitionResult;
+    auto gotoTypeDefinition(
+      const TypeDefinitionParams &params
+    ) -> GotoTypeDefinitionResult;
+    auto gotoImplementation(
+      const ImplementationParams &params
+    ) -> GotoImplementationResult;
+    auto findReferences(
+      const ReferenceParams &params
+    ) -> FindReferencesResult;
+    auto prepareCallHierarchy(
+      const CallHierarchyPrepareParams &params
+    ) -> PrepareCallHierarchyResult;
     auto shutdown() -> void;
 
     // notification: client -> server
@@ -80,8 +110,12 @@ namespace LCompilers::LanguageServerProtocol {
     ) -> void;
 
     // request: server -> client
+    auto registerCapability(const RegistrationParams &params) -> void;
+    auto unregisterCapability(const UnregistrationParams &params) -> void;
 
     // notification: server -> client
+    auto reportProgress(const ProgressParams &params) -> void;
+    auto logTrace(const LogTraceParams &params) -> void;
 
     void assertInitialized();
     void assertRunning();

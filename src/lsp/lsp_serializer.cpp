@@ -1,5 +1,7 @@
+#include "lsp/lsp_language_server.h"
 #include <format>
 #include <iostream>
+#include <stdexcept>
 #include <utility>
 
 #include <rapidjson/rapidjson.h>
@@ -10,21 +12,182 @@
 
 namespace LCompilers::LanguageServerProtocol {
 
-  auto JsonRpcLspSerializer::serializeResponse(
-    const ResponseMessage &response
-  ) const -> std::string {
+  auto JsonRpcLspSerializer::prepareDocument() const -> rapidjson::Document {
     rapidjson::Document document;
     rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
     document.SetObject();
     document.AddMember(
       "jsonrpc",
       rapidjson::Value(
-        response.jsonrpc.c_str(),
-        response.jsonrpc.length(),
+        JSON_RPC_VERSION.c_str(),
+        JSON_RPC_VERSION.length(),
         allocator
       ),
       allocator
     );
+    return document;
+  }
+
+  auto JsonRpcLspSerializer::serializeNotification(
+    const NotificationMessage &notification
+  ) const -> std::string {
+    rapidjson::Document document = prepareDocument();
+    rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
+    document.AddMember(
+      "method",
+      rapidjson::Value(
+        notification.method.c_str(),
+        notification.method.length(),
+        allocator
+      ),
+      allocator
+    );
+    if (notification.params.has_value()) {
+      rapidjson::Value params = lspToJson(
+        *notification.params.value(),
+        allocator
+      );
+      document.AddMember("params", params, allocator);
+    }
+    return serialize(document);
+  }
+
+  auto JsonRpcLspSerializer::lspToJson(
+    const NotificationParams &params,
+    rapidjson::Document::AllocatorType &allocator
+  ) const -> rapidjson::Value {
+    switch (params.type) {
+    case NotificationParamsType::LSP_OBJECT: {
+      const LSPObject &object =
+        *std::get<std::unique_ptr<LSPObject>>(params.value);
+      return lspToJson(object, allocator);
+    }
+    case NotificationParamsType::LSP_ARRAY: {
+      const LSPArray &array =
+        *std::get<std::unique_ptr<LSPArray>>(params.value);
+      return lspToJson(array, allocator);
+    }
+    }
+    throw std::runtime_error(
+      "JsonRpcLspSerializer::lspToJson should not reach the end of the function."
+    );
+  }
+
+  auto JsonRpcLspSerializer::lspToJson(
+    const LSPObject &object,
+    rapidjson::Document::AllocatorType &allocator
+  ) const -> rapidjson::Value {
+    rapidjson::Value json;
+    json.SetObject();
+    for (const auto &[lspName, lspValue] : object) {
+      rapidjson::Value fieldName(
+        lspName.c_str(),
+        lspName.length(),
+        allocator
+      );
+      rapidjson::Value fieldValue = lspToJson(*lspValue, allocator);
+      json.AddMember(fieldName, fieldValue, allocator);
+    }
+    return json;
+  }
+
+  auto JsonRpcLspSerializer::lspToJson(
+    const LSPArray &array,
+    rapidjson::Document::AllocatorType &allocator
+  ) const -> rapidjson::Value {
+    rapidjson::Value json;
+    json.SetArray();
+    for (const auto &lspValue : array) {
+      rapidjson::Value jsonValue = lspToJson(*lspValue, allocator);
+      json.PushBack(jsonValue, allocator);
+    }
+    return json;
+  }
+
+  auto JsonRpcLspSerializer::serializeRequest(
+    const RequestMessage &request
+  ) const -> std::string {
+    rapidjson::Document document = prepareDocument();
+    rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
+    document.AddMember(
+      "id",
+      lspToJson(*request.id, allocator),
+      allocator
+    );
+    document.AddMember(
+      "method",
+      stringToJson(request.method, allocator),
+      allocator
+    );
+    if (request.params.has_value()) {
+      rapidjson::Value params = lspToJson(
+        *request.params.value(),
+        allocator
+      );
+      document.AddMember("params", params, allocator);
+    }
+    return serialize(document);
+  }
+
+  auto JsonRpcLspSerializer::lspToJson(
+    const RequestId &requestId,
+    rapidjson::Document::AllocatorType &allocator
+  ) const -> rapidjson::Value {
+    switch (requestId.type) {
+    case RequestIdType::LSP_INTEGER: {
+      int value = std::get<int>(requestId.value);
+      return intToJson(value, allocator);
+    }
+    case RequestIdType::LSP_STRING: {
+      const std::string &value = std::get<std::string>(requestId.value);
+      return stringToJson(value, allocator);
+    }
+    }
+    throw std::runtime_error(
+      "JsonRpcLspSerializer::lspToJson should not reach the end of the function."
+    );
+  }
+
+  auto JsonRpcLspSerializer::intToJson(
+    int value,
+    rapidjson::Document::AllocatorType &allocator
+  ) const -> rapidjson::Value {
+    return rapidjson::Value(value);
+  }
+
+  auto JsonRpcLspSerializer::stringToJson(
+    const std::string &value,
+    rapidjson::Document::AllocatorType &allocator
+  ) const -> rapidjson::Value {
+    return rapidjson::Value(value.c_str(), value.length(), allocator);
+  }
+
+  auto JsonRpcLspSerializer::lspToJson(
+    const RequestParams &params,
+    rapidjson::Document::AllocatorType &allocator
+  ) const -> rapidjson::Value {
+    switch (params.type) {
+    case RequestParamsType::LSP_OBJECT: {
+      const LSPObject &object =
+        *std::get<std::unique_ptr<LSPObject>>(params.value);
+      return lspToJson(object, allocator);
+    }
+    case RequestParamsType::LSP_ARRAY: {
+      const LSPArray &array =
+        *std::get<std::unique_ptr<LSPArray>>(params.value);
+      return lspToJson(array, allocator);
+    }
+    }
+    throw std::runtime_error(
+      "JsonRpcLspSerializer::lspToJson should not reach the end of the function."
+    );
+  }
+
+  auto JsonRpcLspSerializer::serializeResponse(
+    const ResponseMessage &response
+  ) const -> std::string {
+    rapidjson::Document document = prepareDocument();
+    rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
     setResponseId(document, *response.id, allocator);
     if (response.result.has_value()) {
       rapidjson::Value result = lspToJson(
@@ -104,62 +267,56 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &lspAny,
     rapidjson::Document::AllocatorType &allocator
   ) const -> rapidjson::Value {
-    rapidjson::Value value;
     switch (lspAny.type) {
     case LSPAnyType::LSP_OBJECT: {
-      value.SetObject();
-      for (const auto &[lspName, lspValue]
-             : *std::get<std::unique_ptr<LSPObject>>(lspAny.value)) {
-        rapidjson::Value fieldName(
-          lspName.c_str(),
-          lspName.length(),
-          allocator
-        );
-        rapidjson::Value fieldValue = lspToJson(*lspValue, allocator);
-        value.AddMember(fieldName, fieldValue, allocator);
-      }
-      break;
+      const LSPObject &object =
+        *std::get<std::unique_ptr<LSPObject>>(lspAny.value);
+      return lspToJson(object, allocator);
     }
     case LSPAnyType::LSP_ARRAY: {
-      value.SetArray();
-      for (const auto &lspValue
-             : *std::get<std::unique_ptr<LSPArray>>(lspAny.value)) {
-        rapidjson::Value jsonValue = lspToJson(*lspValue, allocator);
-        value.PushBack(jsonValue, allocator);
-      }
-      break;
+      const LSPArray &array =
+        *std::get<std::unique_ptr<LSPArray>>(lspAny.value);
+      return lspToJson(array, allocator);
     }
     case LSPAnyType::LSP_STRING: {
+      rapidjson::Value value;
       const string &stringValue = std::get<string>(lspAny.value);
       value.SetString(
         stringValue.c_str(),
         stringValue.length(),
         allocator
       );
-      break;
+      return value;
     }
     case LSPAnyType::LSP_INTEGER: {
+      rapidjson::Value value;
       value.SetInt(std::get<integer>(lspAny.value));
-      break;
+      return value;
     }
     case LSPAnyType::LSP_UINTEGER: {
+      rapidjson::Value value;
       value.SetUint(std::get<uinteger>(lspAny.value));
-      break;
+      return value;
     }
     case LSPAnyType::LSP_DECIMAL: {
+      rapidjson::Value value;
       value.SetDouble(std::get<decimal>(lspAny.value));
-      break;
+      return value;
     }
     case LSPAnyType::LSP_BOOLEAN: {
+      rapidjson::Value value;
       value.SetBool(std::get<boolean>(lspAny.value));
-      break;
+      return value;
     }
     case LSPAnyType::LSP_NULL: {
+      rapidjson::Value value;
       value.SetNull();
-      break;
+      return value;
     }
     }
-    return value;
+    throw std::runtime_error(
+      "JsonRpcLspSerializer::lspToJson should not reach the end of the function."
+    );
   }
 
   auto JsonRpcLspDeserializer::deserializeRequest(

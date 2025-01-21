@@ -16,10 +16,12 @@ set(LFORTRAN_LSP_SRC
   specification.cpp
   lsp_exception.cpp
   text_document.cpp
+  message_queue.cpp
   thread_pool.cpp
   serializer.cpp
   lsp_serializer.cpp
   lsp_transformer.cpp
+  language_server.cpp
   lsp_language_server.cpp
   lfortran_lsp_language_server.cpp
   request_parser.cpp

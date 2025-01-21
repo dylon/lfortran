@@ -1,7 +1,9 @@
 #ifndef LCOMPILERS_LS_COMMUNICATION_PROTOCOL_H
 #define LCOMPILERS_LS_COMMUNICATION_PROTOCOL_H
 
+#include <atomic>
 #include <memory>
+#include <thread>
 #include <type_traits>
 #include <utility>
 
@@ -16,6 +18,7 @@
 #include <asio/read_until.hpp>
 
 #include <lsp/thread_pool.h>
+#include <lsp/message_queue.h>
 #include <lsp/language_server.h>
 #include <lsp/request_parser.h>
 
@@ -32,11 +35,13 @@ namespace LCompilers::LanguageServer {
   public:
     CommunicationProtocol(
       LanguageServer &languageServer,
-      RequestParserFactory &parserFactory);
+      RequestParserFactory &parserFactory,
+      MessageQueue &incomingMessages);
     virtual void serve() = 0;
   protected:
     LanguageServer &languageServer;
     RequestParserFactory &parserFactory;
+    MessageQueue &incomingMessages;
   };
 
   class StdIOCommunicationProtocol : public CommunicationProtocol {
@@ -44,15 +49,23 @@ namespace LCompilers::LanguageServer {
     StdIOCommunicationProtocol(
       LanguageServer &languageServer,
       RequestParserFactory &parserFactory,
-      std::unique_ptr<lst::ThreadPool> threadPool);
+      std::unique_ptr<lst::ThreadPool> threadPool,
+      MessageQueue &incomingMessages);
     void serve() override;
   private:
     std::unique_ptr<lst::ThreadPool> threadPool;
+    std::thread messageListener;
+    std::atomic_bool running = true;
+
+    auto listen() -> void;
   };
 
   class TcpRequestMatchCondition {
   public:
-    TcpRequestMatchCondition(RequestParser &parser, LanguageServer &languageServer);
+    TcpRequestMatchCondition(
+      RequestParser &parser,
+      LanguageServer &languageServer
+    );
     template <typename Iterator>
     auto operator()(Iterator begin, Iterator end) -> std::pair<Iterator, bool>;
   private:
@@ -65,10 +78,14 @@ namespace LCompilers::LanguageServer {
     TcpCommunicationProtocol(
       LanguageServer &languageServer,
       RequestParserFactory &parserFactory,
-      short unsigned int port);
+      short unsigned int port,
+      MessageQueue &incomingMessages
+    );
     void serve() override;
   private:
     short unsigned int port;
+    std::thread messageListener;
+    std::atomic_bool running = true;
 
     auto listener() -> awaitable<void>;
     auto dispatch(tcp::socket socket) -> awaitable<void>;
@@ -78,13 +95,16 @@ namespace LCompilers::LanguageServer {
       const std::string &statusText,
       const std::string &error
     ) -> void;
+    auto listen() -> void;
   };
 
   class WebSocketCommunicationProtocol : public CommunicationProtocol {
   public:
     WebSocketCommunicationProtocol(
       LanguageServer &languageServer,
-      RequestParserFactory &parserFactory);
+      RequestParserFactory &parserFactory,
+      MessageQueue &incomingMessages
+    );
     void serve() override;
   };
 
