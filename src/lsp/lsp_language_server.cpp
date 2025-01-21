@@ -153,9 +153,10 @@ namespace LCompilers::LanguageServerProtocol {
     switch (method) {
     case RequestMethod::INITIALIZE: {
       const RequestParams &requestParams = transformer.requireRequestParams(request);
-      InitializeParams params = transformer.asInitializeParams(requestParams);
-      InitializeResult result = initialize(params);
+      _initializeParams = transformer.asInitializeParams(requestParams);
+      InitializeResult result = initialize(_initializeParams);
       response.result = transformer.lspToAny(result);
+      _initialized = true;
       break;
     }
     case RequestMethod::WILL_SAVE_WAIT_UNTIL: {
@@ -340,6 +341,7 @@ namespace LCompilers::LanguageServerProtocol {
     const InitializeParams &params
   ) -> InitializeResult {
     InitializeResult result;
+
     std::unique_ptr<ServerCapabilities> capabilities =
       std::make_unique<ServerCapabilities>();
 
@@ -361,10 +363,7 @@ namespace LCompilers::LanguageServerProtocol {
     textDocumentSyncOptions->save = std::move(save);
     textDocumentSync->value = std::move(textDocumentSyncOptions);
     capabilities->textDocumentSync = std::move(textDocumentSync);
-
     result.capabilities = std::move(capabilities);
-
-    _initialized = true;
 
     return result;
   }

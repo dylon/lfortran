@@ -33,12 +33,12 @@ namespace LCompilers::LanguageServerProtocol {
 
   template <typename T>
   struct ValueSet {
-    ptr_vector<T> valueSet;
+    std::vector<T> valueSet;
   };
 
   template <typename T>
   struct OptionalValueSet {
-    optional_ptr_vector<T> valueSet;
+    optional_vector<T> valueSet;
   };
 
   /**
@@ -1281,6 +1281,8 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto diagnosticTagByName(const std::string &name) -> DiagnosticTag;
 
+  auto diagnosticTagByValue(int value) -> DiagnosticTag;
+
   /**
    * Represents a related message and source code location for a diagnostic.
    * This should be used to point to code locations that cause or are related to
@@ -1580,7 +1582,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    std::optional<std::vector<std::string>> allowedTags;
+    optional_vector<string> allowedTags;
   };
 
   // --------------------------------------------------------------------------
@@ -2050,7 +2052,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.13.0
      */
-    optional_ptr_vector<ResourceOperationKind> resourceOperations;
+    optional_vector<ResourceOperationKind> resourceOperations;
 
     /**
      * The failure handling strategy of a client if applying the workspace edit
@@ -2060,7 +2062,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.13.0
      */
-    optional_ptr<FailureHandlingKind> failureHandling;
+    std::optional<FailureHandlingKind> failureHandling;
 
     /**
      * Whether the client normalizes line endings to the client specific
@@ -3063,6 +3065,8 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto symbolKindByName(const std::string &name) -> SymbolKind;
 
+  auto symbolKindByValue(int value) -> SymbolKind;
+
   /**
    * Symbol tags are extra annotations that tweak the rendering of a symbol.
    *
@@ -3086,6 +3090,8 @@ namespace LCompilers::LanguageServerProtocol {
   extern std::map<SymbolTag, std::string> SymbolTagNames;
 
   auto symbolTagByName(const std::string &name) -> SymbolTag;
+
+  auto symbolTagByValue(int value) -> SymbolTag;
 
   struct DocumentSymbol;  // Forward reference for cyclic reference.
 
@@ -4064,7 +4070,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * contentFormat?: MarkupKind[];
      */
-    optional_ptr_vector<MarkupKind> contentFormat;
+    optional_vector<MarkupKind> contentFormat;
   };
 
   /**
@@ -5072,14 +5078,14 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tokenTypes: string[];
      */
-    ptr_vector<string> tokenTypes;
+    std::vector<string> tokenTypes;
 
     /**
      * The token modifiers a server uses.
      *
      * tokenModifiers: string[];
      */
-    ptr_vector<string> tokenModifiers;
+    std::vector<string> tokenModifiers;
   };
 
   struct RangeCapabilities {
@@ -5199,7 +5205,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tokenTypes: string[];
      */
-    ptr_vector<string> tokenTypes;
+    std::vector<string> tokenTypes;
 
     /**
      * The token modifiers that the client supports.
@@ -6545,6 +6551,8 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto completionItemTagByName(const std::string &name) -> CompletionItemTag;
 
+  auto completionItemTagByValue(int value) -> CompletionItemTag;
+
   /**
    * How whitespace and indentation is handled during completion item insertion.
    *
@@ -6584,6 +6592,8 @@ namespace LCompilers::LanguageServerProtocol {
   extern std::map<InsertTextMode, std::string> InsertTextModeNames;
 
   auto insertTextModeByName(const std::string &name) -> InsertTextMode;
+
+  auto insertTextModeByValue(int value) -> InsertTextMode;
 
   struct CompletionItemCapabilities {
 
@@ -6769,6 +6779,8 @@ namespace LCompilers::LanguageServerProtocol {
   extern std::map<CompletionItemKind, std::string> CompletionItemKindNames;
 
   auto completionItemKindByName(const std::string &name) -> CompletionItemKind;
+
+  auto completionItemKindByValue(int value) -> CompletionItemKind;
 
   /**
    * The Completion request is sent from the client to the server to compute
@@ -10079,6 +10091,8 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto prepareSupportDefaultBehaviorByName(const std::string &name) -> PrepareSupportDefaultBehavior;
 
+  auto prepareSupportDefaultBehaviorByValue(int value) -> PrepareSupportDefaultBehavior;
+
   /**
    * The rename request is sent from the client to the server to ask the server
    * to compute a workspace change so that the client can perform a
@@ -12250,7 +12264,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.14.0
      */
-    std::optional<std::unique_ptr<DeclarationClientCapabilities>> declaration;
+    optional_ptr<DeclarationClientCapabilities> declaration;
 
     /**
      * Capabilities specific to the `textDocument/definition` request.
@@ -13065,7 +13079,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * retryOnContentModified: string[];
      */
-    ptr_vector<string> retryOnContentModified;
+    std::vector<string> retryOnContentModified;
   };
 
   /**
@@ -13130,7 +13144,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr_vector<PositionEncodingKind> positionEncodings;
+    optional_vector<PositionEncodingKind> positionEncodings;
   };
 
   /**

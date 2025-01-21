@@ -94,6 +94,17 @@ namespace LCompilers::LanguageServerProtocol {
     throw std::invalid_argument("Invalid DiagnosticTag name: " + name);
   }
 
+  auto diagnosticTagByValue(int value) -> DiagnosticTag {
+    for (const auto &[enum_key, enum_value] : DiagnosticTagNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format("Invalid DiagnosticTag value: {}", value)
+    );
+  }
+
   std::map<MarkupKind, std::string> MarkupKindNames = {
     {MarkupKind::PlainText, "PlainText"},
     {MarkupKind::Markdown, "Markdown"},
@@ -264,10 +275,7 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument(
-      std::format(
-        "Invalid TextDocumentSaveReason value: {}",
-        value
-      )
+      std::format("Invalid TextDocumentSaveReason value: {}", value)
     );
   }
 
@@ -292,10 +300,7 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument(
-      std::format(
-        "Invalid NotebookCellKind value: {}",
-        value
-      )
+      std::format("Invalid NotebookCellKind value: {}", value)
     );
   }
 
@@ -382,6 +387,17 @@ namespace LCompilers::LanguageServerProtocol {
     throw std::invalid_argument("Invalid SymbolKind name: " + name);
   }
 
+  auto symbolKindByValue(int value) -> SymbolKind {
+    for (const auto &[enum_key, enum_value] : SymbolKindNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format("Invalid SymbolKind value: {}", value)
+    );
+  }
+
   std::map<SymbolTag, std::string> SymbolTagNames = {
     {SymbolTag::Deprecated, "Deprecated"},
   };
@@ -393,6 +409,17 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument("Invalid SymbolTag name: " + name);
+  }
+
+  auto symbolTagByValue(int value) -> SymbolTag {
+    for (const auto &[enum_key, enum_value] : SymbolTagNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format("Invalid SymbolTag value: {}", value)
+    );
   }
 
   std::map<SemanticTokenTypes, std::string> SemanticTokenTypeNames = {
@@ -655,6 +682,17 @@ namespace LCompilers::LanguageServerProtocol {
     throw std::invalid_argument("Invalid CompletionItemTag name: " + name);
   }
 
+  auto completionItemTagByValue(int value) -> CompletionItemTag {
+    for (const auto &[enum_key, enum_value] : CompletionItemTagNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format("Invalid CompletionItemTag value: {}", value)
+    );
+  }
+
   std::map<InsertTextMode, std::string> InsertTextModeNames = {
     {InsertTextMode::asIs, "asIs"},
     {InsertTextMode::adjustIndentation, "adjustIndentation"},
@@ -667,6 +705,17 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument("Invalid InsertTextMode name: " + name);
+  }
+
+  auto insertTextModeByValue(int value) -> InsertTextMode {
+    for (const auto &[enum_key, enum_value] : InsertTextModeNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format("Invalid InsertTextMode value: {}", value)
+    );
   }
 
   std::map<CompletionItemKind, std::string> CompletionItemKindNames = {
@@ -704,6 +753,17 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument("Invalid CompletionItemKind name: " + name);
+  }
+
+  auto completionItemKindByValue(int value) -> CompletionItemKind {
+    for (const auto &[enum_key, enum_value] : CompletionItemKindNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format("Invalid CompletionItemKind value: {}", value)
+    );
   }
 
   std::map<DocumentDiagnosticReportKind, std::string> DocumentDiagnosticReportKindNames = {
@@ -816,6 +876,17 @@ namespace LCompilers::LanguageServerProtocol {
       }
     }
     throw std::invalid_argument("Invalid PrepareSupportDefaultBehavior name: " + name);
+  }
+
+  auto prepareSupportDefaultBehaviorByValue(int value) -> PrepareSupportDefaultBehavior {
+    for (const auto &[enum_key, enum_value] : PrepareSupportDefaultBehaviorNames) {
+      if (value == static_cast<int>(enum_key)) {
+        return enum_key;
+      }
+    }
+    throw std::invalid_argument(
+      std::format("Invalid PrepareSupportDefaultBehavior value: {}", value)
+    );
   }
 
   std::map<FileOperationPatternKind, std::string> FileOperationPatternKindNames = {

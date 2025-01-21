@@ -1,13 +1,13 @@
 #ifndef LCOMPILERS_LSP_LANGUAGE_SERVER_H
 #define LCOMPILERS_LSP_LANGUAGE_SERVER_H
 
-#include "lsp/lsp_transformer.h"
 #include <atomic>
 #include <map>
 #include <shared_mutex>
 
 #include <lsp/language_server.h>
 #include <lsp/lsp_serializer.h>
+#include <lsp/lsp_transformer.h>
 #include <lsp/specification.h>
 #include <lsp/text_document.h>
 
@@ -27,6 +27,7 @@ namespace LCompilers::LanguageServerProtocol {
     JsonRpcLspDeserializer deserializer;
     LspTransformer transformer;
     std::map<DocumentUri, TextDocument> textDocuments;
+    InitializeParams _initializeParams;
     std::shared_mutex readWriteMutex;
     std::atomic_bool _initialized = false;
     std::atomic_bool _shutdown = false;
@@ -40,6 +41,8 @@ namespace LCompilers::LanguageServerProtocol {
       ResponseMessage &response,
       const NotificationMessage &notification
     ) -> void;
+
+    auto initializeParams() const -> const InitializeParams &;
 
     // request: client -> server
     auto initialize(const InitializeParams &params) -> InitializeResult;
