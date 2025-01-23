@@ -16,15 +16,8 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   }
 
-  auto LspLanguageServer::nextId() -> int {
+  auto LspLanguageServer::nextId() -> RequestId {
     return serialId++;
-  }
-
-  auto LspLanguageServer::nextRequestId() -> std::unique_ptr<RequestId> {
-    std::unique_ptr<RequestId> requestId = std::make_unique<RequestId>();
-    requestId->type = RequestIdType::LSP_INTEGER;
-    requestId->value = nextId();
-    return requestId;
   }
 
   std::string LspLanguageServer::serve(const std::string &request) {
@@ -32,10 +25,7 @@ namespace LCompilers::LanguageServerProtocol {
     try {
       // The language server protocol always uses “2.0” as the jsonrpc version.
       response.jsonrpc = JSON_RPC_VERSION;
-
-      response.id = std::make_unique<ResponseId>();
-      response.id->type = ResponseIdType::LSP_NULL;
-      response.id->value = nullptr;
+      response.id = nullptr;
 
       rapidjson::Document document = deserializer.deserialize(request);
       if (document.HasParseError()) {
@@ -52,11 +42,9 @@ namespace LCompilers::LanguageServerProtocol {
       if (document.HasMember("id")) {
         const rapidjson::Value &idValue = document["id"];
         if (idValue.IsString()) {
-          response.id->type = ResponseIdType::LSP_STRING;
-          response.id->value = idValue.GetString();
+          response.id = idValue.GetString();
         } else if (idValue.IsInt()) {
-          response.id->type = ResponseIdType::LSP_INTEGER;
-          response.id->value = idValue.GetInt();
+          response.id = idValue.GetInt();
         } else if (!idValue.IsNull()) { // null => notification
           throw LspException(
             ErrorCodes::InvalidParams,
@@ -71,7 +59,7 @@ namespace LCompilers::LanguageServerProtocol {
       if (document.HasMember("method")) {
         const std::string &method = document["method"].GetString();
         if (isRequestMethod(method)) {
-          if (response.id->type == ResponseIdType::LSP_NULL) {
+          if (static_cast<ResponseIdType>(response.id.index()) == ResponseIdType::LSP_NULL) {
             throw LspException(
               ErrorCodes::InvalidParams,
               std::format(
@@ -84,7 +72,7 @@ namespace LCompilers::LanguageServerProtocol {
           response.jsonrpc = request.jsonrpc;
           dispatch(response, request);
         } else if (isNotificationMethod(method)) {
-          if (response.id->type != ResponseIdType::LSP_NULL) {
+          if (static_cast<ResponseIdType>(response.id.index()) != ResponseIdType::LSP_NULL) {
             throw LspException(
               ErrorCodes::InvalidParams,
               std::format(
@@ -181,16 +169,16 @@ namespace LCompilers::LanguageServerProtocol {
     }
     switch (method) {
     case RequestMethod::INITIALIZE: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       _initializeParams = transformer.asInitializeParams(requestParams);
       InitializeResult result = initialize(_initializeParams.value());
       response.result = transformer.lspToAny(result);
       break;
     }
     case RequestMethod::WILL_SAVE_WAIT_UNTIL: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       WillSaveTextDocumentParams params =
         transformer.asWillSaveTextDocumentParams(requestParams);
       WillSaveWaitUntilResult result = willSaveWaitUntil(params);
@@ -198,44 +186,44 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case RequestMethod::GOTO_DECLARATION: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       DeclarationParams params =
         transformer.asDeclarationParams(requestParams);
-      GotoDeclarationResult result = gotoDeclaration(params);
+      GotoResult result = gotoDeclaration(params);
       response.result = transformer.lspToAny(result);
       break;
     }
     case RequestMethod::GOTO_DEFINITION: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       DefinitionParams params =
         transformer.asDefinitionParams(requestParams);
-      GotoDefinitionResult result = gotoDefinition(params);
+      GotoResult result = gotoDefinition(params);
       response.result = transformer.lspToAny(result);
       break;
     }
     case RequestMethod::GOTO_TYPE_DEFINITION: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       TypeDefinitionParams params =
         transformer.asTypeDefinitionParams(requestParams);
-      GotoTypeDefinitionResult result = gotoTypeDefinition(params);
+      GotoResult result = gotoTypeDefinition(params);
       response.result = transformer.lspToAny(result);
       break;
     }
     case RequestMethod::GOTO_IMPLEMENTATION: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       ImplementationParams params =
         transformer.asImplementationParams(requestParams);
-      GotoImplementationResult result = gotoImplementation(params);
+      GotoResult result = gotoImplementation(params);
       response.result = transformer.lspToAny(result);
       break;
     }
     case RequestMethod::FIND_REFERENCES: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       ReferenceParams params =
         transformer.asReferenceParams(requestParams);
       FindReferencesResult result = findReferences(params);
@@ -243,11 +231,21 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case RequestMethod::PREPARE_CALL_HIERARCHY: {
-      const RequestParams &requestParams =
-        transformer.requireRequestParams(request);
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
       CallHierarchyPrepareParams params =
         transformer.asCallHierarchyPrepareParams(requestParams);
       PrepareCallHierarchyResult result = prepareCallHierarchy(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::CALL_HIERARCHY_INCOMING_CALLS: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      CallHierarchyIncomingCallsParams params =
+        transformer.asCallHierarchyIncomingCallsParams(requestParams);
+      CallHierarchyIncomingCallsResult result =
+        callHierarchyIncomingCalls(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -292,78 +290,78 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case NotificationMethod::CANCEL_REQUEST: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       CancelParams params = transformer.asCancelParams(notificationParams);
       cancelRequest(params);
       break;
     }
     case NotificationMethod::SET_TRACE: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       SetTraceParams params = transformer.asSetTraceParams(notificationParams);
       setTrace(params);
       break;
     }
     case NotificationMethod::DID_OPEN_NOTEBOOK_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidOpenNotebookDocumentParams params =
         transformer.asDidOpenNotebookDocumentParams(notificationParams);
       didOpenNotebookDocument(params);
       break;
     }
     case NotificationMethod::DID_CHANGE_NOTEBOOK_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidChangeNotebookDocumentParams params =
         transformer.asDidChangeNotebookDocumentParams(notificationParams);
       didChangeNotebookDocument(params);
       break;
     }
     case NotificationMethod::DID_SAVE_NOTEBOOK_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidSaveNotebookDocumentParams params =
         transformer.asDidSaveNotebookDocumentParams(notificationParams);
       didSaveNotebookDocument(params);
       break;
     }
     case NotificationMethod::DID_CLOSE_NOTEBOOK_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidCloseNotebookDocumentParams params =
         transformer.asDidCloseNotebookDocumentParams(notificationParams);
       didCloseNotebookDocument(params);
       break;
     }
     case NotificationMethod::DID_OPEN_TEXT_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidOpenTextDocumentParams params =
         transformer.asDidOpenTextDocumentParams(notificationParams);
       didOpenTextDocument(params);
       break;
     }
     case NotificationMethod::DID_CHANGE_TEXT_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidChangeTextDocumentParams params =
         transformer.asDidChangeTextDocumentParams(notificationParams);
       didChangeTextDocument(params);
       break;
     }
     case NotificationMethod::DID_SAVE_TEXT_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidSaveTextDocumentParams params =
         transformer.asDidSaveTextDocumentParams(notificationParams);
       didSaveTextDocument(params);
       break;
     }
     case NotificationMethod::DID_CLOSE_TEXT_DOCUMENT: {
-      const NotificationParams &notificationParams =
-        transformer.requireNotificationParams(notification);
+      const MessageParams &notificationParams =
+        transformer.requireMessageParams(notification);
       DidCloseTextDocumentParams params =
         transformer.asDidCloseTextDocumentParams(notificationParams);
       didCloseTextDocument(params);
@@ -440,20 +438,17 @@ namespace LCompilers::LanguageServerProtocol {
     // ------------------------- //
     // TextDocument Sync Options //
     // ------------------------- //
-    std::unique_ptr<TextDocumentSync> textDocumentSync =
-      std::make_unique<TextDocumentSync>();
-    textDocumentSync->type = TextDocumentSyncType::TEXT_DOCUMENT_SYNC_OPTIONS;
+    TextDocumentSync textDocumentSync;
     std::unique_ptr<TextDocumentSyncOptions> textDocumentSyncOptions =
       std::make_unique<TextDocumentSyncOptions>();
     textDocumentSyncOptions->openClose = true;
     textDocumentSyncOptions->change = TextDocumentSyncKind::Incremental;
-    std::unique_ptr<SaveOrOptions> save = std::make_unique<SaveOrOptions>();
-    save->type = SaveOrOptionsType::SAVE_OPTIONS;
+    SaveOrOptions save;
     std::unique_ptr<SaveOptions> saveOptions = std::make_unique<SaveOptions>();
     saveOptions->includeText = true;
-    save->value = std::move(saveOptions);
+    save = std::move(saveOptions);
     textDocumentSyncOptions->save = std::move(save);
-    textDocumentSync->value = std::move(textDocumentSyncOptions);
+    textDocumentSync = std::move(textDocumentSyncOptions);
     capabilities->textDocumentSync = std::move(textDocumentSync);
     result.capabilities = std::move(capabilities);
 
@@ -476,7 +471,7 @@ namespace LCompilers::LanguageServerProtocol {
   // request: "textDocument/declaration"
   auto LspLanguageServer::gotoDeclaration(
     const DeclarationParams &params
-  ) -> GotoDeclarationResult {
+  ) -> GotoResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
@@ -489,7 +484,7 @@ namespace LCompilers::LanguageServerProtocol {
   // request: "textDocument/definition"
   auto LspLanguageServer::gotoDefinition(
     const DefinitionParams &params
-  ) -> GotoDefinitionResult {
+  ) -> GotoResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
@@ -502,7 +497,7 @@ namespace LCompilers::LanguageServerProtocol {
   // request: "textDocument/typeDefinition"
   auto LspLanguageServer::gotoTypeDefinition(
     const TypeDefinitionParams &params
-  ) -> GotoTypeDefinitionResult {
+  ) -> GotoResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
@@ -515,7 +510,7 @@ namespace LCompilers::LanguageServerProtocol {
   // request: "textDocument/implementation"
   auto LspLanguageServer::gotoImplementation(
     const ImplementationParams &params
-  ) -> GotoImplementationResult {
+  ) -> GotoResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
@@ -547,6 +542,19 @@ namespace LCompilers::LanguageServerProtocol {
       std::format(
         "No handler exists for request=\"{}\"",
         RequestMethodValues.at(RequestMethod::PREPARE_CALL_HIERARCHY)
+      )
+    );
+  }
+
+  // request: "callHierarchy/incomingCalls"
+  auto LspLanguageServer::callHierarchyIncomingCalls(
+    const CallHierarchyIncomingCallsParams &params
+  ) -> CallHierarchyIncomingCallsResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::CALL_HIERARCHY_INCOMING_CALLS)
       )
     );
   }
@@ -737,9 +745,9 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextRequestId();
+    request.id = nextId();
     request.method = "client/registerCapability";
-    request.params = transformer.asRequestParams(params);
+    request.params = transformer.asMessageParams(params);
     const std::string message = serializer.serializeRequest(request);
     outgoingMessages.enqueue(message);
   }
@@ -750,9 +758,9 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextRequestId();
+    request.id = nextId();
     request.method = "client/unregisterCapability";
-    request.params = transformer.asRequestParams(params);
+    request.params = transformer.asMessageParams(params);
     const std::string message = serializer.serializeRequest(request);
     outgoingMessages.enqueue(message);
   }
@@ -768,7 +776,7 @@ namespace LCompilers::LanguageServerProtocol {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "$/progress";
-    notification.params = transformer.asNotificationParams(params);
+    notification.params = transformer.asMessageParams(params);
     const std::string message = serializer.serializeNotification(notification);
     outgoingMessages.enqueue(message);
   }
@@ -780,7 +788,7 @@ namespace LCompilers::LanguageServerProtocol {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "$/logTrace";
-    notification.params = transformer.asNotificationParams(params);
+    notification.params = transformer.asMessageParams(params);
     const std::string message = serializer.serializeNotification(notification);
     outgoingMessages.enqueue(message);
   }

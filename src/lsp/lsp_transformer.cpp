@@ -9,20 +9,19 @@
 namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::asInitializeParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> InitializeParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::WILL_SAVE_WAIT_UNTIL
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     InitializeParams initializeParams;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("workDoneToken");
     if (iter != object.end()) {
@@ -156,20 +155,19 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asWillSaveTextDocumentParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> WillSaveTextDocumentParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::WILL_SAVE_WAIT_UNTIL
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     WillSaveTextDocumentParams willSaveTextDocumentParams;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("textDocument");
     if (iter != object.end()) {
@@ -197,20 +195,19 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDeclarationParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> DeclarationParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::GOTO_DECLARATION
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     DeclarationParams params;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("textDocument");
     if (iter != object.end()) {
@@ -246,20 +243,19 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDefinitionParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> DefinitionParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::GOTO_DEFINITION
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     DefinitionParams params;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("textDocument");
     if (iter != object.end()) {
@@ -295,20 +291,19 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asTypeDefinitionParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> TypeDefinitionParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::GOTO_TYPE_DEFINITION
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     TypeDefinitionParams params;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("textDocument");
     if (iter != object.end()) {
@@ -344,20 +339,19 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asImplementationParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> ImplementationParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::GOTO_IMPLEMENTATION
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     ImplementationParams params;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("textDocument");
     if (iter != object.end()) {
@@ -393,20 +387,19 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asReferenceParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> ReferenceParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::FIND_REFERENCES
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     ReferenceParams params;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("textDocument");
     if (iter != object.end()) {
@@ -447,20 +440,19 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asCallHierarchyPrepareParams(
-    const RequestParams &requestParams
+    const MessageParams &requestParams
   ) const -> CallHierarchyPrepareParams {
     assertRequestType(
       RequestMethodValues.at(
         RequestMethod::PREPARE_CALL_HIERARCHY
       ),
       requestParams,
-      RequestParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     CallHierarchyPrepareParams params;
 
-    LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(requestParams.value);
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
 
     auto iter = object.find("textDocument");
     if (iter != object.end()) {
@@ -488,6 +480,184 @@ namespace LCompilers::LanguageServerProtocol {
     }
 
     return params;
+  }
+
+  auto LspTransformer::asCallHierarchyIncomingCallsParams(
+    const MessageParams &requestParams
+  ) const -> CallHierarchyIncomingCallsParams {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::CALL_HIERARCHY_INCOMING_CALLS
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    CallHierarchyIncomingCallsParams params;
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    auto iter = object.find("workDoneToken");
+    if (iter != object.end()) {
+      params.workDoneToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("partialResultToken");
+    if (iter != object.end()) {
+      params.partialResultToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("item");
+    if (iter != object.end()) {
+      params.item = anyToCallHierarchyItem(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CallHierarchyPrepareParams attribute: item"
+      );
+    }
+
+    return params;
+  }
+
+  auto LspTransformer::anyToCallHierarchyItem(
+    const LSPAny &any
+  ) const -> std::unique_ptr<CallHierarchyItem> {
+    assertAnyType("CallHierarchyItem", any, LSPAnyType::LSP_OBJECT);
+
+    std::unique_ptr<CallHierarchyItem> item =
+      std::make_unique<CallHierarchyItem>();
+
+    const LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
+
+    auto iter = object.find("name");
+    if (iter != object.end()) {
+      item->name = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CallHierarchyItem attribute: name"
+      );
+    }
+
+    iter = object.find("kind");
+    if (iter != object.end()) {
+      item->kind = anyToSymbolKind(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CallHierarchyItem attribute: kind"
+      );
+    }
+
+    iter = object.find("tags");
+    if (iter != object.end()) {
+      const LSPAny &array = *iter->second;
+      assertAnyType("std::vector", array, LSPAnyType::LSP_ARRAY);
+      std::vector<SymbolTag> tags;
+      for (const std::unique_ptr<LSPAny> &tag
+             : *std::get<std::unique_ptr<LSPArray>>(array.value)) {
+        tags.push_back(anyToSymbolTag(*tag));
+      }
+      item->tags = std::move(tags);
+    }
+
+    iter = object.find("detail");
+    if (iter != object.end()) {
+      item->detail = anyToString(*iter->second);
+    }
+
+    iter = object.find("uri");
+    if (iter != object.end()) {
+      item->uri = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CallHierarchyItem attribute: uri"
+      );
+    }
+
+    iter = object.find("range");
+    if (iter != object.end()) {
+      item->range = anyToRange(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CallHierarchyItem attribute: range"
+      );
+    }
+
+    iter = object.find("selectionRange");
+    if (iter != object.end()) {
+      item->selectionRange = anyToRange(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CallHierarchyItem attribute: selectionRange"
+      );
+    }
+
+    iter = object.find("data");
+    if (iter != object.end()) {
+      item->data = copy(iter->second);
+    }
+
+    return item;
+  }
+
+  auto LspTransformer::lspToAny(
+    const CallHierarchyIncomingCallsResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<CallHierarchyIncomingCallsResultType>(result.index())) {
+    case CallHierarchyIncomingCallsResultType::CALL_HIERARCHY_INCOMING_CALL_ARRAY: {
+      std::unique_ptr<LSPAny> array = std::make_unique<LSPAny>();
+      array->type = LSPAnyType::LSP_ARRAY;
+      std::unique_ptr<LSPArray> value = std::make_unique<LSPArray>();
+      for (const std::unique_ptr<CallHierarchyIncomingCall> &call
+             : std::get<ptr_vector<CallHierarchyIncomingCall>>(result)) {
+        value->push_back(lspToAny(*call));
+      }
+      array->value = std::move(value);
+      return array;
+    }
+    case CallHierarchyIncomingCallsResultType::LSP_NULL: {
+      return nullToAny(std::get<std::nullptr_t>(result));
+    }
+    }
+  }
+
+  auto LspTransformer::lspToAny(
+    const CallHierarchyIncomingCall &call
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->type = LSPAnyType::LSP_OBJECT;
+    any->value = lspToObject(call);
+    return any;
+  }
+
+  auto LspTransformer::lspToObject(
+    const CallHierarchyIncomingCall &call
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("from", lspToAny(*call.from));
+    std::unique_ptr<LSPArray> fromRangesValue = std::make_unique<LSPArray>();
+    for (const std::unique_ptr<Range> &range : call.fromRanges) {
+      fromRangesValue->push_back(lspToAny(*range));
+    }
+    std::unique_ptr<LSPAny> fromRanges = std::make_unique<LSPAny>();
+    fromRanges->type = LSPAnyType::LSP_ARRAY;
+    fromRanges->value = std::move(fromRangesValue);
+    object->emplace("fromRanges", std::move(fromRanges));
+    return object;
+  }
+
+  auto LspTransformer::nullToAny(
+    std::nullptr_t null
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->type = LSPAnyType::LSP_NULL;
+    any->value = null;
+    return any;
   }
 
   auto LspTransformer::anyToReferenceContext(
@@ -661,20 +831,13 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::anyToProgressToken(
     const LSPAny &any
-  ) const -> std::unique_ptr<ProgressToken> {
-    std::unique_ptr<ProgressToken> token =
-      std::make_unique<ProgressToken>();
-
+  ) const -> ProgressToken {
     switch (any.type) {
     case LSPAnyType::LSP_INTEGER: {
-      token->type = ProgressTokenType::LSP_INTEGER;
-      token->value = std::get<int>(any.value);
-      break;
+      return std::get<int>(any.value);
     }
     case LSPAnyType::LSP_STRING: {
-      token->type = ProgressTokenType::LSP_STRING;
-      token->value = std::get<std::string>(any.value);
-      break;
+      return std::get<std::string>(any.value);
     }
     default: {
       throw LspException(
@@ -689,8 +852,6 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     }
-
-    return token;
   }
 
   auto LspTransformer::anyToNotebookCellArrayChange(
@@ -785,7 +946,7 @@ namespace LCompilers::LanguageServerProtocol {
     if (iter != object.end()) {
       LSPAny &anyData = *iter->second;
       assertAnyType("std::vector", any, LSPAnyType::LSP_ARRAY);
-      ptr_vector<TextDocumentContentChangeEvent> changes;
+      std::vector<TextDocumentContentChangeEvent> changes;
       for (const std::unique_ptr<LSPAny> &change
              : *std::get<std::unique_ptr<LSPArray>>(anyData.value)) {
         changes.push_back(anyToTextDocumentContentChangeEvent(*change));
@@ -1051,18 +1212,13 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::anyToRequestId(
     const LSPAny &any
-  ) const -> std::unique_ptr<RequestId> {
-    std::unique_ptr<RequestId> requestId = std::make_unique<RequestId>();
+  ) const -> RequestId {
     switch (any.type) {
     case LSPAnyType::LSP_INTEGER: {
-      requestId->type = RequestIdType::LSP_INTEGER;
-      requestId->value = std::get<int>(any.value);
-      break;
+      return std::get<int>(any.value);
     }
     case LSPAnyType::LSP_STRING: {
-      requestId->type = RequestIdType::LSP_STRING;
-      requestId->value = std::get<std::string>(any.value);
-      break;
+      return std::get<std::string>(any.value);
     }
     default: {
       throw LspException(
@@ -1077,7 +1233,6 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     }
-    return requestId;
   }
 
   auto LspTransformer::anyToFailureHandlingKind(
@@ -2811,20 +2966,13 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::anyToOptionalRangeCapabilities(
     const LSPAny &any
-  ) const -> std::unique_ptr<OptionalRangeCapabilities> {
-    std::unique_ptr<OptionalRangeCapabilities> capabilities =
-      std::make_unique<OptionalRangeCapabilities>();
-
+  ) const -> OptionalRangeCapabilities {
     switch (any.type) {
     case LSPAnyType::LSP_BOOLEAN: {
-      capabilities->type = OptionalRangeCapabilitiesType::BOOLEAN;
-      capabilities->value = anyToBool(any);
-      break;
+      return anyToBool(any);
     }
     case LSPAnyType::LSP_OBJECT: {
-      capabilities->type = OptionalRangeCapabilitiesType::RANGE_CAPABILITIES;
-      capabilities->value = anyToRangeCapabilities(any);
-      break;
+      return anyToRangeCapabilities(any);
     }
     default: {
       throw LspException(
@@ -2839,8 +2987,6 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     }
-
-    return capabilities;
   }
 
   auto LspTransformer::anyToFullCapabilities(
@@ -2863,20 +3009,13 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::anyToOptionalFullCapabilities(
     const LSPAny &any
-  ) const -> std::unique_ptr<OptionalFullCapabilities> {
-    std::unique_ptr<OptionalFullCapabilities> capabilities =
-      std::make_unique<OptionalFullCapabilities>();
-
+  ) const -> OptionalFullCapabilities {
     switch (any.type) {
     case LSPAnyType::LSP_BOOLEAN: {
-      capabilities->type = OptionalFullCapabilitiesType::BOOLEAN;
-      capabilities->value = anyToBool(any);
-      break;
+      return anyToBool(any);
     }
     case LSPAnyType::LSP_OBJECT: {
-      capabilities->type = OptionalFullCapabilitiesType::FULL_CAPABILITIES;
-      capabilities->value = anyToFullCapabilities(any);
-      break;
+      return anyToFullCapabilities(any);
     }
     default: {
       throw LspException(
@@ -2891,8 +3030,6 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     }
-
-    return capabilities;
   }
 
   auto LspTransformer::anyToSemanticTokensClientRequestCapabilities(
@@ -3825,17 +3962,12 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::anyToTextDocumentContentChangeEvent(
     const LSPAny &any
-  ) const -> std::unique_ptr<TextDocumentContentChangeEvent> {
+  ) const -> TextDocumentContentChangeEvent {
     assertAnyType("TextDocumentContentChangeEvent", any, LSPAnyType::LSP_OBJECT);
     LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
 
-    std::unique_ptr<TextDocumentContentChangeEvent> change =
-      std::make_unique<TextDocumentContentChangeEvent>();
-
     auto iter = object.find("range");
     if (iter != object.end()) {
-      change->type = TextDocumentContentChangeEventType::PARTIAL_TEXT_DOCUMENT;
-
       std::unique_ptr<PartialTextDocumentContentChangeEvent> value =
         std::make_unique<PartialTextDocumentContentChangeEvent>();
       value->range = anyToRange(*iter->second);
@@ -3855,10 +3987,8 @@ namespace LCompilers::LanguageServerProtocol {
         value->rangeLength = anyToInt(*iter->second);
       }
 
-      change->value = std::move(value);
+      return value;
     } else {
-      change->type = TextDocumentContentChangeEventType::WHOLE_TEXT_DOCUMENT;
-
       std::unique_ptr<WholeTextDocumentContentChangeEvent> value =
         std::make_unique<WholeTextDocumentContentChangeEvent>();
       iter = object.find("text");
@@ -3871,10 +4001,8 @@ namespace LCompilers::LanguageServerProtocol {
         );
       }
 
-      change->value = std::move(value);
+      return value;
     }
-
-    return change;
   }
 
   auto LspTransformer::anyToRange(
@@ -4050,17 +4178,17 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::assertRequestType(
     const std::string &method,
-    const RequestParams &params,
-    RequestParamsType type
+    const MessageParams &params,
+    MessageParamsType type
   ) const -> void {
-    if (params.type != type) {
+    if (static_cast<MessageParamsType>(params.index()) != type) {
       throw LspException(
         ErrorCodes::InvalidParams,
         std::format(
-          "RequestParamsType must be {} for method=\"{}\" but received type {}",
+          "MessageParamsType must be {} for method=\"{}\" but received type {}",
           static_cast<int>(type),
           method,
-          static_cast<int>(params.type)
+          params.index()
         )
       );
     }
@@ -4068,37 +4196,37 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspTransformer::assertNotificationType(
     const std::string &method,
-    const NotificationParams &params,
-    NotificationParamsType type
+    const MessageParams &params,
+    MessageParamsType type
   ) const -> void {
-    if (params.type != type) {
+    if (static_cast<MessageParamsType>(params.index()) != type) {
       throw LspException(
         ErrorCodes::InvalidParams,
         std::format(
-          "NotificationParamsType must be {} for method=\"{}\" but received type {}",
+          "MessageParamsType must be {} for method=\"{}\" but received type {}",
           static_cast<int>(type),
           method,
-          static_cast<int>(params.type)
+          params.index()
         )
       );
     }
   }
 
   auto LspTransformer::asCancelParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> CancelParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::CANCEL_REQUEST
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     CancelParams params;
 
     const LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     auto iter = object.find("id");
     if (iter != object.end()) {
@@ -4109,20 +4237,20 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asSetTraceParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> SetTraceParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::SET_TRACE
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     SetTraceParams params;
 
     const LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     auto iter = object.find("value");
     if (iter != object.end()) {
@@ -4138,7 +4266,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asInitializedParams(
-    const optional_ptr<NotificationParams> &notificationParams
+    const std::optional<MessageParams> &notificationParams
   ) const -> InitializedParams {
     InitializedParams params;
     // Nothing to initialize at the moment ...
@@ -4146,20 +4274,20 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidOpenNotebookDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidOpenNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_OPEN_NOTEBOOK_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     DidOpenNotebookDocumentParams params;
 
     const LSPObject &value =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     auto iter = value.find("notebookDocument");
     if (iter != value.end()) {
@@ -4190,20 +4318,20 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidChangeNotebookDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidChangeNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_CHANGE_NOTEBOOK_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     DidChangeNotebookDocumentParams params;
 
     const LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     auto iter = object.find("notebookDocument");
     if (iter != object.end()) {
@@ -4230,20 +4358,20 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidSaveNotebookDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidSaveNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_SAVE_NOTEBOOK_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     DidSaveNotebookDocumentParams params;
 
     const LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     auto iter = object.find("notebookDocument");
     if (iter != object.end()) {
@@ -4259,20 +4387,20 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidCloseNotebookDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidCloseNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_CLOSE_NOTEBOOK_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     DidCloseNotebookDocumentParams params;
 
     const LSPObject &object =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     auto iter = object.find("notebookDocument");
     if (iter != object.end()) {
@@ -4307,20 +4435,20 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidOpenTextDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidOpenTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_OPEN_TEXT_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     DidOpenTextDocumentParams params;
 
     const LSPObject &value =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     auto iter = value.find("textDocumentItem");
     if (iter != value.end()) {
@@ -4337,18 +4465,18 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidChangeTextDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidChangeTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_CHANGE_TEXT_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     const LSPObject &value =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     DidChangeTextDocumentParams params;
 
@@ -4370,7 +4498,7 @@ namespace LCompilers::LanguageServerProtocol {
       LSPArray &anyChanges =
         *std::get<std::unique_ptr<LSPArray>>(anyContentChanges.value);
       for (const auto &anyChange : anyChanges) {
-        std::unique_ptr<TextDocumentContentChangeEvent> change =
+        TextDocumentContentChangeEvent change =
           anyToTextDocumentContentChangeEvent(*anyChange);
         params.contentChanges.push_back(std::move(change));
       }
@@ -4385,18 +4513,18 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidSaveTextDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidSaveTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_SAVE_TEXT_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     const LSPObject &value =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     DidSaveTextDocumentParams params;
 
@@ -4426,18 +4554,18 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::asDidCloseTextDocumentParams(
-    const NotificationParams &notificationParams
+    const MessageParams &notificationParams
   ) const -> DidCloseTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
         NotificationMethod::DID_CLOSE_TEXT_DOCUMENT
       ),
       notificationParams,
-      NotificationParamsType::LSP_OBJECT
+      MessageParamsType::LSP_OBJECT
     );
 
     const LSPObject &value =
-      *std::get<std::unique_ptr<LSPObject>>(notificationParams.value);
+      *std::get<std::unique_ptr<LSPObject>>(notificationParams);
 
     DidCloseTextDocumentParams params;
 
@@ -4455,44 +4583,28 @@ namespace LCompilers::LanguageServerProtocol {
     return params;
   }
 
-  auto LspTransformer::asRequestParams(
+  auto LspTransformer::asMessageParams(
     const RegistrationParams &registrationParams
-  ) const -> std::unique_ptr<RequestParams> {
-    std::unique_ptr<RequestParams> requestParams =
-      std::make_unique<RequestParams>();
-    requestParams->type = RequestParamsType::LSP_OBJECT;
-    requestParams->value = lspToObject(registrationParams);
-    return requestParams;
+  ) const -> MessageParams {
+    return lspToObject(registrationParams);
   }
 
-  auto LspTransformer::asRequestParams(
+  auto LspTransformer::asMessageParams(
     const UnregistrationParams &unregistrationParams
-  ) const -> std::unique_ptr<RequestParams> {
-    std::unique_ptr<RequestParams> requestParams =
-      std::make_unique<RequestParams>();
-    requestParams->type = RequestParamsType::LSP_OBJECT;
-    requestParams->value = lspToObject(unregistrationParams);
-    return requestParams;
+  ) const -> MessageParams {
+    return lspToObject(unregistrationParams);
   }
 
-  auto LspTransformer::asNotificationParams(
+  auto LspTransformer::asMessageParams(
     const ProgressParams &progressParams
-  ) const -> std::unique_ptr<NotificationParams> {
-    std::unique_ptr<NotificationParams> notificationParams =
-      std::make_unique<NotificationParams>();
-    notificationParams->type = NotificationParamsType::LSP_OBJECT;
-    notificationParams->value = lspToObject(progressParams);
-    return notificationParams;
+  ) const -> MessageParams {
+    return lspToObject(progressParams);
   }
 
-  auto LspTransformer::asNotificationParams(
+  auto LspTransformer::asMessageParams(
     const LogTraceParams &logTraceParams
-  ) const -> std::unique_ptr<NotificationParams> {
-    std::unique_ptr<NotificationParams> notificationParams =
-      std::make_unique<NotificationParams>();
-    notificationParams->type = NotificationParamsType::LSP_OBJECT;
-    notificationParams->value = lspToObject(logTraceParams);
-    return notificationParams;
+  ) const -> MessageParams {
+    return lspToObject(logTraceParams);
   }
 
   auto LspTransformer::lspToAny(
@@ -4500,12 +4612,12 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
 
-    switch (result.type) {
+    switch (static_cast<FindReferencesResultType>(result.index())) {
     case FindReferencesResultType::LOCATION_ARRAY: {
       any->type = LSPAnyType::LSP_ARRAY;
       std::unique_ptr<LSPArray> locations = std::make_unique<LSPArray>();
       for (const std::unique_ptr<Location> &location
-             : std::get<ptr_vector<Location>>(result.value)) {
+             : std::get<ptr_vector<Location>>(result)) {
         locations->push_back(lspToAny(*location));
       }
       any->value = std::move(locations);
@@ -4526,12 +4638,12 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
 
-    switch (result.type) {
+    switch (static_cast<PrepareCallHierarchyResultType>(result.index())) {
     case PrepareCallHierarchyResultType::CALL_HIERARCHY_ITEM_ARRAY: {
       any->type = LSPAnyType::LSP_ARRAY;
       std::unique_ptr<LSPArray> items = std::make_unique<LSPArray>();
       for (const std::unique_ptr<CallHierarchyItem> &item
-             : std::get<ptr_vector<CallHierarchyItem>>(result.value)) {
+             : std::get<ptr_vector<CallHierarchyItem>>(result)) {
         items->push_back(lspToAny(*item));
       }
       any->value = std::move(items);
@@ -4588,15 +4700,15 @@ namespace LCompilers::LanguageServerProtocol {
     const ProgressToken &token
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    switch (token.type) {
+    switch (static_cast<ProgressTokenType>(token.index())) {
     case ProgressTokenType::LSP_INTEGER: {
       any->type = LSPAnyType::LSP_INTEGER;
-      any->value = std::get<int>(token.value);
+      any->value = std::get<int>(token);
       break;
     }
     case ProgressTokenType::LSP_STRING: {
       any->type = LSPAnyType::LSP_STRING;
-      any->value = std::get<std::string>(token.value);
+      any->value = std::get<std::string>(token);
       break;
     }
     }
@@ -4627,12 +4739,12 @@ namespace LCompilers::LanguageServerProtocol {
     const WillSaveWaitUntilResult &result
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    switch (result.type) {
+    switch (static_cast<WillSaveWaitUntilResultType>(result.index())) {
     case WillSaveWaitUntilResultType::TEXT_EDITS: {
       any->type = LSPAnyType::LSP_ARRAY;
       std::unique_ptr<LSPArray> edits;
       for (const std::unique_ptr<TextEdit> &edit
-             : std::get<ptr_vector<TextEdit>>(result.value)) {
+             : std::get<ptr_vector<TextEdit>>(result)) {
         edits->push_back(lspToAny(*edit));
       }
       any->value = std::move(edits);
@@ -4648,168 +4760,37 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::lspToAny(
-    const GotoDeclarationResult &result
+    const GotoResult &result
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
 
-    switch (result.type) {
-    case GotoDeclarationResultType::LOCATION: {
+    switch (static_cast<GotoResultType>(result.index())) {
+    case GotoResultType::LOCATION: {
       any->type = LSPAnyType::LSP_OBJECT;
-      any->value = lspToObject(
-        *std::get<std::unique_ptr<Location>>(result.value)
-      );
+      any->value = lspToObject(*std::get<std::unique_ptr<Location>>(result));
       break;
     }
-    case GotoDeclarationResultType::LOCATION_ARRAY: {
+    case GotoResultType::LOCATION_ARRAY: {
       any->type = LSPAnyType::LSP_ARRAY;
       std::unique_ptr<LSPArray> locations = std::make_unique<LSPArray>();
       for (const std::unique_ptr<Location> &location
-             : std::get<ptr_vector<Location>>(result.value)) {
+             : std::get<ptr_vector<Location>>(result)) {
         locations->push_back(lspToAny(*location));
       }
       any->value = std::move(locations);
       break;
     }
-    case GotoDeclarationResultType::LOCATION_LINK_ARRAY: {
+    case GotoResultType::LOCATION_LINK_ARRAY: {
       any->type = LSPAnyType::LSP_ARRAY;
       std::unique_ptr<LSPArray> links = std::make_unique<LSPArray>();
       for (const std::unique_ptr<LocationLink> &link
-             : std::get<ptr_vector<LocationLink>>(result.value)) {
+             : std::get<ptr_vector<LocationLink>>(result)) {
         links->push_back(lspToAny(*link));
       }
       any->value = std::move(links);
       break;
     }
-    case GotoDeclarationResultType::LSP_NULL: {
-      any->type = LSPAnyType::LSP_NULL;
-      any->value = nullptr;
-      break;
-    }
-    }
-
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const GotoDefinitionResult &result
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
-    switch (result.type) {
-    case GotoDefinitionResultType::LOCATION: {
-      any->type = LSPAnyType::LSP_OBJECT;
-      any->value = lspToObject(
-        *std::get<std::unique_ptr<Location>>(result.value)
-      );
-      break;
-    }
-    case GotoDefinitionResultType::LOCATION_ARRAY: {
-      any->type = LSPAnyType::LSP_ARRAY;
-      std::unique_ptr<LSPArray> locations = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<Location> &location
-             : std::get<ptr_vector<Location>>(result.value)) {
-        locations->push_back(lspToAny(*location));
-      }
-      any->value = std::move(locations);
-      break;
-    }
-    case GotoDefinitionResultType::LOCATION_LINK_ARRAY: {
-      any->type = LSPAnyType::LSP_ARRAY;
-      std::unique_ptr<LSPArray> links = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<LocationLink> &link
-             : std::get<ptr_vector<LocationLink>>(result.value)) {
-        links->push_back(lspToAny(*link));
-      }
-      any->value = std::move(links);
-      break;
-    }
-    case GotoDefinitionResultType::LSP_NULL: {
-      any->type = LSPAnyType::LSP_NULL;
-      any->value = nullptr;
-      break;
-    }
-    }
-
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const GotoTypeDefinitionResult &result
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
-    switch (result.type) {
-    case GotoTypeDefinitionResultType::LOCATION: {
-      any->type = LSPAnyType::LSP_OBJECT;
-      any->value = lspToObject(
-        *std::get<std::unique_ptr<Location>>(result.value)
-      );
-      break;
-    }
-    case GotoTypeDefinitionResultType::LOCATION_ARRAY: {
-      any->type = LSPAnyType::LSP_ARRAY;
-      std::unique_ptr<LSPArray> locations = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<Location> &location
-             : std::get<ptr_vector<Location>>(result.value)) {
-        locations->push_back(lspToAny(*location));
-      }
-      any->value = std::move(locations);
-      break;
-    }
-    case GotoTypeDefinitionResultType::LOCATION_LINK_ARRAY: {
-      any->type = LSPAnyType::LSP_ARRAY;
-      std::unique_ptr<LSPArray> links = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<LocationLink> &link
-             : std::get<ptr_vector<LocationLink>>(result.value)) {
-        links->push_back(lspToAny(*link));
-      }
-      any->value = std::move(links);
-      break;
-    }
-    case GotoTypeDefinitionResultType::LSP_NULL: {
-      any->type = LSPAnyType::LSP_NULL;
-      any->value = nullptr;
-      break;
-    }
-    }
-
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const GotoImplementationResult &result
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
-    switch (result.type) {
-    case GotoImplementationResultType::LOCATION: {
-      any->type = LSPAnyType::LSP_OBJECT;
-      any->value = lspToObject(
-        *std::get<std::unique_ptr<Location>>(result.value)
-      );
-      break;
-    }
-    case GotoImplementationResultType::LOCATION_ARRAY: {
-      any->type = LSPAnyType::LSP_ARRAY;
-      std::unique_ptr<LSPArray> locations = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<Location> &location
-             : std::get<ptr_vector<Location>>(result.value)) {
-        locations->push_back(lspToAny(*location));
-      }
-      any->value = std::move(locations);
-      break;
-    }
-    case GotoImplementationResultType::LOCATION_LINK_ARRAY: {
-      any->type = LSPAnyType::LSP_ARRAY;
-      std::unique_ptr<LSPArray> links = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<LocationLink> &link
-             : std::get<ptr_vector<LocationLink>>(result.value)) {
-        links->push_back(lspToAny(*link));
-      }
-      any->value = std::move(links);
-      break;
-    }
-    case GotoImplementationResultType::LSP_NULL: {
+    case GotoResultType::LSP_NULL: {
       any->type = LSPAnyType::LSP_NULL;
       any->value = nullptr;
       break;
@@ -4827,7 +4808,7 @@ namespace LCompilers::LanguageServerProtocol {
     std::unique_ptr<LSPObject> value = std::make_unique<LSPObject>();
     if (capabilities.textDocumentSync.has_value()) {
       (*value)["textDocumentSync"] =
-        lspToAny(*capabilities.textDocumentSync.value());
+        lspToAny(capabilities.textDocumentSync.value());
     }
     any->value = std::move(value);
     return any;
@@ -4837,20 +4818,18 @@ namespace LCompilers::LanguageServerProtocol {
     const TextDocumentSync &textDocumentSync
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    switch (textDocumentSync.type) {
+    switch (static_cast<TextDocumentSyncType>(textDocumentSync.index())) {
     case TextDocumentSyncType::TEXT_DOCUMENT_SYNC_KIND: {
       any->type = LSPAnyType::LSP_UINTEGER;
       any->value = static_cast<uinteger>(
-        std::get<TextDocumentSyncKind>(textDocumentSync.value)
+        std::get<TextDocumentSyncKind>(textDocumentSync)
       );
       break;
     }
     case TextDocumentSyncType::TEXT_DOCUMENT_SYNC_OPTIONS: {
       any->type = LSPAnyType::LSP_OBJECT;
       any->value = lspToObject(
-        *std::get<std::unique_ptr<TextDocumentSyncOptions>>(
-          textDocumentSync.value
-        )
+        *std::get<std::unique_ptr<TextDocumentSyncOptions>>(textDocumentSync)
       );
       break;
     }
@@ -5026,7 +5005,7 @@ namespace LCompilers::LanguageServerProtocol {
     const ProgressParams &params
   ) const -> std::unique_ptr<LSPObject> {
     std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
-    object->emplace("token", lspToAny(*params.token));
+    object->emplace("token", lspToAny(params.token));
     object->emplace("value", copy(params.value));
     return object;
   }
@@ -5116,17 +5095,17 @@ namespace LCompilers::LanguageServerProtocol {
     }
     if (options.save.has_value()) {
       std::unique_ptr<LSPAny> save = std::make_unique<LSPAny>();
-      SaveOrOptions &saveOrOptions = *options.save.value();
-      switch (saveOrOptions.type) {
+      const SaveOrOptions &saveOrOptions = options.save.value();
+      switch (static_cast<SaveOrOptionsType>(saveOrOptions.index())) {
       case SaveOrOptionsType::BOOLEAN: {
         save->type = LSPAnyType::LSP_BOOLEAN;
-        save->value = std::get<boolean>(saveOrOptions.value);
+        save->value = std::get<boolean>(saveOrOptions);
         break;
       }
       case SaveOrOptionsType::SAVE_OPTIONS: {
         save->type = LSPAnyType::LSP_OBJECT;
         save->value = lspToObject(
-          *std::get<std::unique_ptr<SaveOptions>>(saveOrOptions.value)
+          *std::get<std::unique_ptr<SaveOptions>>(saveOrOptions)
         );
         break;
       }
@@ -5149,11 +5128,11 @@ namespace LCompilers::LanguageServerProtocol {
     return object;
   }
 
-  auto LspTransformer::requireRequestParams(
+  auto LspTransformer::requireMessageParams(
     const RequestMessage &request
-  ) const -> const RequestParams & {
+  ) const -> const MessageParams & {
     if (request.params.has_value()) {
-      return *request.params.value();
+      return request.params.value();
     }
     throw LspException(
       ErrorCodes::InvalidParams,
@@ -5164,11 +5143,11 @@ namespace LCompilers::LanguageServerProtocol {
     );
   }
 
-  auto LspTransformer::requireNotificationParams(
+  auto LspTransformer::requireMessageParams(
     const NotificationMessage &notification
-  ) const -> const NotificationParams & {
+  ) const -> const MessageParams & {
     if (notification.params.has_value()) {
-      return *notification.params.value();
+      return notification.params.value();
     }
     throw LspException(
       ErrorCodes::InvalidParams,

@@ -1,6 +1,7 @@
 #ifndef LCOMPILERS_LSP_TRANSFORMER_H
 #define LCOMPILERS_LSP_TRANSFORMER_H
 
+#include <cstddef>
 #include <memory>
 
 #include <lsp/specification.h>
@@ -10,78 +11,83 @@ namespace LCompilers::LanguageServerProtocol {
   class LspTransformer {
   public:
     auto asInitializeParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> InitializeParams;
     auto asWillSaveTextDocumentParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> WillSaveTextDocumentParams;
     auto asDeclarationParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> DeclarationParams;
     auto asDefinitionParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> DefinitionParams;
     auto asTypeDefinitionParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> TypeDefinitionParams;
     auto asImplementationParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> ImplementationParams;
     auto asReferenceParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> ReferenceParams;
     auto asCallHierarchyPrepareParams(
-      const RequestParams &requestParams
+      const MessageParams &requestParams
     ) const -> CallHierarchyPrepareParams;
+    auto asCallHierarchyIncomingCallsParams(
+      const MessageParams &requestParams
+    ) const -> CallHierarchyIncomingCallsParams;
 
     auto asCancelParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> CancelParams;
     auto asSetTraceParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> SetTraceParams;
     auto asInitializedParams(
-      const optional_ptr<NotificationParams> &notificationParams
+      const std::optional<MessageParams> &notificationParams
     ) const -> InitializedParams;
     auto asDidOpenTextDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidOpenTextDocumentParams;
     auto asDidChangeTextDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidChangeTextDocumentParams;
     auto asDidSaveTextDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidSaveTextDocumentParams;
     auto asDidCloseTextDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidCloseTextDocumentParams;
     auto asDidOpenNotebookDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidOpenNotebookDocumentParams;
     auto asDidChangeNotebookDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidChangeNotebookDocumentParams;
     auto asDidSaveNotebookDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidSaveNotebookDocumentParams;
     auto asDidCloseNotebookDocumentParams(
-      const NotificationParams &notificationParams
+      const MessageParams &notificationParams
     ) const -> DidCloseNotebookDocumentParams;
 
-    auto asRequestParams(
+    auto asMessageParams(
       const RegistrationParams &registrationParams
-    ) const -> std::unique_ptr<RequestParams>;
-    auto asRequestParams(
+    ) const -> MessageParams;
+    auto asMessageParams(
       const UnregistrationParams &unregistrationParams
-    ) const -> std::unique_ptr<RequestParams>;
-
-    auto asNotificationParams(
+    ) const -> MessageParams;
+    auto asMessageParams(
       const ProgressParams &progressParams
-    ) const -> std::unique_ptr<NotificationParams>;
-    auto asNotificationParams(
+    ) const -> MessageParams;
+    auto asMessageParams(
       const LogTraceParams &logTraceParams
-    ) const -> std::unique_ptr<NotificationParams>;
+    ) const -> MessageParams;
 
+    auto anyToCallHierarchyItem(
+      const LSPAny &any
+    ) const -> std::unique_ptr<CallHierarchyItem>;
     auto anyToReferenceContext(
       const LSPAny &any
     ) const -> std::unique_ptr<ReferenceContext>;
@@ -141,13 +147,13 @@ namespace LCompilers::LanguageServerProtocol {
     ) const -> std::unique_ptr<FullCapabilities>;
     auto anyToOptionalFullCapabilities(
       const LSPAny &any
-    ) const -> std::unique_ptr<OptionalFullCapabilities>;
+    ) const -> OptionalFullCapabilities;
     auto anyToRangeCapabilities(
       const LSPAny &any
     ) const -> std::unique_ptr<RangeCapabilities>;
     auto anyToOptionalRangeCapabilities(
       const LSPAny &any
-    ) const -> std::unique_ptr<OptionalRangeCapabilities>;
+    ) const -> OptionalRangeCapabilities;
     auto anyToSemanticTokensClientRequestCapabilities(
       const LSPAny &any
     ) const -> std::unique_ptr<SemanticTokensClientRequestCapabilities>;
@@ -357,7 +363,7 @@ namespace LCompilers::LanguageServerProtocol {
     ) const -> std::unique_ptr<ClientInfo>;
     auto anyToProgressToken(
       const LSPAny &any
-    ) const -> std::unique_ptr<ProgressToken>;
+    ) const -> ProgressToken;
     auto anyToNotebookCellArrayChange(
       const LSPAny &any
     ) const -> std::unique_ptr<NotebookCellArrayChange>;
@@ -393,7 +399,7 @@ namespace LCompilers::LanguageServerProtocol {
     ) const -> TextDocumentSaveReason;
     auto anyToRequestId(
       const LSPAny &any
-    ) const -> std::unique_ptr<RequestId>;
+    ) const -> RequestId;
     auto anyToTraceValue(
       const LSPAny &any
     ) const -> TraceValue;
@@ -411,7 +417,7 @@ namespace LCompilers::LanguageServerProtocol {
     ) const -> std::unique_ptr<VersionedTextDocumentIdentifier>;
     auto anyToTextDocumentContentChangeEvent(
       const LSPAny &any
-    ) const -> std::unique_ptr<TextDocumentContentChangeEvent>;
+    ) const -> TextDocumentContentChangeEvent;
     auto anyToRange(
       const LSPAny &any
     ) const -> std::unique_ptr<Range>;
@@ -430,6 +436,19 @@ namespace LCompilers::LanguageServerProtocol {
     auto anyToBool(
       const LSPAny &any
     ) const -> bool;
+
+    auto nullToAny(
+      std::nullptr_t null
+    ) const -> std::unique_ptr<LSPAny>;
+    auto intToAny(
+      int value
+    ) const -> std::unique_ptr<LSPAny>;
+    auto unsignedIntToAny(
+      uinteger value
+    ) const -> std::unique_ptr<LSPAny>;
+    auto stringToAny(
+      const string &value
+    ) const -> std::unique_ptr<LSPAny>;
 
     auto lspToAny(
       const CallHierarchyItem &item
@@ -453,16 +472,7 @@ namespace LCompilers::LanguageServerProtocol {
       const WillSaveWaitUntilResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
-      const GotoDeclarationResult &result
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const GotoDefinitionResult &result
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const GotoTypeDefinitionResult &result
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const GotoImplementationResult &result
+      const GotoResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const ServerCapabilities &capabilities
@@ -494,17 +504,16 @@ namespace LCompilers::LanguageServerProtocol {
     auto lspToAny(
       const LogTraceParams &logTraceParams
     ) const -> std::unique_ptr<LSPAny>;
-
-    auto intToAny(
-      int value
+    auto lspToAny(
+      const CallHierarchyIncomingCallsResult &result
     ) const -> std::unique_ptr<LSPAny>;
-    auto unsignedIntToAny(
-      uinteger value
-    ) const -> std::unique_ptr<LSPAny>;
-    auto stringToAny(
-      const string &value
+    auto lspToAny(
+      const CallHierarchyIncomingCall &call
     ) const -> std::unique_ptr<LSPAny>;
 
+    auto lspToObject(
+      const CallHierarchyIncomingCall &call
+    ) const -> std::unique_ptr<LSPObject>;
     auto lspToObject(
       const CallHierarchyItem &item
     ) const -> std::unique_ptr<LSPObject>;
@@ -556,23 +565,23 @@ namespace LCompilers::LanguageServerProtocol {
 
     auto assertRequestType(
       const std::string &method,
-      const RequestParams &params,
-      RequestParamsType type
+      const MessageParams &params,
+      MessageParamsType type
     ) const -> void;
 
     auto assertNotificationType(
       const std::string &method,
-      const NotificationParams &params,
-      NotificationParamsType type
+      const MessageParams &params,
+      MessageParamsType type
     ) const -> void;
 
-    auto requireRequestParams(
+    auto requireMessageParams(
       const RequestMessage &request
-    ) const -> const RequestParams &;
+    ) const -> const MessageParams &;
 
-    auto requireNotificationParams(
+    auto requireMessageParams(
       const NotificationMessage &notification
-    ) const -> const NotificationParams &;
+    ) const -> const MessageParams &;
 
     auto copy(
       const std::unique_ptr<LSPAny> &any

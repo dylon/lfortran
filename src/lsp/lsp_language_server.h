@@ -39,8 +39,7 @@ namespace LCompilers::LanguageServerProtocol {
     std::atomic_bool _exit = false;
     std::atomic_int serialId = 0;
 
-    auto nextId() -> int;
-    auto nextRequestId() -> std::unique_ptr<RequestId>;
+    auto nextId() -> RequestId;
 
     auto dispatch(
       ResponseMessage &response,
@@ -69,22 +68,25 @@ namespace LCompilers::LanguageServerProtocol {
     ) -> WillSaveWaitUntilResult;
     auto gotoDeclaration(
       const DeclarationParams &params
-    ) -> GotoDeclarationResult;
+    ) -> GotoResult;
     auto gotoDefinition(
       const DefinitionParams &params
-    ) -> GotoDefinitionResult;
+    ) -> GotoResult;
     auto gotoTypeDefinition(
       const TypeDefinitionParams &params
-    ) -> GotoTypeDefinitionResult;
+    ) -> GotoResult;
     auto gotoImplementation(
       const ImplementationParams &params
-    ) -> GotoImplementationResult;
+    ) -> GotoResult;
     auto findReferences(
       const ReferenceParams &params
     ) -> FindReferencesResult;
     auto prepareCallHierarchy(
       const CallHierarchyPrepareParams &params
     ) -> PrepareCallHierarchyResult;
+    auto callHierarchyIncomingCalls(
+      const CallHierarchyIncomingCallsParams &params
+    ) -> CallHierarchyIncomingCallsResult;
     auto shutdown() -> void;
 
     // notification: client -> server

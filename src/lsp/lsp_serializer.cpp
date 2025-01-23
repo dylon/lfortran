@@ -44,7 +44,7 @@ namespace LCompilers::LanguageServerProtocol {
     );
     if (notification.params.has_value()) {
       rapidjson::Value params = lspToJson(
-        *notification.params.value(),
+        notification.params.value(),
         allocator
       );
       document.AddMember("params", params, allocator);
@@ -53,18 +53,18 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto JsonRpcLspSerializer::lspToJson(
-    const NotificationParams &params,
+    const MessageParams &params,
     rapidjson::Document::AllocatorType &allocator
   ) const -> rapidjson::Value {
-    switch (params.type) {
-    case NotificationParamsType::LSP_OBJECT: {
+    switch (static_cast<MessageParamsType>(params.index())) {
+    case MessageParamsType::LSP_OBJECT: {
       const LSPObject &object =
-        *std::get<std::unique_ptr<LSPObject>>(params.value);
+        *std::get<std::unique_ptr<LSPObject>>(params);
       return lspToJson(object, allocator);
     }
-    case NotificationParamsType::LSP_ARRAY: {
+    case MessageParamsType::LSP_ARRAY: {
       const LSPArray &array =
-        *std::get<std::unique_ptr<LSPArray>>(params.value);
+        *std::get<std::unique_ptr<LSPArray>>(params);
       return lspToJson(array, allocator);
     }
     }
@@ -111,7 +111,7 @@ namespace LCompilers::LanguageServerProtocol {
     rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
     document.AddMember(
       "id",
-      lspToJson(*request.id, allocator),
+      lspToJson(request.id, allocator),
       allocator
     );
     document.AddMember(
@@ -121,7 +121,7 @@ namespace LCompilers::LanguageServerProtocol {
     );
     if (request.params.has_value()) {
       rapidjson::Value params = lspToJson(
-        *request.params.value(),
+        request.params.value(),
         allocator
       );
       document.AddMember("params", params, allocator);
@@ -133,13 +133,13 @@ namespace LCompilers::LanguageServerProtocol {
     const RequestId &requestId,
     rapidjson::Document::AllocatorType &allocator
   ) const -> rapidjson::Value {
-    switch (requestId.type) {
+    switch (static_cast<RequestIdType>(requestId.index())) {
     case RequestIdType::LSP_INTEGER: {
-      int value = std::get<int>(requestId.value);
+      int value = std::get<int>(requestId);
       return intToJson(value, allocator);
     }
     case RequestIdType::LSP_STRING: {
-      const std::string &value = std::get<std::string>(requestId.value);
+      const std::string &value = std::get<std::string>(requestId);
       return stringToJson(value, allocator);
     }
     }
@@ -162,33 +162,12 @@ namespace LCompilers::LanguageServerProtocol {
     return rapidjson::Value(value.c_str(), value.length(), allocator);
   }
 
-  auto JsonRpcLspSerializer::lspToJson(
-    const RequestParams &params,
-    rapidjson::Document::AllocatorType &allocator
-  ) const -> rapidjson::Value {
-    switch (params.type) {
-    case RequestParamsType::LSP_OBJECT: {
-      const LSPObject &object =
-        *std::get<std::unique_ptr<LSPObject>>(params.value);
-      return lspToJson(object, allocator);
-    }
-    case RequestParamsType::LSP_ARRAY: {
-      const LSPArray &array =
-        *std::get<std::unique_ptr<LSPArray>>(params.value);
-      return lspToJson(array, allocator);
-    }
-    }
-    throw std::runtime_error(
-      "JsonRpcLspSerializer::lspToJson should not reach the end of the function."
-    );
-  }
-
   auto JsonRpcLspSerializer::serializeResponse(
     const ResponseMessage &response
   ) const -> std::string {
     rapidjson::Document document = prepareDocument();
     rapidjson::Document::AllocatorType &allocator = document.GetAllocator();
-    setResponseId(document, *response.id, allocator);
+    setResponseId(document, response.id, allocator);
     if (response.result.has_value()) {
       rapidjson::Value result = lspToJson(
         *response.result.value(),
@@ -207,17 +186,17 @@ namespace LCompilers::LanguageServerProtocol {
     const ResponseId &id,
     rapidjson::Document::AllocatorType &allocator
   ) const -> void {
-    switch (id.type) {
+    switch (static_cast<ResponseIdType>(id.index())) {
     case ResponseIdType::LSP_INTEGER: {
       document.AddMember(
         "id",
-        rapidjson::Value(std::get<integer>(id.value)),
+        rapidjson::Value(std::get<integer>(id)),
         allocator
       );
       break;
     }
     case ResponseIdType::LSP_STRING: {
-      std::string stringId = std::get<std::string>(id.value);
+      std::string stringId = std::get<std::string>(id);
       document.AddMember(
         "id",
         rapidjson::Value(
@@ -327,25 +306,20 @@ namespace LCompilers::LanguageServerProtocol {
     request.id = buildRequestId(document["id"]);
     request.method = document["method"].GetString();
     if (document.HasMember("params")) {
-      request.params = buildRequestParams(document["params"]);
+      request.params = buildMessageParams(document["params"]);
     }
     return request;
   }
 
   auto JsonRpcLspDeserializer::buildRequestId(
     const rapidjson::Value &jsonId
-  ) const -> std::unique_ptr<RequestId> {
-    std::unique_ptr<RequestId> requestId = std::make_unique<RequestId>();
+  ) const -> RequestId {
     switch (jsonId.GetType()) {
     case rapidjson::kStringType: {
-      requestId->type = RequestIdType::LSP_STRING;
-      requestId->value = jsonId.GetString();
-      break;
+      return jsonId.GetString();
     }
     case rapidjson::kNumberType: {
-      requestId->type = RequestIdType::LSP_INTEGER;
-      requestId->value = jsonId.GetInt();
-      break;
+      return jsonId.GetInt();
     }
     default: {
       throw LspException(
@@ -357,7 +331,6 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     }
-    return requestId;
   }
 
   auto JsonRpcLspDeserializer::deserializeNotification(
@@ -367,91 +340,43 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = document["jsonrpc"].GetString();
     notification.method = document["method"].GetString();
     if (document.HasMember("params")) {
-      notification.params = buildNotificationParams(document["params"]);
+      notification.params = buildMessageParams(document["params"]);
     }
     return notification;
   }
 
-  auto JsonRpcLspDeserializer::buildRequestParams(
+  auto JsonRpcLspDeserializer::buildMessageParams(
     const rapidjson::Value &jsonParams
-  ) const -> std::unique_ptr<RequestParams> {
-    std::unique_ptr<RequestParams> requestParams =
-      std::make_unique<RequestParams>();
+  ) const -> MessageParams {
     switch (jsonParams.GetType()) {
     case rapidjson::kArrayType: {
-      requestParams->type = RequestParamsType::LSP_ARRAY;
       std::unique_ptr<LSPArray> lspArray = std::make_unique<LSPArray>();
       for (rapidjson::Value::ConstValueIterator iter = jsonParams.Begin();
            iter != jsonParams.End();
            ++iter) {
         lspArray->push_back(jsonToLsp(*iter));
       }
-      requestParams->value = std::move(lspArray);
-      break;
+      return lspArray;
     }
     case rapidjson::kObjectType: {
-      requestParams->type = RequestParamsType::LSP_OBJECT;
       std::unique_ptr<LSPObject> lspObject = std::make_unique<LSPObject>();
       for (rapidjson::Value::ConstMemberIterator iter = jsonParams.MemberBegin();
            iter != jsonParams.MemberEnd();
            ++iter) {
         (*lspObject)[iter->name.GetString()] = jsonToLsp(iter->value);
       }
-      requestParams->value = std::move(lspObject);
-      break;
+      return lspObject;
     }
     default: {
       throw LspException(
         ErrorCodes::InvalidParams,
         std::format(
-          "Unsupported RequestParams type: {}",
+          "Unsupported MessageParams type: {}",
           static_cast<int>(jsonParams.GetType())
         )
       );
     }
     }
-    return requestParams;
-  }
-
-  auto JsonRpcLspDeserializer::buildNotificationParams(
-    const rapidjson::Value &jsonParams
-  ) const -> std::unique_ptr<NotificationParams> {
-    std::unique_ptr<NotificationParams> notificationParams =
-      std::make_unique<NotificationParams>();
-    switch (jsonParams.GetType()) {
-    case rapidjson::kArrayType: {
-      notificationParams->type = NotificationParamsType::LSP_ARRAY;
-      std::unique_ptr<LSPArray> lspArray = std::make_unique<LSPArray>();
-      for (rapidjson::Value::ConstValueIterator iter = jsonParams.Begin();
-           iter != jsonParams.End();
-           ++iter) {
-        lspArray->push_back(jsonToLsp(*iter));
-      }
-      notificationParams->value = std::move(lspArray);
-      break;
-    }
-    case rapidjson::kObjectType: {
-      notificationParams->type = NotificationParamsType::LSP_OBJECT;
-      std::unique_ptr<LSPObject> lspObject = std::make_unique<LSPObject>();
-      for (rapidjson::Value::ConstMemberIterator iter = jsonParams.MemberBegin();
-           iter != jsonParams.MemberEnd();
-           ++iter) {
-        (*lspObject)[iter->name.GetString()] = jsonToLsp(iter->value);
-      }
-      notificationParams->value = std::move(lspObject);
-      break;
-    }
-    default: {
-      throw LspException(
-        ErrorCodes::InvalidParams,
-        std::format(
-          "Unsupported NotificationParams type: {}",
-          static_cast<int>(jsonParams.GetType())
-        )
-      );
-    }
-    }
-    return notificationParams;
   }
 
   auto JsonRpcLspDeserializer::jsonToLsp(

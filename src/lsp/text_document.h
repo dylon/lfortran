@@ -27,7 +27,7 @@ namespace LCompilers::LanguageServerProtocol {
     auto text() -> const std::string &;
     auto setText(const std::string &text) -> void;
     auto apply(
-      ptr_vector<TextDocumentContentChangeEvent> &changes
+      std::vector<TextDocumentContentChangeEvent> &changes
     ) -> void;
   private:
     DocumentUri _uri;

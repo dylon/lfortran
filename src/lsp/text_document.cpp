@@ -52,13 +52,13 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::apply(
-    ptr_vector<TextDocumentContentChangeEvent> &changes
+    std::vector<TextDocumentContentChangeEvent> &changes
   ) -> void {
     std::sort(
       changes.begin(),
       changes.end(),
       [this](auto &a, auto &b) {
-        return from(*a) < from(*b);
+        return from(a) < from(b);
       }
     );
 
@@ -71,7 +71,7 @@ namespace LCompilers::LanguageServerProtocol {
         std::size_t j;
         std::size_t k;
         std::string patch;
-        decompose(*change, j, k, patch);
+        decompose(change, j, k, patch);
         if (i < _text.length()) {
           // std::cerr
           //   << "text[" << i << ":" << j << "] "
@@ -122,19 +122,15 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::from(
     const TextDocumentContentChangeEvent &event
   ) const -> std::size_t {
-    switch (event.type) {
+    switch (static_cast<TextDocumentContentChangeEventType>(event.index())) {
     case TextDocumentContentChangeEventType::PARTIAL_TEXT_DOCUMENT: {
       return from(
-        *std::get<std::unique_ptr<PartialTextDocumentContentChangeEvent>>(
-          event.value
-        )
+        *std::get<std::unique_ptr<PartialTextDocumentContentChangeEvent>>(event)
       );
     }
     case TextDocumentContentChangeEventType::WHOLE_TEXT_DOCUMENT: {
       return from(
-        *std::get<std::unique_ptr<WholeTextDocumentContentChangeEvent>>(
-          event.value
-        )
+        *std::get<std::unique_ptr<WholeTextDocumentContentChangeEvent>>(event)
       );
     }
     }
@@ -162,20 +158,16 @@ namespace LCompilers::LanguageServerProtocol {
     std::size_t &k,
     std::string &patch
   ) const -> void {
-    switch (event.type) {
+    switch (static_cast<TextDocumentContentChangeEventType>(event.index())) {
     case TextDocumentContentChangeEventType::PARTIAL_TEXT_DOCUMENT: {
       const PartialTextDocumentContentChangeEvent &partial =
-        *std::get<std::unique_ptr<PartialTextDocumentContentChangeEvent>>(
-          event.value
-        );
+        *std::get<std::unique_ptr<PartialTextDocumentContentChangeEvent>>(event);
       decompose(partial, j, k, patch);
       break;
     }
     case TextDocumentContentChangeEventType::WHOLE_TEXT_DOCUMENT: {
       const WholeTextDocumentContentChangeEvent &whole =
-        *std::get<std::unique_ptr<WholeTextDocumentContentChangeEvent>>(
-          event.value
-        );
+        *std::get<std::unique_ptr<WholeTextDocumentContentChangeEvent>>(event);
       decompose(whole, j, k, patch);
       break;
     }

@@ -29,9 +29,6 @@ namespace LCompilers::LanguageServerProtocol {
   using optional_ptr_vector = std::optional<ptr_vector<T>>;
 
   template <typename T>
-  using optional_ptr_vector = std::optional<ptr_vector<T>>;
-
-  template <typename T>
   struct ValueSet {
     std::vector<T> valueSet;
   };
@@ -118,6 +115,8 @@ namespace LCompilers::LanguageServerProtocol {
    */
   struct LSPAny {
     LSPAnyType type;
+    // NOTE: `value` was implemented as a `union` but `std::string` values kept
+    // causing segfaults.
     std::variant<
       std::unique_ptr<LSPObject>,
       std::unique_ptr<LSPArray>,
@@ -147,26 +146,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSP_STRING,
   };
 
-  struct RequestId {
-    RequestIdType type;
-    std::variant<
-      integer,
-      string
-    > value;
-  };
+  typedef std::variant<
+    integer,
+    string
+  > RequestId;
 
-  enum class RequestParamsType {
+  enum class MessageParamsType {
     LSP_ARRAY,
     LSP_OBJECT,
   };
 
-  struct RequestParams {
-    RequestParamsType type;
-    std::variant<
-      std::unique_ptr<LSPArray>,
-      std::unique_ptr<LSPObject>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<LSPArray>,
+    std::unique_ptr<LSPObject>
+  > MessageParams;
 
   /**
    * A request message to describe a request between the client and the server.
@@ -186,7 +179,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * id: integer | string;
      */
-    std::unique_ptr<RequestId> id;
+    RequestId id;
 
     /**
     * The method to be invoked.
@@ -200,7 +193,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * params?: array | object;
      */
-    optional_ptr<RequestParams> params;
+    std::optional<MessageParams> params;
   };
 
   /**
@@ -419,14 +412,11 @@ namespace LCompilers::LanguageServerProtocol {
     LSP_NULL,
   };
 
-  struct ResponseId {
-    ResponseIdType type;
-    std::variant<
-      integer,
-      string,
-      null
-    > value;
-  };
+  typedef std::variant<
+    integer,
+    string,
+    null
+  > ResponseId;
 
   /**
    * A Response Message sent as a result of a request. If a request doesn’t
@@ -442,7 +432,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * id: integer | string | null;
      */
-    std::unique_ptr<ResponseId> id;
+    ResponseId id;
 
     /**
      * The result of a request. This member is REQUIRED on success. This member
@@ -458,19 +448,6 @@ namespace LCompilers::LanguageServerProtocol {
      * error?: ResponseError;
      */
     optional_ptr<ResponseError> error;
-  };
-
-  enum class NotificationParamsType {
-    LSP_ARRAY,
-    LSP_OBJECT,
-  };
-
-  struct NotificationParams {
-    NotificationParamsType type;
-    std::variant<
-      std::unique_ptr<LSPArray>,
-      std::unique_ptr<LSPObject>
-    > value;
   };
 
   /**
@@ -496,7 +473,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * params?: array | object;
      */
-    optional_ptr<NotificationParams> params;
+    std::optional<MessageParams> params;
   };
 
   // ---------------------------------------------------------------------------
@@ -538,7 +515,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * id: integer | string;
      */
-    std::unique_ptr<RequestId> id;
+    RequestId id;
   };
 
   enum class ProgressTokenType {
@@ -546,13 +523,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSP_STRING,
   };
 
-  struct ProgressToken {
-    ProgressTokenType type;
-    std::variant<
-      integer,
-      string
-    > value;
-  };
+  typedef std::variant<
+    integer,
+    string
+  > ProgressToken;
 
   /**
    * The base protocol offers also support to report progress in a generic
@@ -583,7 +557,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * token: ProgressToken;
      */
-    std::unique_ptr<ProgressToken> token;
+    ProgressToken token;
 
     /**
      * The progress data.
@@ -1085,13 +1059,10 @@ namespace LCompilers::LanguageServerProtocol {
     ANNOTATED,
   };
 
-  struct OptionalAnnotatedTextEdit {
-    OptionalAnnotatedTextEditType type;
-    std::variant<
-      std::unique_ptr<TextEdit>,
-      std::unique_ptr<AnnotatedTextEdit>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<TextEdit>,
+    std::unique_ptr<AnnotatedTextEdit>
+  > OptionalAnnotatedTextEdit;
 
   /**
    * New in version 3.16: support for AnnotatedTextEdit. The support is guarded
@@ -1129,7 +1100,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * edits: (TextEdit | AnnotatedTextEdit)[];
      */
-    ptr_vector<OptionalAnnotatedTextEdit> edits;
+    std::vector<OptionalAnnotatedTextEdit> edits;
   };
 
   /**
@@ -1335,13 +1306,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSP_STRING,
   };
 
-  struct DiagnosticCode {
-    DiagnosticCodeType type;
-    std::variant<
-      integer,
-      string
-    > value;
-  };
+  typedef std::variant<
+    integer,
+    string
+  > DiagnosticCode;
 
   /**
    * Represents a diagnostic, such as a compiler error or warning. Diagnostic
@@ -1383,7 +1351,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * code?: integer | string;
      */
-    optional_ptr<DiagnosticCode> code;
+    std::optional<DiagnosticCode> code;
 
     /**
      * An optional property to describe the error code.
@@ -1818,15 +1786,12 @@ namespace LCompilers::LanguageServerProtocol {
     DELETE_FILE,
   };
 
-  struct DocumentChange {
-    DocumentChangeType type;
-    std::variant<
-      std::unique_ptr<TextDocumentEdit>,
-      std::unique_ptr<CreateFile>,
-      std::unique_ptr<RenameFile>,
-      std::unique_ptr<DeleteFile>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<TextDocumentEdit>,
+    std::unique_ptr<CreateFile>,
+    std::unique_ptr<RenameFile>,
+    std::unique_ptr<DeleteFile>
+  > DocumentChange;
 
   /**
    * A workspace edit represents changes to many resources managed in the
@@ -1884,7 +1849,7 @@ namespace LCompilers::LanguageServerProtocol {
      *   (TextDocumentEdit | CreateFile | RenameFile | DeleteFile)[]
      * );
      */
-    optional_ptr_vector<DocumentChange> documentChanges;
+    optional_vector<DocumentChange> documentChanges;
 
     /**
      * A map of change annotations that can be referenced in
@@ -2260,7 +2225,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * workDoneToken?: ProgressToken;
      */
-    optional_ptr<ProgressToken> workDoneToken;
+    std::optional<ProgressToken> workDoneToken;
   };
 
   /**
@@ -2311,7 +2276,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * partialResultToken?: ProgressToken;
      */
-    optional_ptr<ProgressToken> partialResultToken;
+    std::optional<ProgressToken> partialResultToken;
   };
 
   /**
@@ -2586,22 +2551,19 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   };
 
-  enum class GotoDeclarationResultType {
+  enum class GotoResultType {
     LOCATION,
     LOCATION_ARRAY,
     LOCATION_LINK_ARRAY,
     LSP_NULL
   };
 
-  struct GotoDeclarationResult {
-    GotoDeclarationResultType type;
-    std::variant<
-      std::unique_ptr<Location>,
-      ptr_vector<Location>,
-      ptr_vector<LocationLink>,
-      null
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<Location>,
+    ptr_vector<Location>,
+    ptr_vector<LocationLink>,
+    null
+  > GotoResult;
 
   /**
    * Request:
@@ -2686,23 +2648,6 @@ namespace LCompilers::LanguageServerProtocol {
     : public TextDocumentRegistrationOptions
     , public DefinitionOptions {
     //empty
-  };
-
-  enum class GotoDefinitionResultType {
-    LOCATION,
-    LOCATION_ARRAY,
-    LOCATION_LINK_ARRAY,
-    LSP_NULL
-  };
-
-  struct GotoDefinitionResult {
-    GotoDefinitionResultType type;
-    std::variant<
-      std::unique_ptr<Location>,
-      ptr_vector<Location>,
-      ptr_vector<LocationLink>,
-      null
-    > value;
   };
 
   /**
@@ -2795,23 +2740,6 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   };
 
-  enum class GotoTypeDefinitionResultType {
-    LOCATION,
-    LOCATION_ARRAY,
-    LOCATION_LINK_ARRAY,
-    LSP_NULL
-  };
-
-  struct GotoTypeDefinitionResult {
-    GotoTypeDefinitionResultType type;
-    std::variant<
-      std::unique_ptr<Location>,
-      ptr_vector<Location>,
-      ptr_vector<LocationLink>,
-      null
-    > value;
-  };
-
   /**
    * Request:
    * - method: textDocument/typeDefinition
@@ -2900,23 +2828,6 @@ namespace LCompilers::LanguageServerProtocol {
     , public ImplementationOptions
     , public StaticRegistrationOptions {
     // empty
-  };
-
-  enum class GotoImplementationResultType {
-    LOCATION,
-    LOCATION_ARRAY,
-    LOCATION_LINK_ARRAY,
-    LSP_NULL
-  };
-
-  struct GotoImplementationResult {
-    GotoImplementationResultType type;
-    std::variant<
-      std::unique_ptr<Location>,
-      ptr_vector<Location>,
-      ptr_vector<LocationLink>,
-      null
-    > value;
   };
 
   /**
@@ -3010,13 +2921,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSP_NULL
   };
 
-  struct FindReferencesResult {
-    FindReferencesResultType type;
-    std::variant<
-      ptr_vector<Location>,
-      null
-    > value;
-  };
+  typedef std::variant<
+    ptr_vector<Location>,
+    null
+  > FindReferencesResult;
 
   /**
    * Request:
@@ -3461,13 +3369,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSP_NULL,
   };
 
-  struct PrepareCallHierarchyResult {
-    PrepareCallHierarchyResultType type;
-    std::variant<
-      ptr_vector<CallHierarchyItem>,
-      null
-    > value;
-  };
+  typedef std::variant<
+    ptr_vector<CallHierarchyItem>,
+    null
+  > PrepareCallHierarchyResult;
 
   /**
    * The request is sent from the client to the server to resolve incoming calls
@@ -3524,6 +3429,16 @@ namespace LCompilers::LanguageServerProtocol {
      */
     ptr_vector<Range> fromRanges;
   };
+
+  enum class CallHierarchyIncomingCallsResultType {
+    CALL_HIERARCHY_INCOMING_CALL_ARRAY = 0,
+    LSP_NULL = 1,
+  };
+
+  typedef std::variant<
+    ptr_vector<CallHierarchyIncomingCall>,
+    null
+  > CallHierarchyIncomingCallsResult;
 
   /**
    * The request is sent from the client to the server to resolve outgoing calls
@@ -4211,13 +4126,10 @@ namespace LCompilers::LanguageServerProtocol {
    *
    * @deprecated use MarkupContent instead.
    */
-  struct MarkedString {
-    MarkedStringType type;
-    std::variant<
-      string,
-      std::unique_ptr<MarkedStringWithLanguage>
-    > value;
-  };
+  typedef std::variant<
+    string,
+    std::unique_ptr<MarkedStringWithLanguage>
+  > MarkedString;
 
   enum class HoverContentsType {
     MARKED_STRING,
@@ -4225,14 +4137,11 @@ namespace LCompilers::LanguageServerProtocol {
     MARKUP_CONTENT,
   };
 
-  struct HoverContents {
-    HoverContentsType type;
-    std::variant<
-      std::unique_ptr<MarkedString>,
-      ptr_vector<MarkedString>,
-      std::unique_ptr<MarkupContent>
-    > value;
-  };
+  typedef std::variant<
+    MarkedString,
+    std::vector<MarkedString>,
+    std::unique_ptr<MarkupContent>
+  > HoverContents;
 
   /**
    * The result of a hover request.
@@ -4255,7 +4164,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * contents: MarkedString | MarkedString[] | MarkupContent;
      */
-    std::unique_ptr<HoverContents> contents;
+    HoverContents contents;
 
     /**
      * An optional range is a range inside a text document
@@ -5158,13 +5067,10 @@ namespace LCompilers::LanguageServerProtocol {
     RANGE_CAPABILITIES,
   };
 
-  struct OptionalRangeCapabilities {
-    OptionalRangeCapabilitiesType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<RangeCapabilities>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<RangeCapabilities>
+  > OptionalRangeCapabilities;
 
   struct FullCapabilities {
     std::optional<boolean> delta;
@@ -5175,13 +5081,10 @@ namespace LCompilers::LanguageServerProtocol {
     FULL_CAPABILITIES,
   };
 
-  struct OptionalFullCapabilities {
-    OptionalFullCapabilitiesType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<FullCapabilities>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<FullCapabilities>
+  > OptionalFullCapabilities;
 
   struct SemanticTokensClientRequestCapabilities {
 
@@ -5192,7 +5095,7 @@ namespace LCompilers::LanguageServerProtocol {
      * range?: boolean | {
      * };
      */
-    optional_ptr<OptionalRangeCapabilities> range;
+    std::optional<OptionalRangeCapabilities> range;
 
     /**
      * The client will send the `textDocument/semanticTokens/full` request if
@@ -5202,7 +5105,7 @@ namespace LCompilers::LanguageServerProtocol {
      *   delta?: boolean;
      * };
      */
-    optional_ptr<OptionalFullCapabilities> full;
+    std::optional<OptionalFullCapabilities> full;
   };
 
   /**
@@ -5356,7 +5259,7 @@ namespace LCompilers::LanguageServerProtocol {
      * range?: boolean | {
      * };
      */
-    optional_ptr<OptionalRangeCapabilities> range;
+    std::optional<OptionalRangeCapabilities> range;
 
     /**
      * Server supports providing semantic tokens for a full document.
@@ -5365,7 +5268,7 @@ namespace LCompilers::LanguageServerProtocol {
      *   delta?: boolean;
      * };
      */
-    optional_ptr<OptionalFullCapabilities> full;
+    std::optional<OptionalFullCapabilities> full;
   };
 
   /**
@@ -5778,13 +5681,10 @@ namespace LCompilers::LanguageServerProtocol {
     MARKUP_CONTENT,
   };
 
-  struct StringOrMarkupContent {
-    StringOrMarkupContentType type;
-    std::variant<
-      string,
-      std::unique_ptr<MarkupContent>
-    > value;
-  };
+  typedef std::variant<
+    string,
+    std::unique_ptr<MarkupContent>
+  > StringOrMarkupContent;
 
   /**
    * An inlay hint label part allows for interactive and composite labels
@@ -5808,7 +5708,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tooltip?: string | MarkupContent;
      */
-    optional_ptr<StringOrMarkupContent> tooltip;
+    std::optional<StringOrMarkupContent> tooltip;
 
     /**
      * An optional source code location that represents this label part.
@@ -5874,13 +5774,10 @@ namespace LCompilers::LanguageServerProtocol {
     INLAY_HINT_LABEL_PART,
   };
 
-  struct StringOrInlayHintLabelParts {
-    StringOrInlayHintLabelPartsType type;
-    std::variant<
-      string,
-      ptr_vector<InlayHintLabelPart>
-    > value;
-  };
+  typedef std::variant<
+    string,
+    ptr_vector<InlayHintLabelPart>
+  > StringOrInlayHintLabelParts;
 
   /**
    * Inlay hint information.
@@ -5924,7 +5821,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * label: string | InlayHintLabelPart[];
      */
-    std::unique_ptr<StringOrInlayHintLabelParts> label;
+    StringOrInlayHintLabelParts label;
 
     /**
      * The kind of this hint. Can be omitted in which case the client
@@ -5956,7 +5853,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tooltip?: string | MarkupContent;
      */
-    optional_ptr<StringOrMarkupContent> tooltip;
+    std::optional<StringOrMarkupContent> tooltip;
 
     /**
      * Render padding before the hint.
@@ -6318,14 +6215,11 @@ namespace LCompilers::LanguageServerProtocol {
    *
    * @since 3.17.0
    */
-  struct InlineValue {
-    InlineValueType type;
-    std::variant<
-      std::unique_ptr<InlineValueText>,
-      std::unique_ptr<InlineValueVariableLookup>,
-      std::unique_ptr<InlineValueEvaluatableExpression>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<InlineValueText>,
+    std::unique_ptr<InlineValueVariableLookup>,
+    std::unique_ptr<InlineValueEvaluatableExpression>
+  > InlineValue;
 
   /**
    * Client workspace capabilities specific to inline values.
@@ -7283,13 +7177,10 @@ namespace LCompilers::LanguageServerProtocol {
     INSERT_REPLACE_EDIT,
   };
 
-  struct TextEditOrInsertReplaceEdit {
-    TextEditOrInsertReplaceEditType type;
-    std::variant<
-      std::unique_ptr<TextEdit>,
-      std::unique_ptr<InsertReplaceEdit>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<TextEdit>,
+    std::unique_ptr<InsertReplaceEdit>
+  > TextEditOrInsertReplaceEdit;
 
   struct CompletionItem {
 
@@ -7346,7 +7237,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * documentation?: string | MarkupContent;
      */
-    optional_ptr<StringOrMarkupContent> documentation;
+    std::optional<StringOrMarkupContent> documentation;
 
     /**
      * Indicates if this item is deprecated.
@@ -7450,7 +7341,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0 additional type `InsertReplaceEdit`
      */
-    optional_ptr<TextEditOrInsertReplaceEdit> textEdit;
+    std::optional<TextEditOrInsertReplaceEdit> textEdit;
 
     /**
      * The edit text used if the completion item is part of a CompletionList and
@@ -7519,13 +7410,10 @@ namespace LCompilers::LanguageServerProtocol {
     INSERT_REPLACE,
   };
 
-  struct RangeOrInsertReplace {
-    RangeOrInsertReplaceType type;
-    std::variant<
-      std::unique_ptr<Range>,
-      std::unique_ptr<InsertReplace>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<Range>,
+    std::unique_ptr<InsertReplace>
+  > RangeOrInsertReplace;
 
   struct CompletionListItemDefaults {
 
@@ -7548,7 +7436,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<RangeOrInsertReplace> editRange;
+    std::optional<RangeOrInsertReplace> editRange;
 
     /**
      * A default insert text format
@@ -8075,13 +7963,10 @@ namespace LCompilers::LanguageServerProtocol {
     UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
   };
 
-  struct FullOrUnchangedDocumentDiagnosticReport {
-    FullOrUnchangedDocumentDiagnosticReportType type;
-    std::variant<
-      std::unique_ptr<FullDocumentDiagnosticReport>,
-      std::unique_ptr<UnchangedDocumentDiagnosticReport>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<FullDocumentDiagnosticReport>,
+    std::unique_ptr<UnchangedDocumentDiagnosticReport>
+  > FullOrUnchangedDocumentDiagnosticReport;
 
   /**
    * A full diagnostic report with a set of related documents.
@@ -8112,7 +7997,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<std::map<string, FullOrUnchangedDocumentDiagnosticReport>> relatedDocuments;
+    std::optional<std::map<string, FullOrUnchangedDocumentDiagnosticReport>> relatedDocuments;
   };
 
   /**
@@ -8144,7 +8029,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<std::map<string, FullOrUnchangedDocumentDiagnosticReport>> relatedDocuments;
+    std::optional<std::map<string, FullOrUnchangedDocumentDiagnosticReport>> relatedDocuments;
   };
 
   /**
@@ -8183,13 +8068,10 @@ namespace LCompilers::LanguageServerProtocol {
    *
    * @since 3.17.0
    */
-  struct DocumentDiagnosticReport {
-    DocumentDiagnosticReportType type;
-    std::variant<
-      std::unique_ptr<RelatedFullDocumentDiagnosticReport>,
-      std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<RelatedFullDocumentDiagnosticReport>,
+    std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport>
+  > DocumentDiagnosticReport;
 
   /**
    * A partial result for a document diagnostic report.
@@ -8211,7 +8093,7 @@ namespace LCompilers::LanguageServerProtocol {
      *     FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
      * };
      */
-    std::unique_ptr<std::map<string, FullOrUnchangedDocumentDiagnosticReport>> relatedDocuments;
+    std::map<string, FullOrUnchangedDocumentDiagnosticReport> relatedDocuments;
   };
 
   /**
@@ -8332,13 +8214,10 @@ namespace LCompilers::LanguageServerProtocol {
    *
    * @since 3.17.0
    */
-  struct WorkspaceDocumentDiagnosticReport {
-    WorkspaceDocumentDiagnosticReportType type;
-    std::variant<
-      std::unique_ptr<WorkspaceFullDocumentDiagnosticReport>,
-      std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<WorkspaceFullDocumentDiagnosticReport>,
+    std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport>
+  > WorkspaceDocumentDiagnosticReport;
 
   /**
    * A workspace diagnostic report.
@@ -8367,7 +8246,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * items: WorkspaceDocumentDiagnosticReport[];
      */
-    ptr_vector<WorkspaceDocumentDiagnosticReport> items;
+    std::vector<WorkspaceDocumentDiagnosticReport> items;
   };
 
   /**
@@ -8384,7 +8263,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * items: WorkspaceDocumentDiagnosticReport[];
      */
-    ptr_vector<WorkspaceDocumentDiagnosticReport> items;
+    std::vector<WorkspaceDocumentDiagnosticReport> items;
   };
 
   /**
@@ -8692,13 +8571,10 @@ namespace LCompilers::LanguageServerProtocol {
     UINTEGER_PAIR,
   };
 
-  struct StringOrUintegerPair {
-    StringOrUintegerPairType type;
-    std::variant<
-      string,
-      std::unique_ptr<std::pair<uinteger, uinteger>>
-    > value;
-  };
+  typedef std::variant<
+    string,
+    std::unique_ptr<std::pair<uinteger, uinteger>>
+  > StringOrUintegerPair;
 
   /**
    * Represents a parameter of a callable-signature. A parameter can have a
@@ -8725,7 +8601,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * label: string | [uinteger, uinteger];
      */
-    std::unique_ptr<StringOrUintegerPair> label;
+    StringOrUintegerPair label;
 
     /**
      * The human-readable doc-comment of this parameter. Will be shown in the UI
@@ -8733,7 +8609,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * documentation?: string | MarkupContent;
      */
-    optional_ptr<StringOrMarkupContent> documentation;
+    std::optional<StringOrMarkupContent> documentation;
   };
 
   /**
@@ -8762,7 +8638,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * documentation?: string | MarkupContent;
      */
-    optional_ptr<StringOrMarkupContent> documentation;
+    std::optional<StringOrMarkupContent> documentation;
 
     /**
      * The parameters of this signature.
@@ -9817,14 +9693,11 @@ namespace LCompilers::LanguageServerProtocol {
     STRING,
   };
 
-  struct BooleanOrIntegerOrString {
-    BooleanOrIntegerOrStringType type;
-    std::variant<
-      boolean,
-      integer,
-      string
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    integer,
+    string
+  > BooleanOrIntegerOrString;
 
   /**
    * Value-object describing what options formatting should use.
@@ -10572,13 +10445,10 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_URI,
   };
 
-  struct LocationOrDocumentUri {
-    LocationOrDocumentUriType type;
-    std::variant<
-      std::unique_ptr<Location>,
-      std::unique_ptr<DocumentUriLocation>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<Location>,
+    std::unique_ptr<DocumentUriLocation>
+  > LocationOrDocumentUri;
 
   /**
    * A special workspace symbol that supports locations without a range
@@ -10648,7 +10518,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * See also `SymbolInformation.location`.
      */
-    std::unique_ptr<LocationOrDocumentUri> location;
+    LocationOrDocumentUri location;
 
     /**
      * A data entry field that is preserved on a workspace symbol between a
@@ -10797,13 +10667,10 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN,
   };
 
-  struct StringOrBoolean {
-    StringOrBooleanType type;
-    std::variant<
-      string,
-      boolean
-    > value;
-  };
+  typedef std::variant<
+    string,
+    boolean
+  > StringOrBoolean;
 
   /**
    * Many tools support more than one root folder per workspace. Examples for
@@ -10855,7 +10722,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * changeNotifications?: string | boolean;
      */
-    optional_ptr<StringOrBoolean> changeNotifications;
+    std::optional<StringOrBoolean> changeNotifications;
   };
 
   /**
@@ -11468,13 +11335,10 @@ namespace LCompilers::LanguageServerProtocol {
     URI,
   };
 
-  struct WorkspaceFolderOrUri {
-    WorkspaceFolderOrUriType type;
-    std::variant<
-      std::unique_ptr<WorkspaceFolder>,
-      URI
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<WorkspaceFolder>,
+    URI
+  > WorkspaceFolderOrUri;
 
   /**
    * A relative pattern is a helper to construct glob patterns that are matched
@@ -11496,7 +11360,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * baseUri: WorkspaceFolder | URI;
      */
-    std::unique_ptr<WorkspaceFolderOrUri> baseUri;
+    WorkspaceFolderOrUri baseUri;
 
     /**
      * The actual glob pattern;
@@ -11554,13 +11418,10 @@ namespace LCompilers::LanguageServerProtocol {
    *
    * @since 3.17.0
    */
-  struct GlobPattern {
-    GlobPatternType type;
-    std::variant<
-      Pattern,
-      std::unique_ptr<RelativePattern>
-    > value;
-  };
+  typedef std::variant<
+    Pattern,
+    std::unique_ptr<RelativePattern>
+  > GlobPattern;
 
   /**
    * export interface FileSystemWatcher {
@@ -11578,7 +11439,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0 support for relative patterns.
      */
-    std::unique_ptr<GlobPattern> globPattern;
+    GlobPattern globPattern;
 
     /**
      * The kind of events of interest. If omitted it defaults to
@@ -12212,7 +12073,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * token: ProgressToken;
      */
-    std::unique_ptr<ProgressToken> token;
+    ProgressToken token;
   };
 
   /**
@@ -12237,7 +12098,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * token: ProgressToken;
      */
-    std::unique_ptr<ProgressToken> token;
+    ProgressToken token;
   };
 
   // ---------------------------------------------------------------------------
@@ -12782,27 +12643,21 @@ namespace LCompilers::LanguageServerProtocol {
     string pattern;
   };
 
-  struct NotebookDocumentFilter {
-    NotebookDocumentFilterType type;
-    std::variant<
-      std::unique_ptr<NotebookTypeDocumentFilter>,
-      std::unique_ptr<NotebookSchemeDocumentFilter>,
-      std::unique_ptr<NotebookPatternDocumentFilter>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<NotebookTypeDocumentFilter>,
+    std::unique_ptr<NotebookSchemeDocumentFilter>,
+    std::unique_ptr<NotebookPatternDocumentFilter>
+  > NotebookDocumentFilter;
 
   enum class StringOrNotebookDocumentFilterType {
     STRING,
     NOTEBOOK_DOCUMENT_FILTER,
   };
 
-  struct StringOrNotebookDocumentFilter {
-    StringOrNotebookDocumentFilterType type;
-    std::variant<
-      string,
-      std::unique_ptr<NotebookDocumentFilter>
-    > value;
-  };
+  typedef std::variant<
+    string,
+    std::unique_ptr<NotebookDocumentFilter>
+  > StringOrNotebookDocumentFilter;
 
   /**
    * A notebook cell text document filter denotes a cell text
@@ -13474,13 +13329,10 @@ namespace LCompilers::LanguageServerProtocol {
     SAVE_OPTIONS,
   };
 
-  struct SaveOrOptions {
-    SaveOrOptionsType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<SaveOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<SaveOptions>
+  > SaveOrOptions;
 
   /**
    * export interface TextDocumentSyncOptions {
@@ -13533,7 +13385,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * save?: boolean | SaveOptions;
      */
-    optional_ptr<SaveOrOptions> save;
+    std::optional<SaveOrOptions> save;
   };
 
   enum class TextDocumentSyncType {
@@ -13547,13 +13399,10 @@ namespace LCompilers::LanguageServerProtocol {
    * TextDocumentSyncKind number. If omitted it defaults to
    * `TextDocumentSyncKind.None`.
    */
-  struct TextDocumentSync {
-    TextDocumentSyncType type;
-    std::variant<
-      std::unique_ptr<TextDocumentSyncOptions>,
-      TextDocumentSyncKind
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<TextDocumentSyncOptions>,
+    TextDocumentSyncKind
+  > TextDocumentSync;
 
   struct PartialTextDocumentContentChangeEvent {
 
@@ -13600,13 +13449,10 @@ namespace LCompilers::LanguageServerProtocol {
    * An event describing a change to a text document. If only a text is provided
    * it is considered to be the full content of the document.
    */
-  struct TextDocumentContentChangeEvent {
-    TextDocumentContentChangeEventType type;
-    std::variant<
-      std::unique_ptr<PartialTextDocumentContentChangeEvent>,
-      std::unique_ptr<WholeTextDocumentContentChangeEvent>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<PartialTextDocumentContentChangeEvent>,
+    std::unique_ptr<WholeTextDocumentContentChangeEvent>
+  > TextDocumentContentChangeEvent;
 
   struct NotebookSelectorCell {
     string language;
@@ -13620,7 +13466,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * notebook: string | NotebookDocumentFilter;
      */
-    std::unique_ptr<StringOrNotebookDocumentFilter> notebook;
+    StringOrNotebookDocumentFilter notebook;
 
     /**
      * The cells of the matching notebook to be synced.
@@ -13638,7 +13484,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * notebook: string | NotebookDocumentFilter;
      */
-    optional_ptr<StringOrNotebookDocumentFilter> notebook;
+    std::optional<StringOrNotebookDocumentFilter> notebook;
 
     /**
      * The cells of the matching notebook to be synced.
@@ -13653,13 +13499,10 @@ namespace LCompilers::LanguageServerProtocol {
     CELLS_REQUIRED,
   };
 
-  struct NotebookSelector {
-    NotebookSelectorType type;
-    std::variant<
-      std::unique_ptr<NotebookRequiredNotebookSelector>,
-      std::unique_ptr<CellsRequiredNotebookSelector>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<NotebookRequiredNotebookSelector>,
+    std::unique_ptr<CellsRequiredNotebookSelector>
+  > NotebookSelector;
 
   /**
    * Options specific to a notebook plus its cells to be synced to the server.
@@ -13697,7 +13540,7 @@ namespace LCompilers::LanguageServerProtocol {
      *   cells: { language: string }[];
      * })[];
      */
-    ptr_vector<NotebookSelector> notebookSelector;
+    std::vector<NotebookSelector> notebookSelector;
 
     /**
      * Whether save notification should be forwarded to the server. Will only be
@@ -13872,7 +13715,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * changes: TextDocumentContentChangeEvent[];
      */
-    ptr_vector<TextDocumentContentChangeEvent> changes;
+    std::vector<TextDocumentContentChangeEvent> changes;
   };
 
   struct NotebookDocumentChangeEventCells {
@@ -14072,26 +13915,20 @@ namespace LCompilers::LanguageServerProtocol {
     NOTEBOOK_DOCUMENT_SYNC_REGISTRATION_OPTIONS,
   };
 
-  struct NotebookDocumentSync {
-    NotebookDocumentSyncType type;
-    std::variant<
-      std::unique_ptr<NotebookDocumentSyncOptions>,
-      std::unique_ptr<NotebookDocumentSyncRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<NotebookDocumentSyncOptions>,
+    std::unique_ptr<NotebookDocumentSyncRegistrationOptions>
+  > NotebookDocumentSync;
 
   enum class HoverProviderType {
     BOOLEAN,
     HOVER_OPTIONS,
   };
 
-  struct HoverProvider {
-    HoverProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<HoverOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<HoverOptions>
+  > HoverProvider;
 
   enum class DeclarationProviderType {
     BOOLEAN,
@@ -14099,27 +13936,21 @@ namespace LCompilers::LanguageServerProtocol {
     DECLARATION_REGISTRATION_OPTIONS,
   };
 
-  struct DeclarationProvider {
-    DeclarationProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<DeclarationOptions>,
-      std::unique_ptr<DeclarationRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<DeclarationOptions>,
+    std::unique_ptr<DeclarationRegistrationOptions>
+  > DeclarationProvider;
 
   enum class DefinitionProviderType {
     BOOLEAN,
     DEFINITION_OPTIONS,
   };
 
-  struct DefinitionProvider {
-    DefinitionProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<DefinitionOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<DefinitionOptions>
+  > DefinitionProvider;
 
   enum class TypeDefinitionProviderType {
     BOOLEAN,
@@ -14127,14 +13958,11 @@ namespace LCompilers::LanguageServerProtocol {
     TYPE_DEFINITION_REGISTRATION_OPTIONS,
   };
 
-  struct TypeDefinitionProvider {
-    TypeDefinitionProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<TypeDefinitionOptions>,
-      std::unique_ptr<TypeDefinitionRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<TypeDefinitionOptions>,
+    std::unique_ptr<TypeDefinitionRegistrationOptions>
+  > TypeDefinitionProvider;
 
   enum class ImplementationProviderType {
     BOOLEAN,
@@ -14142,66 +13970,51 @@ namespace LCompilers::LanguageServerProtocol {
     IMPLEMENTATION_REGISTRATION_OPTIONS,
   };
 
-  struct ImplementationProvider {
-    ImplementationProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<ImplementationOptions>,
-      std::unique_ptr<ImplementationRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<ImplementationOptions>,
+    std::unique_ptr<ImplementationRegistrationOptions>
+  > ImplementationProvider;
 
   enum class ReferencesProviderType {
     BOOLEAN,
     REFERENCE_OPTIONS,
   };
 
-  struct ReferencesProvider {
-    ReferencesProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<ReferenceOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<ReferenceOptions>
+  > ReferencesProvider;
 
   enum class DocumentHighlightProviderType {
     BOOLEAN,
     DOCUMENT_HIGHLIGHT_OPTIONS,
   };
 
-  struct DocumentHighlightProvider {
-    DocumentHighlightProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<DocumentHighlightOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<DocumentHighlightOptions>
+  > DocumentHighlightProvider;
 
   enum class DocumentSymbolProviderType {
     BOOLEAN,
     DOCUMENT_SYMBOL_OPTIONS,
   };
 
-  struct DocumentSymbolProvider {
-    DocumentSymbolProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<DocumentSymbolOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<DocumentSymbolOptions>
+  > DocumentSymbolProvider;
 
   enum class CodeActionProviderType {
     BOOLEAN,
     CODE_ACTION_OPTIONS,
   };
 
-  struct CodeActionProvider {
-    CodeActionProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<CodeActionOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<CodeActionOptions>
+  > CodeActionProvider;
 
   enum class ColorProviderType {
     BOOLEAN,
@@ -14209,53 +14022,41 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_COLOR_REGISTRATION_OPTIONS,
   };
 
-  struct ColorProvider {
-    ColorProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<DocumentColorOptions>,
-      std::unique_ptr<DocumentColorRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<DocumentColorOptions>,
+    std::unique_ptr<DocumentColorRegistrationOptions>
+  > ColorProvider;
 
   enum class DocumentFormattingProviderType {
     BOOLEAN,
     DOCUMENT_FORMATTING_OPTIONS,
   };
 
-  struct DocumentFormattingProvider {
-    DocumentFormattingProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<DocumentFormattingOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<DocumentFormattingOptions>
+  > DocumentFormattingProvider;
 
   enum class DocumentRangeFormattingProviderType {
     BOOLEAN,
     DOCUMENT_RANGE_FORMATTING_OPTIONS,
   };
 
-  struct DocumentRangeFormattingProvider {
-    DocumentRangeFormattingProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<DocumentRangeFormattingOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<DocumentRangeFormattingOptions>
+  > DocumentRangeFormattingProvider;
 
   enum class RenameProviderType {
     BOOLEAN,
     RENAME_OPTIONS,
   };
 
-  struct RenameProvider {
-    RenameProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<RenameOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<RenameOptions>
+  > RenameProvider;
 
   enum class FoldingRangeProviderType {
     BOOLEAN,
@@ -14263,14 +14064,11 @@ namespace LCompilers::LanguageServerProtocol {
     FOLDING_RANGE_REGISTRATION_OPTIONS,
   };
 
-  struct FoldingRangeProvider {
-    FoldingRangeProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<FoldingRangeOptions>,
-      std::unique_ptr<FoldingRangeRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<FoldingRangeOptions>,
+    std::unique_ptr<FoldingRangeRegistrationOptions>
+  > FoldingRangeProvider;
 
   enum class SelectionRangeProviderType {
     BOOLEAN,
@@ -14278,14 +14076,11 @@ namespace LCompilers::LanguageServerProtocol {
     SELECTION_RANGE_REGISTRATION_OPTIONS,
   };
 
-  struct SelectionRangeProvider {
-    SelectionRangeProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<SelectionRangeOptions>,
-      std::unique_ptr<SelectionRangeRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<SelectionRangeOptions>,
+    std::unique_ptr<SelectionRangeRegistrationOptions>
+  > SelectionRangeProvider;
 
   enum class LinkedEditingRangeProviderType {
     BOOLEAN,
@@ -14293,14 +14088,11 @@ namespace LCompilers::LanguageServerProtocol {
     LINKED_EDITING_RANGE_REGISTRATION_OPTIONS,
   };
 
-  struct LinkedEditingRangeProvider {
-    LinkedEditingRangeProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<LinkedEditingRangeOptions>,
-      std::unique_ptr<LinkedEditingRangeRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<LinkedEditingRangeOptions>,
+    std::unique_ptr<LinkedEditingRangeRegistrationOptions>
+  > LinkedEditingRangeProvider;
 
   enum class CallHierarchyProviderType {
     BOOLEAN,
@@ -14308,27 +14100,21 @@ namespace LCompilers::LanguageServerProtocol {
     CALL_HIERARCHY_REGISTRATION_OPTIONS,
   };
 
-  struct CallHierarchyProvider {
-    CallHierarchyProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<CallHierarchyOptions>,
-      std::unique_ptr<CallHierarchyRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<CallHierarchyOptions>,
+    std::unique_ptr<CallHierarchyRegistrationOptions>
+  > CallHierarchyProvider;
 
   enum class SemanticTokensProviderType {
     SEMANTIC_TOKENS_OPTIONS,
     SEMANTIC_TOKENS_REGISTRATION_OPTIONS,
   };
 
-  struct SemanticTokensProvider {
-    SemanticTokensProviderType type;
-    std::variant<
-      std::unique_ptr<SemanticTokensOptions>,
-      std::unique_ptr<SemanticTokensRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<SemanticTokensOptions>,
+    std::unique_ptr<SemanticTokensRegistrationOptions>
+  > SemanticTokensProvider;
 
   enum class MonikerProviderType {
     BOOLEAN,
@@ -14336,14 +14122,11 @@ namespace LCompilers::LanguageServerProtocol {
     MONIKER_REGISTRATION_OPTIONS,
   };
 
-  struct MonikerProvider {
-    MonikerProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<MonikerOptions>,
-      std::unique_ptr<MonikerRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<MonikerOptions>,
+    std::unique_ptr<MonikerRegistrationOptions>
+  > MonikerProvider;
 
   enum class TypeHierarchyProviderType {
     BOOLEAN,
@@ -14351,14 +14134,11 @@ namespace LCompilers::LanguageServerProtocol {
     TYPE_HIERARCHY_REGISTRATION_OPTIONS,
   };
 
-  struct TypeHierarchyProvider {
-    TypeHierarchyProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<TypeHierarchyOptions>,
-      std::unique_ptr<TypeHierarchyRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<TypeHierarchyOptions>,
+    std::unique_ptr<TypeHierarchyRegistrationOptions>
+  > TypeHierarchyProvider;
 
   enum class InlineValueProviderType {
     BOOLEAN,
@@ -14366,14 +14146,11 @@ namespace LCompilers::LanguageServerProtocol {
     INLINE_VALUE_REGISTRATION_OPTIONS,
   };
 
-  struct InlineValueProvider {
-    InlineValueProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<InlineValueOptions>,
-      std::unique_ptr<InlineValueRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<InlineValueOptions>,
+    std::unique_ptr<InlineValueRegistrationOptions>
+  > InlineValueProvider;
 
   enum class InlayHintProviderType {
     BOOLEAN,
@@ -14381,40 +14158,31 @@ namespace LCompilers::LanguageServerProtocol {
     INLAY_HINT_REGISTRATION_OPTIONS,
   };
 
-  struct InlayHintProvider {
-    InlayHintProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<InlayHintOptions>,
-      std::unique_ptr<InlayHintRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<InlayHintOptions>,
+    std::unique_ptr<InlayHintRegistrationOptions>
+  > InlayHintProvider;
 
   enum class DiagnosticProviderType {
     DIAGNOSTIC_OPTIONS,
     DIAGNOSTIC_REGISTRATION_OPTIONS,
   };
 
-  struct DiagnosticProvider {
-    DiagnosticProviderType type;
-    std::variant<
-      std::unique_ptr<DiagnosticOptions>,
-      std::unique_ptr<DiagnosticRegistrationOptions>
-    > value;
-  };
+  typedef std::variant<
+    std::unique_ptr<DiagnosticOptions>,
+    std::unique_ptr<DiagnosticRegistrationOptions>
+  > DiagnosticProvider;
 
   enum class WorkspaceSymbolProviderType {
     BOOLEAN,
     WORKSPACE_SYMBOL_OPTIONS,
   };
 
-  struct WorkspaceSymbolProvider {
-    WorkspaceSymbolProviderType type;
-    std::variant<
-      boolean,
-      std::unique_ptr<WorkspaceSymbolOptions>
-    > value;
-  };
+  typedef std::variant<
+    boolean,
+    std::unique_ptr<WorkspaceSymbolOptions>
+  > WorkspaceSymbolProvider;
 
   struct FileOperations {
 
@@ -14582,7 +14350,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * textDocumentSync?: TextDocumentSyncOptions | TextDocumentSyncKind;
      */
-    optional_ptr<TextDocumentSync> textDocumentSync;
+    std::optional<TextDocumentSync> textDocumentSync;
 
     /**
      * Defines how notebook documents are synced.
@@ -14592,7 +14360,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<NotebookDocumentSync> notebookDocumentSync;
+    std::optional<NotebookDocumentSync> notebookDocumentSync;
 
     /**
      * The server provides completion support.
@@ -14606,7 +14374,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * hoverProvider?: boolean | HoverOptions;
      */
-    optional_ptr<HoverProvider> hoverProvider;
+    std::optional<HoverProvider> hoverProvider;
 
     /**
      * The server provides signature help support.
@@ -14623,14 +14391,14 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.14.0
      */
-    optional_ptr<DeclarationProvider> declarationProvider;
+    std::optional<DeclarationProvider> declarationProvider;
 
     /**
      * The server provides goto definition support.
      *
      * definitionProvider?: boolean | DefinitionOptions;
      */
-    optional_ptr<DefinitionProvider> definitionProvider;
+    std::optional<DefinitionProvider> definitionProvider;
 
     /**
      * The server provides goto type definition support.
@@ -14640,7 +14408,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.6.0
      */
-    optional_ptr<TypeDefinitionProvider> typeDefinitionProvider;
+    std::optional<TypeDefinitionProvider> typeDefinitionProvider;
 
     /**
      * The server provides goto implementation support.
@@ -14650,28 +14418,28 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.6.0
      */
-    optional_ptr<ImplementationProvider> implementationProvider;
+    std::optional<ImplementationProvider> implementationProvider;
 
     /**
      * The server provides find references support.
      *
      * referencesProvider?: boolean | ReferenceOptions;
      */
-    optional_ptr<ReferencesProvider> referencesProvider;
+    std::optional<ReferencesProvider> referencesProvider;
 
     /**
      * The server provides document highlight support.
      *
      * documentHighlightProvider?: boolean | DocumentHighlightOptions;
      */
-    optional_ptr<DocumentHighlightProvider> documentHighlightProvider;
+    std::optional<DocumentHighlightProvider> documentHighlightProvider;
 
     /**
      * The server provides document symbol support.
      *
      * documentSymbolProvider?: boolean | DocumentSymbolOptions;
      */
-    optional_ptr<DocumentSymbolProvider> documentSymbolProvider;
+    std::optional<DocumentSymbolProvider> documentSymbolProvider;
 
     /**
      * The server provides code actions. The `CodeActionOptions` return type is
@@ -14680,7 +14448,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * codeActionProvider?: boolean | CodeActionOptions;
      */
-    optional_ptr<CodeActionProvider> codeActionProvider;
+    std::optional<CodeActionProvider> codeActionProvider;
 
     /**
      * The server provides code lens.
@@ -14704,21 +14472,21 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.6.0
      */
-    optional_ptr<ColorProvider> colorProvider;
+    std::optional<ColorProvider> colorProvider;
 
     /**
      * The server provides document formatting.
      *
      * documentFormattingProvider?: boolean | DocumentFormattingOptions;
      */
-    optional_ptr<DocumentFormattingProvider> documentFormattingProvider;
+    std::optional<DocumentFormattingProvider> documentFormattingProvider;
 
     /**
      * The server provides document range formatting.
      *
      * documentRangeFormattingProvider?: boolean | DocumentRangeFormattingOptions;
      */
-    optional_ptr<DocumentRangeFormattingProvider> documentRangeFormattingProvider;
+    std::optional<DocumentRangeFormattingProvider> documentRangeFormattingProvider;
 
     /**
      * The server provides document formatting on typing.
@@ -14734,7 +14502,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * renameProvider?: boolean | RenameOptions;
      */
-    optional_ptr<RenameProvider> renameProvider;
+    std::optional<RenameProvider> renameProvider;
 
     /**
      * The server provides folding provider support.
@@ -14744,7 +14512,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.10.0
      */
-    optional_ptr<FoldingRangeProvider> foldingRangeProvider;
+    std::optional<FoldingRangeProvider> foldingRangeProvider;
 
     /**
      * The server provides execute command support.
@@ -14761,7 +14529,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.15.0
      */
-    optional_ptr<SelectionRangeProvider> selectionRangeProvider;
+    std::optional<SelectionRangeProvider> selectionRangeProvider;
 
     /**
      * The server provides linked editing range support.
@@ -14771,7 +14539,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    optional_ptr<LinkedEditingRangeProvider> linkedEditingRangeProvider;
+    std::optional<LinkedEditingRangeProvider> linkedEditingRangeProvider;
 
     /**
      * The server provides call hierarchy support.
@@ -14781,7 +14549,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    optional_ptr<CallHierarchyProvider> callHierarchyProvider;
+    std::optional<CallHierarchyProvider> callHierarchyProvider;
 
     /**
      * The server provides semantic tokens support.
@@ -14791,7 +14559,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    optional_ptr<SemanticTokensProvider> semanticTokensProvider;
+    std::optional<SemanticTokensProvider> semanticTokensProvider;
 
     /**
      * Whether server provides moniker support.
@@ -14800,7 +14568,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    optional_ptr<MonikerProvider> monikerProvider;
+    std::optional<MonikerProvider> monikerProvider;
 
     /**
      * The server provides type hierarchy support.
@@ -14810,7 +14578,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<TypeHierarchyProvider> typeHierarchyProvider;
+    std::optional<TypeHierarchyProvider> typeHierarchyProvider;
 
     /**
      * The server provides inline values.
@@ -14820,7 +14588,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<InlineValueProvider> inlineValueProvider;
+    std::optional<InlineValueProvider> inlineValueProvider;
 
     /**
      * The server provides inlay hints.
@@ -14830,7 +14598,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<InlayHintProvider> inlayHintProvider;
+    std::optional<InlayHintProvider> inlayHintProvider;
 
     /**
      * The server has support for pull model diagnostics.
@@ -14839,14 +14607,14 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    optional_ptr<DiagnosticProvider> diagnosticProvider;
+    std::optional<DiagnosticProvider> diagnosticProvider;
 
     /**
      * The server provides workspace symbol support.
      *
      * workspaceSymbolProvider?: boolean | WorkspaceSymbolOptions;
      */
-    optional_ptr<WorkspaceSymbolProvider> workspaceSymbolProvider;
+    std::optional<WorkspaceSymbolProvider> workspaceSymbolProvider;
 
     /**
      * Workspace specific server capabilities
@@ -15394,7 +15162,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * contentChanges: TextDocumentContentChangeEvent[];
      */
-    ptr_vector<TextDocumentContentChangeEvent> contentChanges;
+    std::vector<TextDocumentContentChangeEvent> contentChanges;
   };
 
   /**
@@ -15528,13 +15296,10 @@ namespace LCompilers::LanguageServerProtocol {
    * - error: code and message set in case an exception happens during the
    *   textDocument/willSaveWaitUntil request.
    */
-  struct WillSaveWaitUntilResult {
-    WillSaveWaitUntilResultType type;
-    std::variant<
-      ptr_vector<TextEdit>,
-      null
-    > value;
-  };
+  typedef std::variant<
+    ptr_vector<TextEdit>,
+    null
+  > WillSaveWaitUntilResult;
 
   /**
    * The capability indicates that the server is interested in
@@ -15631,6 +15396,7 @@ namespace LCompilers::LanguageServerProtocol {
     GOTO_IMPLEMENTATION,
     FIND_REFERENCES,
     PREPARE_CALL_HIERARCHY,
+    CALL_HIERARCHY_INCOMING_CALLS,
     PREPARE_TYPE_HIERARCHY,
     TYPE_HIERARCHY_SUPERTYPES,
     TYPE_HIERARCHY_SUBTYPES,

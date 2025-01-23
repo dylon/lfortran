@@ -49,11 +49,7 @@ namespace LCompilers::LanguageServerProtocol {
       rapidjson::Document::AllocatorType &allocator
     ) const -> rapidjson::Value;
     auto lspToJson(
-      const NotificationParams &params,
-      rapidjson::Document::AllocatorType &allocator
-    ) const -> rapidjson::Value;
-    auto lspToJson(
-      const RequestParams &params,
+      const MessageParams &params,
       rapidjson::Document::AllocatorType &allocator
     ) const -> rapidjson::Value;
     auto lspToJson(
@@ -82,13 +78,10 @@ namespace LCompilers::LanguageServerProtocol {
   private:
     auto buildRequestId(
       const rapidjson::Value &jsonId
-    ) const -> std::unique_ptr<RequestId>;
-    auto buildRequestParams(
+    ) const -> RequestId;
+    auto buildMessageParams(
       const rapidjson::Value &jsonParams
-    ) const -> std::unique_ptr<RequestParams>;
-    auto buildNotificationParams(
-      const rapidjson::Value &jsonParams
-    ) const -> std::unique_ptr<NotificationParams>;
+    ) const -> MessageParams;
     auto jsonToLsp(
       const rapidjson::Value &json
     ) const -> std::unique_ptr<LSPAny>;
