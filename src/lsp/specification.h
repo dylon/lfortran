@@ -68,6 +68,9 @@ namespace LCompilers::LanguageServerProtocol {
 
   typedef std::string string;
 
+  // NOTE: This is a wrapper around std::variant because the types `LSPAny`,
+  // `LSPObject`, and `LSPArray` are mutually recursive and cannot be easily
+  // forward-declared otherwise.
   struct LSPAny;  // Forward declaration
 
   /**
@@ -114,7 +117,6 @@ namespace LCompilers::LanguageServerProtocol {
    * @since 3.17.0
    */
   struct LSPAny {
-    LSPAnyType type;
     // NOTE: `value` was implemented as a `union` but `std::string` values kept
     // causing segfaults.
     std::variant<
@@ -3496,6 +3498,16 @@ namespace LCompilers::LanguageServerProtocol {
     ptr_vector<Range> fromRanges;
   };
 
+  enum class CallHierarchyOutgoingCallsResultType {
+    CALL_HIERARCHY_OUTGOING_CALL_ARRAY = 0,
+    LSP_NULL = 1,
+  };
+
+  typedef std::variant<
+    ptr_vector<CallHierarchyOutgoingCall>,
+    null
+  > CallHierarchyOutgoingCallsResult;
+
   /**
    * The type hierarchy request is sent from the client to the server to return
    * a type hierarchy for the language element of given text document positions.
@@ -3609,7 +3621,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * tags?: SymbolTag[];
      */
-    optional_ptr_vector<SymbolTag> tags;
+    optional_vector<SymbolTag> tags;
 
     /**
      * More detail for this item, e.g. the signature of a function.
@@ -3652,6 +3664,16 @@ namespace LCompilers::LanguageServerProtocol {
      */
     optional_ptr<LSPAny> data;
   };
+
+  enum class TypeHierarchyResultType {
+    TYPE_HIERARCHY_ITEM_ARRAY,
+    LSP_NULL,
+  };
+
+  typedef std::variant<
+    ptr_vector<TypeHierarchyItem>,
+    null
+  > TypeHierarchyResult;
 
   /**
    * The request is sent from the client to the server to resolve the supertypes
@@ -3859,6 +3881,16 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<DocumentHighlightKind> kind;
   };
 
+  enum class DocumentHighlightResultType {
+    DOCUMENT_HIGHLIGHT_ARRAY,
+    LSP_NULL,
+  };
+
+  typedef std::variant<
+    ptr_vector<DocumentHighlight>,
+    null
+  > DocumentHighlightResult;
+
   /**
    * The document links request is sent from the client to the server to request
    * the location of links in a document.
@@ -4000,6 +4032,16 @@ namespace LCompilers::LanguageServerProtocol {
      */
     optional_ptr<LSPAny> data;
   };
+
+  enum class DocumentLinkResultType {
+    DOCUMENT_LINK_ARRAY,
+    LSP_NULL,
+  };
+
+  typedef std::variant<
+    ptr_vector<DocumentLink>,
+    null
+  > DocumentLinkResult;
 
   // --------------------------------------------------------------------------
   // Document Link Resolve Request
@@ -15397,9 +15439,12 @@ namespace LCompilers::LanguageServerProtocol {
     FIND_REFERENCES,
     PREPARE_CALL_HIERARCHY,
     CALL_HIERARCHY_INCOMING_CALLS,
+    CALL_HIERARCHY_OUTGOING_CALLS,
     PREPARE_TYPE_HIERARCHY,
     TYPE_HIERARCHY_SUPERTYPES,
     TYPE_HIERARCHY_SUBTYPES,
+    HIGHLIGHT_DOCUMENT,
+    EXTRACT_DOCUMENT_LINKS,
     WORKSPACE_SYMBOL,
     RESOLVE_WORKSPACE_SYMBOL,
     CREATE_FILES,

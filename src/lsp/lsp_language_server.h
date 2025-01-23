@@ -87,6 +87,24 @@ namespace LCompilers::LanguageServerProtocol {
     auto callHierarchyIncomingCalls(
       const CallHierarchyIncomingCallsParams &params
     ) -> CallHierarchyIncomingCallsResult;
+    auto callHierarchyOutgoingCalls(
+      const CallHierarchyOutgoingCallsParams &params
+    ) -> CallHierarchyOutgoingCallsResult;
+    auto prepareTypeHierarchy(
+      const TypeHierarchyPrepareParams &params
+    ) -> TypeHierarchyResult;
+    auto typeHierarchySupertypes(
+      const TypeHierarchySupertypesParams &params
+    ) -> TypeHierarchyResult;
+    auto typeHierarchySubtypes(
+      const TypeHierarchySubtypesParams &params
+    ) -> TypeHierarchyResult;
+    auto highlightDocument(
+      const DocumentHighlightParams &params
+    ) -> DocumentHighlightResult;
+    auto extractDocumentLinks(
+      const DocumentLinkParams &params
+    ) -> DocumentLinkResult;
     auto shutdown() -> void;
 
     // notification: client -> server

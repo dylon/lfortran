@@ -37,6 +37,24 @@ namespace LCompilers::LanguageServerProtocol {
     auto asCallHierarchyIncomingCallsParams(
       const MessageParams &requestParams
     ) const -> CallHierarchyIncomingCallsParams;
+    auto asCallHierarchyOutgoingCallsParams(
+      const MessageParams &requestParams
+    ) const -> CallHierarchyOutgoingCallsParams;
+    auto asTypeHierarchyPrepareParams(
+      const MessageParams &requestParams
+    ) const -> TypeHierarchyPrepareParams;
+    auto asTypeHierarchySupertypesParams(
+      const MessageParams &requestParams
+    ) const -> TypeHierarchySupertypesParams;
+    auto asTypeHierarchySubtypesParams(
+      const MessageParams &requestParams
+    ) const -> TypeHierarchySubtypesParams;
+    auto asDocumentHighlightParams(
+      const MessageParams &requestParams
+    ) const -> DocumentHighlightParams;
+    auto asDocumentLinkParams(
+      const MessageParams &requestParams
+    ) const -> DocumentLinkParams;
 
     auto asCancelParams(
       const MessageParams &notificationParams
@@ -85,6 +103,9 @@ namespace LCompilers::LanguageServerProtocol {
       const LogTraceParams &logTraceParams
     ) const -> MessageParams;
 
+    auto anyToTypeHierarchyItem(
+      const LSPAny &any
+    ) const -> std::unique_ptr<TypeHierarchyItem>;
     auto anyToCallHierarchyItem(
       const LSPAny &any
     ) const -> std::unique_ptr<CallHierarchyItem>;
@@ -510,7 +531,52 @@ namespace LCompilers::LanguageServerProtocol {
     auto lspToAny(
       const CallHierarchyIncomingCall &call
     ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const CallHierarchyOutgoingCallsResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const CallHierarchyOutgoingCall &call
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const TypeHierarchyResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const TypeHierarchyItem &item
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      SymbolKind kind
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      SymbolTag tag
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const DocumentHighlightResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const DocumentHighlight &highlight
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      DocumentHighlightKind kind
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const DocumentLinkResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const DocumentLink &link
+    ) const -> std::unique_ptr<LSPAny>;
 
+    auto lspToObject(
+      const DocumentLink &link
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const DocumentHighlight &highlight
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const TypeHierarchyItem &item
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const CallHierarchyOutgoingCall &call
+    ) const -> std::unique_ptr<LSPObject>;
     auto lspToObject(
       const CallHierarchyIncomingCall &call
     ) const -> std::unique_ptr<LSPObject>;

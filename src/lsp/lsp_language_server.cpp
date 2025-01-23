@@ -249,6 +249,61 @@ namespace LCompilers::LanguageServerProtocol {
       response.result = transformer.lspToAny(result);
       break;
     }
+    case RequestMethod::CALL_HIERARCHY_OUTGOING_CALLS: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      CallHierarchyOutgoingCallsParams params =
+        transformer.asCallHierarchyOutgoingCallsParams(requestParams);
+      CallHierarchyOutgoingCallsResult result =
+        callHierarchyOutgoingCalls(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::PREPARE_TYPE_HIERARCHY: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      TypeHierarchyPrepareParams params =
+        transformer.asTypeHierarchyPrepareParams(requestParams);
+      TypeHierarchyResult result = prepareTypeHierarchy(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::TYPE_HIERARCHY_SUPERTYPES: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      TypeHierarchySupertypesParams params =
+        transformer.asTypeHierarchySupertypesParams(requestParams);
+      TypeHierarchyResult result = typeHierarchySupertypes(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::TYPE_HIERARCHY_SUBTYPES: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      TypeHierarchySubtypesParams params =
+        transformer.asTypeHierarchySubtypesParams(requestParams);
+      TypeHierarchyResult result = typeHierarchySubtypes(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::HIGHLIGHT_DOCUMENT: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      DocumentHighlightParams params =
+        transformer.asDocumentHighlightParams(requestParams);
+      DocumentHighlightResult result = highlightDocument(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::EXTRACT_DOCUMENT_LINKS: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      DocumentLinkParams params =
+        transformer.asDocumentLinkParams(requestParams);
+      DocumentLinkResult result = extractDocumentLinks(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
     case RequestMethod::SHUTDOWN: {
       shutdown();
       break;
@@ -555,6 +610,84 @@ namespace LCompilers::LanguageServerProtocol {
       std::format(
         "No handler exists for request=\"{}\"",
         RequestMethodValues.at(RequestMethod::CALL_HIERARCHY_INCOMING_CALLS)
+      )
+    );
+  }
+
+  // request: "callHierarchy/outgoingCalls"
+  auto LspLanguageServer::callHierarchyOutgoingCalls(
+    const CallHierarchyOutgoingCallsParams &params
+  ) -> CallHierarchyOutgoingCallsResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::CALL_HIERARCHY_OUTGOING_CALLS)
+      )
+    );
+  }
+
+  // request: "textDocument/prepareTypeHierarchy"
+  auto LspLanguageServer::prepareTypeHierarchy(
+    const TypeHierarchyPrepareParams &params
+  ) -> TypeHierarchyResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::PREPARE_TYPE_HIERARCHY)
+      )
+    );
+  }
+
+  // request: "typeHierarchy/supertypes"
+  auto LspLanguageServer::typeHierarchySupertypes(
+    const TypeHierarchySupertypesParams &params
+  ) -> TypeHierarchyResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TYPE_HIERARCHY_SUPERTYPES)
+      )
+    );
+  }
+
+  // request: "textDocument/documentHighlight"
+  auto LspLanguageServer::highlightDocument(
+    const DocumentHighlightParams &params
+  ) -> DocumentHighlightResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::HIGHLIGHT_DOCUMENT)
+      )
+    );
+  }
+
+  // request: "textDocument/documentLink"
+  auto LspLanguageServer::extractDocumentLinks(
+    const DocumentLinkParams &params
+  ) -> DocumentLinkResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::HIGHLIGHT_DOCUMENT)
+      )
+    );
+  }
+
+  // request: "typeHierarchy/subtypes"
+  auto LspLanguageServer::typeHierarchySubtypes(
+    const TypeHierarchySubtypesParams &params
+  ) -> TypeHierarchyResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TYPE_HIERARCHY_SUBTYPES)
       )
     );
   }

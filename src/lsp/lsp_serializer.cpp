@@ -246,7 +246,7 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &lspAny,
     rapidjson::Document::AllocatorType &allocator
   ) const -> rapidjson::Value {
-    switch (lspAny.type) {
+    switch (static_cast<LSPAnyType>(lspAny.value.index())) {
     case LSPAnyType::LSP_OBJECT: {
       const LSPObject &object =
         *std::get<std::unique_ptr<LSPObject>>(lspAny.value);
@@ -385,18 +385,15 @@ namespace LCompilers::LanguageServerProtocol {
     std::unique_ptr<LSPAny> lspAny = std::make_unique<LSPAny>();
     switch (json.GetType()) {
     case rapidjson::kNullType: {
-      lspAny->type = LSPAnyType::LSP_NULL;
       lspAny->value = nullptr;
       break;
     }
     case rapidjson::kFalseType: // fallthrough
     case rapidjson::kTrueType: {
-      lspAny->type = LSPAnyType::LSP_BOOLEAN;
       lspAny->value = json.GetBool();
       break;
     }
     case rapidjson::kObjectType: {
-      lspAny->type = LSPAnyType::LSP_OBJECT;
       std::unique_ptr<LSPObject> lspObject = std::make_unique<LSPObject>();
       for (rapidjson::Value::ConstMemberIterator iter = json.MemberBegin();
            iter != json.MemberEnd();
@@ -407,7 +404,6 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case rapidjson::kArrayType: {
-      lspAny->type = LSPAnyType::LSP_ARRAY;
       std::unique_ptr<LSPArray> lspArray = std::make_unique<LSPArray>();
       for (rapidjson::Value::ConstValueIterator iter = json.Begin();
            iter != json.End();
@@ -418,19 +414,15 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case rapidjson::kStringType: {
-      lspAny->type = LSPAnyType::LSP_STRING;
       lspAny->value = json.GetString();
       break;
     }
     case rapidjson::kNumberType: {
       if (json.IsInt()) {
-        lspAny->type = LSPAnyType::LSP_INTEGER;
         lspAny->value = json.GetInt();
       } else if (json.IsDouble()) {
-        lspAny->type = LSPAnyType::LSP_DECIMAL;
         lspAny->value = json.GetDouble();
       } else if (json.IsUint()) {
-        lspAny->type = LSPAnyType::LSP_UINTEGER;
         lspAny->value = json.GetUint();
       } else {
         throw LspException(
