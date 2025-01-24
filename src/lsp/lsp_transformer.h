@@ -12,6 +12,11 @@ namespace LCompilers::LanguageServerProtocol {
   public:
 
     template <typename T>
+    auto asMessageParams(const T &params) const -> MessageParams {
+      return lspToObject(params);
+    }
+
+    template <typename T>
     auto lspToAny(
       const T &lsp
     ) const -> std::unique_ptr<LSPAny> {
@@ -145,19 +150,6 @@ namespace LCompilers::LanguageServerProtocol {
     auto asDidCloseNotebookDocumentParams(
       const MessageParams &notificationParams
     ) const -> DidCloseNotebookDocumentParams;
-
-    auto asMessageParams(
-      const RegistrationParams &registrationParams
-    ) const -> MessageParams;
-    auto asMessageParams(
-      const UnregistrationParams &unregistrationParams
-    ) const -> MessageParams;
-    auto asMessageParams(
-      const ProgressParams &progressParams
-    ) const -> MessageParams;
-    auto asMessageParams(
-      const LogTraceParams &logTraceParams
-    ) const -> MessageParams;
 
     auto anyToTypeHierarchyItem(
       const LSPAny &any
@@ -550,7 +542,7 @@ namespace LCompilers::LanguageServerProtocol {
       const FindReferencesResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
-      const ProgressToken &token
+      const IntegerOrString &variant
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const InitializeResult &result
@@ -618,7 +610,25 @@ namespace LCompilers::LanguageServerProtocol {
     auto lspToAny(
       const SemanticTokensResult &result
     ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const DiagnosticSeverity &severity
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const DiagnosticTag &tag
+    ) const -> std::unique_ptr<LSPAny>;
 
+    auto lspToObject(
+      const DiagnosticRelatedInformation &info
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const CodeDescription &description
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const Diagnostic &diagnostic
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const PublishDiagnosticsParams &params
+    ) const -> std::unique_ptr<LSPObject>;
     auto lspToObject(
       const SemanticTokens &tokens
     ) const -> std::unique_ptr<LSPObject>;

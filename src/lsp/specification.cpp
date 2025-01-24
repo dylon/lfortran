@@ -1181,6 +1181,7 @@ namespace LCompilers::LanguageServerProtocol {
     {ServerNotificationMethod::LOG_TRACE, "LOG_TRACE"},
     {ServerNotificationMethod::PROGRESS, "PROGRESS"},
     {ServerNotificationMethod::TELEMETRY_EVENT, "TELEMETRY_EVENT"},
+    {ServerNotificationMethod::TEXT_DOCUMENT_PUBLISH_DIAGNOSTICS, "TEXT_DOCUMENT_PUBLISH_DIAGNOSTICS"},
     {ServerNotificationMethod::WINDOW_SHOW_MESSAGE, "WINDOW_SHOW_MESSAGE"},
   };
 
@@ -1188,6 +1189,7 @@ namespace LCompilers::LanguageServerProtocol {
     {ServerNotificationMethod::LOG_TRACE, "$/logTrace"},
     {ServerNotificationMethod::PROGRESS, "$/progress"},
     {ServerNotificationMethod::TELEMETRY_EVENT, "telemetry/event"},
+    {ServerNotificationMethod::TEXT_DOCUMENT_PUBLISH_DIAGNOSTICS, "textDocument/publishDiagnostics"},
     {ServerNotificationMethod::WINDOW_SHOW_MESSAGE, "window/showMessage"},
   };
 

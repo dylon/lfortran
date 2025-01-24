@@ -1085,13 +1085,11 @@ namespace LCompilers::LanguageServerProtocol {
   // notification: server -> client //
   // ============================== //
 
-  // notification: "$/progress"
-  auto LspLanguageServer::notifyProgress(
-    const ProgressParams &params
-  ) -> void {
+  template <typename T>
+  auto LspLanguageServer::notify(const std::string &method, const T &params) -> void {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
-    notification.method = "$/progress";
+    notification.method = method;
     notification.params = transformer.asMessageParams(params);
     const std::string message = serializer.serializeNotification(notification);
     outgoingMessages.enqueue(message);
@@ -1101,12 +1099,21 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::notifyLogTrace(
     const LogTraceParams &params
   ) -> void {
-    NotificationMessage notification;
-    notification.jsonrpc = JSON_RPC_VERSION;
-    notification.method = "$/logTrace";
-    notification.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeNotification(notification);
-    outgoingMessages.enqueue(message);
+    notify("$/logTrace", params);
+  }
+
+  // notification: "$/progress"
+  auto LspLanguageServer::notifyProgress(
+    const ProgressParams &params
+  ) -> void {
+    notify("$/progress", params);
+  }
+
+  // notification: "textDocument/publishDiagnostics"
+  auto LspLanguageServer::notifyTextDocumentPublishDiagnostics(
+    const PublishDiagnosticsParams &params
+  ) -> void {
+    notify("textDocument/publishDiagnostics", params);
   }
 
 } // namespace LCompilers::LanguageServerProtocol

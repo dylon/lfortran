@@ -68,6 +68,16 @@ namespace LCompilers::LanguageServerProtocol {
 
   typedef std::string string;
 
+  enum class IntegerOrStringType {
+    LSP_INTEGER,
+    LSP_STRING,
+  };
+
+  typedef std::variant<
+    integer,
+    string
+  > IntegerOrString;
+
   // NOTE: This is a wrapper around std::variant because the types `LSPAny`,
   // `LSPObject`, and `LSPArray` are mutually recursive and cannot be easily
   // forward-declared otherwise.
@@ -143,15 +153,8 @@ namespace LCompilers::LanguageServerProtocol {
     string jsonrpc;
   };
 
-  enum class RequestIdType {
-    LSP_INTEGER,
-    LSP_STRING,
-  };
-
-  typedef std::variant<
-    integer,
-    string
-  > RequestId;
+  typedef IntegerOrStringType RequestIdType;
+  typedef IntegerOrString RequestId;
 
   enum class MessageParamsType {
     LSP_ARRAY,
@@ -520,15 +523,8 @@ namespace LCompilers::LanguageServerProtocol {
     RequestId id;
   };
 
-  enum class ProgressTokenType {
-    LSP_INTEGER,
-    LSP_STRING,
-  };
-
-  typedef std::variant<
-    integer,
-    string
-  > ProgressToken;
+  typedef IntegerOrStringType ProgressTokenType;
+  typedef IntegerOrString ProgressToken;
 
   /**
    * The base protocol offers also support to report progress in a generic
@@ -1303,15 +1299,8 @@ namespace LCompilers::LanguageServerProtocol {
     URI href;
   };
 
-  enum class DiagnosticCodeType {
-    LSP_INTEGER,
-    LSP_STRING,
-  };
-
-  typedef std::variant<
-    integer,
-    string
-  > DiagnosticCode;
+  typedef IntegerOrStringType DiagnosticCodeType;
+  typedef IntegerOrString DiagnosticCode;
 
   /**
    * Represents a diagnostic, such as a compiler error or warning. Diagnostic
@@ -1386,7 +1375,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.15.0
      */
-    optional_ptr_vector<DiagnosticTag> tags;
+    optional_vector<DiagnosticTag> tags;
 
     /**
      * An array of related diagnostic information, e.g. when symbol-names within
@@ -15594,6 +15583,7 @@ namespace LCompilers::LanguageServerProtocol {
     LOG_TRACE,
     PROGRESS,
     TELEMETRY_EVENT,
+    TEXT_DOCUMENT_PUBLISH_DIAGNOSTICS,
     WINDOW_SHOW_MESSAGE,
   };
 

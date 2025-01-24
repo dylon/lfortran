@@ -5703,28 +5703,85 @@ namespace LCompilers::LanguageServerProtocol {
     return params;
   }
 
-  auto LspTransformer::asMessageParams(
-    const RegistrationParams &registrationParams
-  ) const -> MessageParams {
-    return lspToObject(registrationParams);
+  auto LspTransformer::lspToObject(
+    const PublishDiagnosticsParams &params
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("uri", stringToAny(params.uri));
+    if (params.version.has_value()) {
+      object->emplace("version", intToAny(params.version.value()));
+    }
+    object->emplace("diagnostics", lspToAny(params.diagnostics));
+    return object;
   }
 
-  auto LspTransformer::asMessageParams(
-    const UnregistrationParams &unregistrationParams
-  ) const -> MessageParams {
-    return lspToObject(unregistrationParams);
+  auto LspTransformer::lspToObject(
+    const Diagnostic &diagnostic
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("range", lspToAny(*diagnostic.range));
+    if (diagnostic.severity.has_value()) {
+      object->emplace("severity", lspToAny(diagnostic.severity.value()));
+    }
+    if (diagnostic.code.has_value()) {
+      object->emplace("code", lspToAny(diagnostic.code.value()));
+    }
+    if (diagnostic.codeDescription.has_value()) {
+      object->emplace(
+        "codeDescription",
+        lspToAny(*diagnostic.codeDescription.value())
+      );
+    }
+    if (diagnostic.source.has_value()) {
+      object->emplace("source", stringToAny(diagnostic.source.value()));
+    }
+    object->emplace("message", stringToAny(diagnostic.message));
+    if (diagnostic.tags.has_value()) {
+      object->emplace("tags", lspToAny(diagnostic.tags.value()));
+    }
+    if (diagnostic.relatedInformation.has_value()) {
+      object->emplace(
+        "relatedInformation",
+        lspToAny(diagnostic.relatedInformation.value())
+      );
+    }
+    if (diagnostic.data.has_value()) {
+      object->emplace("data", copy(diagnostic.data.value()));
+    }
+    return object;
   }
 
-  auto LspTransformer::asMessageParams(
-    const ProgressParams &progressParams
-  ) const -> MessageParams {
-    return lspToObject(progressParams);
+  auto LspTransformer::lspToObject(
+    const DiagnosticRelatedInformation &info
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("location", lspToAny(*info.location));
+    object->emplace("message", stringToAny(info.message));
+    return object;
   }
 
-  auto LspTransformer::asMessageParams(
-    const LogTraceParams &logTraceParams
-  ) const -> MessageParams {
-    return lspToObject(logTraceParams);
+  auto LspTransformer::lspToAny(
+    const DiagnosticTag &tag
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->value = static_cast<int>(tag);
+    return any;
+  }
+
+  auto LspTransformer::lspToObject(
+    const CodeDescription &description
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("href", stringToAny(description.href));
+    return object;
+  }
+
+  auto LspTransformer::lspToAny(
+    const DiagnosticSeverity &severity
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->value = static_cast<int>(severity);
+    return any;
   }
 
   auto LspTransformer::lspToAny(
@@ -5775,20 +5832,16 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::lspToAny(
-    const ProgressToken &token
+    const IntegerOrString &variant
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    switch (static_cast<ProgressTokenType>(token.index())) {
-    case ProgressTokenType::LSP_INTEGER: {
-      any->value = std::get<int>(token);
-      break;
+    switch (static_cast<IntegerOrStringType>(variant.index())) {
+    case IntegerOrStringType::LSP_INTEGER: {
+      return intToAny(std::get<int>(variant));
     }
-    case ProgressTokenType::LSP_STRING: {
-      any->value = std::get<std::string>(token);
-      break;
+    case IntegerOrStringType::LSP_STRING: {
+      return stringToAny(std::get<std::string>(variant));
     }
     }
-    return any;
   }
 
   auto LspTransformer::lspToAny(

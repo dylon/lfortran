@@ -165,8 +165,13 @@ namespace LCompilers::LanguageServerProtocol {
     ) -> void;
 
     // notification: server -> client
-    auto notifyProgress(const ProgressParams &params) -> void;
+    template <typename T>
+    auto notify(const std::string &method, const T &params) -> void;
     auto notifyLogTrace(const LogTraceParams &params) -> void;
+    auto notifyProgress(const ProgressParams &params) -> void;
+    auto notifyTextDocumentPublishDiagnostics(
+      const PublishDiagnosticsParams &params
+    ) -> void;
 
     void assertInitialized();
     void assertRunning();
