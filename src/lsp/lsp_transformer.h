@@ -10,6 +10,38 @@ namespace LCompilers::LanguageServerProtocol {
 
   class LspTransformer {
   public:
+
+    template <typename T>
+    auto lspToAny(
+      const T &lsp
+    ) const -> std::unique_ptr<LSPAny> {
+      std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+      any->value = lspToObject(lsp);
+      return any;
+    }
+
+    template <typename T>
+    auto lspToAny(
+      const std::vector<T> &lsps
+    ) const -> std::unique_ptr<LSPAny> {
+      std::unique_ptr<LSPArray> array = std::make_unique<LSPArray>();
+      for (const T &lsp : lsps) {
+        array->push_back(lspToAny(lsp));
+      }
+      return arrayToAny(array);
+    }
+
+    template <typename T>
+    auto lspToAny(
+      const std::vector<std::unique_ptr<T>> &lsps
+    ) const -> std::unique_ptr<LSPAny> {
+      std::unique_ptr<LSPArray> array = std::make_unique<LSPArray>();
+      for (const std::unique_ptr<T> &lsp : lsps) {
+        array->push_back(lspToAny(*lsp));
+      }
+      return arrayToAny(array);
+    }
+
     auto asInitializeParams(
       const MessageParams &requestParams
     ) const -> InitializeParams;
@@ -55,6 +87,30 @@ namespace LCompilers::LanguageServerProtocol {
     auto asDocumentLinkParams(
       const MessageParams &requestParams
     ) const -> DocumentLinkParams;
+    auto asDocumentLink(
+      const MessageParams &requestParams
+    ) const -> DocumentLink;
+    auto asHoverParams(
+      const MessageParams &requestParams
+    ) const -> HoverParams;
+    auto asCodeLensParams(
+      const MessageParams &requestParams
+    ) const -> CodeLensParams;
+    auto asCodeLens(
+      const MessageParams &requestParams
+    ) const -> CodeLens;
+    auto asFoldingRangeParams(
+      const MessageParams &requestParams
+    ) const -> FoldingRangeParams;
+    auto asSelectionRangeParams(
+      const MessageParams &requestParams
+    ) const -> SelectionRangeParams;
+    auto asDocumentSymbolParams(
+      const MessageParams &requestParams
+    ) const -> DocumentSymbolParams;
+    auto asSemanticTokensParams(
+      const MessageParams &requestParams
+    ) const -> SemanticTokensParams;
 
     auto asCancelParams(
       const MessageParams &notificationParams
@@ -457,7 +513,13 @@ namespace LCompilers::LanguageServerProtocol {
     auto anyToBool(
       const LSPAny &any
     ) const -> bool;
+    auto anyToCommand(
+      const LSPAny &any
+    ) const -> std::unique_ptr<Command>;
 
+    auto arrayToAny(
+      std::unique_ptr<LSPArray> &array
+    ) const -> std::unique_ptr<LSPAny>;
     auto nullToAny(
       std::nullptr_t null
     ) const -> std::unique_ptr<LSPAny>;
@@ -467,13 +529,20 @@ namespace LCompilers::LanguageServerProtocol {
     auto unsignedIntToAny(
       uinteger value
     ) const -> std::unique_ptr<LSPAny>;
+    auto unsignedIntToAny(
+      const std::vector<uinteger> &values
+    ) const -> std::unique_ptr<LSPAny>;
     auto stringToAny(
       const string &value
     ) const -> std::unique_ptr<LSPAny>;
-
-    auto lspToAny(
-      const CallHierarchyItem &item
+    auto boolToAny(
+      bool value
     ) const -> std::unique_ptr<LSPAny>;
+
+    auto unsignedIntToArray(
+      const std::vector<uinteger> &values
+    ) const -> std::unique_ptr<LSPArray>;
+
     auto lspToAny(
       const PrepareCallHierarchyResult &result
     ) const -> std::unique_ptr<LSPAny>;
@@ -482,9 +551,6 @@ namespace LCompilers::LanguageServerProtocol {
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const ProgressToken &token
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const ProgressParams &params
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const InitializeResult &result
@@ -502,58 +568,22 @@ namespace LCompilers::LanguageServerProtocol {
       const TextDocumentSync &textDocumentSync
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
-      const TextEdit &edit
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const LocationLink &link
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const Location &location
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const Range &range
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const Position &position
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const Registration &registration
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const Unregistration &unregistration
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const LogTraceParams &logTraceParams
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
       const CallHierarchyIncomingCallsResult &result
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const CallHierarchyIncomingCall &call
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const CallHierarchyOutgoingCallsResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
-      const CallHierarchyOutgoingCall &call
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
       const TypeHierarchyResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
-      const TypeHierarchyItem &item
+      const SymbolKind &kind
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
-      SymbolKind kind
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      SymbolTag tag
+      const SymbolTag &tag
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       const DocumentHighlightResult &result
-    ) const -> std::unique_ptr<LSPAny>;
-    auto lspToAny(
-      const DocumentHighlight &highlight
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
       DocumentHighlightKind kind
@@ -562,9 +592,66 @@ namespace LCompilers::LanguageServerProtocol {
       const DocumentLinkResult &result
     ) const -> std::unique_ptr<LSPAny>;
     auto lspToAny(
-      const DocumentLink &link
+      const HoverResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const HoverContents &contents
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const MarkedString &markedString
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const CodeLensResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const FoldingRangeResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      FoldingRangeKind kind
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const SelectionRangeResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const DocumentSymbolResult &result
+    ) const -> std::unique_ptr<LSPAny>;
+    auto lspToAny(
+      const SemanticTokensResult &result
     ) const -> std::unique_ptr<LSPAny>;
 
+    auto lspToObject(
+      const SemanticTokens &tokens
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const SemanticTokensPartialResult &tokens
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const SymbolInformation &info
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const DocumentSymbol &symbol
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const SelectionRange &selectionRange
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const FoldingRange &foldingRange
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const Command &command
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const CodeLens &codeLens
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const MarkupContent &markup
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const MarkedStringWithLanguage &markedString
+    ) const -> std::unique_ptr<LSPObject>;
+    auto lspToObject(
+      const Hover &hover
+    ) const -> std::unique_ptr<LSPObject>;
     auto lspToObject(
       const DocumentLink &link
     ) const -> std::unique_ptr<LSPObject>;
@@ -652,16 +739,17 @@ namespace LCompilers::LanguageServerProtocol {
     auto copy(
       const std::unique_ptr<LSPAny> &any
     ) const -> std::unique_ptr<LSPAny>;
-
     auto copy(
       const std::unique_ptr<LSPObject> &object
     ) const -> std::unique_ptr<LSPObject>;
-
     auto copy(
       const std::unique_ptr<LSPArray> &array
     ) const -> std::unique_ptr<LSPArray>;
+
+    auto copyToAny(
+      const std::vector<std::unique_ptr<LSPAny>> &source
+    ) const -> std::unique_ptr<LSPAny>;
   };
 
 } // namespace LCompilers::LanguageServerProtocol
-
 #endif // LCOMPILERS_LSP_TRANSFORMER_H

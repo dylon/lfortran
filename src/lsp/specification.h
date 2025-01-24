@@ -3102,7 +3102,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    optional_ptr<std::vector<SymbolTag>> tags;
+    optional_vector<SymbolTag> tags;
 
     /**
      * Indicates if this symbol is deprecated.
@@ -3136,7 +3136,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * children?: DocumentSymbol[];
      */
-    optional_ptr<ptr_vector<DocumentSymbol>> children;
+    optional_ptr_vector<DocumentSymbol> children;
   };
 
   /**
@@ -3177,7 +3177,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    optional_ptr<std::vector<SymbolTag>> tags;
+    std::optional<std::vector<SymbolTag>> tags;
 
     /**
      * Indicates if this symbol is deprecated.
@@ -3213,6 +3213,18 @@ namespace LCompilers::LanguageServerProtocol {
      */
     std::optional<string> containerName;
   };
+
+  enum class DocumentSymbolResultType {
+    DOCUMENT_SYMBOL_ARRAY,
+    SYMBOL_INFORMATION_ARRAY,
+    LSP_NULL,
+  };
+
+  typedef std::variant<
+    ptr_vector<DocumentSymbol>,
+    ptr_vector<SymbolInformation>,
+    null
+  > DocumentSymbolResult;
 
   /**
    * The call hierarchy request is sent from the client to the server to return
@@ -4217,6 +4229,16 @@ namespace LCompilers::LanguageServerProtocol {
     optional_ptr<Range> range;
   };
 
+  enum class HoverResultType {
+    HOVER,
+    LSP_NULL,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<Hover>,
+    null
+  > HoverResult;
+
   /**
    * The code lens request is sent from the client to the server to compute code
    * lenses for a given text document.
@@ -4338,6 +4360,16 @@ namespace LCompilers::LanguageServerProtocol {
      */
     optional_ptr<LSPAny> data;
   };
+
+  enum class CodeLensResultType {
+    CODE_LENS_ARRAY,
+    LSP_NULL
+  };
+
+  typedef std::variant<
+    ptr_vector<CodeLens>,
+    null
+  > CodeLensResult;
 
   // --------------------------------------------------------------------------
   // Code Lens Resolve Request
@@ -4519,6 +4551,16 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<string> collapsedText;
   };
 
+  enum class FoldingRangeResultType {
+    FOLDING_RANGE_ARRAY,
+    LSP_NULL,
+  };
+
+  typedef std::variant<
+    ptr_vector<FoldingRange>,
+    null
+  > FoldingRangeResult;
+
   /**
    * The selection range request is sent from the client to the server to return
    * suggested selection ranges at an array of given positions. A selection
@@ -4644,6 +4686,16 @@ namespace LCompilers::LanguageServerProtocol {
      */
     optional_ptr<SelectionRange> parent;
   };
+
+  enum class SelectionRangeResultType {
+    SELECTION_RANGE_ARRAY,
+    LSP_NULL,
+  };
+
+  typedef std::variant<
+    ptr_vector<SelectionRange>,
+    null
+  > SelectionRangeResult;
 
   struct FoldingRangeCollapsedText {
 
@@ -5400,6 +5452,18 @@ namespace LCompilers::LanguageServerProtocol {
      */
     std::vector<uinteger> data;
   };
+
+  enum class SemanticTokensResultType {
+    SEMANTIC_TOKENS,
+    SEMANTIC_TOKENS_PARTIAL_RESULT,
+    LSP_NULL
+  };
+
+  typedef std::variant<
+    std::unique_ptr<SemanticTokens>,
+    std::unique_ptr<SemanticTokensPartialResult>,
+    null
+  > SemanticTokensResult;
 
   /**
    * Request:
@@ -15429,27 +15493,36 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   enum class RequestMethod {
-    INITIALIZE,
-    SHUTDOWN,
-    WILL_SAVE_WAIT_UNTIL,
-    GOTO_DECLARATION,
-    GOTO_DEFINITION,
-    GOTO_TYPE_DEFINITION,
-    GOTO_IMPLEMENTATION,
-    FIND_REFERENCES,
-    PREPARE_CALL_HIERARCHY,
     CALL_HIERARCHY_INCOMING_CALLS,
     CALL_HIERARCHY_OUTGOING_CALLS,
-    PREPARE_TYPE_HIERARCHY,
-    TYPE_HIERARCHY_SUPERTYPES,
-    TYPE_HIERARCHY_SUBTYPES,
-    HIGHLIGHT_DOCUMENT,
-    EXTRACT_DOCUMENT_LINKS,
-    WORKSPACE_SYMBOL,
-    RESOLVE_WORKSPACE_SYMBOL,
+    CODE_LENS_RESOLVE,
     CREATE_FILES,
-    RENAME_FILES,
     EXECUTE_COMMAND,
+    EXTRACT_DOCUMENT_LINKS,
+    FIND_REFERENCES,
+    GOTO_DEFINITION,
+    GOTO_IMPLEMENTATION,
+    GOTO_TYPE_DEFINITION,
+    HIGHLIGHT_DOCUMENT,
+    INITIALIZE,
+    PREPARE_CALL_HIERARCHY,
+    PREPARE_TYPE_HIERARCHY,
+    RENAME_FILES,
+    RESOLVE_DOCUMENT_LINK,
+    RESOLVE_WORKSPACE_SYMBOL,
+    SHUTDOWN,
+    TEXT_DOCUMENT_CODE_LENS,
+    TEXT_DOCUMENT_DECLARATION,
+    TEXT_DOCUMENT_DOCUMENT_SYMBOL,
+    TEXT_DOCUMENT_FOLDING_RANGE,
+    TEXT_DOCUMENT_HOVER,
+    TEXT_DOCUMENT_SELECTION_RANGE,
+    TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL,
+    TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL,
+    TYPE_HIERARCHY_SUBTYPES,
+    TYPE_HIERARCHY_SUPERTYPES,
+    WORKSPACE_CODE_LENS_REFRESH,
+    WORKSPACE_SYMBOL,
   };
 
   extern std::map<RequestMethod, std::string> RequestMethodNames;

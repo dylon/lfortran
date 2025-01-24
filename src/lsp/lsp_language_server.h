@@ -105,6 +105,31 @@ namespace LCompilers::LanguageServerProtocol {
     auto extractDocumentLinks(
       const DocumentLinkParams &params
     ) -> DocumentLinkResult;
+    auto resolveDocumentLink(
+      const DocumentLink &params
+    ) -> DocumentLink;
+    auto textDocumentHover(
+      const HoverParams &params
+    ) -> HoverResult;
+    auto textDocumentCodeLens(
+      const CodeLensParams &params
+    ) -> CodeLensResult;
+    auto codeLensResolve(
+      const CodeLens &codeLens
+    ) -> CodeLens;
+    auto workspaceCodeLensRefresh() -> void;
+    auto textDocumentFoldingRange(
+      const FoldingRangeParams &params
+    ) -> FoldingRangeResult;
+    auto textDocumentSelectionRange(
+      const SelectionRangeParams &params
+    ) -> SelectionRangeResult;
+    auto extractDocumentSymbols(
+      const DocumentSymbolParams &params
+    ) -> DocumentSymbolResult;
+    auto extractAllSemanticTokens(
+      const SemanticTokensParams &params
+    ) -> SemanticTokensResult;
     auto shutdown() -> void;
 
     // notification: client -> server

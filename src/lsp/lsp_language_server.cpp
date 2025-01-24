@@ -176,7 +176,7 @@ namespace LCompilers::LanguageServerProtocol {
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::WILL_SAVE_WAIT_UNTIL: {
+    case RequestMethod::TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       WillSaveTextDocumentParams params =
@@ -185,7 +185,7 @@ namespace LCompilers::LanguageServerProtocol {
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::GOTO_DECLARATION: {
+    case RequestMethod::TEXT_DOCUMENT_DECLARATION: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       DeclarationParams params =
@@ -301,6 +301,74 @@ namespace LCompilers::LanguageServerProtocol {
       DocumentLinkParams params =
         transformer.asDocumentLinkParams(requestParams);
       DocumentLinkResult result = extractDocumentLinks(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::RESOLVE_DOCUMENT_LINK: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      DocumentLink params = transformer.asDocumentLink(requestParams);
+      DocumentLink result = resolveDocumentLink(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::TEXT_DOCUMENT_HOVER: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      HoverParams params = transformer.asHoverParams(requestParams);
+      HoverResult result = textDocumentHover(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::TEXT_DOCUMENT_CODE_LENS: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      CodeLensParams params = transformer.asCodeLensParams(requestParams);
+      CodeLensResult result = textDocumentCodeLens(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::CODE_LENS_RESOLVE: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      CodeLens params = transformer.asCodeLens(requestParams);
+      CodeLens result = codeLensResolve(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::WORKSPACE_CODE_LENS_REFRESH: {
+      workspaceCodeLensRefresh();
+      break;
+    }
+    case RequestMethod::TEXT_DOCUMENT_FOLDING_RANGE: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      FoldingRangeParams params = transformer.asFoldingRangeParams(requestParams);
+      FoldingRangeResult result = textDocumentFoldingRange(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::TEXT_DOCUMENT_SELECTION_RANGE: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      SelectionRangeParams params = transformer.asSelectionRangeParams(requestParams);
+      SelectionRangeResult result = textDocumentSelectionRange(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::TEXT_DOCUMENT_DOCUMENT_SYMBOL: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      DocumentSymbolParams params = transformer.asDocumentSymbolParams(requestParams);
+      DocumentSymbolResult result = extractDocumentSymbols(params);
+      response.result = transformer.lspToAny(result);
+      break;
+    }
+    case RequestMethod::TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL: {
+      const MessageParams &requestParams =
+        transformer.requireMessageParams(request);
+      SemanticTokensParams params = transformer.asSemanticTokensParams(requestParams);
+      SemanticTokensResult result = extractAllSemanticTokens(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -518,7 +586,7 @@ namespace LCompilers::LanguageServerProtocol {
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::WILL_SAVE_WAIT_UNTIL)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL)
       )
     );
   }
@@ -531,7 +599,7 @@ namespace LCompilers::LanguageServerProtocol {
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::GOTO_DECLARATION)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_DECLARATION)
       )
     );
   }
@@ -674,7 +742,122 @@ namespace LCompilers::LanguageServerProtocol {
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::HIGHLIGHT_DOCUMENT)
+        RequestMethodValues.at(RequestMethod::EXTRACT_DOCUMENT_LINKS)
+      )
+    );
+  }
+
+  // request: "documentLink/resolve"
+  auto LspLanguageServer::resolveDocumentLink(
+    const DocumentLink &params
+  ) -> DocumentLink {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::RESOLVE_DOCUMENT_LINK)
+      )
+    );
+  }
+
+  // request: "textDocument/hover"
+  auto LspLanguageServer::textDocumentHover(
+    const HoverParams &params
+  ) -> HoverResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_HOVER)
+      )
+    );
+  }
+
+  // request: "textDocument/codeLens"
+  auto LspLanguageServer::textDocumentCodeLens(
+    const CodeLensParams &params
+  ) -> CodeLensResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_CODE_LENS)
+      )
+    );
+  }
+
+  // request: "codeLens/resolve"
+  auto LspLanguageServer::codeLensResolve(
+    const CodeLens &codeLens
+  ) -> CodeLens {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::CODE_LENS_RESOLVE)
+      )
+    );
+  }
+
+  // request: "workspace/codeLens/refresh"
+  auto LspLanguageServer::workspaceCodeLensRefresh() -> void {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::WORKSPACE_CODE_LENS_REFRESH)
+      )
+    );
+  }
+
+  // request: "textDocument/foldingRange"
+  auto LspLanguageServer::textDocumentFoldingRange(
+    const FoldingRangeParams &params
+  ) -> FoldingRangeResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_FOLDING_RANGE)
+      )
+    );
+  }
+
+  // request: "textDocument/selectionRange"
+  auto LspLanguageServer::textDocumentSelectionRange(
+    const SelectionRangeParams &params
+  ) -> SelectionRangeResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_SELECTION_RANGE)
+      )
+    );
+  }
+
+  // request: "textDocument/documentSymbol"
+  auto LspLanguageServer::extractDocumentSymbols(
+    const DocumentSymbolParams &params
+  ) -> DocumentSymbolResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_DOCUMENT_SYMBOL)
+      )
+    );
+  }
+
+  // request: "textDocument/semanticTokens/full"
+  auto LspLanguageServer::extractAllSemanticTokens(
+    const SemanticTokensParams &params
+  ) -> SemanticTokensResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL)
       )
     );
   }

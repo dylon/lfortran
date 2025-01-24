@@ -13,7 +13,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> InitializeParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::WILL_SAVE_WAIT_UNTIL
+        RequestMethod::TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -159,7 +159,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> WillSaveTextDocumentParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::WILL_SAVE_WAIT_UNTIL
+        RequestMethod::TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -199,7 +199,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DeclarationParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::GOTO_DECLARATION
+        RequestMethod::TEXT_DOCUMENT_DECLARATION
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -240,6 +240,97 @@ namespace LCompilers::LanguageServerProtocol {
     }
 
     return params;
+  }
+
+  auto LspTransformer::asSemanticTokensParams(
+    const MessageParams &requestParams
+  ) const -> SemanticTokensParams {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    SemanticTokensParams params;
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    auto iter = object.find("workDoneToken");
+    if (iter != object.end()) {
+      params.workDoneToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("partialResultToken");
+    if (iter != object.end()) {
+      params.partialResultToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("textDocument");
+    if (iter != object.end()) {
+      params.textDocument = anyToTextDocumentIdentifier(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required SemanticTokensParams attribute: textDocument"
+      );
+    }
+
+    return params;
+  }
+
+  auto LspTransformer::lspToAny(
+    const SemanticTokensResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<SemanticTokensResultType>(result.index())) {
+    case SemanticTokensResultType::SEMANTIC_TOKENS: {
+      return lspToAny(*std::get<std::unique_ptr<SemanticTokens>>(result));
+    }
+    case SemanticTokensResultType::SEMANTIC_TOKENS_PARTIAL_RESULT: {
+      return lspToAny(*std::get<std::unique_ptr<SemanticTokensPartialResult>>(result));
+    }
+    case SemanticTokensResultType::LSP_NULL: {
+      return nullToAny(std::get<std::nullptr_t>(result));
+    }
+    }
+  }
+
+  auto LspTransformer::lspToObject(
+    const SemanticTokens &tokens
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    if (tokens.resultId.has_value()) {
+      object->emplace("resultId", stringToAny(tokens.resultId.value()));
+    }
+    object->emplace("data", unsignedIntToAny(tokens.data));
+    return object;
+  }
+
+  auto LspTransformer::unsignedIntToAny(
+    const std::vector<uinteger> &values
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->value = unsignedIntToArray(values);
+    return any;
+  }
+
+  auto LspTransformer::unsignedIntToArray(
+    const std::vector<uinteger> &values
+  ) const -> std::unique_ptr<LSPArray> {
+    std::unique_ptr<LSPArray> array = std::make_unique<LSPArray>();
+    for (unsigned int value : values) {
+      array->push_back(unsignedIntToAny(value));
+    }
+    return array;
+  }
+
+  auto LspTransformer::lspToObject(
+    const SemanticTokensPartialResult &tokens
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("data", unsignedIntToAny(tokens.data));
+    return object;
   }
 
   auto LspTransformer::asDefinitionParams(
@@ -610,14 +701,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> std::unique_ptr<LSPAny> {
     switch (static_cast<CallHierarchyIncomingCallsResultType>(result.index())) {
     case CallHierarchyIncomingCallsResultType::CALL_HIERARCHY_INCOMING_CALL_ARRAY: {
-      std::unique_ptr<LSPAny> array = std::make_unique<LSPAny>();
-      std::unique_ptr<LSPArray> value = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<CallHierarchyIncomingCall> &call
-             : std::get<ptr_vector<CallHierarchyIncomingCall>>(result)) {
-        value->push_back(lspToAny(*call));
-      }
-      array->value = std::move(value);
-      return array;
+      return lspToAny(std::get<ptr_vector<CallHierarchyIncomingCall>>(result));
     }
     case CallHierarchyIncomingCallsResultType::LSP_NULL: {
       return nullToAny(std::get<std::nullptr_t>(result));
@@ -625,26 +709,12 @@ namespace LCompilers::LanguageServerProtocol {
     }
   }
 
-  auto LspTransformer::lspToAny(
-    const CallHierarchyIncomingCall &call
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(call);
-    return any;
-  }
-
   auto LspTransformer::lspToObject(
     const CallHierarchyIncomingCall &call
   ) const -> std::unique_ptr<LSPObject> {
     std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
     object->emplace("from", lspToAny(*call.from));
-    std::unique_ptr<LSPArray> fromRangesValue = std::make_unique<LSPArray>();
-    for (const std::unique_ptr<Range> &range : call.fromRanges) {
-      fromRangesValue->push_back(lspToAny(*range));
-    }
-    std::unique_ptr<LSPAny> fromRanges = std::make_unique<LSPAny>();
-    fromRanges->value = std::move(fromRangesValue);
-    object->emplace("fromRanges", std::move(fromRanges));
+    object->emplace("fromRanges", lspToAny(call.fromRanges));
     return object;
   }
 
@@ -691,14 +761,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> std::unique_ptr<LSPAny> {
     switch (static_cast<CallHierarchyOutgoingCallsResultType>(result.index())) {
     case CallHierarchyOutgoingCallsResultType::CALL_HIERARCHY_OUTGOING_CALL_ARRAY: {
-      std::unique_ptr<LSPAny> array = std::make_unique<LSPAny>();
-      std::unique_ptr<LSPArray> value = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<CallHierarchyOutgoingCall> &call
-             : std::get<ptr_vector<CallHierarchyOutgoingCall>>(result)) {
-        value->push_back(lspToAny(*call));
-      }
-      array->value = std::move(value);
-      return array;
+      return lspToAny(std::get<ptr_vector<CallHierarchyOutgoingCall>>(result));
     }
     case CallHierarchyOutgoingCallsResultType::LSP_NULL: {
       return nullToAny(std::get<std::nullptr_t>(result));
@@ -706,26 +769,12 @@ namespace LCompilers::LanguageServerProtocol {
     }
   }
 
-  auto LspTransformer::lspToAny(
-    const CallHierarchyOutgoingCall &call
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(call);
-    return any;
-  }
-
   auto LspTransformer::lspToObject(
     const CallHierarchyOutgoingCall &call
   ) const -> std::unique_ptr<LSPObject> {
     std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
     object->emplace("to", lspToAny(*call.to));
-    std::unique_ptr<LSPArray> fromRangesValue = std::make_unique<LSPArray>();
-    for (const std::unique_ptr<Range> &range : call.fromRanges) {
-      fromRangesValue->push_back(lspToAny(*range));
-    }
-    std::unique_ptr<LSPAny> fromRanges = std::make_unique<LSPAny>();
-    fromRanges->value = std::move(fromRangesValue);
-    object->emplace("fromRanges", std::move(fromRanges));
+    object->emplace("fromRanges", lspToAny(call.fromRanges));
     return object;
   }
 
@@ -775,25 +824,14 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::lspToAny(
     const TypeHierarchyResult &result
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
     switch (static_cast<TypeHierarchyResultType>(result.index())) {
     case TypeHierarchyResultType::TYPE_HIERARCHY_ITEM_ARRAY: {
-      std::unique_ptr<LSPArray> items = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<TypeHierarchyItem> &item
-             : std::get<ptr_vector<TypeHierarchyItem>>(result)) {
-        items->push_back(lspToAny(*item));
-      }
-      any->value = std::move(items);
-      break;
+      return lspToAny(std::get<ptr_vector<TypeHierarchyItem>>(result));
     }
     case TypeHierarchyResultType::LSP_NULL: {
-      any->value = nullptr;
-      break;
+      return nullToAny(std::get<std::nullptr_t>(result));
     }
     }
-
-    return any;
   }
 
   auto LspTransformer::asTypeHierarchySupertypesParams(
@@ -957,6 +995,607 @@ namespace LCompilers::LanguageServerProtocol {
     return params;
   }
 
+  auto LspTransformer::asDocumentLink(
+    const MessageParams &requestParams
+  ) const -> DocumentLink {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::RESOLVE_DOCUMENT_LINK
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    DocumentLink link;
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    auto iter = object.find("range");
+    if (iter != object.end()) {
+      link.range = anyToRange(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DocumentLink attribute: range"
+      );
+    }
+
+    iter = object.find("target");
+    if (iter != object.end()) {
+      link.target = anyToString(*iter->second);
+    }
+
+    iter = object.find("tooltip");
+    if (iter != object.end()) {
+      link.tooltip = anyToString(*iter->second);
+    }
+
+    iter = object.find("data");
+    if (iter != object.end()) {
+      link.data = copy(iter->second);
+    }
+
+    return link;
+  }
+
+  auto LspTransformer::asHoverParams(
+    const MessageParams &requestParams
+  ) const -> HoverParams {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::TEXT_DOCUMENT_HOVER
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    HoverParams params;
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    auto iter = object.find("textDocument");
+    if (iter != object.end()) {
+      params.textDocument = anyToTextDocumentIdentifier(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required HoverParams attribute: textDocument"
+      );
+    }
+
+    iter = object.find("position");
+    if (iter != object.end()) {
+      params.position = anyToPosition(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required HoverParams attribute: position"
+      );
+    }
+
+    iter = object.find("workDoneToken");
+    if (iter != object.end()) {
+      params.workDoneToken = anyToProgressToken(*iter->second);
+    }
+
+    return params;
+  }
+
+  auto LspTransformer::lspToAny(
+    const HoverResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+
+    switch (static_cast<HoverResultType>(result.index())) {
+    case HoverResultType::HOVER: {
+      any->value = lspToObject(*std::get<std::unique_ptr<Hover>>(result));
+      break;
+    }
+    case HoverResultType::LSP_NULL: {
+      any->value = nullptr;
+      break;
+    }
+    }
+
+    return any;
+  }
+
+  auto LspTransformer::lspToObject(
+    const Hover &hover
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("contents", lspToAny(hover.contents));
+    if (hover.range.has_value()) {
+      object->emplace("range", lspToAny(*hover.range.value()));
+    }
+    return object;
+  }
+
+  auto LspTransformer::lspToAny(
+    const HoverContents &contents
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<HoverContentsType>(contents.index())) {
+    case HoverContentsType::MARKED_STRING: {
+      return lspToAny(std::get<MarkedString>(contents));
+      break;
+    }
+    case HoverContentsType::MARKED_STRING_ARRAY: {
+      return lspToAny(std::get<std::vector<MarkedString>>(contents));
+    }
+    case HoverContentsType::MARKUP_CONTENT: {
+      return lspToAny(*std::get<std::unique_ptr<MarkupContent>>(contents));
+    }
+    }
+  }
+
+  auto LspTransformer::lspToObject(
+    const MarkupContent &markup
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("kind", stringToAny(MarkupKindValues.at(markup.kind)));
+    object->emplace("value", stringToAny(markup.value));
+    return object;
+  }
+
+  auto LspTransformer::lspToAny(
+    const MarkedString &markedString
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<MarkedStringType>(markedString.index())) {
+    case MarkedStringType::LITERAL: {
+      return stringToAny(std::get<std::string>(markedString));
+    }
+    case MarkedStringType::WITH_LANGUAGE: {
+      return lspToAny(
+        *std::get<std::unique_ptr<MarkedStringWithLanguage>>(markedString)
+      );
+    }
+    }
+  }
+
+  auto LspTransformer::lspToObject(
+    const MarkedStringWithLanguage &markedString
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("language", stringToAny(markedString.language));
+    object->emplace("value", stringToAny(markedString.value));
+    return object;
+  }
+
+  auto LspTransformer::asCodeLensParams(
+    const MessageParams &requestParams
+  ) const -> CodeLensParams {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::TEXT_DOCUMENT_CODE_LENS
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    CodeLensParams params;
+
+    auto iter = object.find("workDoneToken");
+    if (iter != object.end()) {
+      params.workDoneToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("partialResultToken");
+    if (iter != object.end()) {
+      params.partialResultToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("textDocument");
+    if (iter != object.end()) {
+      params.textDocument = anyToTextDocumentIdentifier(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CodeLensParams attribute: textDocument"
+      );
+    }
+
+    return params;
+  }
+
+  auto LspTransformer::lspToAny(
+    const CodeLensResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<CodeLensResultType>(result.index())) {
+    case CodeLensResultType::CODE_LENS_ARRAY: {
+      return lspToAny(std::get<ptr_vector<CodeLens>>(result));
+    }
+    case CodeLensResultType::LSP_NULL: {
+      return nullToAny(std::get<std::nullptr_t>(result));
+    }
+    }
+  }
+
+  auto LspTransformer::lspToObject(
+    const CodeLens &codeLens
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("range", lspToAny(*codeLens.range));
+    if (codeLens.command.has_value()) {
+      object->emplace("command", lspToAny(*codeLens.command.value()));
+    }
+    if (codeLens.data.has_value()) {
+      object->emplace("data", copy(codeLens.data.value()));
+    }
+    return object;
+  }
+
+  auto LspTransformer::lspToObject(
+    const Command &command
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("title", stringToAny(command.title));
+    object->emplace("command", stringToAny(command.command));
+    if (command.arguments.has_value()) {
+      object->emplace("arguments", copyToAny(command.arguments.value()));
+    }
+    return object;
+  }
+
+  auto LspTransformer::arrayToAny(
+    std::unique_ptr<LSPArray> &array
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->value = std::move(array);
+    return any;
+  }
+
+  auto LspTransformer::asCodeLens(
+    const MessageParams &requestParams
+  ) const -> CodeLens {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::CODE_LENS_RESOLVE
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    CodeLens codeLens;
+
+    auto iter = object.find("range");
+    if (iter != object.end()) {
+      codeLens.range = anyToRange(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required CodeLens attribute: range"
+      );
+    }
+
+    iter = object.find("command");
+    if (iter != object.end()) {
+      codeLens.command = anyToCommand(*iter->second);
+    }
+
+    iter = object.find("data");
+    if (iter != object.end()) {
+      codeLens.data = copy(iter->second);
+    }
+
+    return codeLens;
+  }
+
+  auto LspTransformer::asFoldingRangeParams(
+    const MessageParams &requestParams
+  ) const -> FoldingRangeParams {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::TEXT_DOCUMENT_FOLDING_RANGE
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    FoldingRangeParams params;
+
+    auto iter = object.find("workDoneToken");
+    if (iter != object.end()) {
+      params.workDoneToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("partialResultToken");
+    if (iter != object.end()) {
+      params.partialResultToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("textDocument");
+    if (iter != object.end()) {
+      params.textDocument = anyToTextDocumentIdentifier(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required TextDocumentIdentifier attribute: textDocument"
+      );
+    }
+
+    return params;
+  }
+
+  auto LspTransformer::lspToAny(
+    const FoldingRangeResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<FoldingRangeResultType>(result.index())) {
+    case FoldingRangeResultType::FOLDING_RANGE_ARRAY: {
+      return lspToAny(std::get<ptr_vector<FoldingRange>>(result));
+    }
+    case FoldingRangeResultType::LSP_NULL: {
+      return nullToAny(std::get<std::nullptr_t>(result));
+    }
+    }
+  }
+
+  auto LspTransformer::asSelectionRangeParams(
+    const MessageParams &requestParams
+  ) const -> SelectionRangeParams {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::TEXT_DOCUMENT_SELECTION_RANGE
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    SelectionRangeParams params;
+
+    auto iter = object.find("workDoneToken");
+    if (iter != object.end()) {
+      params.workDoneToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("partialResultToken");
+    if (iter != object.end()) {
+      params.partialResultToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("textDocument");
+    if (iter != object.end()) {
+      params.textDocument = anyToTextDocumentIdentifier(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required TextDocumentIdentifier attribute: textDocument"
+      );
+    }
+
+    iter = object.find("positions");
+    if (iter != object.end()) {
+      const LSPAny &array = *iter->second;
+      assertAnyType(
+        "SelectionRangeParams::positions",
+        array, LSPAnyType::LSP_ARRAY
+      );
+      ptr_vector<Position> positions;
+      for (const std::unique_ptr<LSPAny> &position
+             : *std::get<std::unique_ptr<LSPArray>>(array.value)) {
+        positions.push_back(anyToPosition(*position));
+      }
+      params.positions = std::move(positions);
+    }
+
+    return params;
+  }
+
+  auto LspTransformer::lspToAny(
+    const SelectionRangeResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<SelectionRangeResultType>(result.index())) {
+    case SelectionRangeResultType::SELECTION_RANGE_ARRAY: {
+      return lspToAny(std::get<ptr_vector<SelectionRange>>(result));
+    }
+    case SelectionRangeResultType::LSP_NULL: {
+      return nullToAny(std::get<std::nullptr_t>(result));
+    }
+    }
+  }
+
+  auto LspTransformer::lspToObject(
+    const SelectionRange &selectionRange
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("range", lspToAny(*selectionRange.range));
+    if (selectionRange.parent.has_value()) {
+      object->emplace("parent", lspToAny(*selectionRange.parent.value()));
+    }
+    return object;
+  }
+
+  auto LspTransformer::asDocumentSymbolParams(
+    const MessageParams &requestParams
+  ) const -> DocumentSymbolParams {
+    assertRequestType(
+      RequestMethodValues.at(
+        RequestMethod::TEXT_DOCUMENT_DOCUMENT_SYMBOL
+      ),
+      requestParams,
+      MessageParamsType::LSP_OBJECT
+    );
+
+    LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(requestParams);
+
+    DocumentSymbolParams params;
+
+    auto iter = object.find("workDoneToken");
+    if (iter != object.end()) {
+      params.workDoneToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("partialResultToken");
+    if (iter != object.end()) {
+      params.partialResultToken = anyToProgressToken(*iter->second);
+    }
+
+    iter = object.find("textDocument");
+    if (iter != object.end()) {
+      params.textDocument = anyToTextDocumentIdentifier(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required DocumentSymbolParams attribute: textDocument"
+      );
+    }
+
+    return params;
+  }
+
+  auto LspTransformer::lspToAny(
+    const DocumentSymbolResult &result
+  ) const -> std::unique_ptr<LSPAny> {
+    switch (static_cast<DocumentSymbolResultType>(result.index())) {
+    case DocumentSymbolResultType::DOCUMENT_SYMBOL_ARRAY: {
+      return lspToAny(std::get<ptr_vector<DocumentSymbol>>(result));
+    }
+    case DocumentSymbolResultType::SYMBOL_INFORMATION_ARRAY: {
+      return lspToAny(std::get<ptr_vector<SymbolInformation>>(result));
+    }
+    case DocumentSymbolResultType::LSP_NULL: {
+      return nullToAny(std::get<std::nullptr_t>(result));
+    }
+    }
+  }
+
+  auto LspTransformer::lspToObject(
+    const SymbolInformation &info
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("name", stringToAny(info.name));
+    object->emplace("kind", lspToAny(info.kind));
+    if (info.tags.has_value()) {
+      object->emplace("tags", lspToAny(info.tags.value()));
+    }
+    if (info.deprecated.has_value()) {
+      object->emplace("deprecated", boolToAny(info.deprecated.value()));
+    }
+    object->emplace("location", lspToAny(*info.location));
+    if (info.containerName.has_value()) {
+      object->emplace("containerName", stringToAny(info.containerName.value()));
+    }
+    return object;
+  }
+
+  auto LspTransformer::lspToObject(
+    const DocumentSymbol &symbol
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("name", stringToAny(symbol.name));
+    if (symbol.detail.has_value()) {
+      object->emplace("detail", stringToAny(symbol.detail.value()));
+    }
+    object->emplace("kind", lspToAny(symbol.kind));
+    if (symbol.tags.has_value()) {
+      object->emplace("tags", lspToAny(symbol.tags.value()));
+    }
+    if (symbol.deprecated.has_value()) {
+      object->emplace("deprecated", boolToAny(symbol.deprecated.value()));
+    }
+    object->emplace("range", lspToAny(*symbol.range));
+    object->emplace("selectionRange", lspToAny(*symbol.selectionRange));
+    if (symbol.children.has_value()) {
+      object->emplace("children", lspToAny(symbol.children.value()));
+    }
+    return object;
+  }
+
+  auto LspTransformer::boolToAny(
+    bool value
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    any->value = value;
+    return any;
+  }
+
+  auto LspTransformer::lspToObject(
+    const FoldingRange &foldingRange
+  ) const -> std::unique_ptr<LSPObject> {
+    std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
+    object->emplace("startLine", unsignedIntToAny(foldingRange.startLine));
+    if (foldingRange.startCharacter.has_value()) {
+      object->emplace(
+        "startCharacter",
+        unsignedIntToAny(foldingRange.startCharacter.value())
+      );
+    }
+    object->emplace("endLine", unsignedIntToAny(foldingRange.endLine));
+    if (foldingRange.endCharacter.has_value()) {
+      object->emplace(
+        "endCharacter",
+        unsignedIntToAny(foldingRange.endCharacter.value())
+      );
+    }
+    if (foldingRange.kind.has_value()) {
+      object->emplace("kind", lspToAny(foldingRange.kind.value()));
+    }
+    if (foldingRange.collapsedText.has_value()) {
+      object->emplace(
+        "collapsedText",
+        stringToAny(foldingRange.collapsedText.value())
+      );
+    }
+    return object;
+  }
+
+  auto LspTransformer::lspToAny(
+    FoldingRangeKind kind
+  ) const -> std::unique_ptr<LSPAny> {
+    return stringToAny(FoldingRangeKindValues.at(kind));
+  }
+
+  auto LspTransformer::anyToCommand(
+    const LSPAny &any
+  ) const -> std::unique_ptr<Command> {
+    assertAnyType("Command", any, LSPAnyType::LSP_OBJECT);
+
+    std::unique_ptr<Command> command = std::make_unique<Command>();
+
+    const LSPObject &object = *std::get<std::unique_ptr<LSPObject>>(any.value);
+
+    auto iter = object.find("title");
+    if (iter != object.end()) {
+      command->title = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required Command attribute: title"
+      );
+    }
+
+    iter = object.find("command");
+    if (iter != object.end()) {
+      command->command = anyToString(*iter->second);
+    } else {
+      throw LspException(
+        ErrorCodes::InvalidParams,
+        "Missing required Command attribute: command"
+      );
+    }
+
+    iter = object.find("arguments");
+    if (iter != object.end()) {
+      const LSPAny &array = *iter->second;
+      assertAnyType("Command::arguments", array, LSPAnyType::LSP_ARRAY);
+      ptr_vector<LSPAny> arguments;
+      for (const std::unique_ptr<LSPAny> &argument
+             : *std::get<std::unique_ptr<LSPArray>>(array.value)) {
+        arguments.push_back(copy(argument));
+      }
+      command->arguments = std::move(arguments);
+    }
+
+    return command;
+  }
+
   auto LspTransformer::asDocumentHighlightParams(
     const MessageParams &requestParams
   ) const -> DocumentHighlightParams {
@@ -1008,33 +1647,14 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::lspToAny(
     const DocumentHighlightResult &result
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
     switch (static_cast<DocumentHighlightResultType>(result.index())) {
     case DocumentHighlightResultType::DOCUMENT_HIGHLIGHT_ARRAY: {
-      std::unique_ptr<LSPArray> items = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<DocumentHighlight> &highlight
-             : std::get<ptr_vector<DocumentHighlight>>(result)) {
-        items->push_back(lspToAny(*highlight));
-      }
-      any->value = std::move(items);
-      break;
+      return lspToAny(std::get<ptr_vector<DocumentHighlight>>(result));
     }
     case DocumentHighlightResultType::LSP_NULL: {
-      any->value = nullptr;
-      break;
+      return nullToAny(std::get<std::nullptr_t>(result));
     }
     }
-
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const DocumentHighlight &highlight
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(highlight);
-    return any;
   }
 
   auto LspTransformer::lspToObject(
@@ -1097,33 +1717,14 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::lspToAny(
     const DocumentLinkResult &result
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
     switch (static_cast<DocumentLinkResultType>(result.index())) {
     case DocumentLinkResultType::DOCUMENT_LINK_ARRAY: {
-      std::unique_ptr<LSPArray> items = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<DocumentLink> &link
-             : std::get<ptr_vector<DocumentLink>>(result)) {
-        items->push_back(lspToAny(*link));
-      }
-      any->value = std::move(items);
-      break;
+      return lspToAny(std::get<ptr_vector<DocumentLink>>(result));
     }
     case DocumentLinkResultType::LSP_NULL: {
-      any->value = nullptr;
-      break;
+      return nullToAny(std::get<std::nullptr_t>(result));
     }
     }
-
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const DocumentLink &link
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(link);
-    return any;
   }
 
   auto LspTransformer::lspToObject(
@@ -1143,14 +1744,6 @@ namespace LCompilers::LanguageServerProtocol {
     return object;
   }
 
-  auto LspTransformer::lspToAny(
-    const TypeHierarchyItem &item
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(item);
-    return any;
-  }
-
   auto LspTransformer::lspToObject(
     const TypeHierarchyItem &item
   ) const -> std::unique_ptr<LSPObject> {
@@ -1158,18 +1751,13 @@ namespace LCompilers::LanguageServerProtocol {
     object->emplace("name", stringToAny(item.name));
     object->emplace("kind", lspToAny(item.kind));
     if (item.tags.has_value()) {
-      std::unique_ptr<LSPArray> array = std::make_unique<LSPArray>();
-      for (SymbolTag tag : item.tags.value()) {
-        array->push_back(lspToAny(tag));
-      }
-      std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-      any->value = std::move(array);
+      object->emplace("tags", lspToAny(item.tags.value()));
     }
     return object;
   }
 
   auto LspTransformer::lspToAny(
-    SymbolTag tag
+    const SymbolTag &tag
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
     any->value = static_cast<int>(tag);
@@ -1177,7 +1765,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::lspToAny(
-    SymbolKind kind
+    const SymbolKind &kind
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
     any->value = static_cast<int>(kind);
@@ -5142,57 +5730,27 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::lspToAny(
     const FindReferencesResult &result
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
     switch (static_cast<FindReferencesResultType>(result.index())) {
     case FindReferencesResultType::LOCATION_ARRAY: {
-      std::unique_ptr<LSPArray> locations = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<Location> &location
-             : std::get<ptr_vector<Location>>(result)) {
-        locations->push_back(lspToAny(*location));
-      }
-      any->value = std::move(locations);
-      break;
+      return lspToAny(std::get<ptr_vector<Location>>(result));
     }
     case FindReferencesResultType::LSP_NULL: {
-      any->value = nullptr;
-      break;
+      return nullToAny(std::get<std::nullptr_t>(result));
     }
     }
-
-    return any;
   }
 
   auto LspTransformer::lspToAny(
     const PrepareCallHierarchyResult &result
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
     switch (static_cast<PrepareCallHierarchyResultType>(result.index())) {
     case PrepareCallHierarchyResultType::CALL_HIERARCHY_ITEM_ARRAY: {
-      std::unique_ptr<LSPArray> items = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<CallHierarchyItem> &item
-             : std::get<ptr_vector<CallHierarchyItem>>(result)) {
-        items->push_back(lspToAny(*item));
-      }
-      any->value = std::move(items);
-      break;
+      return lspToAny(std::get<ptr_vector<CallHierarchyItem>>(result));
     }
     case PrepareCallHierarchyResultType::LSP_NULL: {
-      any->value = nullptr;
-      break;
+      return nullToAny(std::get<std::nullptr_t>(result));
     }
     }
-
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const CallHierarchyItem &item
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(item);
-    return any;
   }
 
   auto LspTransformer::lspToObject(
@@ -5202,13 +5760,7 @@ namespace LCompilers::LanguageServerProtocol {
     object->emplace("name", stringToAny(item.name));
     object->emplace("kind", intToAny(static_cast<int>(item.kind)));
     if (item.tags.has_value()) {
-      std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-      std::unique_ptr<LSPArray> array = std::make_unique<LSPArray>();
-      for (SymbolTag tag : item.tags.value()) {
-        array->push_back(intToAny(static_cast<int>(tag)));
-      }
-      any->value = std::move(array);
-      object->emplace("tags", std::move(any));
+      object->emplace("tags", lspToAny(item.tags.value()));
     }
     if (item.detail.has_value()) {
       object->emplace("detail", stringToAny(item.detail.value()));
@@ -5240,14 +5792,6 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspTransformer::lspToAny(
-    const ProgressParams &params
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(params);
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
     const InitializeResult &result
   ) const -> std::unique_ptr<LSPAny> {
     std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
@@ -5260,60 +5804,33 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::lspToAny(
     const WillSaveWaitUntilResult &result
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
     switch (static_cast<WillSaveWaitUntilResultType>(result.index())) {
     case WillSaveWaitUntilResultType::TEXT_EDITS: {
-      std::unique_ptr<LSPArray> edits;
-      for (const std::unique_ptr<TextEdit> &edit
-             : std::get<ptr_vector<TextEdit>>(result)) {
-        edits->push_back(lspToAny(*edit));
-      }
-      any->value = std::move(edits);
-      break;
+      return lspToAny(std::get<ptr_vector<TextEdit>>(result));
     }
     case WillSaveWaitUntilResultType::LSP_NULL: {
-      any->value = nullptr;
-      break;
+      return nullToAny(std::get<std::nullptr_t>(result));
     }
     }
-    return any;
   }
 
   auto LspTransformer::lspToAny(
     const GotoResult &result
   ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-
     switch (static_cast<GotoResultType>(result.index())) {
     case GotoResultType::LOCATION: {
-      any->value = lspToObject(*std::get<std::unique_ptr<Location>>(result));
-      break;
+      return lspToAny(*std::get<std::unique_ptr<Location>>(result));
     }
     case GotoResultType::LOCATION_ARRAY: {
-      std::unique_ptr<LSPArray> locations = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<Location> &location
-             : std::get<ptr_vector<Location>>(result)) {
-        locations->push_back(lspToAny(*location));
-      }
-      any->value = std::move(locations);
-      break;
+      return lspToAny(std::get<ptr_vector<Location>>(result));
     }
     case GotoResultType::LOCATION_LINK_ARRAY: {
-      std::unique_ptr<LSPArray> links = std::make_unique<LSPArray>();
-      for (const std::unique_ptr<LocationLink> &link
-             : std::get<ptr_vector<LocationLink>>(result)) {
-        links->push_back(lspToAny(*link));
-      }
-      any->value = std::move(links);
-      break;
+      return lspToAny(std::get<ptr_vector<LocationLink>>(result));
     }
     case GotoResultType::LSP_NULL: {
-      any->value = nullptr;
-      break;
+      return nullToAny(std::get<std::nullptr_t>(result));
     }
     }
-
-    return any;
   }
 
   auto LspTransformer::lspToAny(
@@ -5350,46 +5867,6 @@ namespace LCompilers::LanguageServerProtocol {
     return any;
   }
 
-  auto LspTransformer::lspToAny(
-    const TextEdit &edit
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(edit);
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const LocationLink &link
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(link);
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const Location &location
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(location);
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const Range &range
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(range);
-    return any;
-  }
-
-  auto LspTransformer::lspToAny(
-    const Position &position
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(position);
-    return any;
-  }
-
   auto LspTransformer::intToAny(
     int value
   ) const -> std::unique_ptr<LSPAny> {
@@ -5418,13 +5895,7 @@ namespace LCompilers::LanguageServerProtocol {
     const RegistrationParams &registrationParams
   ) const -> std::unique_ptr<LSPObject> {
     std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
-    std::unique_ptr<LSPAny> array = std::make_unique<LSPAny>();
-    std::unique_ptr<LSPArray> registrations = std::make_unique<LSPArray>();
-    for (const std::unique_ptr<Registration> &registration
-           : registrationParams.registrations) {
-      registrations->push_back(lspToAny(*registration));
-    }
-    array->value = std::move(registrations);
+    object->emplace("registrations", lspToAny(registrationParams.registrations));
     return object;
   }
 
@@ -5432,22 +5903,8 @@ namespace LCompilers::LanguageServerProtocol {
     const UnregistrationParams &unregistrationParams
   ) const -> std::unique_ptr<LSPObject> {
     std::unique_ptr<LSPObject> object = std::make_unique<LSPObject>();
-    std::unique_ptr<LSPAny> array = std::make_unique<LSPAny>();
-    std::unique_ptr<LSPArray> unregistrations = std::make_unique<LSPArray>();
-    for (const std::unique_ptr<Unregistration> &unregistration
-           : unregistrationParams.unregisterations) {
-      unregistrations->push_back(lspToAny(*unregistration));
-    }
-    array->value = std::move(unregistrations);
+    object->emplace("unregisterations", lspToAny(unregistrationParams.unregisterations));
     return object;
-  }
-
-  auto LspTransformer::lspToAny(
-    const Unregistration &unregistration
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(unregistration);
-    return any;
   }
 
   auto LspTransformer::lspToObject(
@@ -5459,14 +5916,6 @@ namespace LCompilers::LanguageServerProtocol {
     return object;
   }
 
-  auto LspTransformer::lspToAny(
-    const LogTraceParams &logTraceParams
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(logTraceParams);
-    return any;
-  }
-
   auto LspTransformer::lspToObject(
     const LogTraceParams &logTraceParams
   ) const -> std::unique_ptr<LSPObject> {
@@ -5476,14 +5925,6 @@ namespace LCompilers::LanguageServerProtocol {
       object->emplace("verbose", stringToAny(logTraceParams.verbose.value()));
     }
     return object;
-  }
-
-  auto LspTransformer::lspToAny(
-    const Registration &registration
-  ) const -> std::unique_ptr<LSPAny> {
-    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
-    any->value = lspToObject(registration);
-    return any;
   }
 
   auto LspTransformer::lspToObject(
@@ -5710,6 +6151,18 @@ namespace LCompilers::LanguageServerProtocol {
       clone->push_back(copy(elem));
     }
     return clone;
+  }
+
+  auto LspTransformer::copyToAny(
+    const std::vector<std::unique_ptr<LSPAny>> &source
+  ) const -> std::unique_ptr<LSPAny> {
+    std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();
+    std::unique_ptr<LSPArray> target = std::make_unique<LSPArray>();
+    for (const std::unique_ptr<LSPAny> &any : source) {
+      target->push_back(copy(any));
+    }
+    any->value = std::move(target);
+    return any;
   }
 
 } // namespace LCompilers::LanguageServerProtocol
