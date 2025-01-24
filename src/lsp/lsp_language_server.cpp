@@ -172,7 +172,7 @@ namespace LCompilers::LanguageServerProtocol {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       _initializeParams = transformer.asInitializeParams(requestParams);
-      InitializeResult result = initialize(_initializeParams.value());
+      InitializeResult result = handleInitialize(_initializeParams.value());
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -181,7 +181,7 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.requireMessageParams(request);
       WillSaveTextDocumentParams params =
         transformer.asWillSaveTextDocumentParams(requestParams);
-      WillSaveWaitUntilResult result = willSaveWaitUntil(params);
+      WillSaveWaitUntilResult result = handleTextDocumentWillSaveWaitUntil(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -190,52 +190,52 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.requireMessageParams(request);
       DeclarationParams params =
         transformer.asDeclarationParams(requestParams);
-      GotoResult result = gotoDeclaration(params);
+      GotoResult result = handleTextDocumentDeclaration(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::GOTO_DEFINITION: {
+    case RequestMethod::TEXT_DOCUMENT_DEFINITION: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       DefinitionParams params =
         transformer.asDefinitionParams(requestParams);
-      GotoResult result = gotoDefinition(params);
+      GotoResult result = handleTextDocumentDefinition(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::GOTO_TYPE_DEFINITION: {
+    case RequestMethod::TEXT_DOCUMENT_TYPE_DEFINITION: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       TypeDefinitionParams params =
         transformer.asTypeDefinitionParams(requestParams);
-      GotoResult result = gotoTypeDefinition(params);
+      GotoResult result = handleTextDocumentTypeDefinition(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::GOTO_IMPLEMENTATION: {
+    case RequestMethod::TEXT_DOCUMENT_IMPLEMENTATION: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       ImplementationParams params =
         transformer.asImplementationParams(requestParams);
-      GotoResult result = gotoImplementation(params);
+      GotoResult result = handleTextDocumentImplementation(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::FIND_REFERENCES: {
+    case RequestMethod::TEXT_DOCUMENT_REFERENCES: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       ReferenceParams params =
         transformer.asReferenceParams(requestParams);
-      FindReferencesResult result = findReferences(params);
+      FindReferencesResult result = handleTextDocumentReferences(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::PREPARE_CALL_HIERARCHY: {
+    case RequestMethod::TEXT_DOCUMENT_PREPARE_CALL_HIERARCHY: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       CallHierarchyPrepareParams params =
         transformer.asCallHierarchyPrepareParams(requestParams);
-      PrepareCallHierarchyResult result = prepareCallHierarchy(params);
+      PrepareCallHierarchyResult result = handleTextDocumentPrepareCallHierarchy(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -245,7 +245,7 @@ namespace LCompilers::LanguageServerProtocol {
       CallHierarchyIncomingCallsParams params =
         transformer.asCallHierarchyIncomingCallsParams(requestParams);
       CallHierarchyIncomingCallsResult result =
-        callHierarchyIncomingCalls(params);
+        handleCallHierarchyIncomingCalls(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -255,16 +255,16 @@ namespace LCompilers::LanguageServerProtocol {
       CallHierarchyOutgoingCallsParams params =
         transformer.asCallHierarchyOutgoingCallsParams(requestParams);
       CallHierarchyOutgoingCallsResult result =
-        callHierarchyOutgoingCalls(params);
+        handleCallHierarchyOutgoingCalls(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::PREPARE_TYPE_HIERARCHY: {
+    case RequestMethod::TEXT_DOCUMENT_PREPARE_TYPE_HIERARCHY: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       TypeHierarchyPrepareParams params =
         transformer.asTypeHierarchyPrepareParams(requestParams);
-      TypeHierarchyResult result = prepareTypeHierarchy(params);
+      TypeHierarchyResult result = handleTextDocumentPrepareTypeHierarchy(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -273,7 +273,7 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.requireMessageParams(request);
       TypeHierarchySupertypesParams params =
         transformer.asTypeHierarchySupertypesParams(requestParams);
-      TypeHierarchyResult result = typeHierarchySupertypes(params);
+      TypeHierarchyResult result = handleTypeHierarchySupertypes(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -282,33 +282,33 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.requireMessageParams(request);
       TypeHierarchySubtypesParams params =
         transformer.asTypeHierarchySubtypesParams(requestParams);
-      TypeHierarchyResult result = typeHierarchySubtypes(params);
+      TypeHierarchyResult result = handleTypeHierarchySubtypes(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::HIGHLIGHT_DOCUMENT: {
+    case RequestMethod::TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       DocumentHighlightParams params =
         transformer.asDocumentHighlightParams(requestParams);
-      DocumentHighlightResult result = highlightDocument(params);
+      DocumentHighlightResult result = handleTextDocumentDocumentHighlight(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::EXTRACT_DOCUMENT_LINKS: {
+    case RequestMethod::TEXT_DOCUMENT_DOCUMENT_LINK: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       DocumentLinkParams params =
         transformer.asDocumentLinkParams(requestParams);
-      DocumentLinkResult result = extractDocumentLinks(params);
+      DocumentLinkResult result = handleTextDocumentDocumentLink(params);
       response.result = transformer.lspToAny(result);
       break;
     }
-    case RequestMethod::RESOLVE_DOCUMENT_LINK: {
+    case RequestMethod::DOCUMENT_LINK_RESOLVE: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       DocumentLink params = transformer.asDocumentLink(requestParams);
-      DocumentLink result = resolveDocumentLink(params);
+      DocumentLink result = handleDocumentLinkResolve(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -316,7 +316,7 @@ namespace LCompilers::LanguageServerProtocol {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       HoverParams params = transformer.asHoverParams(requestParams);
-      HoverResult result = textDocumentHover(params);
+      HoverResult result = handleTextDocumentHover(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -324,7 +324,7 @@ namespace LCompilers::LanguageServerProtocol {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       CodeLensParams params = transformer.asCodeLensParams(requestParams);
-      CodeLensResult result = textDocumentCodeLens(params);
+      CodeLensResult result = handleTextDocumentCodeLens(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -332,19 +332,19 @@ namespace LCompilers::LanguageServerProtocol {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       CodeLens params = transformer.asCodeLens(requestParams);
-      CodeLens result = codeLensResolve(params);
+      CodeLens result = handleCodeLensResolve(params);
       response.result = transformer.lspToAny(result);
       break;
     }
     case RequestMethod::WORKSPACE_CODE_LENS_REFRESH: {
-      workspaceCodeLensRefresh();
+      handleWorkspaceCodeLensRefresh();
       break;
     }
     case RequestMethod::TEXT_DOCUMENT_FOLDING_RANGE: {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       FoldingRangeParams params = transformer.asFoldingRangeParams(requestParams);
-      FoldingRangeResult result = textDocumentFoldingRange(params);
+      FoldingRangeResult result = handleTextDocumentFoldingRange(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -352,7 +352,7 @@ namespace LCompilers::LanguageServerProtocol {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       SelectionRangeParams params = transformer.asSelectionRangeParams(requestParams);
-      SelectionRangeResult result = textDocumentSelectionRange(params);
+      SelectionRangeResult result = handleTextDocumentSelectionRange(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -360,7 +360,7 @@ namespace LCompilers::LanguageServerProtocol {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       DocumentSymbolParams params = transformer.asDocumentSymbolParams(requestParams);
-      DocumentSymbolResult result = extractDocumentSymbols(params);
+      DocumentSymbolResult result = handleTextDocumentDocumentSymbol(params);
       response.result = transformer.lspToAny(result);
       break;
     }
@@ -368,12 +368,12 @@ namespace LCompilers::LanguageServerProtocol {
       const MessageParams &requestParams =
         transformer.requireMessageParams(request);
       SemanticTokensParams params = transformer.asSemanticTokensParams(requestParams);
-      SemanticTokensResult result = extractAllSemanticTokens(params);
+      SemanticTokensResult result = handleTextDocumentSemanticTokensFull(params);
       response.result = transformer.lspToAny(result);
       break;
     }
     case RequestMethod::SHUTDOWN: {
-      shutdown();
+      handleShutdown();
       break;
     }
     default: {
@@ -409,89 +409,89 @@ namespace LCompilers::LanguageServerProtocol {
     case NotificationMethod::INITIALIZED: {
       InitializedParams params =
         transformer.asInitializedParams(notification.params);
-      initialized(params);
+      handleInitialized(params);
       break;
     }
     case NotificationMethod::CANCEL_REQUEST: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       CancelParams params = transformer.asCancelParams(notificationParams);
-      cancelRequest(params);
+      handleCancelRequest(params);
       break;
     }
     case NotificationMethod::SET_TRACE: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       SetTraceParams params = transformer.asSetTraceParams(notificationParams);
-      setTrace(params);
+      handleSetTrace(params);
       break;
     }
-    case NotificationMethod::DID_OPEN_NOTEBOOK_DOCUMENT: {
+    case NotificationMethod::NOTEBOOK_DOCUMENT_DID_OPEN: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidOpenNotebookDocumentParams params =
         transformer.asDidOpenNotebookDocumentParams(notificationParams);
-      didOpenNotebookDocument(params);
+      handleNotebookDocumentDidOpen(params);
       break;
     }
-    case NotificationMethod::DID_CHANGE_NOTEBOOK_DOCUMENT: {
+    case NotificationMethod::NOTEBOOK_DOCUMENT_DID_CHANGE: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidChangeNotebookDocumentParams params =
         transformer.asDidChangeNotebookDocumentParams(notificationParams);
-      didChangeNotebookDocument(params);
+      handleNotebookDocumentDidChange(params);
       break;
     }
-    case NotificationMethod::DID_SAVE_NOTEBOOK_DOCUMENT: {
+    case NotificationMethod::NOTEBOOK_DOCUMENT_DID_SAVE: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidSaveNotebookDocumentParams params =
         transformer.asDidSaveNotebookDocumentParams(notificationParams);
-      didSaveNotebookDocument(params);
+      handleNotebookDocumentDidSave(params);
       break;
     }
-    case NotificationMethod::DID_CLOSE_NOTEBOOK_DOCUMENT: {
+    case NotificationMethod::NOTEBOOK_DOCUMENT_DID_CLOSE: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidCloseNotebookDocumentParams params =
         transformer.asDidCloseNotebookDocumentParams(notificationParams);
-      didCloseNotebookDocument(params);
+      handleNotebookDocumentdidClose(params);
       break;
     }
-    case NotificationMethod::DID_OPEN_TEXT_DOCUMENT: {
+    case NotificationMethod::TEXT_DOCUMENT_DID_OPEN: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidOpenTextDocumentParams params =
         transformer.asDidOpenTextDocumentParams(notificationParams);
-      didOpenTextDocument(params);
+      handleTextDocumentDidOpen(params);
       break;
     }
-    case NotificationMethod::DID_CHANGE_TEXT_DOCUMENT: {
+    case NotificationMethod::TEXT_DOCUMENT_DID_CHANGE: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidChangeTextDocumentParams params =
         transformer.asDidChangeTextDocumentParams(notificationParams);
-      didChangeTextDocument(params);
+      handleTextDocumentDidChange(params);
       break;
     }
-    case NotificationMethod::DID_SAVE_TEXT_DOCUMENT: {
+    case NotificationMethod::TEXT_DOCUMENT_DID_SAVE: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidSaveTextDocumentParams params =
         transformer.asDidSaveTextDocumentParams(notificationParams);
-      didSaveTextDocument(params);
+      handleTextDocumentDidSave(params);
       break;
     }
-    case NotificationMethod::DID_CLOSE_TEXT_DOCUMENT: {
+    case NotificationMethod::TEXT_DOCUMENT_DID_CLOSE: {
       const MessageParams &notificationParams =
         transformer.requireMessageParams(notification);
       DidCloseTextDocumentParams params =
         transformer.asDidCloseTextDocumentParams(notificationParams);
-      didCloseTextDocument(params);
+      handleTextDocumentDidClose(params);
       break;
     }
     case NotificationMethod::EXIT: {
-      exit();
+      handleExit();
       break;
     }
     default: {
@@ -550,7 +550,7 @@ namespace LCompilers::LanguageServerProtocol {
   // ========================= //
 
   // request: "initialize"
-  auto LspLanguageServer::initialize(
+  auto LspLanguageServer::handleInitialize(
     const InitializeParams &params
   ) -> InitializeResult {
     InitializeResult result;
@@ -579,7 +579,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/willSaveWaitUntil"
-  auto LspLanguageServer::willSaveWaitUntil(
+  auto LspLanguageServer::handleTextDocumentWillSaveWaitUntil(
     const WillSaveTextDocumentParams &params
   ) -> WillSaveWaitUntilResult {
     throw LspException(
@@ -592,7 +592,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/declaration"
-  auto LspLanguageServer::gotoDeclaration(
+  auto LspLanguageServer::handleTextDocumentDeclaration(
     const DeclarationParams &params
   ) -> GotoResult {
     throw LspException(
@@ -605,72 +605,72 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/definition"
-  auto LspLanguageServer::gotoDefinition(
+  auto LspLanguageServer::handleTextDocumentDefinition(
     const DefinitionParams &params
   ) -> GotoResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::GOTO_DEFINITION)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_DEFINITION)
       )
     );
   }
 
   // request: "textDocument/typeDefinition"
-  auto LspLanguageServer::gotoTypeDefinition(
+  auto LspLanguageServer::handleTextDocumentTypeDefinition(
     const TypeDefinitionParams &params
   ) -> GotoResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::GOTO_TYPE_DEFINITION)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_TYPE_DEFINITION)
       )
     );
   }
 
   // request: "textDocument/implementation"
-  auto LspLanguageServer::gotoImplementation(
+  auto LspLanguageServer::handleTextDocumentImplementation(
     const ImplementationParams &params
   ) -> GotoResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::GOTO_IMPLEMENTATION)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_IMPLEMENTATION)
       )
     );
   }
 
   // request: "textDocument/references"
-  auto LspLanguageServer::findReferences(
+  auto LspLanguageServer::handleTextDocumentReferences(
     const ReferenceParams &params
   ) -> FindReferencesResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::FIND_REFERENCES)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_REFERENCES)
       )
     );
   }
 
   // request: "textDocument/prepareCallHierarchy"
-  auto LspLanguageServer::prepareCallHierarchy(
+  auto LspLanguageServer::handleTextDocumentPrepareCallHierarchy(
     const CallHierarchyPrepareParams &params
   ) -> PrepareCallHierarchyResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::PREPARE_CALL_HIERARCHY)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_PREPARE_CALL_HIERARCHY)
       )
     );
   }
 
   // request: "callHierarchy/incomingCalls"
-  auto LspLanguageServer::callHierarchyIncomingCalls(
+  auto LspLanguageServer::handleCallHierarchyIncomingCalls(
     const CallHierarchyIncomingCallsParams &params
   ) -> CallHierarchyIncomingCallsResult {
     throw LspException(
@@ -683,7 +683,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "callHierarchy/outgoingCalls"
-  auto LspLanguageServer::callHierarchyOutgoingCalls(
+  auto LspLanguageServer::handleCallHierarchyOutgoingCalls(
     const CallHierarchyOutgoingCallsParams &params
   ) -> CallHierarchyOutgoingCallsResult {
     throw LspException(
@@ -696,20 +696,20 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/prepareTypeHierarchy"
-  auto LspLanguageServer::prepareTypeHierarchy(
+  auto LspLanguageServer::handleTextDocumentPrepareTypeHierarchy(
     const TypeHierarchyPrepareParams &params
   ) -> TypeHierarchyResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::PREPARE_TYPE_HIERARCHY)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_PREPARE_TYPE_HIERARCHY)
       )
     );
   }
 
   // request: "typeHierarchy/supertypes"
-  auto LspLanguageServer::typeHierarchySupertypes(
+  auto LspLanguageServer::handleTypeHierarchySupertypes(
     const TypeHierarchySupertypesParams &params
   ) -> TypeHierarchyResult {
     throw LspException(
@@ -721,47 +721,60 @@ namespace LCompilers::LanguageServerProtocol {
     );
   }
 
+  // request: "typeHierarchy/subtypes"
+  auto LspLanguageServer::handleTypeHierarchySubtypes(
+    const TypeHierarchySubtypesParams &params
+  ) -> TypeHierarchyResult {
+    throw LspException(
+      ErrorCodes::MethodNotFound,
+      std::format(
+        "No handler exists for request=\"{}\"",
+        RequestMethodValues.at(RequestMethod::TYPE_HIERARCHY_SUBTYPES)
+      )
+    );
+  }
+
   // request: "textDocument/documentHighlight"
-  auto LspLanguageServer::highlightDocument(
+  auto LspLanguageServer::handleTextDocumentDocumentHighlight(
     const DocumentHighlightParams &params
   ) -> DocumentHighlightResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::HIGHLIGHT_DOCUMENT)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT)
       )
     );
   }
 
   // request: "textDocument/documentLink"
-  auto LspLanguageServer::extractDocumentLinks(
+  auto LspLanguageServer::handleTextDocumentDocumentLink(
     const DocumentLinkParams &params
   ) -> DocumentLinkResult {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::EXTRACT_DOCUMENT_LINKS)
+        RequestMethodValues.at(RequestMethod::TEXT_DOCUMENT_DOCUMENT_LINK)
       )
     );
   }
 
   // request: "documentLink/resolve"
-  auto LspLanguageServer::resolveDocumentLink(
+  auto LspLanguageServer::handleDocumentLinkResolve(
     const DocumentLink &params
   ) -> DocumentLink {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
         "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::RESOLVE_DOCUMENT_LINK)
+        RequestMethodValues.at(RequestMethod::DOCUMENT_LINK_RESOLVE)
       )
     );
   }
 
   // request: "textDocument/hover"
-  auto LspLanguageServer::textDocumentHover(
+  auto LspLanguageServer::handleTextDocumentHover(
     const HoverParams &params
   ) -> HoverResult {
     throw LspException(
@@ -774,7 +787,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/codeLens"
-  auto LspLanguageServer::textDocumentCodeLens(
+  auto LspLanguageServer::handleTextDocumentCodeLens(
     const CodeLensParams &params
   ) -> CodeLensResult {
     throw LspException(
@@ -787,7 +800,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "codeLens/resolve"
-  auto LspLanguageServer::codeLensResolve(
+  auto LspLanguageServer::handleCodeLensResolve(
     const CodeLens &codeLens
   ) -> CodeLens {
     throw LspException(
@@ -800,7 +813,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "workspace/codeLens/refresh"
-  auto LspLanguageServer::workspaceCodeLensRefresh() -> void {
+  auto LspLanguageServer::handleWorkspaceCodeLensRefresh() -> void {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
@@ -811,7 +824,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/foldingRange"
-  auto LspLanguageServer::textDocumentFoldingRange(
+  auto LspLanguageServer::handleTextDocumentFoldingRange(
     const FoldingRangeParams &params
   ) -> FoldingRangeResult {
     throw LspException(
@@ -824,7 +837,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/selectionRange"
-  auto LspLanguageServer::textDocumentSelectionRange(
+  auto LspLanguageServer::handleTextDocumentSelectionRange(
     const SelectionRangeParams &params
   ) -> SelectionRangeResult {
     throw LspException(
@@ -837,7 +850,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/documentSymbol"
-  auto LspLanguageServer::extractDocumentSymbols(
+  auto LspLanguageServer::handleTextDocumentDocumentSymbol(
     const DocumentSymbolParams &params
   ) -> DocumentSymbolResult {
     throw LspException(
@@ -850,7 +863,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/semanticTokens/full"
-  auto LspLanguageServer::extractAllSemanticTokens(
+  auto LspLanguageServer::handleTextDocumentSemanticTokensFull(
     const SemanticTokensParams &params
   ) -> SemanticTokensResult {
     throw LspException(
@@ -862,21 +875,8 @@ namespace LCompilers::LanguageServerProtocol {
     );
   }
 
-  // request: "typeHierarchy/subtypes"
-  auto LspLanguageServer::typeHierarchySubtypes(
-    const TypeHierarchySubtypesParams &params
-  ) -> TypeHierarchyResult {
-    throw LspException(
-      ErrorCodes::MethodNotFound,
-      std::format(
-        "No handler exists for request=\"{}\"",
-        RequestMethodValues.at(RequestMethod::TYPE_HIERARCHY_SUBTYPES)
-      )
-    );
-  }
-
   // request: "shutdown"
-  auto LspLanguageServer::shutdown() -> void {
+  auto LspLanguageServer::handleShutdown() -> void {
     std::cerr << "Shutting down server." << std::endl;
     _shutdown = true;
   }
@@ -886,7 +886,7 @@ namespace LCompilers::LanguageServerProtocol {
   // ============================== //
 
   // notification: "exit"
-  auto LspLanguageServer::exit() -> void {
+  auto LspLanguageServer::handleExit() -> void {
     std::cerr << "Exiting server." << std::endl;
     _exit = true;
     if (!_shutdown) {
@@ -898,7 +898,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "$/cancelRequest"
-  auto LspLanguageServer::cancelRequest(const CancelParams &params) -> void {
+  auto LspLanguageServer::handleCancelRequest(const CancelParams &params) -> void {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
@@ -909,14 +909,14 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "initialized"
-  auto LspLanguageServer::initialized(
+  auto LspLanguageServer::handleInitialized(
     const InitializedParams &params
   ) -> void {
     // empty
   }
 
   // notification: "$/setTrace"
-  auto LspLanguageServer::setTrace(const SetTraceParams &params) -> void {
+  auto LspLanguageServer::handleSetTrace(const SetTraceParams &params) -> void {
     throw LspException(
       ErrorCodes::MethodNotFound,
       std::format(
@@ -927,7 +927,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "textDocument/didOpen"
-  auto LspLanguageServer::didOpenTextDocument(
+  auto LspLanguageServer::handleTextDocumentDidOpen(
     const DidOpenTextDocumentParams &params
   ) -> void {
     const TextDocumentItem &textDocumentItem = *params.textDocument;
@@ -944,7 +944,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "textDocument/didChange"
-  auto LspLanguageServer::didChangeTextDocument(
+  auto LspLanguageServer::handleTextDocumentDidChange(
     DidChangeTextDocumentParams &params
   ) -> void {
     const DocumentUri &uri = params.textDocument->uri;
@@ -957,7 +957,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "textDocument/didSave"
-  auto LspLanguageServer::didSaveTextDocument(
+  auto LspLanguageServer::handleTextDocumentDidSave(
     const DidSaveTextDocumentParams &params
   ) -> void {
     if (params.text.has_value()) {
@@ -973,7 +973,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "textDocument/didClose"
-  auto LspLanguageServer::didCloseTextDocument(
+  auto LspLanguageServer::handleTextDocumentDidClose(
     const DidCloseTextDocumentParams &params
   ) -> void {
     const DocumentUri &uri = params.textDocument->uri;
@@ -992,7 +992,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "notebookDocument/didOpen"
-  auto LspLanguageServer::didOpenNotebookDocument(
+  auto LspLanguageServer::handleNotebookDocumentDidOpen(
     const DidOpenNotebookDocumentParams &params
   ) -> void {
     throw LspException(
@@ -1000,14 +1000,14 @@ namespace LCompilers::LanguageServerProtocol {
       std::format(
         "No handler exists for notification=\"{}\"",
         NotificationMethodValues.at(
-          NotificationMethod::DID_OPEN_NOTEBOOK_DOCUMENT
+          NotificationMethod::NOTEBOOK_DOCUMENT_DID_OPEN
         )
       )
     );
   }
 
   // notification: "notebookDocument/didChange"
-  auto LspLanguageServer::didChangeNotebookDocument(
+  auto LspLanguageServer::handleNotebookDocumentDidChange(
     const DidChangeNotebookDocumentParams &params
   ) -> void {
     throw LspException(
@@ -1015,14 +1015,14 @@ namespace LCompilers::LanguageServerProtocol {
       std::format(
         "No handler exists for notification=\"{}\"",
         NotificationMethodValues.at(
-          NotificationMethod::DID_CHANGE_NOTEBOOK_DOCUMENT
+          NotificationMethod::NOTEBOOK_DOCUMENT_DID_CHANGE
         )
       )
     );
   }
 
   // notification: "notebookDocument/didSave"
-  auto LspLanguageServer::didSaveNotebookDocument(
+  auto LspLanguageServer::handleNotebookDocumentDidSave(
     const DidSaveNotebookDocumentParams &params
   ) -> void {
     throw LspException(
@@ -1030,14 +1030,14 @@ namespace LCompilers::LanguageServerProtocol {
       std::format(
         "No handler exists for notification=\"{}\"",
         NotificationMethodValues.at(
-          NotificationMethod::DID_SAVE_NOTEBOOK_DOCUMENT
+          NotificationMethod::NOTEBOOK_DOCUMENT_DID_SAVE
         )
       )
     );
   }
 
   // notification: "notebookDocument/didClose"
-  auto LspLanguageServer::didCloseNotebookDocument(
+  auto LspLanguageServer::handleNotebookDocumentdidClose(
     const DidCloseNotebookDocumentParams &params
   ) -> void {
     throw LspException(
@@ -1045,7 +1045,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::format(
         "No handler exists for notification=\"{}\"",
         NotificationMethodValues.at(
-          NotificationMethod::DID_CLOSE_NOTEBOOK_DOCUMENT
+          NotificationMethod::NOTEBOOK_DOCUMENT_DID_CLOSE
         )
       )
     );
@@ -1056,7 +1056,7 @@ namespace LCompilers::LanguageServerProtocol {
   // ========================= //
 
   // request: "client/registerCapability"
-  auto LspLanguageServer::registerCapability(
+  auto LspLanguageServer::requestClientRegisterCapability(
     const RegistrationParams &params
   ) -> void {
     RequestMessage request;
@@ -1069,7 +1069,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "client/unregisterCapability"
-  auto LspLanguageServer::unregisterCapability(
+  auto LspLanguageServer::requestClientUnregisterCapability(
     const UnregistrationParams &params
   ) -> void {
     RequestMessage request;
@@ -1086,7 +1086,7 @@ namespace LCompilers::LanguageServerProtocol {
   // ============================== //
 
   // notification: "$/progress"
-  auto LspLanguageServer::reportProgress(
+  auto LspLanguageServer::notifyProgress(
     const ProgressParams &params
   ) -> void {
     NotificationMessage notification;
@@ -1098,7 +1098,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // notification: "$/logTrace"
-  auto LspLanguageServer::logTrace(
+  auto LspLanguageServer::notifyLogTrace(
     const LogTraceParams &params
   ) -> void {
     NotificationMessage notification;

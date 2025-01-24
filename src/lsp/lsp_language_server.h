@@ -62,105 +62,111 @@ namespace LCompilers::LanguageServerProtocol {
     auto initializeParams() const -> const InitializeParams &;
 
     // request: client -> server
-    auto initialize(const InitializeParams &params) -> InitializeResult;
-    auto willSaveWaitUntil(
-      const WillSaveTextDocumentParams &params
-    ) -> WillSaveWaitUntilResult;
-    auto gotoDeclaration(
-      const DeclarationParams &params
-    ) -> GotoResult;
-    auto gotoDefinition(
-      const DefinitionParams &params
-    ) -> GotoResult;
-    auto gotoTypeDefinition(
-      const TypeDefinitionParams &params
-    ) -> GotoResult;
-    auto gotoImplementation(
-      const ImplementationParams &params
-    ) -> GotoResult;
-    auto findReferences(
-      const ReferenceParams &params
-    ) -> FindReferencesResult;
-    auto prepareCallHierarchy(
-      const CallHierarchyPrepareParams &params
-    ) -> PrepareCallHierarchyResult;
-    auto callHierarchyIncomingCalls(
+    auto handleCallHierarchyIncomingCalls(
       const CallHierarchyIncomingCallsParams &params
     ) -> CallHierarchyIncomingCallsResult;
-    auto callHierarchyOutgoingCalls(
+    auto handleCallHierarchyOutgoingCalls(
       const CallHierarchyOutgoingCallsParams &params
     ) -> CallHierarchyOutgoingCallsResult;
-    auto prepareTypeHierarchy(
-      const TypeHierarchyPrepareParams &params
-    ) -> TypeHierarchyResult;
-    auto typeHierarchySupertypes(
-      const TypeHierarchySupertypesParams &params
-    ) -> TypeHierarchyResult;
-    auto typeHierarchySubtypes(
-      const TypeHierarchySubtypesParams &params
-    ) -> TypeHierarchyResult;
-    auto highlightDocument(
+    auto handleCodeLensResolve(const CodeLens &codeLens) -> CodeLens;
+    auto handleDocumentLinkResolve(const DocumentLink &params) -> DocumentLink;
+    auto handleInitialize(const InitializeParams &params) -> InitializeResult;
+    auto handleShutdown() -> void;
+    auto handleTextDocumentCodeLens(const CodeLensParams &params) -> CodeLensResult;
+    auto handleTextDocumentDeclaration(
+      const DeclarationParams &params
+    ) -> GotoResult;
+    auto handleTextDocumentDefinition(
+      const DefinitionParams &params
+    ) -> GotoResult;
+    auto handleTextDocumentDocumentHighlight(
       const DocumentHighlightParams &params
     ) -> DocumentHighlightResult;
-    auto extractDocumentLinks(
+    auto handleTextDocumentDocumentLink(
       const DocumentLinkParams &params
     ) -> DocumentLinkResult;
-    auto resolveDocumentLink(
-      const DocumentLink &params
-    ) -> DocumentLink;
-    auto textDocumentHover(
-      const HoverParams &params
-    ) -> HoverResult;
-    auto textDocumentCodeLens(
-      const CodeLensParams &params
-    ) -> CodeLensResult;
-    auto codeLensResolve(
-      const CodeLens &codeLens
-    ) -> CodeLens;
-    auto workspaceCodeLensRefresh() -> void;
-    auto textDocumentFoldingRange(
-      const FoldingRangeParams &params
-    ) -> FoldingRangeResult;
-    auto textDocumentSelectionRange(
-      const SelectionRangeParams &params
-    ) -> SelectionRangeResult;
-    auto extractDocumentSymbols(
+    auto handleTextDocumentDocumentSymbol(
       const DocumentSymbolParams &params
     ) -> DocumentSymbolResult;
-    auto extractAllSemanticTokens(
+    auto handleTextDocumentFoldingRange(
+      const FoldingRangeParams &params
+    ) -> FoldingRangeResult;
+    auto handleTextDocumentHover(
+      const HoverParams &params
+    ) -> HoverResult;
+    auto handleTextDocumentImplementation(
+      const ImplementationParams &params
+    ) -> GotoResult;
+    auto handleTextDocumentPrepareCallHierarchy(
+      const CallHierarchyPrepareParams &params
+    ) -> PrepareCallHierarchyResult;
+    auto handleTextDocumentPrepareTypeHierarchy(
+      const TypeHierarchyPrepareParams &params
+    ) -> TypeHierarchyResult;
+    auto handleTextDocumentReferences(
+      const ReferenceParams &params
+    ) -> FindReferencesResult;
+    auto handleTextDocumentSelectionRange(
+      const SelectionRangeParams &params
+    ) -> SelectionRangeResult;
+    auto handleTextDocumentSemanticTokensFull(
       const SemanticTokensParams &params
     ) -> SemanticTokensResult;
-    auto shutdown() -> void;
+    auto handleTextDocumentTypeDefinition(
+      const TypeDefinitionParams &params
+    ) -> GotoResult;
+    auto handleTextDocumentWillSaveWaitUntil(
+      const WillSaveTextDocumentParams &params
+    ) -> WillSaveWaitUntilResult;
+    auto handleTypeHierarchySubtypes(
+      const TypeHierarchySubtypesParams &params
+    ) -> TypeHierarchyResult;
+    auto handleTypeHierarchySupertypes(
+      const TypeHierarchySupertypesParams &params
+    ) -> TypeHierarchyResult;
+    auto handleWorkspaceCodeLensRefresh() -> void;
 
     // notification: client -> server
-    auto exit() -> void;
-    auto cancelRequest(const CancelParams &params) -> void;
-    auto initialized(const InitializedParams &params) -> void;
-    auto setTrace(const SetTraceParams &params) -> void;
-    auto didOpenTextDocument(const DidOpenTextDocumentParams &params) -> void;
-    auto didChangeTextDocument(DidChangeTextDocumentParams &params) -> void;
-    auto didSaveTextDocument(const DidSaveTextDocumentParams &params) -> void;
-    auto didCloseTextDocument(const DidCloseTextDocumentParams &params) -> void;
-    auto didOpenNotebookDocument(
-      const DidOpenNotebookDocumentParams &params
-    ) -> void;
-    auto didChangeNotebookDocument(
+    auto handleCancelRequest(const CancelParams &params) -> void;
+    auto handleExit() -> void;
+    auto handleInitialized(const InitializedParams &params) -> void;
+    auto handleNotebookDocumentDidChange(
       const DidChangeNotebookDocumentParams &params
     ) -> void;
-    auto didSaveNotebookDocument(
+    auto handleNotebookDocumentdidClose(
+      const DidCloseNotebookDocumentParams &params
+    ) -> void;
+    auto handleNotebookDocumentDidOpen(
+      const DidOpenNotebookDocumentParams &params
+    ) -> void;
+    auto handleNotebookDocumentDidSave(
       const DidSaveNotebookDocumentParams &params
     ) -> void;
-    auto didCloseNotebookDocument(
-      const DidCloseNotebookDocumentParams &params
+    auto handleSetTrace(const SetTraceParams &params) -> void;
+    auto handleTextDocumentDidChange(
+      DidChangeTextDocumentParams &params
+    ) -> void;
+    auto handleTextDocumentDidClose(
+      const DidCloseTextDocumentParams &params
+    ) -> void;
+    auto handleTextDocumentDidOpen(
+      const DidOpenTextDocumentParams &params
+    ) -> void;
+    auto handleTextDocumentDidSave(
+      const DidSaveTextDocumentParams &params
     ) -> void;
 
     // request: server -> client
-    auto registerCapability(const RegistrationParams &params) -> void;
-    auto unregisterCapability(const UnregistrationParams &params) -> void;
+    auto requestClientRegisterCapability(
+      const RegistrationParams &params
+    ) -> void;
+    auto requestClientUnregisterCapability(
+      const UnregistrationParams &params
+    ) -> void;
 
     // notification: server -> client
-    auto reportProgress(const ProgressParams &params) -> void;
-    auto logTrace(const LogTraceParams &params) -> void;
+    auto notifyProgress(const ProgressParams &params) -> void;
+    auto notifyLogTrace(const LogTraceParams &params) -> void;
 
     void assertInitialized();
     void assertRunning();

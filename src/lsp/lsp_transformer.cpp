@@ -338,7 +338,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DefinitionParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::GOTO_DEFINITION
+        RequestMethod::TEXT_DOCUMENT_DEFINITION
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -386,7 +386,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> TypeDefinitionParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::GOTO_TYPE_DEFINITION
+        RequestMethod::TEXT_DOCUMENT_TYPE_DEFINITION
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -434,7 +434,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> ImplementationParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::GOTO_IMPLEMENTATION
+        RequestMethod::TEXT_DOCUMENT_IMPLEMENTATION
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -482,7 +482,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> ReferenceParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::FIND_REFERENCES
+        RequestMethod::TEXT_DOCUMENT_REFERENCES
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -535,7 +535,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> CallHierarchyPrepareParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::PREPARE_CALL_HIERARCHY
+        RequestMethod::TEXT_DOCUMENT_PREPARE_CALL_HIERARCHY
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -783,7 +783,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> TypeHierarchyPrepareParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::PREPARE_TYPE_HIERARCHY
+        RequestMethod::TEXT_DOCUMENT_PREPARE_TYPE_HIERARCHY
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -1000,7 +1000,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DocumentLink {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::RESOLVE_DOCUMENT_LINK
+        RequestMethod::DOCUMENT_LINK_RESOLVE
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -1601,7 +1601,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DocumentHighlightParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::HIGHLIGHT_DOCUMENT
+        RequestMethod::TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -1681,7 +1681,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DocumentLinkParams {
     assertRequestType(
       RequestMethodValues.at(
-        RequestMethod::EXTRACT_DOCUMENT_LINKS
+        RequestMethod::TEXT_DOCUMENT_DOCUMENT_LINK
       ),
       requestParams,
       MessageParamsType::LSP_OBJECT
@@ -5398,7 +5398,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidOpenNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_OPEN_NOTEBOOK_DOCUMENT
+        NotificationMethod::NOTEBOOK_DOCUMENT_DID_OPEN
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT
@@ -5442,7 +5442,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidChangeNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_CHANGE_NOTEBOOK_DOCUMENT
+        NotificationMethod::NOTEBOOK_DOCUMENT_DID_CHANGE
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT
@@ -5482,7 +5482,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidSaveNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_SAVE_NOTEBOOK_DOCUMENT
+        NotificationMethod::NOTEBOOK_DOCUMENT_DID_SAVE
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT
@@ -5511,7 +5511,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidCloseNotebookDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_CLOSE_NOTEBOOK_DOCUMENT
+        NotificationMethod::NOTEBOOK_DOCUMENT_DID_CLOSE
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT
@@ -5559,7 +5559,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidOpenTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_OPEN_TEXT_DOCUMENT
+        NotificationMethod::TEXT_DOCUMENT_DID_OPEN
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT
@@ -5589,7 +5589,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidChangeTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_CHANGE_TEXT_DOCUMENT
+        NotificationMethod::TEXT_DOCUMENT_DID_CHANGE
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT
@@ -5637,7 +5637,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidSaveTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_SAVE_TEXT_DOCUMENT
+        NotificationMethod::TEXT_DOCUMENT_DID_SAVE
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT
@@ -5678,7 +5678,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> DidCloseTextDocumentParams {
     assertNotificationType(
       NotificationMethodValues.at(
-        NotificationMethod::DID_CLOSE_TEXT_DOCUMENT
+        NotificationMethod::TEXT_DOCUMENT_DID_CLOSE
       ),
       notificationParams,
       MessageParamsType::LSP_OBJECT

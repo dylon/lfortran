@@ -12,7 +12,7 @@ namespace LCompilers::LanguageServerProtocol {
   public:
     LFortranLspLanguageServer(ls::MessageQueue &outgoingMessages);
   protected:
-    InitializeResult initialize(const InitializeParams &params);
+    InitializeResult handleInitialize(const InitializeParams &params);
   };
 
 } // namespace LCompilers::LanguageServerProtocol
