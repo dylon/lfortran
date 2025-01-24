@@ -21,7 +21,7 @@ namespace LCompilers::LanguageServer {
     auto stop() -> void;
   private:
     std::string buffer[MESSAGE_QUEUE_CAPACITY];
-    std::atomic_bool running;
+    std::atomic_bool running = true;
     std::size_t head = 0;
     std::size_t tail = 0;
     std::size_t _size = 0;
