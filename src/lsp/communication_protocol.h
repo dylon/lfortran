@@ -79,10 +79,12 @@ namespace LCompilers::LanguageServer {
       LanguageServer &languageServer,
       RequestParserFactory &parserFactory,
       short unsigned int port,
+      std::size_t numThreads,
       MessageQueue &incomingMessages
     );
     void serve() override;
   private:
+    asio::io_context io_context;
     short unsigned int port;
     std::thread messageListener;
     std::atomic_bool running = true;

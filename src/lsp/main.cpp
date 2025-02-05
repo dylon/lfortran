@@ -332,6 +332,7 @@ auto buildCommunicationProtocol(
       languageServer,
       requestParserFactory,
       opts.tcpPort,
+      opts.numThreads,
       incomingMessages
     );
   }

@@ -240,8 +240,10 @@ namespace LCompilers::LanguageServer {
     LanguageServer &languageServer,
     RequestParserFactory &parserFactory,
     short unsigned int port,
+    std::size_t numThreads,
     MessageQueue &incomingMessages)
     : CommunicationProtocol(languageServer, parserFactory, incomingMessages)
+    , io_context(numThreads)
     , port(port)
     , messageListener([this]() {
       listen();
@@ -252,13 +254,19 @@ namespace LCompilers::LanguageServer {
 
   auto TcpCommunicationProtocol::listen() -> void {
     std::stringstream ss;
-    do {
-      const std::string message = incomingMessages.dequeue();
-      ss.str("");
-      prepareResponse(ss, 200, "OK", message);
-      const std::string output = ss.str();
-      std::cout << output << std::endl;
-    } while (running);
+    try {
+      do {
+        const std::string message = incomingMessages.dequeue();
+        ss.str("");
+        prepareResponse(ss, 200, "OK", message);
+        const std::string output = ss.str();
+        std::cout << output << std::endl;
+      } while (running);
+    } catch (std::runtime_error &e) {
+      if (running) {
+        throw e;
+      }
+    }
   }
 
   auto TcpCommunicationProtocol::prepareResponse(
@@ -362,6 +370,9 @@ namespace LCompilers::LanguageServer {
     } catch (std::exception &e) {
       std::fprintf(stderr, "tcpDispatch failed with error: %s\n", e.what());
     }
+    if (languageServer.isTerminated()) {
+      io_context.stop();
+    }
   }
 
   auto TcpCommunicationProtocol::listener() -> awaitable<void> {
@@ -379,8 +390,6 @@ namespace LCompilers::LanguageServer {
         << "Starting TCP server; listening on port: "
         << port
         << std::endl;
-
-      asio::io_context io_context(1);
 
       asio::signal_set signals(io_context, SIGINT, SIGTERM);
       signals.async_wait([&](auto, auto) { io_context.stop(); });

@@ -44,10 +44,10 @@ namespace LCompilers::LanguageServerProtocol {
       const TextDocumentContentChangeEvent &event
     ) const -> std::size_t;
     auto from(
-      const PartialTextDocumentContentChangeEvent &event
+      const TextDocumentContentChangeEvent_0 &event
     ) const -> std::size_t;
     auto from(
-      const WholeTextDocumentContentChangeEvent &event
+      const TextDocumentContentChangeEvent_1 &event
     ) const -> std::size_t;
 
     auto decompose(
@@ -57,13 +57,13 @@ namespace LCompilers::LanguageServerProtocol {
       std::string &patch
     ) const -> void;
     auto decompose(
-      const PartialTextDocumentContentChangeEvent &event,
+      const TextDocumentContentChangeEvent_0 &event,
       std::size_t &j,
       std::size_t &k,
       std::string &patch
     ) const -> void;
     auto decompose(
-      const WholeTextDocumentContentChangeEvent &event,
+      const TextDocumentContentChangeEvent_1 &event,
       std::size_t &j,
       std::size_t &k,
       std::string &patch

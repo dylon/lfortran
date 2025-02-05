@@ -5,7 +5,7 @@
 namespace LCompilers::LanguageServerProtocol {
 
   LspException::LspException(
-    ErrorCodes code,
+    ErrorCode code,
     const std::string &message,
     const std::source_location location
   ) : std::logic_error(message)
@@ -15,7 +15,7 @@ namespace LCompilers::LanguageServerProtocol {
     // empty
   }
 
-  auto LspException::code() const -> ErrorCodes {
+  auto LspException::code() const -> const ErrorCode & {
     return _code;
   }
 

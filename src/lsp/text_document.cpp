@@ -17,10 +17,10 @@ namespace LCompilers::LanguageServerProtocol {
     , _text(text)
   {
     validateUriAndSetPath();
-    // std::cerr  // DEBUG
-    //   << "================================================================================" << std::endl
-    //   << _text
-    //   << "================================================================================" << std::endl;
+    std::cerr  // DEBUG
+      << "================================================================================" << std::endl
+      << _text
+      << "================================================================================" << std::endl;
     indexLines();
   }
 
@@ -44,10 +44,10 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::setText(const std::string &text) -> void {
     std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
     _text = text;
-    // std::cerr  // DEBUG
-    //   << "================================================================================" << std::endl
-    //   << _text
-    //   << "================================================================================" << std::endl;
+    std::cerr  // DEBUG
+      << "================================================================================" << std::endl
+      << _text
+      << "================================================================================" << std::endl;
     indexLines();
   }
 
@@ -123,14 +123,14 @@ namespace LCompilers::LanguageServerProtocol {
     const TextDocumentContentChangeEvent &event
   ) const -> std::size_t {
     switch (static_cast<TextDocumentContentChangeEventType>(event.index())) {
-    case TextDocumentContentChangeEventType::PARTIAL_TEXT_DOCUMENT: {
+    case TextDocumentContentChangeEventType::TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_0: {
       return from(
-        *std::get<std::unique_ptr<PartialTextDocumentContentChangeEvent>>(event)
+        *std::get<std::unique_ptr<TextDocumentContentChangeEvent_0>>(event)
       );
     }
-    case TextDocumentContentChangeEventType::WHOLE_TEXT_DOCUMENT: {
+    case TextDocumentContentChangeEventType::TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_1: {
       return from(
-        *std::get<std::unique_ptr<WholeTextDocumentContentChangeEvent>>(event)
+        *std::get<std::unique_ptr<TextDocumentContentChangeEvent_1>>(event)
       );
     }
     }
@@ -138,7 +138,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::from(
-    const PartialTextDocumentContentChangeEvent &event
+    const TextDocumentContentChangeEvent_0 &event
   ) const -> std::size_t {
     const Range &range = *event.range;
     const Position &start = *range.start;
@@ -147,7 +147,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::from(
-    const WholeTextDocumentContentChangeEvent &event
+    const TextDocumentContentChangeEvent_1 &event
   ) const -> std::size_t {
     return 0;
   }
@@ -159,15 +159,15 @@ namespace LCompilers::LanguageServerProtocol {
     std::string &patch
   ) const -> void {
     switch (static_cast<TextDocumentContentChangeEventType>(event.index())) {
-    case TextDocumentContentChangeEventType::PARTIAL_TEXT_DOCUMENT: {
-      const PartialTextDocumentContentChangeEvent &partial =
-        *std::get<std::unique_ptr<PartialTextDocumentContentChangeEvent>>(event);
+    case TextDocumentContentChangeEventType::TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_0: {
+      const TextDocumentContentChangeEvent_0 &partial =
+        *std::get<std::unique_ptr<TextDocumentContentChangeEvent_0>>(event);
       decompose(partial, j, k, patch);
       break;
     }
-    case TextDocumentContentChangeEventType::WHOLE_TEXT_DOCUMENT: {
-      const WholeTextDocumentContentChangeEvent &whole =
-        *std::get<std::unique_ptr<WholeTextDocumentContentChangeEvent>>(event);
+    case TextDocumentContentChangeEventType::TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_1: {
+      const TextDocumentContentChangeEvent_1 &whole =
+        *std::get<std::unique_ptr<TextDocumentContentChangeEvent_1>>(event);
       decompose(whole, j, k, patch);
       break;
     }
@@ -175,7 +175,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::decompose(
-    const PartialTextDocumentContentChangeEvent &event,
+    const TextDocumentContentChangeEvent_0 &event,
     std::size_t &j,
     std::size_t &k,
     std::string &patch
@@ -186,7 +186,7 @@ namespace LCompilers::LanguageServerProtocol {
 
     if (start.line > end.line) {
       throw LspException(
-        ErrorCodes::InvalidParams,
+        ErrorCodes::INVALID_PARAMS,
         std::format(
           "start.line must be <= end.line, but {} > {}",
           start.line,
@@ -197,7 +197,7 @@ namespace LCompilers::LanguageServerProtocol {
 
     if ((start.line == end.line) && (start.character > end.character)) {
       throw LspException(
-        ErrorCodes::InvalidParams,
+        ErrorCodes::INVALID_PARAMS,
         std::format(
           "start.character must be <= end.character when colinear, but {} > {}",
           start.character,
@@ -212,7 +212,7 @@ namespace LCompilers::LanguageServerProtocol {
       j = _text.length();
     } else {
       throw LspException(
-        ErrorCodes::InvalidParams,
+        ErrorCodes::INVALID_PARAMS,
         std::format(
           "start.line must be <= {} but was: {}",
           lineIndices[lineIndices.size() - 1] + 1,
@@ -231,7 +231,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::decompose(
-    const WholeTextDocumentContentChangeEvent &event,
+    const TextDocumentContentChangeEvent_1 &event,
     std::size_t &j,
     std::size_t &k,
     std::string &patch

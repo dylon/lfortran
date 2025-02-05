@@ -13,9 +13,10 @@ namespace LCompilers::LanguageServerProtocol {
 
   // request: "initialize"
   auto LFortranLspLanguageServer::handleInitialize(
-    const InitializeParams &params
+    InitializeParams &params
   ) -> InitializeResult {
     InitializeResult result = LspLanguageServer::handleInitialize(params);
+    // add additional function for lfortran
     return result;
   }
 

@@ -47,9 +47,13 @@ namespace LCompilers::LanguageServer {
   }
 
   auto MessageQueue::stop() -> void {
-    running = false;
-    enqueued.notify_all();
-    dequeued.notify_all();
+    bool expected = true;
+    if (running.compare_exchange_strong(expected, false)) {
+      enqueued.notify_all();
+      dequeued.notify_all();
+    } else {
+      throw std::runtime_error("MessageQueue has already been stopped!");
+    }
   }
 
 } // namespace LCompilers::LanguageServer

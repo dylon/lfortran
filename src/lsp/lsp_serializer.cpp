@@ -57,14 +57,12 @@ namespace LCompilers::LanguageServerProtocol {
     rapidjson::Document::AllocatorType &allocator
   ) const -> rapidjson::Value {
     switch (static_cast<MessageParamsType>(params.index())) {
-    case MessageParamsType::LSP_OBJECT: {
-      const LSPObject &object =
-        *std::get<std::unique_ptr<LSPObject>>(params);
+    case MessageParamsType::OBJECT_TYPE: {
+      const LSPObject &object = std::get<LSPObject>(params);
       return lspToJson(object, allocator);
     }
-    case MessageParamsType::LSP_ARRAY: {
-      const LSPArray &array =
-        *std::get<std::unique_ptr<LSPArray>>(params);
+    case MessageParamsType::ARRAY_TYPE: {
+      const LSPArray &array = std::get<LSPArray>(params);
       return lspToJson(array, allocator);
     }
     }
@@ -134,11 +132,11 @@ namespace LCompilers::LanguageServerProtocol {
     rapidjson::Document::AllocatorType &allocator
   ) const -> rapidjson::Value {
     switch (static_cast<RequestIdType>(requestId.index())) {
-    case RequestIdType::LSP_INTEGER: {
+    case RequestIdType::INTEGER_TYPE: {
       int value = std::get<int>(requestId);
       return intToJson(value, allocator);
     }
-    case RequestIdType::LSP_STRING: {
+    case RequestIdType::STRING_TYPE: {
       const std::string &value = std::get<std::string>(requestId);
       return stringToJson(value, allocator);
     }
@@ -187,15 +185,15 @@ namespace LCompilers::LanguageServerProtocol {
     rapidjson::Document::AllocatorType &allocator
   ) const -> void {
     switch (static_cast<ResponseIdType>(id.index())) {
-    case ResponseIdType::LSP_INTEGER: {
+    case ResponseIdType::INTEGER_TYPE: {
       document.AddMember(
         "id",
-        rapidjson::Value(std::get<integer>(id)),
+        rapidjson::Value(std::get<integer_t>(id)),
         allocator
       );
       break;
     }
-    case ResponseIdType::LSP_STRING: {
+    case ResponseIdType::STRING_TYPE: {
       std::string stringId = std::get<std::string>(id);
       document.AddMember(
         "id",
@@ -208,7 +206,7 @@ namespace LCompilers::LanguageServerProtocol {
       );
       break;
     }
-    case ResponseIdType::LSP_NULL: {
+    case ResponseIdType::NULL_TYPE: {
       document.AddMember(
         "id",
         rapidjson::Value(rapidjson::kNullType),
@@ -246,20 +244,18 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &lspAny,
     rapidjson::Document::AllocatorType &allocator
   ) const -> rapidjson::Value {
-    switch (static_cast<LSPAnyType>(lspAny.value.index())) {
-    case LSPAnyType::LSP_OBJECT: {
-      const LSPObject &object =
-        *std::get<std::unique_ptr<LSPObject>>(lspAny.value);
+    switch (static_cast<LSPAnyType>(lspAny.index())) {
+    case LSPAnyType::OBJECT_TYPE: {
+      const LSPObject &object = std::get<LSPObject>(lspAny);
       return lspToJson(object, allocator);
     }
-    case LSPAnyType::LSP_ARRAY: {
-      const LSPArray &array =
-        *std::get<std::unique_ptr<LSPArray>>(lspAny.value);
+    case LSPAnyType::ARRAY_TYPE: {
+      const LSPArray &array = std::get<LSPArray>(lspAny);
       return lspToJson(array, allocator);
     }
-    case LSPAnyType::LSP_STRING: {
+    case LSPAnyType::STRING_TYPE: {
       rapidjson::Value value;
-      const string &stringValue = std::get<string>(lspAny.value);
+      const string_t &stringValue = std::get<std::string>(lspAny);
       value.SetString(
         stringValue.c_str(),
         stringValue.length(),
@@ -267,27 +263,27 @@ namespace LCompilers::LanguageServerProtocol {
       );
       return value;
     }
-    case LSPAnyType::LSP_INTEGER: {
+    case LSPAnyType::INTEGER_TYPE: {
       rapidjson::Value value;
-      value.SetInt(std::get<integer>(lspAny.value));
+      value.SetInt(std::get<integer_t>(lspAny));
       return value;
     }
-    case LSPAnyType::LSP_UINTEGER: {
+    case LSPAnyType::UINTEGER_TYPE: {
       rapidjson::Value value;
-      value.SetUint(std::get<uinteger>(lspAny.value));
+      value.SetUint(std::get<uinteger_t>(lspAny));
       return value;
     }
-    case LSPAnyType::LSP_DECIMAL: {
+    case LSPAnyType::DECIMAL_TYPE: {
       rapidjson::Value value;
-      value.SetDouble(std::get<decimal>(lspAny.value));
+      value.SetDouble(std::get<decimal_t>(lspAny));
       return value;
     }
-    case LSPAnyType::LSP_BOOLEAN: {
+    case LSPAnyType::BOOLEAN_TYPE: {
       rapidjson::Value value;
-      value.SetBool(std::get<boolean>(lspAny.value));
+      value.SetBool(std::get<boolean_t>(lspAny));
       return value;
     }
-    case LSPAnyType::LSP_NULL: {
+    case LSPAnyType::NULL_TYPE: {
       rapidjson::Value value;
       value.SetNull();
       return value;
@@ -323,7 +319,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     default: {
       throw LspException(
-        ErrorCodes::InvalidParams,
+        ErrorCodes::INVALID_PARAMS,
         std::format(
           "Unsupported RequestId type: {}",
           static_cast<int>(jsonId.GetType())
@@ -350,26 +346,26 @@ namespace LCompilers::LanguageServerProtocol {
   ) const -> MessageParams {
     switch (jsonParams.GetType()) {
     case rapidjson::kArrayType: {
-      std::unique_ptr<LSPArray> lspArray = std::make_unique<LSPArray>();
+      LSPArray lspArray;
       for (rapidjson::Value::ConstValueIterator iter = jsonParams.Begin();
            iter != jsonParams.End();
            ++iter) {
-        lspArray->push_back(jsonToLsp(*iter));
+        lspArray.push_back(jsonToLsp(*iter));
       }
       return lspArray;
     }
     case rapidjson::kObjectType: {
-      std::unique_ptr<LSPObject> lspObject = std::make_unique<LSPObject>();
+      LSPObject lspObject;
       for (rapidjson::Value::ConstMemberIterator iter = jsonParams.MemberBegin();
            iter != jsonParams.MemberEnd();
            ++iter) {
-        (*lspObject)[iter->name.GetString()] = jsonToLsp(iter->value);
+        lspObject.emplace(iter->name.GetString(), jsonToLsp(iter->value));
       }
       return lspObject;
     }
     default: {
       throw LspException(
-        ErrorCodes::InvalidParams,
+        ErrorCodes::INVALID_PARAMS,
         std::format(
           "Unsupported MessageParams type: {}",
           static_cast<int>(jsonParams.GetType())
@@ -385,48 +381,48 @@ namespace LCompilers::LanguageServerProtocol {
     std::unique_ptr<LSPAny> lspAny = std::make_unique<LSPAny>();
     switch (json.GetType()) {
     case rapidjson::kNullType: {
-      lspAny->value = nullptr;
+      (*lspAny) = nullptr;
       break;
     }
     case rapidjson::kFalseType: // fallthrough
     case rapidjson::kTrueType: {
-      lspAny->value = json.GetBool();
+      (*lspAny) = json.GetBool();
       break;
     }
     case rapidjson::kObjectType: {
-      std::unique_ptr<LSPObject> lspObject = std::make_unique<LSPObject>();
+      LSPObject lspObject;
       for (rapidjson::Value::ConstMemberIterator iter = json.MemberBegin();
            iter != json.MemberEnd();
            ++iter) {
-        (*lspObject)[iter->name.GetString()] = jsonToLsp(iter->value);
+        lspObject.emplace(iter->name.GetString(), jsonToLsp(iter->value));
       }
-      lspAny->value = std::move(lspObject);
+      (*lspAny) = std::move(lspObject);
       break;
     }
     case rapidjson::kArrayType: {
-      std::unique_ptr<LSPArray> lspArray = std::make_unique<LSPArray>();
+      LSPArray lspArray;
       for (rapidjson::Value::ConstValueIterator iter = json.Begin();
            iter != json.End();
            ++iter) {
-        lspArray->push_back(jsonToLsp(*iter));
+        lspArray.push_back(jsonToLsp(*iter));
       }
-      lspAny->value = std::move(lspArray);
+      (*lspAny) = std::move(lspArray);
       break;
     }
     case rapidjson::kStringType: {
-      lspAny->value = json.GetString();
+      (*lspAny) = json.GetString();
       break;
     }
     case rapidjson::kNumberType: {
       if (json.IsInt()) {
-        lspAny->value = json.GetInt();
+        (*lspAny) = json.GetInt();
       } else if (json.IsDouble()) {
-        lspAny->value = json.GetDouble();
+        (*lspAny) = json.GetDouble();
       } else if (json.IsUint()) {
-        lspAny->value = json.GetUint();
+        (*lspAny) = json.GetUint();
       } else {
         throw LspException(
-          ErrorCodes::InvalidParams,
+          ErrorCodes::INVALID_PARAMS,
           std::format(
             "Unsupported JSON number type: {}",
             static_cast<int>(json.GetType())

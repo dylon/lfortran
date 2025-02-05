@@ -1,347 +1,389 @@
-#ifndef LCOMPILERS_LSP_SPECIFICATION_H
-#define LCOMPILERS_LSP_SPECIFICATION_H
+// -----------------------------------------------------------------------------
+// NOTE: This file was generated from Microsoft's Language Server Protocol (LSP)
+// specification. Please do not edit it by hand.
+// -----------------------------------------------------------------------------
+
+#pragma once
 
 #include <cstddef>
 #include <map>
 #include <memory>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <variant>
 #include <vector>
 
 /**
- * Interface definitions from the LSP 3.17 specification.
+ * Interface definitions from the LSP 3.17.0 specification.
  * See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification
  */
 namespace LCompilers::LanguageServerProtocol {
+  typedef int integer_t;
+  typedef unsigned int uinteger_t;
+  typedef double decimal_t;
+  typedef bool boolean_t;
+  typedef std::nullptr_t null_t;
+  typedef std::string string_t;
 
-  template <typename T>
-  using ptr_vector = std::vector<std::unique_ptr<T>>;
-
-  template <typename T>
-  using optional_ptr = std::optional<std::unique_ptr<T>>;
-
-  template <typename T>
-  using optional_vector = std::optional<std::vector<T>>;
-
-  template <typename T>
-  using optional_ptr_vector = std::optional<ptr_vector<T>>;
-
-  template <typename T>
-  struct ValueSet {
-    std::vector<T> valueSet;
-  };
-
-  template <typename T>
-  struct OptionalValueSet {
-    optional_vector<T> valueSet;
-  };
-
-  /**
-   * Defines an integer number in the range of -2^31 to 2^31 - 1.
-   *
-   * export type integer = number;
-   */
-  typedef int integer;
-
-  /**
-   * Defines an unsigned integer number in the range of 0 to 2^31 - 1.
-   *
-   * export type uinteger = number;
-   */
-  typedef unsigned int uinteger;
-
-  /**
-   * Defines a decimal number. Since decimal numbers are very rare in the
-   * language server specification we denote the exact range with every decimal
-   * using the mathematics interval notation (e.g. [0, 1] denotes all decimals d
-   * with 0 <= d <= 1.
-   *
-   * export type decimal = number;
-   */
-  typedef double decimal;
-
-  typedef bool boolean;
-
-  typedef std::nullptr_t null;
-
-  typedef std::string string;
-
-  enum class IntegerOrStringType {
-    LSP_INTEGER,
-    LSP_STRING,
-  };
-
-  typedef std::variant<
-    integer,
-    string
-  > IntegerOrString;
+  typedef string_t URI;
+  typedef string_t DocumentUri;
+  typedef string_t RegExp;
 
   // NOTE: This is a wrapper around std::variant because the types `LSPAny`,
   // `LSPObject`, and `LSPArray` are mutually recursive and cannot be easily
   // forward-declared otherwise.
   struct LSPAny;  // Forward declaration
 
-  /**
-   * LSP object definition.
-   *
-   * export type LSPObject = { [key: string]: LSPAny };
-   *
-   * @since 3.17.0
-   */
   typedef std::map<std::string, std::unique_ptr<LSPAny>> LSPObject;
 
-  /**
-   * LSP arrays.
-   *
-   * export type LSPArray = LSPAny[];
-   *
-   * @since 3.17.0
-   */
   typedef std::vector<std::unique_ptr<LSPAny>> LSPArray;
 
-  enum class LSPAnyType {
-    LSP_OBJECT = 0,
-    LSP_ARRAY = 1,
-    LSP_STRING = 2,
-    LSP_INTEGER = 3,
-    LSP_UINTEGER = 4,
-    LSP_DECIMAL = 5,
-    LSP_BOOLEAN = 6,
-    LSP_NULL = 7,
+  enum class LSPAnyType
+  {
+    OBJECT_TYPE = 0,
+    ARRAY_TYPE = 1,
+    STRING_TYPE = 2,
+    INTEGER_TYPE = 3,
+    UINTEGER_TYPE = 4,
+    DECIMAL_TYPE = 5,
+    BOOLEAN_TYPE = 6,
+    NULL_TYPE = 7,
   };
 
-  /**
-   * The LSP any type.
-   *
-   * export type LSPAny = LSPObject
-   *   | LSPArray
-   *   | string
-   *   | integer
-   *   | uinteger
-   *   | decimal
-   *   | boolean
-   *   | null;
-   *
-   * @since 3.17.0
-   */
-  struct LSPAny {
-    // NOTE: `value` was implemented as a `union` but `std::string` values kept
-    // causing segfaults.
-    std::variant<
-      std::unique_ptr<LSPObject>,
-      std::unique_ptr<LSPArray>,
-      string,
-      integer,
-      uinteger,
-      decimal,
-      boolean,
-      null
-    > value;
+  typedef std::variant<
+    LSPObject,
+    LSPArray,
+    string_t,
+    integer_t,
+    uinteger_t,
+    decimal_t,
+    boolean_t,
+    null_t
+  > LSPAnyBase;
+
+  struct LSPAny
+    : public LSPAnyBase
+  {
+    using LSPAnyBase::variant;
   };
 
   /**
    * A general message as defined by JSON-RPC. The language server protocol
    * always uses “2.0” as the jsonrpc version.
-   *
-   * interface Message {
-   *   jsonrpc: string;
-   * }
    */
-  struct Message {
-    string jsonrpc;
+  struct Message
+  {
+    string_t jsonrpc;
   };
 
-  typedef IntegerOrStringType RequestIdType;
-  typedef IntegerOrString RequestId;
-
-  enum class MessageParamsType {
-    LSP_ARRAY,
-    LSP_OBJECT,
+  enum class RequestIdType {
+    INTEGER_TYPE,
+    STRING_TYPE,
   };
 
   typedef std::variant<
-    std::unique_ptr<LSPArray>,
-    std::unique_ptr<LSPObject>
+    integer_t,
+    string_t
+  > RequestId;
+
+  enum class MessageParamsType
+  {
+    ARRAY_TYPE,
+    OBJECT_TYPE,
+  };
+
+  typedef std::variant<
+    LSPArray,
+    LSPObject
   > MessageParams;
 
   /**
    * A request message to describe a request between the client and the server.
    * Every processed request must send a response back to the sender of the
    * request.
-   *
-   * interface RequestMessage extends Message {
-   *   id: integer | string;
-   *   method: string;
-   *   params?: array | object;
-   * }
    */
-  struct RequestMessage : public Message {
+  struct RequestMessage
+    : public Message
+  {
 
     /**
      * The request id.
-     *
-     * id: integer | string;
      */
     RequestId id;
 
     /**
-    * The method to be invoked.
-     *
-     * method: string;
-    */
-    string method;
+     * The method to be invoked.
+     */
+    string_t method;
 
     /**
      * The method's params.
-     *
-     * params?: array | object;
+     */
+    std::optional<MessageParams> params;
+  };
+
+  struct ResponseError
+  {
+
+    /**
+     * A number indicating the error type that occurred.
+     */
+    integer_t code;
+
+    /**
+     * A string providing a short description of the error.
+     */
+    string_t message;
+
+    /**
+     * A primitive or structured value that contains additional information about
+     * the error. Can be omitted.
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
+  };
+
+  enum class ResponseIdType
+  {
+    INTEGER_TYPE,
+    STRING_TYPE,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    string_t,
+    null_t
+  > ResponseId;
+
+  /**
+   * A Response Message sent as a result of a request. If a request doesn’t
+   * provide a result value the receiver of a request still needs to return a
+   * response message to conform to the JSON-RPC specification. The result
+   * property of the ResponseMessage should be set to null in this case to signal
+   * a successful request.
+   */
+  struct ResponseMessage
+    : public Message
+  {
+
+    /**
+     * The request id.
+     */
+    ResponseId id;
+
+    /**
+     * The result of a request. This member is REQUIRED on success. This member
+     * MUST NOT exist if there was an error invoking the method.
+     */
+    std::optional<std::unique_ptr<LSPAny>> result;
+
+    /**
+     * The error object in case a request fails.
+     */
+    std::optional<std::unique_ptr<ResponseError>> error;
+  };
+
+  /**
+   * A notification message. A processed notification message must not send a
+   * response back. They work like events.
+   */
+  struct NotificationMessage
+    : public Message
+  {
+
+    /**
+     * The method to be invoked.
+     */
+    string_t method;
+
+    /**
+     * The notification's params.
      */
     std::optional<MessageParams> params;
   };
 
   /**
-   * export namespace ErrorCodes {
-   *   export const ParseError: integer = -32700;
-   *   export const InvalidRequest: integer = -32600;
-   *   export const MethodNotFound: integer = -32601;
-   *   export const InvalidParams: integer = -32602;
-   *   export const InternalError: integer = -32603;
-   *   export const jsonrpcReservedErrorRangeStart: integer = -32099;
-   *   export const serverErrorStart: integer = jsonrpcReservedErrorRangeStart;
-   *   export const ServerNotInitialized: integer = -32002;
-   *   export const UnknownErrorCode: integer = -32001;
-   *   export const jsonrpcReservedErrorRangeEnd = -32000;
-   *   export const serverErrorEnd: integer = jsonrpcReservedErrorRangeEnd;
-   *   export const lspReservedErrorRangeStart: integer = -32899;
-   *   export const RequestFailed: integer = -32803;
-   *   export const ServerCancelled: integer = -32802;
-   *   export const ContentModified: integer = -32801;
-   *   export const RequestCancelled: integer = -32800;
-   *   export const lspReservedErrorRangeEnd: integer = -32800;
-   * }
+   * A set of predefined token types. This set is not fixed
+   * an clients can specify additional token types via the
+   * corresponding client capabilities.
+   *
+   * @since 3.16.0
+   */
+  enum class SemanticTokenTypes {
+    NAMESPACE,
+    /**
+     * Represents a generic type. Acts as a fallback for types which can't be mapped to
+     * a specific type like class or enum.
+     */
+    TYPE,
+    CLASS,
+    ENUM,
+    INTERFACE,
+    STRUCT,
+    TYPE_PARAMETER,
+    PARAMETER,
+    VARIABLE,
+    PROPERTY,
+    ENUM_MEMBER,
+    EVENT,
+    FUNCTION,
+    METHOD,
+    MACRO,
+    KEYWORD,
+    MODIFIER,
+    COMMENT,
+    STRING_TYPE,
+    NUMBER,
+    REGEXP,
+    OPERATOR,
+    /**
+     * @since 3.17.0
+     */
+    DECORATOR,
+  };
+
+  extern std::map<
+    SemanticTokenTypes,
+    std::string
+  > SemanticTokenTypesNames;
+
+  extern std::map<
+    SemanticTokenTypes,
+    string_t
+  > SemanticTokenTypesValues;
+
+  auto semanticTokenTypesByName(
+    const std::string &name
+  ) -> SemanticTokenTypes;
+
+  auto semanticTokenTypesByValue(
+    const string_t &value
+  ) -> SemanticTokenTypes;
+
+  /**
+   * A set of predefined token modifiers. This set is not fixed
+   * an clients can specify additional token types via the
+   * corresponding client capabilities.
+   *
+   * @since 3.16.0
+   */
+  enum class SemanticTokenModifiers {
+    DECLARATION,
+    DEFINITION,
+    READONLY,
+    STATIC,
+    DEPRECATED,
+    ABSTRACT,
+    ASYNC,
+    MODIFICATION,
+    DOCUMENTATION,
+    DEFAULT_LIBRARY,
+  };
+
+  extern std::map<
+    SemanticTokenModifiers,
+    std::string
+  > SemanticTokenModifiersNames;
+
+  extern std::map<
+    SemanticTokenModifiers,
+    string_t
+  > SemanticTokenModifiersValues;
+
+  auto semanticTokenModifiersByName(
+    const std::string &name
+  ) -> SemanticTokenModifiers;
+
+  auto semanticTokenModifiersByValue(
+    const string_t &value
+  ) -> SemanticTokenModifiers;
+
+  /**
+   * The document diagnostic report kinds.
+   *
+   * @since 3.17.0
+   */
+  enum class DocumentDiagnosticReportKind {
+    /**
+     * A diagnostic report with a full
+     * set of problems.
+     */
+    FULL,
+    /**
+     * A report indicating that the last
+     * returned report is still accurate.
+     */
+    UNCHANGED,
+  };
+
+  extern std::map<
+    DocumentDiagnosticReportKind,
+    std::string
+  > DocumentDiagnosticReportKindNames;
+
+  extern std::map<
+    DocumentDiagnosticReportKind,
+    string_t
+  > DocumentDiagnosticReportKindValues;
+
+  auto documentDiagnosticReportKindByName(
+    const std::string &name
+  ) -> DocumentDiagnosticReportKind;
+
+  auto documentDiagnosticReportKindByValue(
+    const string_t &value
+  ) -> DocumentDiagnosticReportKind;
+
+  /**
+   * Predefined error codes.
    */
   enum class ErrorCodes {
-
-    /**
-     * Defined by JSON-RPC.
-     *
-     * export const ParseError: integer = -32700;
-     */
-    ParseError = -32700,
-
-    /**
-     * Defined by JSON-RPC.
-     *
-     * export const InvalidRequest: integer = -32600;
-     */
-    InvalidRequest = -32600,
-
-    /**
-     * Defined by JSON-RPC.
-     *
-     * export const MethodNotFound: integer = -32601;
-     */
-    MethodNotFound = -32601,
-
-    /**
-     * Defined by JSON-RPC.
-     *
-     * export const InvalidParams: integer = -32602;
-     */
-    InvalidParams = -32602,
-
-    /**
-     * Defined by JSON-RPC.
-     *
-     * export const InternalError: integer = -32603;
-     */
-    InternalError = -32603,
-
-    /**
-     * This is the start range of JSON-RPC reserved error codes.
-     * It doesn't denote a real error code. No LSP error codes should
-     * be defined between the start and end range. For backwards
-     * compatibility the `ServerNotInitialized` and the `UnknownErrorCode`
-     * are left in the range.
-     *
-     * export const jsonrpcReservedErrorRangeStart: integer = -32099;
-     *
-     * @since 3.16.0
-     */
-    jsonrpcReservedErrorRangeStart = -32099,
-
-    /**
-     * @deprecated use jsonrpcReservedErrorRangeStart
-     *
-     * export const serverErrorStart: integer = jsonrpcReservedErrorRangeStart;
-     */
-    serverErrorStart = jsonrpcReservedErrorRangeStart,
-
+    PARSE_ERROR = -32700,
+    INVALID_REQUEST = -32600,
+    METHOD_NOT_FOUND = -32601,
+    INVALID_PARAMS = -32602,
+    INTERNAL_ERROR = -32603,
     /**
      * Error code indicating that a server received a notification or
      * request before the server has received the `initialize` request.
-     *
-     * export const ServerNotInitialized: integer = -32002;
      */
-    ServerNotInitialized = -32002,
+    SERVER_NOT_INITIALIZED = -32002,
+    UNKNOWN_ERROR_CODE = -32001,
+  };
 
-    /**
-     * export const UnknownErrorCode: integer = -32001;
-     */
-    UnknownErrorCode = -32001,
+  extern std::map<
+    ErrorCodes,
+    std::string
+  > ErrorCodesNames;
 
-    /**
-     * This is the end range of JSON-RPC reserved error codes.
-     * It doesn't denote a real error code.
-     *
-     * export const jsonrpcReservedErrorRangeEnd = -32000;
-     *
-     * @since 3.16.0
-     */
-    jsonrpcReservedErrorRangeEnd = -32000,
+  auto errorCodesByName(
+    const std::string &name
+  ) -> ErrorCodes;
 
-    /**
-     * @deprecated use jsonrpcReservedErrorRangeEnd
-     *
-     * export const serverErrorEnd: integer = jsonrpcReservedErrorRangeEnd;
-     */
-    serverErrorEnd = jsonrpcReservedErrorRangeEnd,
+  auto errorCodesByValue(
+    integer_t value
+  ) -> ErrorCodes;
 
-    /**
-     * This is the start range of LSP reserved error codes.
-     * It doesn't denote a real error code.
-     *
-     * @since 3.16.0
-     *
-     * export const lspReservedErrorRangeStart: integer = -32899;
-     */
-    lspReservedErrorRangeStart = -32899,
-
+  enum class LSPErrorCodes {
     /**
      * A request failed but it was syntactically correct, e.g the
      * method name was known and the parameters were valid. The error
      * message should contain human readable information about why
      * the request failed.
      *
-     * export const RequestFailed: integer = -32803;
-     *
      * @since 3.17.0
      */
-    RequestFailed = -32803,
-
+    REQUEST_FAILED = -32803,
     /**
      * The server cancelled the request. This error code should
      * only be used for requests that explicitly support being
      * server cancellable.
      *
-     * export const ServerCancelled: integer = -32802;
-     *
      * @since 3.17.0
      */
-    ServerCancelled = -32802,
-
+    SERVER_CANCELLED = -32802,
     /**
      * The server detected that the content of a document got
      * modified outside normal conditions. A server should
@@ -351,1806 +393,1482 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * If a client decides that a result is not of any use anymore
      * the client should cancel the request.
-     *
-     * export const ContentModified: integer = -32801;
      */
-    ContentModified = -32801,
-
+    CONTENT_MODIFIED = -32801,
     /**
      * The client has canceled a request and a server has detected
      * the cancel.
-     *
-     * export const RequestCancelled: integer = -32800;
      */
-    RequestCancelled = -32800,
-
-    /**
-     * This is the end range of LSP reserved error codes.
-     * It doesn't denote a real error code.
-     *
-     * export const lspReservedErrorRangeEnd: integer = -32800;
-     *
-     * @since 3.16.0
-     */
-    lspReservedErrorRangeEnd = -32800,
+    REQUEST_CANCELLED = -32800,
   };
 
-  extern std::map<ErrorCodes, std::string> ErrorCodeNames;
+  extern std::map<
+    LSPErrorCodes,
+    std::string
+  > LSPErrorCodesNames;
 
-  auto errorCodeByName(const std::string &name) -> ErrorCodes;
+  auto lspErrorCodesByName(
+    const std::string &name
+  ) -> LSPErrorCodes;
+
+  auto lspErrorCodesByValue(
+    integer_t value
+  ) -> LSPErrorCodes;
 
   /**
-   * interface ResponseError {
-   *   code: integer;
-   *   message: string;
-   *   data?: LSPAny;
-   * }
+   * A set of predefined range kinds.
    */
-  struct ResponseError {
-
+  enum class FoldingRangeKind {
     /**
-     * A number indicating the error type that occurred.
-     *
-     * code: integer;
+     * Folding range for a comment
      */
-    integer code;
-
+    COMMENT,
     /**
-     * A string providing a short description of the error.
-     *
-     * message: string;
+     * Folding range for an import or include
      */
-    string message;
-
+    IMPORTS,
     /**
-     * A primitive or structured value that contains additional
-     * information about the error. Can be omitted.
-     *
-     * data?: LSPAny;
+     * Folding range for a region (e.g. `#region`)
      */
-    optional_ptr<LSPAny> data;
+    REGION,
   };
 
-  enum class ResponseIdType {
-    LSP_INTEGER,
-    LSP_STRING,
-    LSP_NULL,
-  };
+  extern std::map<
+    FoldingRangeKind,
+    std::string
+  > FoldingRangeKindNames;
 
-  typedef std::variant<
-    integer,
-    string,
-    null
-  > ResponseId;
+  extern std::map<
+    FoldingRangeKind,
+    string_t
+  > FoldingRangeKindValues;
+
+  auto foldingRangeKindByName(
+    const std::string &name
+  ) -> FoldingRangeKind;
+
+  auto foldingRangeKindByValue(
+    const string_t &value
+  ) -> FoldingRangeKind;
 
   /**
-   * A Response Message sent as a result of a request. If a request doesn’t
-   * provide a result value the receiver of a request still needs to return a
-   * response message to conform to the JSON-RPC specification. The result
-   * property of the ResponseMessage should be set to null in this case to
-   * signal a successful request.
+   * A symbol kind.
    */
-  struct ResponseMessage : public Message {
-
-    /**
-     * The request id.
-     *
-     * id: integer | string | null;
-     */
-    ResponseId id;
-
-    /**
-     * The result of a request. This member is REQUIRED on success. This member
-     * MUST NOT exist if there was an error invoking the method.
-     *
-     * result?: LSPAny;
-     */
-    optional_ptr<LSPAny> result;
-
-    /**
-     * The error object in case a request fails.
-     *
-     * error?: ResponseError;
-     */
-    optional_ptr<ResponseError> error;
+  enum class SymbolKind {
+    FILE = 1,
+    MODULE = 2,
+    NAMESPACE = 3,
+    PACKAGE = 4,
+    CLASS = 5,
+    METHOD = 6,
+    PROPERTY = 7,
+    FIELD = 8,
+    CONSTRUCTOR = 9,
+    ENUM = 10,
+    INTERFACE = 11,
+    FUNCTION = 12,
+    VARIABLE = 13,
+    CONSTANT = 14,
+    STRING_TYPE = 15,
+    NUMBER = 16,
+    BOOLEAN_TYPE = 17,
+    ARRAY_TYPE = 18,
+    OBJECT_TYPE = 19,
+    KEY = 20,
+    NULL_TYPE = 21,
+    ENUM_MEMBER = 22,
+    STRUCT = 23,
+    EVENT = 24,
+    OPERATOR = 25,
+    TYPE_PARAMETER = 26,
   };
 
+  extern std::map<
+    SymbolKind,
+    std::string
+  > SymbolKindNames;
+
+  auto symbolKindByName(
+    const std::string &name
+  ) -> SymbolKind;
+
+  auto symbolKindByValue(
+    uinteger_t value
+  ) -> SymbolKind;
+
   /**
-   * A notification message. A processed notification message must not send a
-   * response back. They work like events.
+   * Symbol tags are extra annotations that tweak the rendering of a symbol.
    *
-   * interface NotificationMessage extends Message {
-   *   method: string;
-   *   params?: array | object;
-   * }
+   * @since 3.16
    */
-  struct NotificationMessage : public Message {
-
+  enum class SymbolTag {
     /**
-     * The method to be invoked.
-     *
-     * method: string;
+     * Render a symbol as obsolete, usually using a strike-out.
      */
-    std::string method;
-
-    /**
-     * The notification's params.
-     *
-     * params?: array | object;
-     */
-    std::optional<MessageParams> params;
+    DEPRECATED = 1,
   };
 
-  // ---------------------------------------------------------------------------
-  // $ Notifications and Requests
-  // ---------------------------------------------------------------------------
-  // Notification and requests whose methods start with ‘$/’ are messages which
-  // are protocol implementation dependent and might not be implementable in all
-  // clients or servers. For example if the server implementation uses a single
-  // threaded synchronous programming language then there is little a server can
-  // do to react to a $/cancelRequest notification. If a server or client
-  // receives notifications starting with ‘$/’ it is free to ignore the
-  // notification. If a server or client receives a request starting with ‘$/’
-  // it must error the request with error code MethodNotFound (e.g. -32601).
-  // ---------------------------------------------------------------------------
+  extern std::map<
+    SymbolTag,
+    std::string
+  > SymbolTagNames;
+
+  auto symbolTagByName(
+    const std::string &name
+  ) -> SymbolTag;
+
+  auto symbolTagByValue(
+    uinteger_t value
+  ) -> SymbolTag;
 
   /**
-   * The base protocol offers support for request cancellation. To cancel a
-   * request, a notification message with the following properties is sent:
+   * Moniker uniqueness level to define scope of the moniker.
    *
-   *  Notification:
-   *    method: ‘$/cancelRequest’
-   *    params: CancelParams defined as follows:
-   *
-   * A request that got canceled still needs to return from the server and send
-   * a response back. It can not be left open / hanging. This is in line with
-   * the JSON-RPC protocol that requires that every request sends a response
-   * back. In addition it allows for returning partial results on cancel. If the
-   * request returns an error response on cancellation it is advised to set the
-   * error code to ErrorCodes.RequestCancelled.
-   *
-   *  interface CancelParams {
-   *    id: integer | string;
-   *  }
+   * @since 3.16.0
    */
-  struct CancelParams {
-
+  enum class UniquenessLevel {
     /**
-     * The request id to cancel.
-     *
-     * id: integer | string;
+     * The moniker is only unique inside a document
      */
-    RequestId id;
+    DOCUMENT,
+    /**
+     * The moniker is unique inside a project for which a dump got created
+     */
+    PROJECT,
+    /**
+     * The moniker is unique inside the group to which a project belongs
+     */
+    GROUP,
+    /**
+     * The moniker is unique inside the moniker scheme.
+     */
+    SCHEME,
+    /**
+     * The moniker is globally unique
+     */
+    GLOBAL,
   };
 
-  typedef IntegerOrStringType ProgressTokenType;
-  typedef IntegerOrString ProgressToken;
+  extern std::map<
+    UniquenessLevel,
+    std::string
+  > UniquenessLevelNames;
+
+  extern std::map<
+    UniquenessLevel,
+    string_t
+  > UniquenessLevelValues;
+
+  auto uniquenessLevelByName(
+    const std::string &name
+  ) -> UniquenessLevel;
+
+  auto uniquenessLevelByValue(
+    const string_t &value
+  ) -> UniquenessLevel;
 
   /**
-   * The base protocol offers also support to report progress in a generic
-   * fashion. This mechanism can be used to report any kind of progress
-   * including work done progress (usually used to report progress in the user
-   * interface using a progress bar) and partial result progress to support
-   * streaming of results.
+   * The moniker kind.
    *
-   * A progress notification has the following properties:
-   *
-   * Notification:
-   *   method: ‘$/progress’
-   *   params: ProgressParams defined as follows:
-   *
-   * Progress is reported against a token. The token is different than the
-   * request ID which allows to report progress out of band and also for
-   * notification.
-   *
-   * interface ProgressParams<T> {
-   *   token: ProgressToken;
-   *   value: T;
-   * }
+   * @since 3.16.0
    */
-  struct ProgressParams {
-
+  enum class MonikerKind {
     /**
-     * The progress token provided by the client or server.
-     *
-     * token: ProgressToken;
+     * The moniker represent a symbol that is imported into a project
      */
-    ProgressToken token;
-
+    IMPORT,
     /**
-     * The progress data.
-     *
-     * value: T;
+     * The moniker represents a symbol that is exported from a project
      */
-    std::unique_ptr<LSPAny> value;
+    EXPORT,
+    /**
+     * The moniker represents a symbol that is local to a project (e.g. a local
+     * variable of a function, a class not visible outside the project, ...)
+     */
+    LOCAL,
   };
 
+  extern std::map<
+    MonikerKind,
+    std::string
+  > MonikerKindNames;
+
+  extern std::map<
+    MonikerKind,
+    string_t
+  > MonikerKindValues;
+
+  auto monikerKindByName(
+    const std::string &name
+  ) -> MonikerKind;
+
+  auto monikerKindByValue(
+    const string_t &value
+  ) -> MonikerKind;
+
   /**
-   * Position in a text document expressed as zero-based line and zero-based
-   * character offset. A position is between two characters like an ‘insert’
-   * cursor in an editor. Special values like for example -1 to denote the end
-   * of a line are not supported.
+   * Inlay hint kinds.
    *
-   * interface Position {
-   *   line: uinteger;
-   *   character: uinteger;
-   * }
+   * @since 3.17.0
    */
-  struct Position {
-
+  enum class InlayHintKind {
     /**
-     * Line position in a document (zero-based).
-     *
-     * line: uinteger;
+     * An inlay hint that for a type annotation.
      */
-    uinteger line;
-
+    TYPE = 1,
     /**
-     * Character offset on a line in a document (zero-based). The meaning of this
-     * offset is determined by the negotiated `PositionEncodingKind`.
-     *
-     * If the character value is greater than the line length it defaults back
-     * to the line length.
-     *
-     * character: uinteger;
+     * An inlay hint that is for a parameter.
      */
-    uinteger character;
+    PARAMETER = 2,
   };
 
+  extern std::map<
+    InlayHintKind,
+    std::string
+  > InlayHintKindNames;
+
+  auto inlayHintKindByName(
+    const std::string &name
+  ) -> InlayHintKind;
+
+  auto inlayHintKindByValue(
+    uinteger_t value
+  ) -> InlayHintKind;
+
   /**
-   * A type indicating how positions are encoded, specifically what column
-   * offsets mean.
+   * The message type
+   */
+  enum class MessageType {
+    /**
+     * An error message.
+     */
+    ERROR = 1,
+    /**
+     * A warning message.
+     */
+    WARNING = 2,
+    /**
+     * An information message.
+     */
+    INFO = 3,
+    /**
+     * A log message.
+     */
+    LOG = 4,
+    /**
+     * A debug message.
+     *
+     * @since 3.18.0
+     */
+    DEBUG = 5,
+  };
+
+  extern std::map<
+    MessageType,
+    std::string
+  > MessageTypeNames;
+
+  auto messageTypeByName(
+    const std::string &name
+  ) -> MessageType;
+
+  auto messageTypeByValue(
+    uinteger_t value
+  ) -> MessageType;
+
+  /**
+   * Defines how the host (editor) should sync
+   * document changes to the language server.
+   */
+  enum class TextDocumentSyncKind {
+    /**
+     * Documents should not be synced at all.
+     */
+    NONE = 0,
+    /**
+     * Documents are synced by always sending the full content
+     * of the document.
+     */
+    FULL = 1,
+    /**
+     * Documents are synced by sending the full content on open.
+     * After that only incremental updates to the document are
+     * send.
+     */
+    INCREMENTAL = 2,
+  };
+
+  extern std::map<
+    TextDocumentSyncKind,
+    std::string
+  > TextDocumentSyncKindNames;
+
+  auto textDocumentSyncKindByName(
+    const std::string &name
+  ) -> TextDocumentSyncKind;
+
+  auto textDocumentSyncKindByValue(
+    uinteger_t value
+  ) -> TextDocumentSyncKind;
+
+  /**
+   * Represents reasons why a text document is saved.
+   */
+  enum class TextDocumentSaveReason {
+    /**
+     * Manually triggered, e.g. by the user pressing save, by starting debugging,
+     * or by an API call.
+     */
+    MANUAL = 1,
+    /**
+     * Automatic after a delay.
+     */
+    AFTER_DELAY = 2,
+    /**
+     * When the editor lost focus.
+     */
+    FOCUS_OUT = 3,
+  };
+
+  extern std::map<
+    TextDocumentSaveReason,
+    std::string
+  > TextDocumentSaveReasonNames;
+
+  auto textDocumentSaveReasonByName(
+    const std::string &name
+  ) -> TextDocumentSaveReason;
+
+  auto textDocumentSaveReasonByValue(
+    uinteger_t value
+  ) -> TextDocumentSaveReason;
+
+  /**
+   * The kind of a completion entry.
+   */
+  enum class CompletionItemKind {
+    TEXT = 1,
+    METHOD = 2,
+    FUNCTION = 3,
+    CONSTRUCTOR = 4,
+    FIELD = 5,
+    VARIABLE = 6,
+    CLASS = 7,
+    INTERFACE = 8,
+    MODULE = 9,
+    PROPERTY = 10,
+    UNIT = 11,
+    VALUE = 12,
+    ENUM = 13,
+    KEYWORD = 14,
+    SNIPPET = 15,
+    COLOR = 16,
+    FILE = 17,
+    REFERENCE = 18,
+    FOLDER = 19,
+    ENUM_MEMBER = 20,
+    CONSTANT = 21,
+    STRUCT = 22,
+    EVENT = 23,
+    OPERATOR = 24,
+    TYPE_PARAMETER = 25,
+  };
+
+  extern std::map<
+    CompletionItemKind,
+    std::string
+  > CompletionItemKindNames;
+
+  auto completionItemKindByName(
+    const std::string &name
+  ) -> CompletionItemKind;
+
+  auto completionItemKindByValue(
+    uinteger_t value
+  ) -> CompletionItemKind;
+
+  /**
+   * Completion item tags are extra annotations that tweak the rendering of a completion
+   * item.
    *
-   * export type PositionEncodingKind = string;
+   * @since 3.15.0
+   */
+  enum class CompletionItemTag {
+    /**
+     * Render a completion as obsolete, usually using a strike-out.
+     */
+    DEPRECATED = 1,
+  };
+
+  extern std::map<
+    CompletionItemTag,
+    std::string
+  > CompletionItemTagNames;
+
+  auto completionItemTagByName(
+    const std::string &name
+  ) -> CompletionItemTag;
+
+  auto completionItemTagByValue(
+    uinteger_t value
+  ) -> CompletionItemTag;
+
+  /**
+   * Defines whether the insert text in a completion item should be interpreted as
+   * plain text or a snippet.
+   */
+  enum class InsertTextFormat {
+    /**
+     * The primary text to be inserted is treated as a plain string.
+     */
+    PLAIN_TEXT = 1,
+    /**
+     * The primary text to be inserted is treated as a snippet.
+     *
+     * A snippet can define tab stops and placeholders with `$1`, `$2`
+     * and `${3:foo}`. `$0` defines the final tab stop, it defaults to
+     * the end of the snippet. Placeholders with equal identifiers are linked,
+     * that is typing in one will update others too.
+     *
+     * See also: https://microsoft.github.io/language-server-protocol/specifications/specification-current/#snippet_syntax
+     */
+    SNIPPET = 2,
+  };
+
+  extern std::map<
+    InsertTextFormat,
+    std::string
+  > InsertTextFormatNames;
+
+  auto insertTextFormatByName(
+    const std::string &name
+  ) -> InsertTextFormat;
+
+  auto insertTextFormatByValue(
+    uinteger_t value
+  ) -> InsertTextFormat;
+
+  /**
+   * How whitespace and indentation is handled during completion
+   * item insertion.
+   *
+   * @since 3.16.0
+   */
+  enum class InsertTextMode {
+    /**
+     * The insertion or replace strings is taken as it is. If the
+     * value is multi line the lines below the cursor will be
+     * inserted using the indentation defined in the string value.
+     * The client will not apply any kind of adjustments to the
+     * string.
+     */
+    AS_IS = 1,
+    /**
+     * The editor adjusts leading whitespace of new lines so that
+     * they match the indentation up to the cursor of the line for
+     * which the item is accepted.
+     *
+     * Consider a line like this: <2tabs><cursor><3tabs>foo. Accepting a
+     * multi line completion item is indented using 2 tabs and all
+     * following lines inserted will be indented using 2 tabs as well.
+     */
+    ADJUST_INDENTATION = 2,
+  };
+
+  extern std::map<
+    InsertTextMode,
+    std::string
+  > InsertTextModeNames;
+
+  auto insertTextModeByName(
+    const std::string &name
+  ) -> InsertTextMode;
+
+  auto insertTextModeByValue(
+    uinteger_t value
+  ) -> InsertTextMode;
+
+  /**
+   * A document highlight kind.
+   */
+  enum class DocumentHighlightKind {
+    /**
+     * A textual occurrence.
+     */
+    TEXT = 1,
+    /**
+     * Read-access of a symbol, like reading a variable.
+     */
+    READ = 2,
+    /**
+     * Write-access of a symbol, like writing to a variable.
+     */
+    WRITE = 3,
+  };
+
+  extern std::map<
+    DocumentHighlightKind,
+    std::string
+  > DocumentHighlightKindNames;
+
+  auto documentHighlightKindByName(
+    const std::string &name
+  ) -> DocumentHighlightKind;
+
+  auto documentHighlightKindByValue(
+    uinteger_t value
+  ) -> DocumentHighlightKind;
+
+  /**
+   * A set of predefined code action kinds
+   */
+  enum class CodeActionKind {
+    /**
+     * Empty kind.
+     */
+    EMPTY,
+    /**
+     * Base kind for quickfix actions: 'quickfix'
+     */
+    QUICK_FIX,
+    /**
+     * Base kind for refactoring actions: 'refactor'
+     */
+    REFACTOR,
+    /**
+     * Base kind for refactoring extraction actions: 'refactor.extract'
+     *
+     * Example extract actions:
+     *
+     * - Extract method
+     * - Extract function
+     * - Extract variable
+     * - Extract interface from class
+     * - ...
+     */
+    REFACTOR_EXTRACT,
+    /**
+     * Base kind for refactoring inline actions: 'refactor.inline'
+     *
+     * Example inline actions:
+     *
+     * - Inline function
+     * - Inline variable
+     * - Inline constant
+     * - ...
+     */
+    REFACTOR_INLINE,
+    /**
+     * Base kind for refactoring rewrite actions: 'refactor.rewrite'
+     *
+     * Example rewrite actions:
+     *
+     * - Convert JavaScript function to class
+     * - Add or remove parameter
+     * - Encapsulate field
+     * - Make method static
+     * - Move method to base class
+     * - ...
+     */
+    REFACTOR_REWRITE,
+    /**
+     * Base kind for source actions: `source`
+     *
+     * Source code actions apply to the entire file.
+     */
+    SOURCE,
+    /**
+     * Base kind for an organize imports source action: `source.organizeImports`
+     */
+    SOURCE_ORGANIZE_IMPORTS,
+    /**
+     * Base kind for auto-fix source actions: `source.fixAll`.
+     *
+     * Fix all actions automatically fix errors that have a clear fix that do not require user input.
+     * They should not suppress errors or perform unsafe fixes such as generating new types or classes.
+     *
+     * @since 3.15.0
+     */
+    SOURCE_FIX_ALL,
+  };
+
+  extern std::map<
+    CodeActionKind,
+    std::string
+  > CodeActionKindNames;
+
+  extern std::map<
+    CodeActionKind,
+    string_t
+  > CodeActionKindValues;
+
+  auto codeActionKindByName(
+    const std::string &name
+  ) -> CodeActionKind;
+
+  auto codeActionKindByValue(
+    const string_t &value
+  ) -> CodeActionKind;
+
+  enum class TraceValues {
+    /**
+     * Turn tracing off.
+     */
+    OFF,
+    /**
+     * Trace messages only.
+     */
+    MESSAGES,
+    /**
+     * Verbose message tracing.
+     */
+    VERBOSE,
+  };
+
+  extern std::map<
+    TraceValues,
+    std::string
+  > TraceValuesNames;
+
+  extern std::map<
+    TraceValues,
+    string_t
+  > TraceValuesValues;
+
+  auto traceValuesByName(
+    const std::string &name
+  ) -> TraceValues;
+
+  auto traceValuesByValue(
+    const string_t &value
+  ) -> TraceValues;
+
+  /**
+   * Describes the content type that a client supports in various
+   * result literals like `Hover`, `ParameterInfo` or `CompletionItem`.
+   *
+   * Please note that `MarkupKinds` must not start with a `$`. This kinds
+   * are reserved for internal usage.
+   */
+  enum class MarkupKind {
+    /**
+     * Plain text is supported as a content format
+     */
+    PLAIN_TEXT,
+    /**
+     * Markdown is supported as a content format
+     */
+    MARKDOWN,
+  };
+
+  extern std::map<
+    MarkupKind,
+    std::string
+  > MarkupKindNames;
+
+  extern std::map<
+    MarkupKind,
+    string_t
+  > MarkupKindValues;
+
+  auto markupKindByName(
+    const std::string &name
+  ) -> MarkupKind;
+
+  auto markupKindByValue(
+    const string_t &value
+  ) -> MarkupKind;
+
+  /**
+   * Describes how an {@link InlineCompletionItemProvider inline completion provider} was triggered.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  enum class InlineCompletionTriggerKind {
+    /**
+     * Completion was triggered explicitly by a user gesture.
+     */
+    INVOKED = 0,
+    /**
+     * Completion was triggered automatically while editing.
+     */
+    AUTOMATIC = 1,
+  };
+
+  extern std::map<
+    InlineCompletionTriggerKind,
+    std::string
+  > InlineCompletionTriggerKindNames;
+
+  auto inlineCompletionTriggerKindByName(
+    const std::string &name
+  ) -> InlineCompletionTriggerKind;
+
+  auto inlineCompletionTriggerKindByValue(
+    uinteger_t value
+  ) -> InlineCompletionTriggerKind;
+
+  /**
+   * A set of predefined position encoding kinds.
    *
    * @since 3.17.0
    */
   enum class PositionEncodingKind {
-
     /**
-     * Character offsets count UTF-8 code units (e.g bytes).
-     *
-     * export const UTF8: PositionEncodingKind = 'utf-8';
+     * Character offsets count UTF-8 code units (e.g. bytes).
      */
     UTF8,
-
     /**
      * Character offsets count UTF-16 code units.
      *
      * This is the default and must always be supported
      * by servers
-     *
-     * export const UTF16: PositionEncodingKind = 'utf-16';
      */
     UTF16,
-
     /**
      * Character offsets count UTF-32 code units.
      *
-     * Implementation note: these are the same as Unicode code points,
+     * Implementation note: these are the same as Unicode codepoints,
      * so this `PositionEncodingKind` may also be used for an
      * encoding-agnostic representation of character offsets.
-     *
-     * export const UTF32: PositionEncodingKind = 'utf-32';
      */
     UTF32,
   };
 
-  extern std::map<PositionEncodingKind, std::string> PositionEncodingKindNames;
+  extern std::map<
+    PositionEncodingKind,
+    std::string
+  > PositionEncodingKindNames;
 
-  auto positionEncodingKindByName(const std::string &name) -> PositionEncodingKind;
+  extern std::map<
+    PositionEncodingKind,
+    string_t
+  > PositionEncodingKindValues;
 
-  extern std::map<PositionEncodingKind, std::string> PositionEncodingKindValues;
+  auto positionEncodingKindByName(
+    const std::string &name
+  ) -> PositionEncodingKind;
 
-  auto positionEncodingKindByValue(const std::string &value) -> PositionEncodingKind;
+  auto positionEncodingKindByValue(
+    const string_t &value
+  ) -> PositionEncodingKind;
 
   /**
-   * A range in a text document expressed as (zero-based) start and end
-   * positions. A range is comparable to a selection in an editor. Therefore,
-   * the end position is exclusive. If you want to specify a range that contains
-   * a line including the line ending character(s) then use an end position
-   * denoting the start of the next line.
-   *
-   * interface Range {
-   *   start: Position;
-   *   end: Position;
-   * }
+   * The file event type
    */
-  struct Range {
-
+  enum class FileChangeType {
     /**
-     * The range's start position.
-     *
-     * start: Position;
+     * The file got created.
      */
-    std::unique_ptr<Position> start;
-
+    CREATED = 1,
     /**
-     * The range's end position.
-     *
-     * end: Position;
+     * The file got changed.
      */
-    std::unique_ptr<Position> end;
+    CHANGED = 2,
+    /**
+     * The file got deleted.
+     */
+    DELETED = 3,
   };
 
-  /**
-   * A URI specifying the path to a document. This should begin with "file://"
-   * but might begin with "file:" or the protocol (e.g. "file://") may be
-   * excluded. By specification, it should begin with the "file://" protocol.
-   *
-   * type DocumentUri = string;
-   */
-  typedef string DocumentUri;
+  extern std::map<
+    FileChangeType,
+    std::string
+  > FileChangeTypeNames;
 
-  /**
-   * A tagging interface for normal non document URIs.
-   *
-   * type URI = string;
-   */
-  typedef string URI;
+  auto fileChangeTypeByName(
+    const std::string &name
+  ) -> FileChangeType;
 
-  /**
-   * Client capabilities specific to regular expressions.
-   *
-   * The following client capability is used to announce a client’s regular
-   * expression engine
-   * - property path (optional): general.regularExpressions
-   * - property type: RegularExpressionsClientCapabilities defined as follows:
-   *
-   * export interface RegularExpressionsClientCapabilities {
-   *   engine: string;
-   *   version?: string;
-   * }
-   *
-   * The following table lists the well known engine values. Please note that
-   * the table should be driven by the community which integrates LSP into
-   * existing clients. It is not the goal of the spec to list all available
-   * regular expression engines.
-   *
-   * +------------+---------+-----------------------+
-   * | Engine     | Version | Documentation         |
-   * +------------+---------+-----------------------+
-   * | ECMAScript | ES2020  | ECMAScript 2020 & MDN |
-   * +------------+---------+-----------------------+
-   *
-   * Regular Expression Subset:
-   *
-   * The following features from the ECMAScript 2020 regular expression
-   * specification are NOT mandatory for a client:
-   * - Assertions: Lookahead assertion, Negative lookahead assertion, lookbehind
-   *   assertion, negative lookbehind assertion.
-   * - Character classes: matching control characters using caret notation and
-   *   matching UTF-16 code units.
-   * - Group and ranges: named capturing groups.
-   * - Unicode property escapes: none of the features needs to be supported.
-   *
-   * The only regular expression flag that a client needs to support is ‘i’ to
-   * specify a case insensitive search.
-   */
-  struct RegularExpressionsClientCapabilities {
+  auto fileChangeTypeByValue(
+    uinteger_t value
+  ) -> FileChangeType;
 
+  enum class WatchKind {
     /**
-     * The engine's name.
-     *
-     * engine: string;
+     * Interested in create events.
      */
-    string engine;
-
+    CREATE = 1,
     /**
-     * The engine's version.
-     *
-     * version?: string;
+     * Interested in change events
      */
-    std::optional<string> version;
+    CHANGE = 2,
+    /**
+     * Interested in delete events
+     */
+    DELETE = 4,
   };
 
-  /**
-   * An item to transfer a text document from the client to the server.
-   *
-   * Text documents have a language identifier to identify a document on the
-   * server side when it handles more than one language to avoid re-interpreting
-   * the file extension. If a document refers to one of the programming
-   * languages listed below it is recommended that clients use those ids.
-   *
-   * --------------------+-----------------------------------
-   * Language            | Identifier
-   * --------------------+-----------------------------------
-   * ABAP                | abap
-   * Windows Bat         | bat
-   * BibTeX              | bibtex
-   * Clojure             | clojure
-   * Coffeescript        | coffeescript
-   * C                   | c
-   * C++                 | cpp
-   * C#                  | csharp
-   * CSS                 | css
-   * Diff                | diff
-   * Dart                | dart
-   * Dockerfile          | dockerfile
-   * Elixir              | elixir
-   * Erlang              | erlang
-   * F#                  | fsharp
-   * Git                 | git-commit
-   * Git                 | git-rebase
-   * Go                  | go
-   * Groovy              | groovy
-   * Handlebars          | handlebars
-   * HTML                | html
-   * Ini                 | ini
-   * Java                | java
-   * JavaScript          | javascript
-   * JavaScript React    | javascriptreact
-   * JSON                | json
-   * LaTeX               | latex
-   * Less                | less
-   * Lua                 | lua
-   * Makefile            | makefile
-   * Markdown            | markdown
-   * Objective-C         | objective-c
-   * Objective-C++       | objective-cpp
-   * Perl                | perl
-   * Perl 6              | perl6
-   * PHP                 | php
-   * Powershell          | powershell
-   * Pug                 | jade
-   * Python              | python
-   * R                   | r
-   * Razor (cshtml)      | razor
-   * Ruby                | ruby
-   * Rust                | rust
-   * SCSS                | scss (syntax using curly brackets)
-   * SCSS                | sass (indented syntax)
-   * Scala               | scala
-   * ShaderLab           | shaderlab
-   * Shell Script (Bash) | shellscript
-   * SQL                 | sql
-   * Swift               | swift
-   * TypeScript          | typescript
-   * TypeScript React    | typescriptreact
-   * TeX                 | tex
-   * Visual Basic        | vb
-   * XML                 | xml
-   * XSL                 | xsl
-   * YAML                | yaml
-   * --------------------+-----------------------------------
-   *
-   * interface TextDocumentItem {
-   *   uri: DocumentUri;
-   *   languageId: string;
-   *   version: integer;
-   *   text: string;
-   * }
-   */
-  struct TextDocumentItem {
+  extern std::map<
+    WatchKind,
+    std::string
+  > WatchKindNames;
 
-    /**
-     * The text document's URI.
-     *
-     * uri: DocumentUri;
-     */
-    DocumentUri uri;
+  auto watchKindByName(
+    const std::string &name
+  ) -> WatchKind;
 
-    /**
-     * The text document's language identifier.
-     *
-     * languageId: string;
-     */
-    string languageId;
-
-    /**
-     * The version number of this document (it will increase after each change,
-     * including undo/redo).
-     *
-     * version: integer;
-     */
-    integer version;
-
-    /**
-     * The content of the opened text document.
-     *
-     * text: string;
-     */
-    string text;
-  };
+  auto watchKindByValue(
+    uinteger_t value
+  ) -> WatchKind;
 
   /**
-   * Text documents are identified using a URI. On the protocol level, URIs are
-   * passed as strings.
-   *
-   * interface TextDocumentIdentifier {
-   *   uri: DocumentUri;
-   * }
-   */
-  struct TextDocumentIdentifier {
-
-    /**
-     * The text document's URI.
-     *
-     * uri: DocumentUri;
-     */
-    DocumentUri uri;
-  };
-
-  /**
-   * An identifier to denote a specific version of a text document. This
-   * information usually flows from the client to the server.
-   *
-   * interface VersionedTextDocumentIdentifier extends TextDocumentIdentifier {
-   *   version: integer;
-   * }
-   */
-  struct VersionedTextDocumentIdentifier : public TextDocumentIdentifier {
-
-    /**
-     * The version number of this document.
-     *
-     * The version number of a document will increase after each change,
-     * including undo/redo. The number doesn't need to be consecutive.
-     *
-     * version: integer;
-     */
-    integer version;
-  };
-
-  /**
-   * An identifier which optionally denotes a specific version of a text
-   * document. This information usually flows from the server to the client.
-   *
-   * interface OptionalVersionedTextDocumentIdentifier extends TextDocumentIdentifier {
-   *   version: integer | null;
-   * }
-   */
-  struct OptionalVersionedTextDocumentIdentifier : public TextDocumentIdentifier {
-
-    /**
-     * The version number of this document. If an optional versioned text document
-     * identifier is sent from the server to the client and the file is not
-     * open in the editor (the server has not received an open notification
-     * before) the server can send `null` to indicate that the version is
-     * known and the content on disk is the master (as specified with document
-     * content ownership).
-     *
-     * The version number of a document will increase after each change,
-     * including undo/redo. The number doesn't need to be consecutive.
-     *
-     * version: integer | null;
-     */
-    std::optional<integer> version;
-  };
-
-  /**
-   * Was TextDocumentPosition in 1.0 with inlined parameters.
-   *
-   * A parameter literal used in requests to pass a text document and a position
-   * inside that document. It is up to the client to decide how a selection is
-   * converted into a position when issuing a request for a text document. The
-   * client can for example honor or ignore the selection direction to make LSP
-   * request consistent with features implemented internally.
-   *
-   * interface TextDocumentPositionParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   position: Position;
-   * }
-   */
-  struct TextDocumentPositionParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The position inside the text document.
-     *
-     * position: Position;
-     */
-    std::unique_ptr<Position> position;
-  };
-
-  /**
-   * A textual edit applicable to a text document.
-   *
-   * interface TextEdit {
-   *   range: Range;
-   *   newText: string;
-   * }
-   */
-  struct TextEdit {
-
-    /**
-     * The range of the text document to be manipulated. To insert
-     * text into a document create a range where start === end.
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-
-    /**
-     * The string to be inserted. For delete operations use an
-     * empty string.
-     *
-     * newText: string;
-     */
-    string newText;
-  };
-
-  /**
-   * Since 3.16.0 there is also the concept of an annotated text edit which
-   * supports to add an annotation to a text edit. The annotation can add
-   * information describing the change to the text edit.
-   *
-   * Usually clients provide options to group the changes along the annotations
-   * they are associated with. To support this in the protocol an edit or
-   * resource operation refers to a change annotation using an identifier and
-   * not the change annotation literal directly. This allows servers to use the
-   * identical annotation across multiple edits or resource operations which
-   * then allows clients to group the operations under that change annotation.
-   * The actual change annotations together with their identifiers are managed
-   * by the workspace edit via the new property changeAnnotations.
-   *
-   * export interface ChangeAnnotation {
-   *   label: string;
-   *   needsConfirmation?: boolean;
-   *   description?: string;
-   * }
-   */
-  struct ChangeAnnotation {
-
-    /**
-     * A human-readable string describing the actual change. The string
-     * is rendered prominent in the user interface.
-     *
-     * label: string;
-     */
-    string label;
-
-    /**
-     * A flag which indicates that user confirmation is needed
-     * before applying the change.
-     *
-     * needsConfirmation?: boolean;
-     */
-    std::optional<boolean> needsConfirmation;
-
-    /**
-     * A human-readable string which is rendered less prominent in
-     * the user interface.
-     *
-     * description?: string;
-     */
-    std::optional<string> description;
-  };
-
-  /**
-   * An identifier referring to a change annotation managed by a workspace
-   * edit.
-   *
-   * export type ChangeAnnotationIdentifier = string;
-   *
-   * @since 3.16.0.
-   */
-  typedef string ChangeAnnotationIdentifier;
-
-  /**
-   * A special text edit with an additional change annotation.
-   *
-   * export interface AnnotatedTextEdit extends TextEdit {
-   *   annotationId: ChangeAnnotationIdentifier;
-   * }
-   *
-   * @since 3.16.0.
-   */
-  struct AnnotatedTextEdit : public TextEdit {
-
-    /**
-     * The actual annotation identifier.
-     *
-     * annotationId: ChangeAnnotationIdentifier;
-     */
-    ChangeAnnotationIdentifier annotationId;
-  };
-
-  enum class OptionalAnnotatedTextEditType {
-    NOT_ANNOTATED,
-    ANNOTATED,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<TextEdit>,
-    std::unique_ptr<AnnotatedTextEdit>
-  > OptionalAnnotatedTextEdit;
-
-  /**
-   * New in version 3.16: support for AnnotatedTextEdit. The support is guarded
-   * by the client capability workspace.workspaceEdit.changeAnnotationSupport.
-   * If a client doesn’t signal the capability, servers shouldn’t send
-   * AnnotatedTextEdit literals back to the client.
-   *
-   * Describes textual changes on a single text document. The text document is
-   * referred to as a OptionalVersionedTextDocumentIdentifier to allow clients
-   * to check the text document version before an edit is applied. A
-   * TextDocumentEdit describes all changes on a version Si and after they are
-   * applied move the document to version Si+1. So the creator of a
-   * TextDocumentEdit doesn’t need to sort the array of edits or do any kind of
-   * ordering. However the edits must be non overlapping.
-   *
-   * export interface TextDocumentEdit {
-   *   textDocument: OptionalVersionedTextDocumentIdentifier;
-   *   edits: (TextEdit | AnnotatedTextEdit)[];
-   * }
-   */
-  struct TextDocumentEdit {
-
-    /**
-     * The text document to change.
-     *
-     * textDocument: OptionalVersionedTextDocumentIdentifier;
-     */
-    std::unique_ptr<OptionalVersionedTextDocumentIdentifier> textDocument;
-
-    /**
-     * The edits to be applied.
-     *
-     * @since 3.16.0 - support for AnnotatedTextEdit. This is guarded by the
-     * client capability `workspace.workspaceEdit.changeAnnotationSupport`
-     *
-     * edits: (TextEdit | AnnotatedTextEdit)[];
-     */
-    std::vector<OptionalAnnotatedTextEdit> edits;
-  };
-
-  /**
-   * Represents a location inside a resource, such as a line inside a text file.
-   *
-   * interface Location {
-   *   uri: DocumentUri;
-   *   range: Range;
-   * }
-   */
-  struct Location {
-
-    DocumentUri uri;
-
-    Range range;
-  };
-
-  /**
-   * Represents a link between a source and a target location.
-   *
-   * interface LocationLink {
-   *   originSelectionRange?: Range;
-   *   targetUri: DocumentUri;
-   *   targetRange: Range;
-   *   targetSelectionRange: Range;
-   * }
-   */
-  struct LocationLink {
-
-    /**
-     * Span of the origin of this link.
-     *
-     * Used as the underlined span for mouse interaction. Defaults to the word
-     * range at the mouse position.
-     *
-     * originSelectionRange?: Range;
-     */
-    optional_ptr<Range> originSelectionRange;
-
-    /**
-     * The target resource identifier of this link.
-     *
-     * targetUri: DocumentUri;
-     */
-    DocumentUri targetUri;
-
-    /**
-     * The full target range of this link. If the target for example is a symbol
-     * then target range is the range enclosing this symbol not including
-     * leading/trailing whitespace but everything else like comments. This
-     * information is typically used to highlight the range in the editor.
-     *
-     * targetRange: Range;
-     */
-    std::unique_ptr<Range> targetRange;
-
-    /**
-     * The range that should be selected and revealed when this link is being
-     * followed, e.g the name of a function. Must be contained by the
-     * `targetRange`. See also `DocumentSymbol#range`
-     *
-     * targetSelectionRange: Range;
-     */
-    std::unique_ptr<Range> targetSelectionRange;
-  };
-
-  /**
-   * The protocol currently supports the following diagnostic severities and
-   * tags.
-   *
-   * export namespace DiagnosticSeverity {
-   *   export const Error: 1 = 1;
-   *   export const Warning: 2 = 2;
-   *   export const Information: 3 = 3;
-   *   export const Hint: 4 = 4;
-   * }
-   *
-   * export type DiagnosticSeverity = 1 | 2 | 3 | 4;
+   * The diagnostic's severity.
    */
   enum class DiagnosticSeverity {
-
     /**
      * Reports an error.
-     *
-     * export const Error: 1 = 1;
      */
-    Error = 1,
-
+    ERROR = 1,
     /**
      * Reports a warning.
-     *
-     * export const Warning: 2 = 2;
      */
-    Warning = 2,
-
+    WARNING = 2,
     /**
      * Reports an information.
-     *
-     * export const Information: 3 = 3;
      */
-    Information = 3,
-
+    INFORMATION = 3,
     /**
      * Reports a hint.
-     *
-     * export const Hint: 4 = 4;
      */
-    Hint = 4,
+    HINT = 4,
   };
 
-  extern std::map<DiagnosticSeverity, std::string> DiagnosticSeverityNames;
+  extern std::map<
+    DiagnosticSeverity,
+    std::string
+  > DiagnosticSeverityNames;
 
-  auto diagnosticSeverityByName(const std::string &name) -> DiagnosticSeverity;
+  auto diagnosticSeverityByName(
+    const std::string &name
+  ) -> DiagnosticSeverity;
+
+  auto diagnosticSeverityByValue(
+    uinteger_t value
+  ) -> DiagnosticSeverity;
 
   /**
    * The diagnostic tags.
    *
-   * export namespace DiagnosticTag {
-   *   export const Unnecessary: 1 = 1;
-   *   export const Deprecated: 2 = 2;
-   * }
-   *
-   * export type DiagnosticTag = 1 | 2;
-   *
    * @since 3.15.0
    */
   enum class DiagnosticTag {
-
     /**
      * Unused or unnecessary code.
      *
-     * Clients are allowed to render diagnostics with this tag faded out
-     * instead of having an error squiggle.
-     *
-     * export const Unnecessary: 1 = 1;
+     * Clients are allowed to render diagnostics with this tag faded out instead of having
+     * an error squiggle.
      */
-    Unnecessary = 1,
-
+    UNNECESSARY = 1,
     /**
      * Deprecated or obsolete code.
      *
      * Clients are allowed to rendered diagnostics with this tag strike through.
-     *
-     * export const Deprecated: 2 = 2;
      */
-    Deprecated = 2,
+    DEPRECATED = 2,
   };
 
-  extern std::map<DiagnosticTag, std::string> DiagnosticTagNames;
+  extern std::map<
+    DiagnosticTag,
+    std::string
+  > DiagnosticTagNames;
 
-  auto diagnosticTagByName(const std::string &name) -> DiagnosticTag;
+  auto diagnosticTagByName(
+    const std::string &name
+  ) -> DiagnosticTag;
 
-  auto diagnosticTagByValue(int value) -> DiagnosticTag;
+  auto diagnosticTagByValue(
+    uinteger_t value
+  ) -> DiagnosticTag;
 
   /**
-   * Represents a related message and source code location for a diagnostic.
-   * This should be used to point to code locations that cause or are related to
-   * a diagnostics, e.g when duplicating a symbol in a scope.
-   *
-   * export interface DiagnosticRelatedInformation {
-   *   location: Location;
-   *   message: string;
-   * }
+   * How a completion was triggered
    */
-  struct DiagnosticRelatedInformation {
-
+  enum class CompletionTriggerKind {
     /**
-     * The location of this related diagnostic information.
-     *
-     * location: Location;
+     * Completion was triggered by typing an identifier (24x7 code
+     * complete), manual invocation (e.g Ctrl+Space) or via API.
      */
-    std::unique_ptr<Location> location;
-
+    INVOKED = 1,
     /**
-     * The message of this related diagnostic information.
-     *
-     * message: string;
+     * Completion was triggered by a trigger character specified by
+     * the `triggerCharacters` properties of the `CompletionRegistrationOptions`.
      */
-    string message;
+    TRIGGER_CHARACTER = 2,
+    /**
+     * Completion was re-triggered as current completion list is incomplete
+     */
+    TRIGGER_FOR_INCOMPLETE_COMPLETIONS = 3,
   };
 
+  extern std::map<
+    CompletionTriggerKind,
+    std::string
+  > CompletionTriggerKindNames;
+
+  auto completionTriggerKindByName(
+    const std::string &name
+  ) -> CompletionTriggerKind;
+
+  auto completionTriggerKindByValue(
+    uinteger_t value
+  ) -> CompletionTriggerKind;
+
   /**
-   * Structure to capture a description for an error code.
+   * How a signature help was triggered.
    *
-   * export interface CodeDescription {
-   *   href: URI;
-   * }
+   * @since 3.15.0
+   */
+  enum class SignatureHelpTriggerKind {
+    /**
+     * Signature help was invoked manually by the user or by a command.
+     */
+    INVOKED = 1,
+    /**
+     * Signature help was triggered by a trigger character.
+     */
+    TRIGGER_CHARACTER = 2,
+    /**
+     * Signature help was triggered by the cursor moving or by the document content changing.
+     */
+    CONTENT_CHANGE = 3,
+  };
+
+  extern std::map<
+    SignatureHelpTriggerKind,
+    std::string
+  > SignatureHelpTriggerKindNames;
+
+  auto signatureHelpTriggerKindByName(
+    const std::string &name
+  ) -> SignatureHelpTriggerKind;
+
+  auto signatureHelpTriggerKindByValue(
+    uinteger_t value
+  ) -> SignatureHelpTriggerKind;
+
+  /**
+   * The reason why code actions were requested.
+   *
+   * @since 3.17.0
+   */
+  enum class CodeActionTriggerKind {
+    /**
+     * Code actions were explicitly requested by the user or by an extension.
+     */
+    INVOKED = 1,
+    /**
+     * Code actions were requested automatically.
+     *
+     * This typically happens when current selection in a file changes, but can
+     * also be triggered when file content changes.
+     */
+    AUTOMATIC = 2,
+  };
+
+  extern std::map<
+    CodeActionTriggerKind,
+    std::string
+  > CodeActionTriggerKindNames;
+
+  auto codeActionTriggerKindByName(
+    const std::string &name
+  ) -> CodeActionTriggerKind;
+
+  auto codeActionTriggerKindByValue(
+    uinteger_t value
+  ) -> CodeActionTriggerKind;
+
+  /**
+   * A pattern kind describing if a glob pattern matches a file a folder or
+   * both.
    *
    * @since 3.16.0
    */
-  struct CodeDescription {
-
+  enum class FileOperationPatternKind {
     /**
-     * An URI to open with more information about the diagnostic error.
-     *
-     * href: URI;
+     * The pattern matches a file only.
      */
-    URI href;
+    FILE,
+    /**
+     * The pattern matches a folder only.
+     */
+    FOLDER,
   };
 
-  typedef IntegerOrStringType DiagnosticCodeType;
-  typedef IntegerOrString DiagnosticCode;
+  extern std::map<
+    FileOperationPatternKind,
+    std::string
+  > FileOperationPatternKindNames;
+
+  extern std::map<
+    FileOperationPatternKind,
+    string_t
+  > FileOperationPatternKindValues;
+
+  auto fileOperationPatternKindByName(
+    const std::string &name
+  ) -> FileOperationPatternKind;
+
+  auto fileOperationPatternKindByValue(
+    const string_t &value
+  ) -> FileOperationPatternKind;
 
   /**
-   * Represents a diagnostic, such as a compiler error or warning. Diagnostic
-   * objects are only valid in the scope of a resource.
+   * A notebook cell kind.
    *
-   * export interface Diagnostic {
-   *   range: Range;
-   *   severity?: DiagnosticSeverity;
-   *   code?: integer | string;
-   *   codeDescription?: CodeDescription;
-   *   source?: string;
-   *   message: string;
-   *   tags?: DiagnosticTag[];
-   *   relatedInformation?: DiagnosticRelatedInformation[];
-   *   data?: LSPAny;
-   * }
+   * @since 3.17.0
    */
-  struct Diagnostic {
-
+  enum class NotebookCellKind {
     /**
-     * The range at which the message applies.
-     *
-     * range: Range;
+     * A markup-cell is formatted source that is used for display.
      */
-    std::unique_ptr<Range> range;
-
+    MARKUP = 1,
     /**
-     * The diagnostic's severity. To avoid interpretation mismatches when a
-     * server is used with different clients it is highly recommended that
-     * servers always provide a severity value. If omitted, it’s recommended for
-     * the client to interpret it as an Error severity.
-     *
-     * severity?: DiagnosticSeverity;
+     * A code-cell is source code.
      */
-    std::optional<DiagnosticSeverity> severity;
-
-    /**
-     * The diagnostic's code, which might appear in the user interface.
-     *
-     * code?: integer | string;
-     */
-    std::optional<DiagnosticCode> code;
-
-    /**
-     * An optional property to describe the error code.
-     *
-     * codeDescription?: CodeDescription;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<CodeDescription> codeDescription;
-
-    /**
-     * A human-readable string describing the source of this
-     * diagnostic, e.g. 'typescript' or 'super lint'.
-     *
-     * source?: string;
-     */
-    std::optional<string> source;
-
-    /**
-     * The diagnostic's message.
-     *
-     * message: string;
-     */
-    string message;
-
-    /**
-     * Additional metadata about the diagnostic.
-     *
-     * tags?: DiagnosticTag[];
-     *
-     * @since 3.15.0
-     */
-    optional_vector<DiagnosticTag> tags;
-
-    /**
-     * An array of related diagnostic information, e.g. when symbol-names within
-     * a scope collide all definitions can be marked via this property.
-     *
-     * relatedInformation?: DiagnosticRelatedInformation[];
-     */
-    optional_ptr_vector<DiagnosticRelatedInformation> relatedInformation;
-
-    /**
-     * A data entry field that is preserved between a
-     * `textDocument/publishDiagnostics` notification and
-     * `textDocument/codeAction` request.
-     *
-     * data?: LSPAny;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<LSPAny> data;
+    CODE = 2,
   };
 
-  /**
-   * Represents a reference to a command. Provides a title which will be used to
-   * represent a command in the UI. Commands are identified by a string
-   * identifier. The recommended way to handle commands is to implement their
-   * execution on the server side if the client and server provides the
-   * corresponding capabilities. Alternatively the tool extension code could
-   * handle the command. The protocol currently doesn’t specify a set of
-   * well-known commands.
-   *
-   * interface Command {
-   *   title: string;
-   *   command: string;
-   *   arguments?: LSPAny[];
-   * }
-   */
-  struct Command {
+  extern std::map<
+    NotebookCellKind,
+    std::string
+  > NotebookCellKindNames;
 
-    /**
-     * Title of the command, like `save`.
-     *
-     * title: string;
-     */
-    string title;
+  auto notebookCellKindByName(
+    const std::string &name
+  ) -> NotebookCellKind;
 
-    /**
-     * The identifier of the actual command handler.
-     *
-     * command: string;
-     */
-    string command;
+  auto notebookCellKindByValue(
+    uinteger_t value
+  ) -> NotebookCellKind;
 
-    /**
-     * Arguments that the command handler should be invoked with.
-     *
-     * arguments?: LSPAny[];
-     */
-    optional_ptr_vector<LSPAny> arguments;
-  };
-
-  /**
-   * Describes the content type that a client supports in various result
-   * literals like `Hover`, `ParameterInfo` or `CompletionItem`.
-   *
-   * Please note that `MarkupKinds` must not start with a `$`. This kinds are
-   * reserved for internal usage.
-   *
-   * export namespace MarkupKind {
-   *   export const PlainText: 'plaintext' = 'plaintext';
-   *   export const Markdown: 'markdown' = 'markdown';
-   * }
-   * export type MarkupKind = 'plaintext' | 'markdown';
-   */
-  enum class MarkupKind {
-
-    /**
-     * Plain text is supported as a content format
-     *
-     * export const PlainText: 'plaintext' = 'plaintext';
-     */
-    PlainText,
-
-    /**
-     * Markdown is supported as a content format
-     *
-     * export const Markdown: 'markdown' = 'markdown';
-     */
-    Markdown,
-  };
-
-  extern std::map<MarkupKind, std::string> MarkupKindNames;
-
-  auto markupKindByName(const std::string &name) -> MarkupKind;
-
-  extern std::map<MarkupKind, std::string> MarkupKindValues;
-
-  auto markupKindByValue(const std::string &value) -> MarkupKind;
-
-  /**
-   * A `MarkupContent` literal represents a string value which content is
-   * interpreted base on its kind flag. Currently the protocol supports
-   * `plaintext` and `markdown` as markup kinds.
-   *
-   * If the kind is `markdown` then the value can contain fenced code blocks
-   * like in GitHub issues.
-   *
-   * *Please Note* that clients might sanitize the return markdown. A client
-   * could decide to remove HTML from the markdown to avoid script execution.
-   *
-   * export interface MarkupContent {
-   *   kind: MarkupKind;
-   *   value: string;
-   * }
-   */
-  struct MarkupContent {
-
-    /**
-     * The type of the Markup
-     *
-     * kind: MarkupKind;
-     */
-    MarkupKind kind;
-
-    /**
-     * The content itself
-     *
-     * value: string;
-     */
-    string value;
-  };
-
-  /**
-   * Client capabilities specific to the used markdown parser.
-   *
-   * export interface MarkdownClientCapabilities {
-   *   parser: string;
-   *   version?: string;
-   *   allowedTags?: string[];
-   * }
-   *
-   * @since 3.16.0
-   */
-  struct MarkdownClientCapabilities {
-
-    /**
-     * The name of the parser.
-     *
-     * parser: string;
-     */
-    string parser;
-
-    /**
-     * The version of the parser.
-     *
-     * version?: string;
-     */
-    std::optional<string> version;
-
-    /**
-     * A list of HTML tags that the client allows / supports in
-     * Markdown.
-     *
-     * allowedTags?: string[];
-     *
-     * @since 3.17.0
-     */
-    optional_vector<string> allowedTags;
-  };
-
-  // --------------------------------------------------------------------------
-  // New in version 3.13. Since version 3.16 file resource changes can carry an
-  // additional property changeAnnotation to describe the actual change in more
-  // detail. Whether a client has support for change annotations is guarded by
-  // the client capability workspace.workspaceEdit.changeAnnotationSupport.
-  //
-  // File resource changes allow servers to create, rename and delete files and
-  // folders via the client. Note that the names talk about files but the
-  // operations are supposed to work on files and folders. This is in line with
-  // other naming in the Language Server Protocol (see file watchers which can
-  // watch files and folders).
-  // --------------------------------------------------------------------------
-
-  /**
-   * Options to create a file.
-   *
-   * export interface CreateFileOptions {
-   *   overwrite?: boolean;
-   *   ignoreIfExists?: boolean;
-   * }
-   */
-  struct CreateFileOptions {
-
-    /**
-     * Overwrite existing file. Overwrite wins over `ignoreIfExists`
-     *
-     * overwrite?: boolean;
-     */
-    std::optional<boolean> overwrite;
-
-    /**
-     * Ignore if exists.
-     *
-     * ignoreIfExists?: boolean;
-     */
-    std::optional<boolean> ignoreIfExists;
-  };
-
-  /**
-   * Create file operation.
-   *
-   * export interface CreateFile {
-   *   kind: 'create';
-   *   uri: DocumentUri;
-   *   options?: CreateFileOptions;
-   *   annotationId?: ChangeAnnotationIdentifier;
-   * }
-   */
-  struct CreateFile {
-
-    /**
-     * A create
-     *
-     * kind: 'create';
-     */
-    const std::string kind = "create";
-
-    /**
-     * The resource to create.
-     *
-     * uri: DocumentUri;
-     */
-    DocumentUri uri;
-
-    /**
-     * Additional options
-     *
-     * options?: CreateFileOptions;
-     */
-    optional_ptr<CreateFileOptions> options;
-
-    /**
-     * An optional annotation identifier describing the operation.
-     *
-     * annotationId?: ChangeAnnotationIdentifier;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ChangeAnnotationIdentifier> annotationId;
-  };
-
-  /**
-   * Rename file options.
-   *
-   * export interface RenameFileOptions {
-   *   overwrite?: boolean;
-   *   ignoreIfExists?: boolean;
-   * }
-   */
-  struct RenameFileOptions {
-
-    /**
-     * Overwrite target if existing. Overwrite wins over `ignoreIfExists`
-     *
-     * overwrite?: boolean;
-     */
-    std::optional<boolean> overwrite;
-
-    /**
-     * Ignores if target exists.
-     *
-     * ignoreIfExists?: boolean;
-     */
-    std::optional<boolean> ignoreIfExists;
-  };
-
-  /**
-   * Rename file operation.
-   *
-   * export interface RenameFile {
-   *   kind: 'rename';
-   *   oldUri: DocumentUri;
-   *   newUri: DocumentUri;
-   *   options?: RenameFileOptions;
-   *   annotationId?: ChangeAnnotationIdentifier;
-   * }
-   */
-  struct RenameFile {
-
-    /**
-     * A rename.
-     *
-     * kind: 'rename';
-     */
-    const std::string kind = "rename";
-
-    /**
-     * The old (existing) location.
-     *
-     * oldUri: DocumentUri;
-     */
-    DocumentUri oldUri;
-
-    /**
-     * The new location.
-     *
-     * newUri: DocumentUri;
-     */
-    DocumentUri newUri;
-
-    /**
-     * Rename options.
-     *
-     * options?: RenameFileOptions;
-     */
-    optional_ptr<RenameFileOptions> options;
-
-    /**
-     * An optional annotation identifier describing the operation.
-     *
-     * annotationId?: ChangeAnnotationIdentifier;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ChangeAnnotationIdentifier> annotationId;
-  };
-
-  /**
-   * Delete file options.
-   *
-   * export interface DeleteFileOptions {
-   *   recursive?: boolean;
-   *   ignoreIfNotExists?: boolean;
-   * }
-   */
-  struct DeleteFileOptions {
-
-    /**
-     * Delete the content recursively if a folder is denoted.
-     *
-     * recursive?: boolean;
-     */
-    std::optional<boolean> recursive;
-
-    /**
-     * Ignore the operation if the file doesn't exist.
-     *
-     * ignoreIfNotExists?: boolean;
-     */
-    std::optional<boolean> ignoreIfNotExists;
-  };
-
-  /**
-   * Delete file operation.
-   *
-   * export interface DeleteFile {
-   *   kind: 'delete';
-   *   uri: DocumentUri;
-   *   options?: DeleteFileOptions;
-   *   annotationId?: ChangeAnnotationIdentifier;
-   * }
-   */
-  struct DeleteFile {
-
-    /**
-     * A delete.
-     *
-     * kind: 'delete';
-     */
-    const std::string kind = "delete";
-
-    /**
-     * The file to delete.
-     *
-     * uri: DocumentUri;
-     */
-    DocumentUri uri;
-
-    /**
-     * Delete options.
-     *
-     * options?: DeleteFileOptions;
-     */
-    optional_ptr<DeleteFileOptions> options;
-
-    /**
-     * An optional annotation identifier describing the operation.
-     *
-     * annotationId?: ChangeAnnotationIdentifier;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ChangeAnnotationIdentifier> annotationId;
-  };
-
-  enum class DocumentChangeType {
-    TEXT_DOCUMENT_EDIT,
-    CREATE_FILE,
-    RENAME_FILE,
-    DELETE_FILE,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<TextDocumentEdit>,
-    std::unique_ptr<CreateFile>,
-    std::unique_ptr<RenameFile>,
-    std::unique_ptr<DeleteFile>
-  > DocumentChange;
-
-  /**
-   * A workspace edit represents changes to many resources managed in the
-   * workspace. The edit should either provide changes or documentChanges. If
-   * the client can handle versioned document edits and if documentChanges are
-   * present, the latter are preferred over changes.
-   *
-   * Since version 3.13.0 a workspace edit can contain resource operations
-   * (create, delete or rename files and folders) as well. If resource
-   * operations are present clients need to execute the operations in the order
-   * in which they are provided. So a workspace edit for example can consist of
-   * the following two changes: (1) create file a.txt and (2) a text document
-   * edit which insert text into file a.txt. An invalid sequence (e.g. (1)
-   * delete file a.txt and (2) insert text into file a.txt) will cause failure
-   * of the operation. How the client recovers from the failure is described by
-   * the client capability: workspace.workspaceEdit.failureHandling
-   *
-   * export interface WorkspaceEdit {
-   *   changes?: { [uri: DocumentUri]: TextEdit[]; };
-   *   documentChanges?: (
-   *     TextDocumentEdit[] |
-   *     (TextDocumentEdit | CreateFile | RenameFile | DeleteFile)[]
-   *   );
-   *   changeAnnotations?: {
-   *     [id: string]: ChangeAnnotation;
-   *   };
-   * }
-   */
-  struct WorkspaceEdit {
-
-    /**
-     * Holds changes to existing resources.
-     *
-     * changes?: { [uri: DocumentUri]: TextEdit[]; };
-     */
-    optional_ptr<std::map<DocumentUri, ptr_vector<TextEdit>>> changes;
-
-    /**
-     * Depending on the client capability
-     * `workspace.workspaceEdit.resourceOperations` document changes are either
-     * an array of `TextDocumentEdit`s to express changes to n different text
-     * documents where each text document edit addresses a specific version of a
-     * text document. Or it can contain above `TextDocumentEdit`s mixed with
-     * create, rename and delete file / folder operations.
-     *
-     * Whether a client supports versioned document edits is expressed via
-     * `workspace.workspaceEdit.documentChanges` client capability.
-     *
-     * If a client neither supports `documentChanges` nor
-     * `workspace.workspaceEdit.resourceOperations` then only plain `TextEdit`s
-     * using the `changes` property are supported.
-     *
-     * documentChanges?: (
-     *   TextDocumentEdit[] |
-     *   (TextDocumentEdit | CreateFile | RenameFile | DeleteFile)[]
-     * );
-     */
-    optional_vector<DocumentChange> documentChanges;
-
-    /**
-     * A map of change annotations that can be referenced in
-     * `AnnotatedTextEdit`s or create, rename and delete file / folder
-     * operations.
-     *
-     * Whether clients honor this property depends on the client capability
-     * `workspace.changeAnnotationSupport`.
-     *
-     * changeAnnotations?: {
-     *   [id: string]: ChangeAnnotation;
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<std::map<string, std::unique_ptr<ChangeAnnotation>>> changeAnnotations;
-  };
-
-  /**
-   * The kind of resource operations supported by the client.
-   *
-   * export type ResourceOperationKind = 'create' | 'rename' | 'delete';
-   * export namespace ResourceOperationKind {
-   *   export const Create: ResourceOperationKind = 'create';
-   *   export const Rename: ResourceOperationKind = 'rename';
-   *   export const Delete: ResourceOperationKind = 'delete';
-   * }
-   */
   enum class ResourceOperationKind {
-
     /**
      * Supports creating new files and folders.
-     *
-     * export const Create: ResourceOperationKind = 'create';
      */
-    Create,
-
+    CREATE,
     /**
      * Supports renaming existing files and folders.
-     *
-     * export const Rename: ResourceOperationKind = 'rename';
      */
-    Rename,
-
+    RENAME,
     /**
      * Supports deleting existing files and folders.
-     *
-     * export const Delete: ResourceOperationKind = 'delete';
      */
-    Delete,
+    DELETE,
   };
 
-  extern std::map<ResourceOperationKind, std::string> ResourceOperationKindNames;
+  extern std::map<
+    ResourceOperationKind,
+    std::string
+  > ResourceOperationKindNames;
 
-  auto resourceOperationKindByName(const std::string &name) -> ResourceOperationKind;
+  extern std::map<
+    ResourceOperationKind,
+    string_t
+  > ResourceOperationKindValues;
 
-  extern std::map<ResourceOperationKind, std::string> ResourceOperationKindValues;
+  auto resourceOperationKindByName(
+    const std::string &name
+  ) -> ResourceOperationKind;
 
-  auto resourceOperationKindByValue(const std::string &value) -> ResourceOperationKind;
+  auto resourceOperationKindByValue(
+    const string_t &value
+  ) -> ResourceOperationKind;
 
-  /**
-   * export type FailureHandlingKind = 'abort' | 'transactional' | 'undo'
-   *   | 'textOnlyTransactional';
-   * export namespace FailureHandlingKind {
-   *   export const Abort: FailureHandlingKind = 'abort';
-   *   export const Transactional: FailureHandlingKind = 'transactional';
-   *   export const TextOnlyTransactional: FailureHandlingKind
-   *     = 'textOnlyTransactional';
-   *   export const Undo: FailureHandlingKind = 'undo';
-   * }
-   */
   enum class FailureHandlingKind {
-
     /**
-     * Applying the workspace change is simply aborted if one of the changes
-     * provided fails. All operations executed before the failing operation stay
-     * executed.
-     *
-     * export const Abort: FailureHandlingKind = 'abort';
+     * Applying the workspace change is simply aborted if one of the changes provided
+     * fails. All operations executed before the failing operation stay executed.
      */
-    Abort,
-
+    ABORT,
     /**
      * All operations are executed transactional. That means they either all
      * succeed or no changes at all are applied to the workspace.
-     *
-     * export const Transactional: FailureHandlingKind = 'transactional';
      */
-    Transactional,
-
+    TRANSACTIONAL,
     /**
-     * If the workspace edit contains only textual file changes they are
-     * executed transactional. If resource changes (create, rename or delete
-     * file) are part of the change the failure handling strategy is abort.
-     *
-     * export const TextOnlyTransactional: FailureHandlingKind
-     *   = 'textOnlyTransactional';
+     * If the workspace edit contains only textual file changes they are executed transactional.
+     * If resource changes (create, rename or delete file) are part of the change the failure
+     * handling strategy is abort.
      */
-    TextOnlyTransactional,
-
+    TEXT_ONLY_TRANSACTIONAL,
     /**
      * The client tries to undo the operations already executed. But there is no
      * guarantee that this is succeeding.
-     *
-     * export const Undo: FailureHandlingKind = 'undo';
      */
-    Undo,
+    UNDO,
   };
 
-  extern std::map<FailureHandlingKind, std::string> FailureHandlingKindNames;
+  extern std::map<
+    FailureHandlingKind,
+    std::string
+  > FailureHandlingKindNames;
 
-  auto failureHandlingKindByName(const std::string &name) -> FailureHandlingKind;
+  extern std::map<
+    FailureHandlingKind,
+    string_t
+  > FailureHandlingKindValues;
 
-  extern std::map<FailureHandlingKind, std::string> FailureHandlingKindValues;
+  auto failureHandlingKindByName(
+    const std::string &name
+  ) -> FailureHandlingKind;
 
-  auto failureHandlingKindByValue(const std::string &value) -> FailureHandlingKind;
+  auto failureHandlingKindByValue(
+    const string_t &value
+  ) -> FailureHandlingKind;
 
-  struct ChangeAnnotationSupport {
-
+  enum class PrepareSupportDefaultBehavior {
     /**
-     * Whether the client groups edits with equal labels into tree nodes,
-     * for instance all edits labelled with "Changes in Strings" would
-     * be a tree node.
-     *
-     * groupsOnLabel?: boolean;
+     * The client's default behavior is to select the identifier
+     * according the to language's syntax rule.
      */
-    std::optional<boolean> groupsOnLabel;
+    IDENTIFIER = 1,
+  };
+
+  extern std::map<
+    PrepareSupportDefaultBehavior,
+    std::string
+  > PrepareSupportDefaultBehaviorNames;
+
+  auto prepareSupportDefaultBehaviorByName(
+    const std::string &name
+  ) -> PrepareSupportDefaultBehavior;
+
+  auto prepareSupportDefaultBehaviorByValue(
+    uinteger_t value
+  ) -> PrepareSupportDefaultBehavior;
+
+  enum class TokenFormat {
+    RELATIVE,
+  };
+
+  extern std::map<
+    TokenFormat,
+    std::string
+  > TokenFormatNames;
+
+  extern std::map<
+    TokenFormat,
+    string_t
+  > TokenFormatValues;
+
+  auto tokenFormatByName(
+    const std::string &name
+  ) -> TokenFormat;
+
+  auto tokenFormatByValue(
+    const string_t &value
+  ) -> TokenFormat;
+
+  /**
+   * A workspace folder inside a client.
+   */
+  struct WorkspaceFolder
+  {
+    /**
+     * The associated URI for this workspace folder.
+     */
+    URI uri;
+    /**
+     * The name of the workspace folder. Used to refer to this
+     * workspace folder in the user interface.
+     */
+    string_t name;
+  };
+
+  struct WorkDoneProgressOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
   };
 
   /**
-   * New in version 3.13: ResourceOperationKind and FailureHandlingKind and the
-   * client capability workspace.workspaceEdit.resourceOperations as well as
-   * workspace.workspaceEdit.failureHandling.
-   *
-   * The capabilities of a workspace edit has evolved over the time. Clients can
-   * describe their support using the following client capability:
-   *
-   * Client Capability:
-   *   property path (optional): workspace.workspaceEdit
-   *   property type: WorkspaceEditClientCapabilities
-   *
-   * export interface WorkspaceEditClientCapabilities {
-   *   documentChanges?: boolean;
-   *   resourceOperations?: ResourceOperationKind[];
-   *   failureHandling?: FailureHandlingKind;
-   *   normalizesLineEndings?: boolean;
-   *   changeAnnotationSupport?: {
-   *     groupsOnLabel?: boolean;
-   *   };
-   * }
+   * Represents a folding range. To be valid, start and end line must be bigger than zero and smaller
+   * than the number of lines in the document. Clients are free to ignore invalid ranges.
    */
-  struct WorkspaceEditClientCapabilities {
-
+  struct FoldingRange
+  {
     /**
-     * The client supports versioned document changes in `WorkspaceEdit`s
-     *
-     * documentChanges?: boolean;
+     * The zero-based start line of the range to fold. The folded area starts after the line's last character.
+     * To be valid, the end must be zero or larger and smaller than the number of lines in the document.
      */
-    std::optional<boolean> documentChanges;
-
+    uinteger_t startLine;
     /**
-     * The resource operations the client supports. Clients should at least
-     * support 'create', 'rename' and 'delete' files and folders.
-     *
-     * resourceOperations?: ResourceOperationKind[];
-     *
-     * @since 3.13.0
+     * The zero-based character offset from where the folded range starts. If not defined, defaults to the length of the start line.
      */
-    optional_vector<ResourceOperationKind> resourceOperations;
-
+    std::optional<uinteger_t> startCharacter;
     /**
-     * The failure handling strategy of a client if applying the workspace edit
-     * fails.
-     *
-     * failureHandling?: FailureHandlingKind;
-     *
-     * @since 3.13.0
+     * The zero-based end line of the range to fold. The folded area ends with the line's last character.
+     * To be valid, the end must be zero or larger and smaller than the number of lines in the document.
      */
-    std::optional<FailureHandlingKind> failureHandling;
-
+    uinteger_t endLine;
     /**
-     * Whether the client normalizes line endings to the client specific
-     * setting. If set to `true` the client will normalize line ending
-     * characters in a workspace edit to the client specific new line
-     * character(s).
-     *
-     * normalizesLineEndings?: boolean;
-     *
-     * @since 3.16.0
+     * The zero-based character offset before the folded range ends. If not defined, defaults to the length of the end line.
      */
-    std::optional<boolean> normalizesLineEndings;
-
+    std::optional<uinteger_t> endCharacter;
     /**
-     * Whether the client in general supports change annotations on text edits,
-     * create file, rename file and delete file changes.
-     *
-     * changeAnnotationSupport?: {
-     *   groupsOnLabel?: boolean;
-     * };
-     *
-     * @since 3.16.0
+     * Describes the kind of the folding range such as `comment' or 'region'. The kind
+     * is used to categorize folding ranges and used by commands like 'Fold all comments'.
+     * See {@link FoldingRangeKind} for an enumeration of standardized kinds.
      */
-    optional_ptr<ChangeAnnotationSupport> changeAnnotationSupport;
+    std::optional<FoldingRangeKind> kind;
+    /**
+     * The text that the client should show when the specified range is
+     * collapsed. If not defined or not supported by the client, a default
+     * will be chosen by the client.
+     *
+     * @since 3.17.0
+     */
+    std::optional<string_t> collapsedText;
   };
 
-  // Work done progress is reported using the generic $/progress notification.
-  // The value payload of a work done progress notification can be of three
-  // different forms.
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokens
+  {
+    /**
+     * An optional result id. If provided and clients support delta updating
+     * the client will include the result id in the next semantic token request.
+     * A server can then instead of computing all semantic tokens again simply
+     * send a delta.
+     */
+    std::optional<string_t> resultId;
+    /**
+     * The actual tokens.
+     */
+    std::vector<uinteger_t> data;
+  };
 
   /**
-   * To start progress reporting a $/progress notification with the following
-   * payload must be sent:
-   *
-   * export interface WorkDoneProgressBegin {
-   *   kind: 'begin';
-   *   title: string;
-   *   cancellable?: boolean;
-   *   message?: string;
-   *   percentage?: uinteger;
-   * }
+   * @since 3.16.0
    */
-  struct WorkDoneProgressBegin {
+  struct SemanticTokensPartialResult
+  {
+    std::vector<uinteger_t> data;
+  };
 
+  /**
+   * The result of a showDocument request.
+   *
+   * @since 3.16.0
+   */
+  struct ShowDocumentResult
+  {
     /**
-     * kind: 'begin';
+     * A boolean indicating if the show was successful.
      */
-    const std::string kind = "begin";
+    boolean_t success;
+  };
 
+  /**
+   * Moniker definition to match LSIF 0.5 moniker definition.
+   *
+   * @since 3.16.0
+   */
+  struct Moniker
+  {
+    /**
+     * The scheme of the moniker. For example tsc or .Net
+     */
+    string_t scheme;
+    /**
+     * The identifier of the moniker. The value is opaque in LSIF however
+     * schema owners are allowed to define the structure if they want.
+     */
+    string_t identifier;
+    /**
+     * The scope in which the moniker is unique
+     */
+    UniquenessLevel unique;
+    /**
+     * The moniker kind if known.
+     */
+    std::optional<MonikerKind> kind;
+  };
+
+  /**
+   * Cancellation data returned from a diagnostic request.
+   *
+   * @since 3.17.0
+   */
+  struct DiagnosticServerCancellationData
+  {
+    boolean_t retriggerRequest;
+  };
+
+  /**
+   * The data type of the ResponseError if the
+   * initialize request fails.
+   */
+  struct InitializeError
+  {
+    /**
+     * Indicates whether the client execute the following retry logic:
+     * (1) show the message provided by the ResponseError to the user
+     * (2) user selects retry or cancel
+     * (3) if user selected retry the initialize method is sent again.
+     */
+    boolean_t retry;
+  };
+
+  struct InitializedParams
+  {
+  };
+
+  /**
+   * The parameters of a change configuration notification.
+   */
+  struct DidChangeConfigurationParams
+  {
+    /**
+     * The actual changed settings
+     */
+    std::unique_ptr<LSPAny> settings;
+  };
+
+  enum class DidChangeConfigurationRegistrationOptions_sectionType {
+    STRING_TYPE,
+    STRING_TYPE_ARRAY,
+  };
+
+  typedef std::variant<
+    string_t,
+    std::vector<string_t>
+  > DidChangeConfigurationRegistrationOptions_section;
+
+  struct DidChangeConfigurationRegistrationOptions
+  {
+    std::optional<DidChangeConfigurationRegistrationOptions_section> section;
+  };
+
+  /**
+   * The parameters of a notification message.
+   */
+  struct ShowMessageParams
+  {
+    /**
+     * The message type. See {@link MessageType}
+     */
+    MessageType type;
+    /**
+     * The actual message.
+     */
+    string_t message;
+  };
+
+  struct MessageActionItem
+  {
+    /**
+     * A short title like 'Retry', 'Open Log' etc.
+     */
+    string_t title;
+  };
+
+  struct ShowMessageRequestParams
+  {
+    /**
+     * The message type. See {@link MessageType}
+     */
+    MessageType type;
+    /**
+     * The actual message.
+     */
+    string_t message;
+    /**
+     * The message action items to present.
+     */
+    std::optional<std::vector<std::unique_ptr<MessageActionItem>>> actions;
+  };
+
+  /**
+   * The log message parameters.
+   */
+  struct LogMessageParams
+  {
+    /**
+     * The message type. See {@link MessageType}
+     */
+    MessageType type;
+    /**
+     * The actual message.
+     */
+    string_t message;
+  };
+
+  /**
+   * Represents a reference to a command. Provides a title which
+   * will be used to represent a command in the UI and, optionally,
+   * an array of arguments which will be passed to the command handler
+   * function when invoked.
+   */
+  struct Command
+  {
+    /**
+     * Title of the command, like `save`.
+     */
+    string_t title;
+    /**
+     * The identifier of the actual command handler.
+     */
+    string_t command;
+    /**
+     * Arguments that the command handler should be
+     * invoked with.
+     */
+    std::optional<std::vector<std::unique_ptr<LSPAny>>> arguments;
+  };
+
+  /**
+   * The result returned from the apply workspace edit request.
+   *
+   * @since 3.17 renamed from ApplyWorkspaceEditResponse
+   */
+  struct ApplyWorkspaceEditResult
+  {
+    /**
+     * Indicates whether the edit was applied or not.
+     */
+    boolean_t applied;
+    /**
+     * An optional textual description for why the edit was not applied.
+     * This may be used by the server for diagnostic logging or to provide
+     * a suitable error for a request that triggered the edit.
+     */
+    std::optional<string_t> failureReason;
+    /**
+     * Depending on the client's failure handling strategy `failedChange` might
+     * contain the index of the change that failed. This property is only available
+     * if the client signals a `failureHandlingStrategy` in its client capabilities.
+     */
+    std::optional<uinteger_t> failedChange;
+  };
+
+  struct WorkDoneProgressBegin
+  {
+    string_t kind;
     /**
      * Mandatory title of the progress operation. Used to briefly inform about
      * the kind of operation being performed.
      *
      * Examples: "Indexing" or "Linking dependencies".
-     *
-     * title: string;
      */
-    string title;
-
+    string_t title;
     /**
      * Controls if a cancel button should show to allow the user to cancel the
-     * long running operation. Clients that don't support cancellation are
-     * allowed to ignore the setting.
-     *
-     * cancellable?: boolean;
+     * long running operation. Clients that don't support cancellation are allowed
+     * to ignore the setting.
      */
-    std::optional<boolean> cancellable;
-
+    std::optional<boolean_t> cancellable;
     /**
      * Optional, more detailed associated progress message. Contains
      * complementary information to the `title`.
      *
      * Examples: "3/25 files", "project/src/module2", "node_modules/some_dep".
      * If unset, the previous progress message (if any) is still valid.
-     *
-     * message?: string;
      */
-    std::optional<string> message;
-
-    /**
-     * Optional progress percentage to display (value 100 is considered 100%).
-     * If not provided infinite progress is assumed and clients are allowed to
-     * ignore the `percentage` value in subsequent report notifications.
-     *
-     * The value should be steadily rising. Clients are free to ignore values
-     * that are not following this rule. The value range is [0, 100].
-     *
-     * percentage?: uinteger;
-     */
-    std::optional<uinteger> percentage;
-  };
-
-  /**
-   * Reporting progress is done using the following payload.
-   *
-   * export interface WorkDoneProgressReport {
-   *   kind: 'report';
-   *   cancellable?: boolean;
-   *   message?: string;
-   *   percentage?: uinteger;
-   * }
-   */
-  struct WorkDoneProgressReport {
-
-    /**
-     * kind: 'report';
-     */
-    const std::string kind = "report";
-
-    /**
-     * Controls enablement state of a cancel button. This property is only valid
-     * if a cancel button got requested in the `WorkDoneProgressBegin` payload.
-     *
-     * Clients that don't support cancellation or don't support control the
-     * button's enablement state are allowed to ignore the setting.
-     *
-     * cancellable?: boolean;
-     */
-    std::optional<boolean> cancellable;
-
-    /**
-     * Optional, more detailed associated progress message. Contains
-     * complementary information to the `title`.
-     *
-     * Examples: "3/25 files", "project/src/module2", "node_modules/some_dep".
-     * If unset, the previous progress message (if any) is still valid.
-     *
-     * message?: string;
-     */
-    std::optional<string> message;
-
+    std::optional<string_t> message;
     /**
      * Optional progress percentage to display (value 100 is considered 100%).
      * If not provided infinite progress is assumed and clients are allowed
@@ -2158,3628 +1876,989 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * The value should be steadily rising. Clients are free to ignore values
      * that are not following this rule. The value range is [0, 100].
-     *
-     * percentage?: uinteger;
      */
-    std::optional<uinteger> percentage;
+    std::optional<uinteger_t> percentage;
   };
 
-  /**
-   * Signaling the end of a progress reporting is done using the following payload.
-   *
-   * export interface WorkDoneProgressEnd {
-   *   kind: 'end';
-   *   message?: string;
-   * }
-   */
-  struct WorkDoneProgressEnd {
-
+  struct WorkDoneProgressReport
+  {
+    string_t kind;
     /**
-     * kind: 'end';
+     * Controls enablement state of a cancel button.
+     *
+     * Clients that don't support cancellation or don't support controlling the button's
+     * enablement state are allowed to ignore the property.
      */
-    const std::string kind = "end";
+    std::optional<boolean_t> cancellable;
+    /**
+     * Optional, more detailed associated progress message. Contains
+     * complementary information to the `title`.
+     *
+     * Examples: "3/25 files", "project/src/module2", "node_modules/some_dep".
+     * If unset, the previous progress message (if any) is still valid.
+     */
+    std::optional<string_t> message;
+    /**
+     * Optional progress percentage to display (value 100 is considered 100%).
+     * If not provided infinite progress is assumed and clients are allowed
+     * to ignore the `percentage` value in subsequent report notifications.
+     *
+     * The value should be steadily rising. Clients are free to ignore values
+     * that are not following this rule. The value range is [0, 100].
+     */
+    std::optional<uinteger_t> percentage;
+  };
 
+  struct WorkDoneProgressEnd
+  {
+    string_t kind;
     /**
      * Optional, a final message indicating to for example indicate the outcome
      * of the operation.
-     *
-     * message?: string;
      */
-    std::optional<string> message;
+    std::optional<string_t> message;
   };
 
-  // ---------------------------------------------------------------------------
-  // Work Done progress can be initiated in two different ways:
-  // 1. By the sender of a request (mostly clients) using the predefined
-  // workDoneToken property in the requests parameter literal. The document will
-  // refer to this kind of progress as client initiated progress.
-  // 2. By a server using the request window/workDoneProgress/create. The
-  // document will refer to this kind of progress as server initiated progress.
-  // ---------------------------------------------------------------------------
+  struct SetTraceParams
+  {
+    TraceValues value;
+  };
 
-  /**
-   * Consider a client sending a textDocument/reference request to a server and
-   * the client accepts work done progress reporting on that request. To signal
-   * this to the server the client would add a workDoneToken property to the
-   * reference request parameters.
-   *
-   * The corresponding type definition for the parameter property looks like this:
-   *
-   * export interface WorkDoneProgressParams {
-   *   workDoneToken?: ProgressToken;
-   * }
-   */
-  struct WorkDoneProgressParams {
+  struct LogTraceParams
+  {
+    string_t message;
+    std::optional<string_t> verbose;
+  };
 
+  enum class CancelParams_idType {
+    INTEGER_TYPE,
+    STRING_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    string_t
+  > CancelParams_id;
+
+  struct CancelParams
+  {
     /**
-     * An optional token that a server can use to report work done progress.
-     *
-     * workDoneToken?: ProgressToken;
+     * The request id to cancel.
      */
-    std::optional<ProgressToken> workDoneToken;
+    CancelParams_id id;
+  };
+
+  struct ImplementationOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
   };
 
   /**
-   * A server uses the workDoneToken to report progress for the specific
-   * textDocument/reference.
-   *
-   * The token received via the workDoneToken property in a request’s param
-   * literal is only valid as long as the request has not send a response back.
-   * Canceling work done progress is done by simply canceling the corresponding
+   * Static registration options to be returned in the initialize
    * request.
-   *
-   * There is no specific client capability signaling whether a client will send
-   * a progress token per request. The reason for this is that this is in many
-   * clients not a static aspect and might even change for every request
-   * instance for the same request type. So the capability is signal on every
-   * request instance by the presence of a workDoneToken property.
-   *
-   * To avoid that clients set up a progress monitor user interface before
-   * sending a request but the server doesn’t actually report any progress a
-   * server needs to signal general work done progress reporting support in the
-   * corresponding server capability. For the above find references example a
-   * server would signal such a support by setting the referencesProvider
-   * property in the server capabilities
-   *
-   * The corresponding type definition for the server capability looks like
-   * this:
-   *
-   * export interface WorkDoneProgressOptions {
-   *   workDoneProgress?: boolean;
-   * }
    */
-  struct WorkDoneProgressOptions {
-    std::optional<boolean> workDoneProgress;
-  };
-
-  /**
-   * A parameter literal used to pass a partial result token.
-   *
-   * export interface PartialResultParams {
-   *   partialResultToken?: ProgressToken;
-   * }
-   */
-  struct PartialResultParams {
-
-    /**
-     * An optional token that a server can use to report partial results (e.g.
-     * streaming) to the client.
-     *
-     * partialResultToken?: ProgressToken;
-     */
-    std::optional<ProgressToken> partialResultToken;
-  };
-
-  /**
-   * A TraceValue represents the level of verbosity with which the server
-   * systematically reports its execution trace using $/logTrace notifications.
-   * The initial trace value is set by the client at initialization and can be
-   * modified later using the $/setTrace notification.
-   */
-  enum class TraceValue {
-    OFF,
-    MESSAGES,
-    VERBOSE,
-  };
-
-  extern std::map<TraceValue, std::string> TraceValueNames;
-
-  auto traceValueByName(const std::string &name) -> TraceValue;
-
-  extern std::map<TraceValue, std::string> TraceValueValues;
-
-  auto traceValueByValue(const std::string &value) -> TraceValue;
-
-  /**
-   * Information about the client
-   *
-   * @since 3.15.0
-   */
-  struct ClientInfo {
-
-    /**
-     * The name of the client as defined by the client.
-     *
-     * name: string;
-     */
-    string name;
-
-    /**
-     * The client's version as defined by the client.
-     *
-     * version?: string;
-     */
-    std::optional<string> version;
-  };
-
-  /**
-   * Document renames should be signaled to a server sending a document close
-   * notification with the document’s old name followed by an open notification
-   * using the document’s new name. Major reason is that besides the name other
-   * attributes can change as well like the language that is associated with the
-   * document. In addition the new document could not be of interest for the
-   * server anymore.
-   *
-   * Servers can participate in a document rename by subscribing for the
-   * workspace/didRenameFiles notification or the workspace/willRenameFiles
-   * request.
-   *
-   * The final structure of the TextDocumentSyncClientCapabilities and the
-   * TextDocumentSyncOptions server options look like this:
-   *
-   * export interface TextDocumentSyncClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   willSave?: boolean;
-   *   willSaveWaitUntil?: boolean;
-   *   didSave?: boolean;
-   * }
-   */
-  struct TextDocumentSyncClientCapabilities {
-
-    /**
-     * Whether text document synchronization supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * The client supports sending will save notifications.
-     *
-     * willSave?: boolean;
-     */
-    std::optional<boolean> willSave;
-
-    /**
-     * The client supports sending a will save request and waits for a response
-     * providing text edits which will be applied to the document before it is
-     * saved.
-     *
-     * willSaveWaitUntil?: boolean;
-     */
-    std::optional<boolean> willSaveWaitUntil;
-
-    /**
-     * The client supports did save notifications.
-     *
-     * didSave?: boolean;
-     */
-    std::optional<boolean> didSave;
-  };
-
-  // Language Features provide the actual smarts in the language server
-  // protocol. They are usually executed on a [text document, position] tuple.
-  // The main language feature categories are:
-  // - code comprehension features like Hover or Goto Definition.
-  // - coding features like diagnostics, code complete or code actions.
-  // The language features should be computed on the synchronized state of the
-  // document.
-
-  /**
-   * The go to declaration request is sent from the client to the server to
-   * resolve the declaration location of a symbol at a given text document
-   * position.
-   *
-   * The result type LocationLink[] got introduced with version 3.14.0 and
-   * depends on the corresponding client capability
-   * textDocument.declaration.linkSupport.
-   *
-   * Client Capability:
-   *   property name (optional): textDocument.declaration
-   *   property type: DeclarationClientCapabilities defined as follows:
-   *
-   * export interface DeclarationClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   linkSupport?: boolean;
-   * }
-   */
-  struct DeclarationClientCapabilities {
-
-    /**
-     * Whether declaration supports dynamic registration. If this is set to
-     * `true` the client supports the new `DeclarationRegistrationOptions`
-     * return value for the corresponding server capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * The client supports additional metadata in the form of declaration links.
-     *
-     * linkSupport?: boolean;
-     */
-    std::optional<boolean> linkSupport;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): declarationProvider
-   * - property type: boolean | DeclarationOptions |
-   *   DeclarationRegistrationOptions where DeclarationOptions is defined as
-   *   follows:
-   *
-   * export interface DeclarationOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct DeclarationOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * A document filter denotes a document through properties like language,
-   * scheme or pattern. An example is a filter that applies to TypeScript files
-   * on disk. Another example is a filter that applies to JSON files with name
-   * package.json.
-   *
-   * Please note that for a document filter to be valid at least one of the
-   * properties for language, scheme, or pattern must be set. To keep the type
-   * definition simple all properties are marked as optional.
-   *
-   * export interface DocumentFilter {
-   *   language?: string;
-   *   scheme?: string;
-   *   pattern?: string;
-   * }
-   */
-  struct DocumentFilter {
-
-    /**
-     * A language id, like `typescript`.
-     *
-     * language?: string;
-     */
-    std::optional<string> language;
-
-    /**
-     * A Uri scheme, like `file` or `untitled`.
-     *
-     * scheme?: string;
-     */
-    std::optional<string> scheme;
-
-    /**
-     * A glob pattern, like `*.{ts,js}`.
-     *
-     * Glob patterns can have the following syntax:
-     * - `*` to match one or more characters in a path segment.
-     * - `?` to match on one character in a path segment.
-     * - `**` to match any number of path segments, including none.
-     * - `{}` to group sub patterns into an OR expression.
-     * - `[]` to declare a range of characters to match in a path segment.
-     * - `[!...]` to negate a range of characters to match in a path segment.
-     *
-     * pattern?: string;
-     */
-    std::optional<string> pattern;
-  };
-
-  /**
-   * A document selector is the combination of one or more document filters.
-   *
-   * export type DocumentSelector = DocumentFilter[];
-   */
-  typedef std::vector<std::unique_ptr<DocumentFilter>> DocumentSelector;
-
-  /**
-   * TextDocumentRegistrationOptions can be used to dynamically register for
-   * requests for a set of text documents.
-   *
-   * export interface TextDocumentRegistrationOptions {
-   *   documentSelector: DocumentSelector | null;
-   * }
-   */
-  struct TextDocumentRegistrationOptions {
-
-    /**
-     * A document selector to identify the scope of the registration. If set to
-     * null the document selector provided on the client side will be used.
-     *
-     * documentSelector: DocumentSelector | null;
-     */
-    optional_ptr<DocumentSelector> documentSelector;
-  };
-
-  /**
-   * Since most of the registration options require to specify a document
-   * selector there is a base interface that can be used. See
-   * TextDocumentRegistrationOptions.
-   *
-   * Response:
-   *   result: void.
-   *   error: code and message set in case an exception happens during the request.
-   *
-   * StaticRegistrationOptions can be used to register a feature in the
-   * initialize result with a given server control ID to be able to un-register
-   * the feature later on.
-   *
-   * export interface StaticRegistrationOptions {
-   *   id?: string;
-   * }
-   */
-  struct StaticRegistrationOptions {
-
+  struct StaticRegistrationOptions
+  {
     /**
      * The id used to register the request. The id can be used to deregister
      * the request again. See also Registration#id.
-     *
-     * id?: string;
      */
-    std::optional<string> id;
+    std::optional<string_t> id;
+  };
+
+  struct TypeDefinitionOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
   };
 
   /**
-   * Registration Options: DeclarationRegistrationOptions defined as follows:
-   *
-   * export interface DeclarationRegistrationOptions extends DeclarationOptions,
-   *   TextDocumentRegistrationOptions, StaticRegistrationOptions {
-   * }
+   * The workspace folder change event.
    */
-  struct DeclarationRegistrationOptions
-    : public DeclarationOptions
-    , public TextDocumentRegistrationOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  enum class GotoResultType {
-    LOCATION,
-    LOCATION_ARRAY,
-    LOCATION_LINK_ARRAY,
-    LSP_NULL
-  };
-
-  typedef std::variant<
-    std::unique_ptr<Location>,
-    ptr_vector<Location>,
-    ptr_vector<LocationLink>,
-    null
-  > GotoResult;
-
-  /**
-   * Request:
-   * - method: textDocument/declaration
-   * - params: DeclarationParams defined as follows:
-   *
-   * export interface DeclarationParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   * }
-   *
-   * Response:
-   * - result: Location | Location[] | LocationLink[] |null
-   * - partial result: Location[] | LocationLink[]
-   * - error: code and message set in case an exception happens during the
-   *   declaration request.
-   */
-  struct DeclarationParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-    // empty
+  struct WorkspaceFoldersChangeEvent
+  {
+    /**
+     * The array of added workspace folders
+     */
+    std::vector<std::unique_ptr<WorkspaceFolder>> added;
+    /**
+     * The array of the removed workspace folders
+     */
+    std::vector<std::unique_ptr<WorkspaceFolder>> removed;
   };
 
   /**
-   * The go to definition request is sent from the client to the server to
-   * resolve the definition location of a symbol at a given text document
-   * position.
-   *
-   * The result type LocationLink[] got introduced with version 3.14.0 and
-   * depends on the corresponding client capability
-   * textDocument.definition.linkSupport.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.definition
-   * - property type: DefinitionClientCapabilities defined as follows:
-   *
-   * export interface DefinitionClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   linkSupport?: boolean;
-   * }
+   * The parameters of a `workspace/didChangeWorkspaceFolders` notification.
    */
-  struct DefinitionClientCapabilities {
-
+  struct DidChangeWorkspaceFoldersParams
+  {
     /**
-     * Whether definition supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
+     * The actual workspace folder change event.
      */
-    std::optional<boolean> dynamicRegistration;
+    std::unique_ptr<WorkspaceFoldersChangeEvent> event;
+  };
 
+  struct ConfigurationItem
+  {
     /**
-     * The client supports additional metadata in the form of definition links.
-     *
-     * linkSupport?: boolean;
-     *
-     * @since 3.14.0
+     * The scope to get the configuration section for.
      */
-    std::optional<boolean> linkSupport;
+    std::optional<URI> scopeUri;
+    /**
+     * The configuration section asked for.
+     */
+    std::optional<string_t> section;
   };
 
   /**
-   * Server Capability:
-   * - property name (optional): definitionProvider
-   * - property type: boolean | DefinitionOptions where DefinitionOptions is
-   *   defined as follows:
-   *
-   * export interface DefinitionOptions extends WorkDoneProgressOptions {
-   * }
+   * The parameters of a configuration request.
    */
-  struct DefinitionOptions : public WorkDoneProgressOptions {
-    // empty
+  struct ConfigurationParams
+  {
+    std::vector<std::unique_ptr<ConfigurationItem>> items;
   };
 
   /**
-   * Registration Options: DefinitionRegistrationOptions defined as follows:
-   *
-   * export interface DefinitionRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DefinitionOptions {
-   * }
+   * A literal to identify a text document in the client.
    */
-  struct DefinitionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DefinitionOptions {
-    //empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/definition
-   * - params: DefinitionParams defined as follows:
-   *
-   * export interface DefinitionParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   * }
-   *
-   * Response:
-   * - result: Location | Location[] | LocationLink[] | null
-   * - partial result: Location[] | LocationLink[]
-   * - error: code and message set in case an exception happens during the
-   *   definition request.
-   */
-  struct DefinitionParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-    // empty
-  };
-
-  /**
-   * The go to type definition request is sent from the client to the server to
-   * resolve the type definition location of a symbol at a given text document
-   * position.
-   *
-   * The result type LocationLink[] got introduced with version 3.14.0 and
-   * depends on the corresponding client capability
-   * textDocument.typeDefinition.linkSupport.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.typeDefinition
-   * - property type: TypeDefinitionClientCapabilities defined as follows:
-   *
-   * export interface TypeDefinitionClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   linkSupport?: boolean;
-   * }
-   */
-  struct TypeDefinitionClientCapabilities {
-
+  struct TextDocumentIdentifier
+  {
     /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new `TypeDefinitionRegistrationOptions`
-     * return value for the corresponding server capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * The client supports additional metadata in the form of definition links.
-     *
-     * linkSupport?: boolean;
-     *
-     * @since 3.14.0
-     */
-    std::optional<boolean> linkSupport;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): typeDefinitionProvider
-   * - property type: boolean | TypeDefinitionOptions |
-   *   TypeDefinitionRegistrationOptions where TypeDefinitionOptions is defined
-   *   as follows:
-   *
-   * export interface TypeDefinitionOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct TypeDefinitionOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: TypeDefinitionRegistrationOptions defined as follows:
-   *
-   * export interface TypeDefinitionRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, TypeDefinitionOptions,
-   *   StaticRegistrationOptions {
-   * }
-   */
-  struct TypeDefinitionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public TypeDefinitionOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/typeDefinition
-   * - params: TypeDefinitionParams defined as follows:
-   *
-   * export interface TypeDefinitionParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   * }
-   *
-   * Response:
-   * - result: Location | Location[] | LocationLink[] | null
-   * - partial result: Location[] | LocationLink[]
-   * - error: code and message set in case an exception happens during the
-   *   definition request.
-   */
-  struct TypeDefinitionParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-    // empty
-  };
-
-  /**
-   * The go to implementation request is sent from the client to the server to
-   * resolve the implementation location of a symbol at a given text document
-   * position.
-   *
-   * The result type LocationLink[] got introduced with version 3.14.0 and
-   * depends on the corresponding client capability
-   * textDocument.implementation.linkSupport.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.implementation
-   * - property type: ImplementationClientCapabilities defined as follows:
-   *
-   * export interface ImplementationClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   linkSupport?: boolean;
-   * }
-   */
-  struct ImplementationClientCapabilities {
-
-    /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new `ImplementationRegistrationOptions`
-     * return value for the corresponding server capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * The client supports additional metadata in the form of definition links.
-     *
-     * linkSupport?: boolean;
-     *
-     * @since 3.14.0
-     */
-    std::optional<boolean> linkSupport;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): implementationProvider
-   * - property type: boolean | ImplementationOptions |
-   *   ImplementationRegistrationOptions where ImplementationOptions is defined
-   *   as follows:
-   *
-   * export interface ImplementationOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct ImplementationOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: ImplementationRegistrationOptions defined as follows:
-   *
-   * export interface ImplementationRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, ImplementationOptions,
-   *   StaticRegistrationOptions {
-   * }
-   */
-  struct ImplementationRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public ImplementationOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/implementation
-   * - params: ImplementationParams defined as follows:
-   *
-   * export interface ImplementationParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   * }
-   *
-   * Response:
-   * - result: Location | Location[] | LocationLink[] | null
-   * - partial result: Location[] | LocationLink[]
-   * - error: code and message set in case an exception happens during the
-   *   definition request.
-   */
-  struct ImplementationParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-    // empty
-  };
-
-  /**
-   * The references request is sent from the client to the server to resolve
-   * project-wide references for the symbol denoted by the given text document
-   * position.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.references
-   * - property type: ReferenceClientCapabilities defined as follows:
-   *
-   * export interface ReferenceClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct ReferenceClientCapabilities {
-
-    /**
-     * Whether references supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): referencesProvider
-   * - property type: boolean | ReferenceOptions where ReferenceOptions is
-   *   defined as follows:
-   *
-   * export interface ReferenceOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct ReferenceOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: ReferenceRegistrationOptions defined as follows:
-   *
-   * export interface ReferenceRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, ReferenceOptions {
-   * }
-   */
-  struct ReferenceRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public ReferenceOptions {
-    // empty
-  };
-
-  /**
-   * export interface ReferenceContext {
-   *   includeDeclaration: boolean;
-   * }
-   */
-  struct ReferenceContext {
-
-    /**
-     * Include the declaration of the current symbol.
-     *
-     * includeDeclaration: boolean;
-     */
-    boolean includeDeclaration;
-  };
-
-  enum class FindReferencesResultType {
-    LOCATION_ARRAY,
-    LSP_NULL
-  };
-
-  typedef std::variant<
-    ptr_vector<Location>,
-    null
-  > FindReferencesResult;
-
-  /**
-   * Request:
-   * - method: textDocument/references
-   * - params: ReferenceParams defined as follows:
-   *
-   * export interface ReferenceParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   *   context: ReferenceContext;
-   * }
-   *
-   * Response:
-   * - result: Location[] | null
-   * - partial result: Location[]
-   * - error: code and message set in case an exception happens during the
-   *   reference request.
-   */
-  struct ReferenceParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * context: ReferenceContext;
-     */
-    std::unique_ptr<ReferenceContext> context;
-  };
-
-  /**
-   * A symbol kind.
-   *
-   *  export namespace SymbolKind {
-   *    export const File = 1;
-   *    export const Module = 2;
-   *    export const Namespace = 3;
-   *    export const Package = 4;
-   *    export const Class = 5;
-   *    export const Method = 6;
-   *    export const Property = 7;
-   *    export const Field = 8;
-   *    export const Constructor = 9;
-   *    export const Enum = 10;
-   *    export const Interface = 11;
-   *    export const Function = 12;
-   *    export const Variable = 13;
-   *    export const Constant = 14;
-   *    export const String = 15;
-   *    export const Number = 16;
-   *    export const Boolean = 17;
-   *    export const Array = 18;
-   *    export const Object = 19;
-   *    export const Key = 20;
-   *    export const Null = 21;
-   *    export const EnumMember = 22;
-   *    export const Struct = 23;
-   *    export const Event = 24;
-   *    export const Operator = 25;
-   *    export const TypeParameter = 26;
-   *  }
-   *  export type SymbolKind = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
-   *    9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 |
-   *    20 | 21 | 22 | 23 | 24 | 25 | 26;
-   */
-  enum class SymbolKind {
-    File = 1,
-    Module = 2,
-    Namespace = 3,
-    Package = 4,
-    Class = 5,
-    Method = 6,
-    Property = 7,
-    Field = 8,
-    Constructor = 9,
-    Enum = 10,
-    Interface = 11,
-    Function = 12,
-    Variable = 13,
-    Constant = 14,
-    String = 15,
-    Number = 16,
-    Boolean = 17,
-    Array = 18,
-    Object = 19,
-    Key = 20,
-    Null = 21,
-    EnumMember = 22,
-    Struct = 23,
-    Event = 24,
-    Operator = 25,
-    TypeParameter = 26,
-  };
-
-  extern std::map<SymbolKind, std::string> SymbolKindNames;
-
-  auto symbolKindByName(const std::string &name) -> SymbolKind;
-
-  auto symbolKindByValue(int value) -> SymbolKind;
-
-  /**
-   * Symbol tags are extra annotations that tweak the rendering of a symbol.
-   *
-   * export namespace SymbolTag {
-   *   export const Deprecated: 1 = 1;
-   * }
-   * export type SymbolTag = 1;
-   *
-   * @since 3.16
-   */
-  enum class SymbolTag {
-
-    /**
-     * Render a symbol as obsolete, usually using a strike-out.
-     *
-     * export const Deprecated: 1 = 1;
-     */
-    Deprecated = 1,
-  };
-
-  extern std::map<SymbolTag, std::string> SymbolTagNames;
-
-  auto symbolTagByName(const std::string &name) -> SymbolTag;
-
-  auto symbolTagByValue(int value) -> SymbolTag;
-
-  struct DocumentSymbol;  // Forward reference for cyclic reference.
-
-  /**
-   * Represents programming constructs like variables, classes, interfaces etc.
-   * that appear in a document. Document symbols can be hierarchical and they
-   * have two ranges: one that encloses its definition and one that points to its
-   * most interesting range, e.g. the range of an identifier.
-   *
-   * export interface DocumentSymbol {
-   *   name: string;
-   *   detail?: string;
-   *   kind: SymbolKind;
-   *   tags?: SymbolTag[];
-   *   deprecated?: boolean;
-   *   range: Range;
-   *   selectionRange: Range;
-   *   children?: DocumentSymbol[];
-   * }
-   */
-  struct DocumentSymbol {
-
-    /**
-     * The name of this symbol. Will be displayed in the user interface and
-     * therefore must not be an empty string or a string only consisting of
-     * white spaces.
-     *
-     * name: string;
-     */
-    string name;
-
-    /**
-     * More detail for this symbol, e.g the signature of a function.
-     *
-     * detail?: string;
-     */
-    std::optional<string> detail;
-
-    /**
-     * The kind of this symbol.
-     *
-     * kind: SymbolKind;
-     */
-    SymbolKind kind;
-
-    /**
-     * Tags for this document symbol.
-     *
-     * tags?: SymbolTag[];
-     *
-     * @since 3.16.0
-     */
-    optional_vector<SymbolTag> tags;
-
-    /**
-     * Indicates if this symbol is deprecated.
-     *
-     * deprecated?: boolean;
-     *
-     * @deprecated Use tags instead
-     */
-    std::optional<boolean> deprecated;
-
-    /**
-     * The range enclosing this symbol not including leading/trailing whitespace
-     * but everything else like comments. This information is typically used to
-     * determine if the clients cursor is inside the symbol to reveal in the
-     * symbol in the UI.
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-
-    /**
-     * The range that should be selected and revealed when this symbol is being
-     * picked, e.g. the name of a function. Must be contained by the `range`.
-     *
-     * selectionRange: Range;
-     */
-    std::unique_ptr<Range> selectionRange;
-
-    /**
-     * Children of this symbol, e.g. properties of a class.
-     *
-     * children?: DocumentSymbol[];
-     */
-    optional_ptr_vector<DocumentSymbol> children;
-  };
-
-  /**
-   * Represents information about programming constructs like variables, classes,
-   * interfaces etc.
-   *
-   * export interface SymbolInformation {
-   *   name: string;
-   *   kind: SymbolKind;
-   *   tags?: SymbolTag[];
-   *   deprecated?: boolean;
-   *   location: Location;
-   *   containerName?: string;
-   * }
-   *
-   * @deprecated use DocumentSymbol or WorkspaceSymbol instead.
-   */
-  struct SymbolInformation {
-
-    /**
-     * The name of this symbol.
-     *
-     * name: string;
-     */
-    string name;
-
-    /**
-     * The kind of this symbol.
-     *
-     * kind: SymbolKind;
-     */
-    SymbolKind kind;
-
-    /**
-     * Tags for this symbol.
-     *
-     * tags?: SymbolTag[];
-     *
-     * @since 3.16.0
-     */
-    std::optional<std::vector<SymbolTag>> tags;
-
-    /**
-     * Indicates if this symbol is deprecated.
-     *
-     * deprecated?: boolean;
-     *
-     * @deprecated Use tags instead
-     */
-    std::optional<boolean> deprecated;
-
-    /**
-     * The location of this symbol. The location's range is used by a tool
-     * to reveal the location in the editor. If the symbol is selected in the
-     * tool the range's start information is used to position the cursor. So
-     * the range usually spans more then the actual symbol's name and does
-     * normally include things like visibility modifiers.
-     *
-     * The range doesn't have to denote a node range in the sense of an abstract
-     * syntax tree. It can therefore not be used to re-construct a hierarchy of
-     * the symbols.
-     *
-     * location: Location;
-     */
-    std::unique_ptr<Location> location;
-
-    /**
-     * The name of the symbol containing this symbol. This information is for
-     * user interface purposes (e.g. to render a qualifier in the user interface
-     * if necessary). It can't be used to re-infer a hierarchy for the document
-     * symbols.
-     *
-     * containerName?: string;
-     */
-    std::optional<string> containerName;
-  };
-
-  enum class DocumentSymbolResultType {
-    DOCUMENT_SYMBOL_ARRAY,
-    SYMBOL_INFORMATION_ARRAY,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    ptr_vector<DocumentSymbol>,
-    ptr_vector<SymbolInformation>,
-    null
-  > DocumentSymbolResult;
-
-  /**
-   * The call hierarchy request is sent from the client to the server to return
-   * a call hierarchy for the language element of given text document positions.
-   * The call hierarchy requests are executed in two steps:
-   * 1. first a call hierarchy item is resolved for the given text document
-   *    position
-   * 2. for a call hierarchy item the incoming or outgoing call hierarchy items
-   *    are resolved.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.callHierarchy
-   * - property type: CallHierarchyClientCapabilities defined as follows:
-   *
-   * interface CallHierarchyClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct CallHierarchyClientCapabilities {
-
-    /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new `(TextDocumentRegistrationOptions &
-     * StaticRegistrationOptions)` return value for the corresponding server
-     * capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): callHierarchyProvider
-   * - property type: boolean | CallHierarchyOptions |
-   *   CallHierarchyRegistrationOptions where CallHierarchyOptions is defined as
-   *   follows:
-   *
-   * export interface CallHierarchyOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct CallHierarchyOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: CallHierarchyRegistrationOptions defined as follows:
-   *
-   * export interface CallHierarchyRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, CallHierarchyOptions,
-   *   StaticRegistrationOptions {
-   * }
-   */
-  struct CallHierarchyRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CallHierarchyOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/prepareCallHierarchy
-   * - params: CallHierarchyPrepareParams defined as follows:
-   *
-   * export interface CallHierarchyPrepareParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams {
-   * }
-   *
-   * Response:
-   * - result: CallHierarchyItem[] | null defined as follows:
-   */
-  struct CallHierarchyPrepareParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams {
-    // empty
-  };
-
-  /**
-   * export interface CallHierarchyItem {
-   *   name: string;
-   *   kind: SymbolKind;
-   *   tags?: SymbolTag[];
-   *   detail?: string;
-   *   uri: DocumentUri;
-   *   range: Range;
-   *   selectionRange: Range;
-   *   data?: LSPAny;
-   * }
-   */
-  struct CallHierarchyItem {
-
-    /**
-     * The name of this item.
-     *
-     * name: string;
-     */
-    string name;
-
-    /**
-     * The kind of this item.
-     *
-     * kind: SymbolKind;
-     */
-    SymbolKind kind;
-
-    /**
-     * Tags for this item.
-     *
-     * tags?: SymbolTag[];
-     */
-    optional_vector<SymbolTag> tags;
-
-    /**
-     * More detail for this item, e.g. the signature of a function.
-     *
-     * detail?: string;
-     */
-    std::optional<string> detail;
-
-    /**
-     * The resource identifier of this item.
-     *
-     * uri: DocumentUri;
+     * The text document's uri.
      */
     DocumentUri uri;
-
-    /**
-     * The range enclosing this symbol not including leading/trailing whitespace
-     * but everything else, e.g. comments and code.
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-
-    /**
-     * The range that should be selected and revealed when this symbol is being
-     * picked, e.g. the name of a function. Must be contained by the
-     * [`range`](#CallHierarchyItem.range).
-     *
-     * selectionRange: Range;
-     */
-    std::unique_ptr<Range> selectionRange;
-
-    /**
-     * A data entry field that is preserved between a call hierarchy prepare and
-     * incoming calls or outgoing calls requests.
-     *
-     * data?: LSPAny;
-     */
-    optional_ptr<LSPAny> data;
   };
-
-  enum class PrepareCallHierarchyResultType {
-    CALL_HIERARCHY_ITEM_ARRAY,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    ptr_vector<CallHierarchyItem>,
-    null
-  > PrepareCallHierarchyResult;
 
   /**
-   * The request is sent from the client to the server to resolve incoming calls
-   * for a given call hierarchy item. The request doesn’t define its own client
-   * and server capabilities. It is only issued if a server registers for the
-   * textDocument/prepareCallHierarchy request.
+   * The parameters sent in a save text document notification
+   */
+  struct DidSaveTextDocumentParams
+  {
+    /**
+     * The document that was saved.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * Optional the content when saved. Depends on the includeText value
+     * when the save notification was requested.
+     */
+    std::optional<string_t> text;
+  };
+
+  /**
+   * The parameters sent in a close text document notification
+   */
+  struct DidCloseTextDocumentParams
+  {
+    /**
+     * The document that was closed.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * The parameters sent in a will save text document notification.
+   */
+  struct WillSaveTextDocumentParams
+  {
+    /**
+     * The document that will be saved.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The 'TextDocumentSaveReason'.
+     */
+    TextDocumentSaveReason reason;
+  };
+
+  /**
+   * Represents a color in RGBA space.
+   */
+  struct Color
+  {
+    /**
+     * The red component of this color in the range [0-1].
+     */
+    decimal_t red;
+    /**
+     * The green component of this color in the range [0-1].
+     */
+    decimal_t green;
+    /**
+     * The blue component of this color in the range [0-1].
+     */
+    decimal_t blue;
+    /**
+     * The alpha component of this color in the range [0-1].
+     */
+    decimal_t alpha;
+  };
+
+  struct DocumentColorOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  struct FoldingRangeOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  struct DeclarationOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * Position in a text document expressed as zero-based line and character
+   * offset. Prior to 3.17 the offsets were always based on a UTF-16 string
+   * representation. So a string of the form `a𐐀b` the character offset of the
+   * character `a` is 0, the character offset of `𐐀` is 1 and the character
+   * offset of b is 3 since `𐐀` is represented using two code units in UTF-16.
+   * Since 3.17 clients and servers can agree on a different string encoding
+   * representation (e.g. UTF-8). The client announces it's supported encoding
+   * via the client capability [`general.positionEncodings`](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#clientCapabilities).
+   * The value is an array of position encodings the client supports, with
+   * decreasing preference (e.g. the encoding at index `0` is the most preferred
+   * one). To stay backwards compatible the only mandatory encoding is UTF-16
+   * represented via the string `utf-16`. The server can pick one of the
+   * encodings offered by the client and signals that encoding back to the
+   * client via the initialize result's property
+   * [`capabilities.positionEncoding`](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#serverCapabilities). If the string value
+   * `utf-16` is missing from the client's capability `general.positionEncodings`
+   * servers can safely assume that the client supports UTF-16. If the server
+   * omits the position encoding in its initialize result the encoding defaults
+   * to the string value `utf-16`. Implementation considerations: since the
+   * conversion from one encoding into another requires the content of the
+   * file / line the conversion is best done where the file is read which is
+   * usually on the server side.
    *
-   * Request:
-   * - method: callHierarchy/incomingCalls
-   * - params: CallHierarchyIncomingCallsParams defined as follows:
+   * Positions are line end character agnostic. So you can not specify a position
+   * that denotes `\r|\n` or `\n|` where `|` represents the character offset.
    *
-   * export interface CallHierarchyIncomingCallsParams extends
-   *   WorkDoneProgressParams, PartialResultParams {
-   *   item: CallHierarchyItem;
+   * @since 3.17.0 - support for negotiated position encoding.
+   */
+  struct Position
+  {
+    /**
+     * Line position in a document (zero-based).
+     *
+     * If a line number is greater than the number of lines in a document, it defaults back to the number of lines in the document.
+     * If a line number is negative, it defaults to 0.
+     */
+    uinteger_t line;
+    /**
+     * Character offset on a line in a document (zero-based).
+     *
+     * The meaning of this offset is determined by the negotiated
+     * `PositionEncodingKind`.
+     *
+     * If the character value is greater than the line length it defaults back to the
+     * line length.
+     */
+    uinteger_t character;
+  };
+
+  /**
+   * A parameter literal used in requests to pass a text document and a position inside that
+   * document.
+   */
+  struct TextDocumentPositionParams
+  {
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The position inside the text document.
+     */
+    std::unique_ptr<Position> position;
+  };
+
+  /**
+   * A range in a text document expressed as (zero-based) start and end positions.
+   *
+   * If you want to specify a range that contains a line including the line ending
+   * character(s) then use an end position denoting the start of the next line.
+   * For example:
+   * ```ts
+   * {
+   *     start: { line: 5, character: 23 }
+   *     end : { line 6, character : 0 }
    * }
+   * ```
    */
-  struct CallHierarchyIncomingCallsParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
+  struct Range
+  {
     /**
-     * item: CallHierarchyItem;
+     * The range's start position.
      */
-    std::unique_ptr<CallHierarchyItem> item;
+    std::unique_ptr<Position> start;
+    /**
+     * The range's end position.
+     */
+    std::unique_ptr<Position> end;
   };
 
   /**
-   * Response:
-   * - result: CallHierarchyIncomingCall[] | null defined as follows:
+   * The result of a linked editing range request.
    *
-   * export interface CallHierarchyIncomingCall {
-   *   from: CallHierarchyItem;
-   *   fromRanges: Range[];
-   * }
-   *
-   * - partial result: CallHierarchyIncomingCall[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘callHierarchy/incomingCalls’ request
+   * @since 3.16.0
    */
-  struct CallHierarchyIncomingCall {
-
+  struct LinkedEditingRanges
+  {
     /**
-     * The item that makes the call.
-     *
-     * from: CallHierarchyItem;
+     * A list of ranges that can be edited together. The ranges must have
+     * identical length and contain identical text content. The ranges cannot overlap.
      */
-    std::unique_ptr<CallHierarchyItem> from;
-
+    std::vector<std::unique_ptr<Range>> ranges;
     /**
-     * The ranges at which the calls appear. This is relative to the caller
-     * denoted by [`this.from`](#CallHierarchyIncomingCall.from).
-     *
-     * fromRanges: Range[];
+     * An optional word pattern (regular expression) that describes valid contents for
+     * the given ranges. If no pattern is provided, the client configuration's word
+     * pattern will be used.
      */
-    ptr_vector<Range> fromRanges;
-  };
-
-  enum class CallHierarchyIncomingCallsResultType {
-    CALL_HIERARCHY_INCOMING_CALL_ARRAY = 0,
-    LSP_NULL = 1,
-  };
-
-  typedef std::variant<
-    ptr_vector<CallHierarchyIncomingCall>,
-    null
-  > CallHierarchyIncomingCallsResult;
-
-  /**
-   * The request is sent from the client to the server to resolve outgoing calls
-   * for a given call hierarchy item. The request doesn’t define its own client
-   * and server capabilities. It is only issued if a server registers for the
-   * textDocument/prepareCallHierarchy request.
-   *
-   * Request:
-   * - method: callHierarchy/outgoingCalls
-   * - params: CallHierarchyOutgoingCallsParams defined as follows:
-   *
-   * export interface CallHierarchyOutgoingCallsParams extends
-   *   WorkDoneProgressParams, PartialResultParams {
-   *   item: CallHierarchyItem;
-   * }
-   */
-  struct CallHierarchyOutgoingCallsParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * item: CallHierarchyItem;
-     */
-    std::unique_ptr<CallHierarchyItem> item;
+    std::optional<string_t> wordPattern;
   };
 
   /**
-   * Response:
-   * - result: CallHierarchyOutgoingCall[] | null defined as follows:
+   * Params to show a resource in the UI.
    *
-   * export interface CallHierarchyOutgoingCall {
-   *   to: CallHierarchyItem;
-   *   fromRanges: Range[];
-   * }
-   *
-   * - partial result: CallHierarchyOutgoingCall[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘callHierarchy/outgoingCalls’ request
+   * @since 3.16.0
    */
-  struct CallHierarchyOutgoingCall {
-
+  struct ShowDocumentParams
+  {
     /**
-     * The item that is called.
-     *
-     * to: CallHierarchyItem;
+     * The uri to show.
      */
-    std::unique_ptr<CallHierarchyItem> to;
-
+    URI uri;
     /**
-     * The range at which this item is called. This is the range relative to the
-     * caller, e.g the item passed to `callHierarchy/outgoingCalls` request.
-     *
-     * fromRanges: Range[];
+     * Indicates to show the resource in an external program.
+     * To show, for example, `https://code.visualstudio.com/`
+     * in the default WEB browser set `external` to `true`.
      */
-    ptr_vector<Range> fromRanges;
+    std::optional<boolean_t> external;
+    /**
+     * An optional property to indicate whether the editor
+     * showing the document should take focus or not.
+     * Clients might ignore this property if an external
+     * program is started.
+     */
+    std::optional<boolean_t> takeFocus;
+    /**
+     * An optional selection range if the document is a text
+     * document. Clients might ignore the property if an
+     * external program is started or the file is not a text
+     * file.
+     */
+    std::optional<std::unique_ptr<Range>> selection;
   };
-
-  enum class CallHierarchyOutgoingCallsResultType {
-    CALL_HIERARCHY_OUTGOING_CALL_ARRAY = 0,
-    LSP_NULL = 1,
-  };
-
-  typedef std::variant<
-    ptr_vector<CallHierarchyOutgoingCall>,
-    null
-  > CallHierarchyOutgoingCallsResult;
-
-  /**
-   * The type hierarchy request is sent from the client to the server to return
-   * a type hierarchy for the language element of given text document positions.
-   * Will return null if the server couldn’t infer a valid type from the
-   * position. The type hierarchy requests are executed in two steps:
-   * 1. first a type hierarchy item is prepared for the given text document position.
-   * 2. for a type hierarchy item the supertype or subtype type hierarchy items
-   *    are resolved.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.typeHierarchy
-   * - property type: TypeHierarchyClientCapabilities defined as follows:
-   *
-   * type TypeHierarchyClientCapabilities = {
-   *   dynamicRegistration?: boolean;
-   * };
-   */
-  struct TypeHierarchyClientCapabilities {
-
-    /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new `(TextDocumentRegistrationOptions &
-     * StaticRegistrationOptions)` return value for the corresponding server
-     * capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): typeHierarchyProvider
-   * - property type: boolean | TypeHierarchyOptions |
-   *   TypeHierarchyRegistrationOptions where TypeHierarchyOptions is defined as
-   *   follows:
-   *
-   * export interface TypeHierarchyOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct TypeHierarchyOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: TypeHierarchyRegistrationOptions defined as follows:
-   *
-   * export interface TypeHierarchyRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, TypeHierarchyOptions,
-   *   StaticRegistrationOptions {
-   * }
-   */
-  struct TypeHierarchyRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public TypeHierarchyOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: ‘textDocument/prepareTypeHierarchy’
-   * - params: TypeHierarchyPrepareParams defined as follows:
-   *
-   * export interface TypeHierarchyPrepareParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams {
-   * }
-   */
-  struct TypeHierarchyPrepareParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams {
-    // empty
-  };
-
-  /**
-   * Response:
-   * - result: TypeHierarchyItem[] | null defined as follows:
-   *
-   * export interface TypeHierarchyItem {
-   *   name: string;
-   *   kind: SymbolKind;
-   *   tags?: SymbolTag[];
-   *   detail?: string;
-   *   uri: DocumentUri;
-   *   range: Range;
-   *   selectionRange: Range;
-   *   data?: LSPAny;
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/prepareTypeHierarchy’ request
-   */
-  struct TypeHierarchyItem {
-
-    /**
-     * The name of this item.
-     *
-     * name: string;
-     */
-    string name;
-
-    /**
-     * The kind of this item.
-     *
-     * kind: SymbolKind;
-     */
-    SymbolKind kind;
-
-    /**
-     * Tags for this item.
-     *
-     * tags?: SymbolTag[];
-     */
-    optional_vector<SymbolTag> tags;
-
-    /**
-     * More detail for this item, e.g. the signature of a function.
-     *
-     * detail?: string;
-     */
-    std::optional<string> detail;
-
-    /**
-     * The resource identifier of this item.
-     *
-     * uri: DocumentUri;
-     */
-    DocumentUri uri;
-
-    /**
-     * The range enclosing this symbol not including leading/trailing whitespace
-     * but everything else, e.g. comments and code.
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-
-    /**
-     * The range that should be selected and revealed when this symbol is being
-     * picked, e.g. the name of a function. Must be contained by the
-     * [`range`](#TypeHierarchyItem.range).
-     *
-     * selectionRange: Range;
-     */
-    std::unique_ptr<Range> selectionRange;
-
-    /**
-     * A data entry field that is preserved between a type hierarchy prepare and
-     * supertypes or subtypes requests. It could also be used to identify the
-     * type hierarchy in the server, helping improve the performance on
-     * resolving supertypes and subtypes.
-     *
-     * data?: LSPAny;
-     */
-    optional_ptr<LSPAny> data;
-  };
-
-  enum class TypeHierarchyResultType {
-    TYPE_HIERARCHY_ITEM_ARRAY,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    ptr_vector<TypeHierarchyItem>,
-    null
-  > TypeHierarchyResult;
-
-  /**
-   * The request is sent from the client to the server to resolve the supertypes
-   * for a given type hierarchy item. Will return null if the server couldn’t
-   * infer a valid type from item in the params. The request doesn’t define its
-   * own client and server capabilities. It is only issued if a server registers
-   * for the textDocument/prepareTypeHierarchy request.
-   *
-   * Request:
-   * - method: ‘typeHierarchy/supertypes’
-   * - params: TypeHierarchySupertypesParams defined as follows:
-   *
-   * export interface TypeHierarchySupertypesParams extends
-   *   WorkDoneProgressParams, PartialResultParams {
-   *   item: TypeHierarchyItem;
-   * }
-   *
-   * Response:
-   * - result: TypeHierarchyItem[] | null
-   * - partial result: TypeHierarchyItem[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘typeHierarchy/supertypes’ request
-   */
-  struct TypeHierarchySupertypesParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * item: TypeHierarchyItem;
-     */
-    std::unique_ptr<TypeHierarchyItem> item;
-  };
-
-  /**
-   * The request is sent from the client to the server to resolve the subtypes
-   * for a given type hierarchy item. Will return null if the server couldn’t
-   * infer a valid type from item in the params. The request doesn’t define its
-   * own client and server capabilities. It is only issued if a server registers
-   * for the textDocument/prepareTypeHierarchy request.
-   *
-   * Request:
-   * - method: ‘typeHierarchy/subtypes’
-   * - params: TypeHierarchySubtypesParams defined as follows:
-   *
-   * export interface TypeHierarchySubtypesParams extends
-   *   WorkDoneProgressParams, PartialResultParams {
-   *   item: TypeHierarchyItem;
-   * }
-   *
-   * Response:
-   * - result: TypeHierarchyItem[] | null
-   * - partial result: TypeHierarchyItem[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘typeHierarchy/subtypes’ request
-   */
-  struct TypeHierarchySubtypesParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * item: TypeHierarchyItem;
-     */
-    std::unique_ptr<TypeHierarchyItem> item;
-  };
-
-  /**
-   * The document highlight request is sent from the client to the server to
-   * resolve document highlights for a given text document position. For
-   * programming languages this usually highlights all references to the symbol
-   * scoped to this file. However, we kept ‘textDocument/documentHighlight’ and
-   * ‘textDocument/references’ separate requests since the first one is allowed
-   * to be more fuzzy. Symbol matches usually have a DocumentHighlightKind of
-   * Read or Write whereas fuzzy or textual matches use Text as the kind.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.documentHighlight
-   * - property type: DocumentHighlightClientCapabilities defined as follows:
-   *
-   * export interface DocumentHighlightClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct DocumentHighlightClientCapabilities {
-
-    /**
-     * Whether document highlight supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): documentHighlightProvider
-   * - property type: boolean | DocumentHighlightOptions where
-   *   DocumentHighlightOptions is defined as follows:
-   *
-   * export interface DocumentHighlightOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct DocumentHighlightOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: DocumentHighlightRegistrationOptions defined as
-   * follows:
-   *
-   * export interface DocumentHighlightRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DocumentHighlightOptions {
-   * }
-   */
-  struct DocumentHighlightRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentHighlightOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/documentHighlight
-   * - params: DocumentHighlightParams defined as follows:
-   *
-   * export interface DocumentHighlightParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   * }
-   */
-  struct DocumentHighlightParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-    // empty
-  };
-
-  /**
-   * A document highlight kind.
-   *
-   * export namespace DocumentHighlightKind {
-   *   export const Text = 1;
-   *   export const Read = 2;
-   *   export const Write = 3;
-   * }
-   * export type DocumentHighlightKind = 1 | 2 | 3;
-   */
-  enum class DocumentHighlightKind {
-
-    /**
-     * A textual occurrence.
-     *
-     * export const Text = 1;
-     */
-    Text = 1,
-
-    /**
-     * Read-access of a symbol, like reading a variable.
-     *
-     * export const Read = 2;
-     */
-    Read = 2,
-
-    /**
-     * Write-access of a symbol, like writing to a variable.
-     *
-     * export const Write = 3;
-     */
-    Write = 3,
-  };
-
-  extern std::map<DocumentHighlightKind, std::string> DocumentHighlightKindNames;
-
-  auto documentHighlightKindByName(const std::string &name) -> DocumentHighlightKind;
 
   /**
    * A document highlight is a range inside a text document which deserves
    * special attention. Usually a document highlight is visualized by changing
    * the background color of its range.
-   *
-   * Response:
-   * - result: DocumentHighlight[] | null defined as follows:
-   *
-   * export interface DocumentHighlight {
-   *   range: Range;
-   *   kind?: DocumentHighlightKind;
-   * }
-   *
-   * - partial result: DocumentHighlight[]
-   * - error: code and message set in case an exception happens during the
-   *   document highlight request.
    */
-  struct DocumentHighlight {
-
+  struct DocumentHighlight
+  {
     /**
      * The range this highlight applies to.
-     *
-     * range: Range;
      */
     std::unique_ptr<Range> range;
-
     /**
-     * The highlight kind, default is DocumentHighlightKind.Text.
-     *
-     * kind?: DocumentHighlightKind;
+     * The highlight kind, default is {@link DocumentHighlightKind.Text text}.
      */
     std::optional<DocumentHighlightKind> kind;
   };
 
-  enum class DocumentHighlightResultType {
-    DOCUMENT_HIGHLIGHT_ARRAY,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    ptr_vector<DocumentHighlight>,
-    null
-  > DocumentHighlightResult;
-
   /**
-   * The document links request is sent from the client to the server to request
-   * the location of links in a document.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.documentLink
-   * - property type: DocumentLinkClientCapabilities defined as follows:
-   *
-   * export interface DocumentLinkClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   tooltipSupport?: boolean;
-   * }
+   * Represents a location inside a resource, such as a line
+   * inside a text file.
    */
-  struct DocumentLinkClientCapabilities {
-
-    /**
-     * Whether document link supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Whether the client supports the `tooltip` property on `DocumentLink`.
-     *
-     * tooltipSupport?: boolean;
-     *
-     * @since 3.15.0
-     */
-    std::optional<boolean> tooltipSupport;
+  struct Location
+  {
+    DocumentUri uri;
+    std::unique_ptr<Range> range;
   };
 
   /**
-   * Server Capability:
-   * - property name (optional): documentLinkProvider
-   * - property type: DocumentLinkOptions defined as follows:
-   *
-   * export interface DocumentLinkOptions extends WorkDoneProgressOptions {
-   *   resolveProvider?: boolean;
-   * }
+   * A text edit applicable to a text document.
    */
-  struct DocumentLinkOptions : public WorkDoneProgressOptions {
-
+  struct TextEdit
+  {
     /**
-     * Document links have a resolve provider as well.
-     *
-     * resolveProvider?: boolean;
-     */
-    std::optional<boolean> resolveProvider;
-  };
-
-  /**
-   * Registration Options: DocumentLinkRegistrationOptions defined as follows:
-   *
-   * export interface DocumentLinkRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DocumentLinkOptions {
-   * }
-   */
-  struct DocumentLinkRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentLinkOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/documentLink
-   * - params: DocumentLinkParams defined as follows:
-   *
-   * interface DocumentLinkParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   * }
-   */
-  struct DocumentLinkParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The document to provide document links for.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * A document link is a range in a text document that links to an internal or
-   * external resource, like another text document or a web site.
-   *
-   * Response:
-   * - result: DocumentLink[] | null.
-   * - partial result: DocumentLink[]
-   * - error: code and message set in case an exception happens during the
-   *   document link request.
-   *
-   * interface DocumentLink {
-   *   range: Range;
-   *   target?: URI;
-   *   tooltip?: string;
-   *   data?: LSPAny;
-   * }
-   */
-  struct DocumentLink {
-
-    /**
-     * The range this link applies to.
-     *
-     * range: Range;
+     * The range of the text document to be manipulated. To insert
+     * text into a document create a range where start === end.
      */
     std::unique_ptr<Range> range;
+    /**
+     * The string to be inserted. For delete operations use an
+     * empty string.
+     */
+    string_t newText;
+  };
 
+  struct ColorPresentation
+  {
+    /**
+     * The label of this color presentation. It will be shown on the color
+     * picker header. By default this is also the text that is inserted when selecting
+     * this color presentation.
+     */
+    string_t label;
+    /**
+     * An {@link TextEdit edit} which is applied to a document when selecting
+     * this presentation for the color.  When `falsy` the {@link ColorPresentation.label label}
+     * is used.
+     */
+    std::optional<std::unique_ptr<TextEdit>> textEdit;
+    /**
+     * An optional array of additional {@link TextEdit text edits} that are applied when
+     * selecting this color presentation. Edits must not overlap with the main {@link ColorPresentation.textEdit edit} nor with themselves.
+     */
+    std::optional<std::vector<std::unique_ptr<TextEdit>>> additionalTextEdits;
+  };
+
+  /**
+   * Represents the connection of two locations. Provides additional metadata over normal {@link Location locations},
+   * including an origin range.
+   */
+  struct LocationLink
+  {
+    /**
+     * Span of the origin of this link.
+     *
+     * Used as the underlined span for mouse interaction. Defaults to the word range at
+     * the definition position.
+     */
+    std::optional<std::unique_ptr<Range>> originSelectionRange;
+    /**
+     * The target resource identifier of this link.
+     */
+    DocumentUri targetUri;
+    /**
+     * The full target range of this link. If the target for example is a symbol then target range is the
+     * range enclosing this symbol not including leading/trailing whitespace but everything else
+     * like comments. This information is typically used to highlight the range in the editor.
+     */
+    std::unique_ptr<Range> targetRange;
+    /**
+     * The range that should be selected and revealed when this link is being followed, e.g the name of a function.
+     * Must be contained by the `targetRange`. See also `DocumentSymbol#range`
+     */
+    std::unique_ptr<Range> targetSelectionRange;
+  };
+
+  /**
+   * A document link is a range in a text document that links to an internal or external resource, like another
+   * text document or a web site.
+   */
+  struct DocumentLink
+  {
+    /**
+     * The range this link applies to.
+     */
+    std::unique_ptr<Range> range;
     /**
      * The uri this link points to. If missing a resolve request is sent later.
-     *
-     * target?: URI;
      */
     std::optional<URI> target;
-
     /**
      * The tooltip text when you hover over this link.
      *
-     * If a tooltip is provided, is will be displayed in a string that includes
-     * instructions on how to trigger the link, such as `{0} (ctrl + click)`.
-     * The specific instructions vary depending on OS, user settings, and
-     * localization.
-     *
-     * tooltip?: string;
+     * If a tooltip is provided, is will be displayed in a string that includes instructions on how to
+     * trigger the link, such as `{0} (ctrl + click)`. The specific instructions vary depending on OS,
+     * user settings, and localization.
      *
      * @since 3.15.0
      */
-    std::optional<string> tooltip;
-
+    std::optional<string_t> tooltip;
     /**
      * A data entry field that is preserved on a document link between a
      * DocumentLinkRequest and a DocumentLinkResolveRequest.
-     *
-     * data?: LSPAny;
      */
-    optional_ptr<LSPAny> data;
-  };
-
-  enum class DocumentLinkResultType {
-    DOCUMENT_LINK_ARRAY,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    ptr_vector<DocumentLink>,
-    null
-  > DocumentLinkResult;
-
-  // --------------------------------------------------------------------------
-  // Document Link Resolve Request
-  // --------------------------------------------------------------------------
-  // The document link resolve request is sent from the client to the server to
-  // resolve the target of a given document link.
-  //
-  // Request:
-  // - method: documentLink/resolve
-  // - params: DocumentLink
-  //
-  // Response:
-  // - result: DocumentLink
-  // - error: code and message set in case an exception happens during the
-  //   document link resolve request.
-  // --------------------------------------------------------------------------
-
-  /**
-   * The hover request is sent from the client to the server to request hover
-   * information at a given text document position.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.hover
-   * - property type: HoverClientCapabilities defined as follows:
-   *
-   * export interface HoverClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   contentFormat?: MarkupKind[];
-   * }
-   */
-  struct HoverClientCapabilities {
-
-    /**
-     * Whether hover supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Client supports the follow content formats if the content
-     * property refers to a `literal of type MarkupContent`.
-     * The order describes the preferred format of the client.
-     *
-     * contentFormat?: MarkupKind[];
-     */
-    optional_vector<MarkupKind> contentFormat;
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
   /**
-   * Server Capability:
-   * - property name (optional): hoverProvider
-   * - property type: boolean | HoverOptions where HoverOptions is defined as
-   *   follows:
-   *
-   * export interface HoverOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct HoverOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: HoverRegistrationOptions defined as follows:
-   *
-   * export interface HoverRegistrationOptions
-   *   extends TextDocumentRegistrationOptions, HoverOptions {
-   * }
-   */
-  struct HoverRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public HoverOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/hover
-   * - params: HoverParams defined as follows:
-   *
-   * export interface HoverParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams {
-   * }
-   */
-  struct HoverParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams {
-    // empty
-  };
-
-  struct MarkedStringWithLanguage {
-
-    /**
-     * language: string;
-     */
-    string language;
-
-    /**
-     * value: string;
-     */
-    string value;
-  };
-
-  enum class MarkedStringType {
-    LITERAL,
-    WITH_LANGUAGE,
-  };
-
-  /**
-   * MarkedString can be used to render human readable text. It is either a
-   * markdown string or a code-block that provides a language and a code snippet.
-   * The language identifier is semantically equal to the optional language
-   * identifier in fenced code blocks in GitHub issues.
-   *
-   * The pair of a language and a value is an equivalent to markdown:
-   * ```${language}
-   * ${value}
-   * ```
-   *
-   * Note that markdown strings will be sanitized - that means html will be
-   * escaped.
-   *
-   * type MarkedString = string | { language: string; value: string };
-   *
-   * @deprecated use MarkupContent instead.
-   */
-  typedef std::variant<
-    string,
-    std::unique_ptr<MarkedStringWithLanguage>
-  > MarkedString;
-
-  enum class HoverContentsType {
-    MARKED_STRING,
-    MARKED_STRING_ARRAY,
-    MARKUP_CONTENT,
-  };
-
-  typedef std::variant<
-    MarkedString,
-    std::vector<MarkedString>,
-    std::unique_ptr<MarkupContent>
-  > HoverContents;
-
-  /**
-   * The result of a hover request.
-   *
-   * Response:
-   * - result: Hover | null defined as follows:
-   *
-   * export interface Hover {
-   *   contents: MarkedString | MarkedString[] | MarkupContent;
-   *   range?: Range;
-   * }
-   *
-   * - error: code and message set in case an exception happens during the hover
-   *   request.
-   */
-  struct Hover {
-
-    /**
-     * The hover's content
-     *
-     * contents: MarkedString | MarkedString[] | MarkupContent;
-     */
-    HoverContents contents;
-
-    /**
-     * An optional range is a range inside a text document
-     * that is used to visualize a hover, e.g. by changing the background color.
-     *
-     * range?: Range;
-     */
-    optional_ptr<Range> range;
-  };
-
-  enum class HoverResultType {
-    HOVER,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<Hover>,
-    null
-  > HoverResult;
-
-  /**
-   * The code lens request is sent from the client to the server to compute code
-   * lenses for a given text document.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.codeLens
-   * - property type: CodeLensClientCapabilities defined as follows:
-   *
-   * export interface CodeLensClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct CodeLensClientCapabilities {
-
-    /**
-     * Whether code lens supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): codeLensProvider
-   * - property type: CodeLensOptions defined as follows:
-   *
-   * export interface CodeLensOptions extends WorkDoneProgressOptions {
-   *   resolveProvider?: boolean;
-   * }
-   */
-  struct CodeLensOptions : public WorkDoneProgressOptions {
-
-    /**
-     * Code lens has a resolve provider as well.
-     *
-     * resolveProvider?: boolean;
-     */
-    std::optional<boolean> resolveProvider;
-  };
-
-  /**
-   * Registration Options: CodeLensRegistrationOptions defined as follows:
-   *
-   * export interface CodeLensRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, CodeLensOptions {
-   * }
-   */
-  struct CodeLensRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CodeLensOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/codeLens
-   * - params: CodeLensParams defined as follows:
-   *
-   * interface CodeLensParams extends WorkDoneProgressParams, PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   * }
-   */
-  struct CodeLensParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The document to request code lens for.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * A code lens represents a command that should be shown along with
+   * A code lens represents a {@link Command command} that should be shown along with
    * source text, like the number of references, a way to run tests, etc.
    *
-   * A code lens is _unresolved_ when no command is associated to it. For
-   * performance reasons the creation of a code lens and resolving should be done
-   * in two stages.
-   *
-   * Response:
-   * - result: CodeLens[] | null defined as follows:
-   *
-   * interface CodeLens {
-   *   range: Range;
-   *   command?: Command;
-   *   data?: LSPAny;
-   * }
-   *
-   * - partial result: CodeLens[]
-   * - error: code and message set in case an exception happens during the code
-   *   lens request.
+   * A code lens is _unresolved_ when no command is associated to it. For performance
+   * reasons the creation of a code lens and resolving should be done in two stages.
    */
-  struct CodeLens {
-
+  struct CodeLens
+  {
     /**
-     * The range in which this code lens is valid. Should only span a single
-     * line.
-     *
-     * range: Range;
+     * The range in which this code lens is valid. Should only span a single line.
      */
     std::unique_ptr<Range> range;
-
     /**
      * The command this code lens represents.
-     *
-     * command?: Command;
      */
-    optional_ptr<Command> command;
-
+    std::optional<std::unique_ptr<Command>> command;
     /**
      * A data entry field that is preserved on a code lens item between
-     * a code lens and a code lens resolve request.
-     *
-     * data?: LSPAny;
+     * a {@link CodeLensRequest} and a {@link CodeLensResolveRequest}
      */
-    optional_ptr<LSPAny> data;
-  };
-
-  enum class CodeLensResultType {
-    CODE_LENS_ARRAY,
-    LSP_NULL
-  };
-
-  typedef std::variant<
-    ptr_vector<CodeLens>,
-    null
-  > CodeLensResult;
-
-  // --------------------------------------------------------------------------
-  // Code Lens Resolve Request
-  // --------------------------------------------------------------------------
-  // The code lens resolve request is sent from the client to the server to
-  // resolve the command for a given code lens item.
-  //
-  // Request:
-  // - method: codeLens/resolve
-  // - params: CodeLens
-  //
-  // Response:
-  // - result: CodeLens
-  // - error: code and message set in case an exception happens during the code
-  //   lens resolve request.
-  // --------------------------------------------------------------------------
-
-  /**
-   * The workspace/codeLens/refresh request is sent from the server to the
-   * client. Servers can use it to ask clients to refresh the code lenses
-   * currently shown in editors. As a result the client should ask the server to
-   * recompute the code lenses for these editors. This is useful if a server
-   * detects a configuration change which requires a re-calculation of all code
-   * lenses. Note that the client still has the freedom to delay the
-   * re-calculation of the code lenses if for example an editor is currently not
-   * visible.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.codeLens
-   * - property type: CodeLensWorkspaceClientCapabilities defined as follows:
-   *
-   * export interface CodeLensWorkspaceClientCapabilities {
-   *   refreshSupport?: boolean;
-   * }
-   *
-   * Request:
-   * - method: workspace/codeLens/refresh
-   * - params: none
-   *
-   * Response:
-   * - result: void
-   * - error: code and message set in case an exception happens during the
-   *   ‘workspace/codeLens/refresh’ request
-   */
-  struct CodeLensWorkspaceClientCapabilities {
-
-    /**
-     * Whether the client implementation supports a refresh request sent from the
-     * server to the client.
-     *
-     * Note that this event is global and will force the client to refresh all
-     * code lenses currently shown. It should be used with absolute care and is
-     * useful for situation where a server for example detect a project wide
-     * change that requires such a calculation.
-     *
-     * refreshSupport?: boolean;
-     */
-    std::optional<boolean> refreshSupport;
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
   /**
-   * A set of predefined range kinds.
-   *
-   * export namespace FoldingRangeKind {
-   *   export const Comment = 'comment';
-   *   export const Imports = 'imports';
-   *   export const Region = 'region';
-   * }
-   * export type FoldingRangeKind = string;
+   * @since 3.17.0
    */
-  enum class FoldingRangeKind {
-
+  struct TypeHierarchyItem
+  {
     /**
-     * Folding range for a comment
-     *
-     * export const Comment = 'comment';
+     * The name of this item.
      */
-    Comment,
-
+    string_t name;
     /**
-     * Folding range for imports or includes
-     *
-     * export const Imports = 'imports';
+     * The kind of this item.
      */
-    Imports,
-
+    SymbolKind kind;
     /**
-     * Folding range for a region (e.g. `#region`)
-     *
-     * export const Region = 'region';
+     * Tags for this item.
      */
-    Region,
-  };
-
-  extern std::map<FoldingRangeKind, std::string> FoldingRangeKindNames;
-
-  auto foldingRangeKindByName(const std::string &name) -> FoldingRangeKind;
-
-  extern std::map<FoldingRangeKind, std::string> FoldingRangeKindValues;
-
-  auto foldingRangeKindByValue(const std::string &value) -> FoldingRangeKind;
-
-  /**
-   * Represents a folding range. To be valid, start and end line must be bigger
-   * than zero and smaller than the number of lines in the document. Clients are
-   * free to ignore invalid ranges.
-   *
-   * Response:
-   * - result: FoldingRange[] | null defined as follows:
-   *
-   * export interface FoldingRange {
-   *   startLine: uinteger;
-   *   startCharacter?: uinteger;
-   *   endLine: uinteger;
-   *   endCharacter?: uinteger;
-   *   kind?: FoldingRangeKind;
-   *   collapsedText?: string;
-   * }
-   *
-   * - partial result: FoldingRange[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/foldingRange’ request
-   */
-  struct FoldingRange {
-
+    std::optional<std::vector<SymbolTag>> tags;
     /**
-     * The zero-based start line of the range to fold. The folded area starts
-     * after the line's last character. To be valid, the end must be zero or
-     * larger and smaller than the number of lines in the document.
-     *
-     * startLine: uinteger;
+     * More detail for this item, e.g. the signature of a function.
      */
-    uinteger startLine;
-
+    std::optional<string_t> detail;
     /**
-     * The zero-based character offset from where the folded range starts. If
-     * not defined, defaults to the length of the start line.
-     *
-     * startCharacter?: uinteger;
+     * The resource identifier of this item.
      */
-    std::optional<uinteger> startCharacter;
-
+    DocumentUri uri;
     /**
-     * The zero-based end line of the range to fold. The folded area ends with
-     * the line's last character. To be valid, the end must be zero or larger
-     * and smaller than the number of lines in the document.
-     *
-     * endLine: uinteger;
-     */
-    uinteger endLine;
-
-    /**
-     * The zero-based character offset before the folded range ends. If not
-     * defined, defaults to the length of the end line.
-     *
-     * endCharacter?: uinteger;
-     */
-    std::optional<uinteger> endCharacter;
-
-    /**
-     * Describes the kind of the folding range such as `comment` or `region`.
-     * The kind is used to categorize folding ranges and used by commands like
-     * 'Fold all comments'. See [FoldingRangeKind](#FoldingRangeKind) for an
-     * enumeration of standardized kinds.
-     *
-     * kind?: FoldingRangeKind;
-     */
-    std::optional<FoldingRangeKind> kind;
-
-    /**
-     * The text that the client should show when the specified range is
-     * collapsed. If not defined or not supported by the client, a default
-     * will be chosen by the client.
-     *
-     * collapsedText?: string;
-     *
-     * @since 3.17.0 - proposed
-     */
-    std::optional<string> collapsedText;
-  };
-
-  enum class FoldingRangeResultType {
-    FOLDING_RANGE_ARRAY,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    ptr_vector<FoldingRange>,
-    null
-  > FoldingRangeResult;
-
-  /**
-   * The selection range request is sent from the client to the server to return
-   * suggested selection ranges at an array of given positions. A selection
-   * range is a range around the cursor position which the user might be
-   * interested in selecting.
-   *
-   * A selection range in the return array is for the position in the provided
-   * parameters at the same index. Therefore positions[i] must be contained in
-   * result[i].range. To allow for results where some positions have selection
-   * ranges and others do not, result[i].range is allowed to be the empty range
-   * at positions[i].
-   *
-   * Typically, but not necessary, selection ranges correspond to the nodes of
-   * the syntax tree.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.selectionRange
-   * - property type: SelectionRangeClientCapabilities defined as follows:
-   *
-   * export interface SelectionRangeClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct SelectionRangeClientCapabilities {
-
-    /**
-     * Whether implementation supports dynamic registration for selection range
-     * providers. If this is set to `true` the client supports the new
-     * `SelectionRangeRegistrationOptions` return value for the corresponding
-     * server capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): selectionRangeProvider
-   * - property type: boolean | SelectionRangeOptions |
-   *   SelectionRangeRegistrationOptions where SelectionRangeOptions is defined
-   *   as follows:
-   *
-   * export interface SelectionRangeOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct SelectionRangeOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: SelectionRangeRegistrationOptions defined as follows:
-   *
-   * export interface SelectionRangeRegistrationOptions extends
-   *   SelectionRangeOptions, TextDocumentRegistrationOptions,
-   *   StaticRegistrationOptions {
-   * }
-   */
-  struct SelectionRangeRegistrationOptions
-    : public SelectionRangeOptions
-    , public TextDocumentRegistrationOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/selectionRange
-   * - params: SelectionRangeParams defined as follows:
-   *
-   * export interface SelectionRangeParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   positions: Position[];
-   * }
-   */
-  struct SelectionRangeParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The positions inside the text document.
-     *
-     * positions: Position[];
-     */
-    ptr_vector<Position> positions;
-  };
-
-  /**
-   * Response:
-   * - result: SelectionRange[] | null defined as follows:
-   *
-   * export interface SelectionRange {
-   *   range: Range;
-   *   parent?: SelectionRange;
-   * }
-   *
-   * - partial result: SelectionRange[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/selectionRange’ request
-   */
-  struct SelectionRange {
-
-    /**
-     * The [range](#Range) of this selection range.
-     *
-     * range: Range;
+     * The range enclosing this symbol not including leading/trailing whitespace
+     * but everything else, e.g. comments and code.
      */
     std::unique_ptr<Range> range;
-
     /**
-     * The parent selection range containing this range. Therefore
-     * `parent.range` must contain `this.range`.
-     *
-     * parent?: SelectionRange;
+     * The range that should be selected and revealed when this symbol is being
+     * picked, e.g. the name of a function. Must be contained by the
+     * {@link TypeHierarchyItem.range `range`}.
      */
-    optional_ptr<SelectionRange> parent;
-  };
-
-  enum class SelectionRangeResultType {
-    SELECTION_RANGE_ARRAY,
-    LSP_NULL,
-  };
-
-  typedef std::variant<
-    ptr_vector<SelectionRange>,
-    null
-  > SelectionRangeResult;
-
-  struct FoldingRangeCollapsedText {
-
+    std::unique_ptr<Range> selectionRange;
     /**
-     * If set, the client signals that it supports setting collapsedText on
-     * folding ranges to display custom labels instead of the default text.
-     *
-     * collapsedText?: boolean;
-     *
-     * @since 3.17.0
+     * A data entry field that is preserved between a type hierarchy prepare and
+     * supertypes or subtypes requests. It could also be used to identify the
+     * type hierarchy in the server, helping improve the performance on
+     * resolving supertypes and subtypes.
      */
-    std::optional<boolean> collapsedText;
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
   /**
-   * The folding range request is sent from the client to the server to return
-   * all folding ranges found in a given text document.
+   * Represents programming constructs like functions or constructors in the context
+   * of call hierarchy.
    *
-   * Client Capability:
-   * - property name (optional): textDocument.foldingRange
-   * - property type: FoldingRangeClientCapabilities defined as follows:
-   *
-   * export interface FoldingRangeClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   rangeLimit?: uinteger;
-   *   lineFoldingOnly?: boolean;
-   *   foldingRangeKind? : {
-   *     valueSet?: FoldingRangeKind[];
-   *   };
-   *   foldingRange?: {
-   *     collapsedText?: boolean;
-   *   };
-   * }
+   * @since 3.16.0
    */
-  struct FoldingRangeClientCapabilities {
-
+  struct CallHierarchyItem
+  {
     /**
-     * Whether implementation supports dynamic registration for folding range
-     * providers. If this is set to `true` the client supports the new
-     * `FoldingRangeRegistrationOptions` return value for the corresponding
-     * server capability as well.
-     *
-     * dynamicRegistration?: boolean;
+     * The name of this item.
      */
-    std::optional<boolean> dynamicRegistration;
-
+    string_t name;
     /**
-     * The maximum number of folding ranges that the client prefers to receive
-     * per document. The value serves as a hint, servers are free to follow the
-     * limit.
-     *
-     * rangeLimit?: uinteger;
+     * The kind of this item.
      */
-    std::optional<uinteger> rangeLimit;
-
+    SymbolKind kind;
     /**
-     * If set, the client signals that it only supports folding complete lines.
-     * If set, client will ignore specified `startCharacter` and `endCharacter`
-     * properties in a FoldingRange.
-     *
-     * lineFoldingOnly?: boolean;
+     * Tags for this item.
      */
-    std::optional<boolean> lineFoldingOnly;
-
+    std::optional<std::vector<SymbolTag>> tags;
     /**
-     * Specific options for the folding range kind.
-     *
-     * foldingRangeKind? : {
-     *   // The folding range kind values the client supports. When this
-     *   // property exists the client also guarantees that it will handle
-     *   // values outside its set gracefully and falls back to a default value
-     *   // when unknown.
-     *   valueSet?: FoldingRangeKind[];
-     * };
-     *
-     * @since 3.17.0
+     * More detail for this item, e.g. the signature of a function.
      */
-    optional_ptr<OptionalValueSet<FoldingRangeKind>> foldingRangeKind;
-
+    std::optional<string_t> detail;
     /**
-     * Specific options for the folding range.
-     *
-     * foldingRange?: {
-     *   collapsedText?: boolean;
-     * };
-     *
-     * @since 3.17.0
+     * The resource identifier of this item.
      */
-    optional_ptr<FoldingRangeCollapsedText> foldingRange;
+    DocumentUri uri;
+    /**
+     * The range enclosing this symbol not including leading/trailing whitespace but everything else, e.g. comments and code.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The range that should be selected and revealed when this symbol is being picked, e.g. the name of a function.
+     * Must be contained by the {@link CallHierarchyItem.range `range`}.
+     */
+    std::unique_ptr<Range> selectionRange;
+    /**
+     * A data entry field that is preserved between a call hierarchy prepare and
+     * incoming calls or outgoing calls requests.
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
   /**
-   * Server Capability:
-   * - property name (optional): foldingRangeProvider
-   * - property type: boolean | FoldingRangeOptions |
-   *   FoldingRangeRegistrationOptions where FoldingRangeOptions is defined as
-   *   follows:
+   * Represents an incoming call, e.g. a caller of a method or constructor.
    *
-   * export interface FoldingRangeOptions extends WorkDoneProgressOptions {
-   * }
+   * @since 3.16.0
    */
-  struct FoldingRangeOptions : public WorkDoneProgressOptions {
-    // empty
+  struct CallHierarchyIncomingCall
+  {
+    /**
+     * The item that makes the call.
+     */
+    std::unique_ptr<CallHierarchyItem> from;
+    /**
+     * The ranges at which the calls appear. This is relative to the caller
+     * denoted by {@link CallHierarchyIncomingCall.from `this.from`}.
+     */
+    std::vector<std::unique_ptr<Range>> fromRanges;
   };
 
   /**
-   * Registration Options: FoldingRangeRegistrationOptions defined as follows:
+   * Represents an outgoing call, e.g. calling a getter from a method or a method from a constructor etc.
    *
-   * export interface FoldingRangeRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, FoldingRangeOptions,
-   *   StaticRegistrationOptions {
-   * }
+   * @since 3.16.0
    */
-  struct FoldingRangeRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public FoldingRangeOptions
-    , public StaticRegistrationOptions {
-    // empty
+  struct CallHierarchyOutgoingCall
+  {
+    /**
+     * The item that is called.
+     */
+    std::unique_ptr<CallHierarchyItem> to;
+    /**
+     * The range at which this item is called. This is the range relative to the caller, e.g the item
+     * passed to {@link CallHierarchyItemProvider.provideCallHierarchyOutgoingCalls `provideCallHierarchyOutgoingCalls`}
+     * and not {@link CallHierarchyOutgoingCall.to `this.to`}.
+     */
+    std::vector<std::unique_ptr<Range>> fromRanges;
   };
 
   /**
-   * Request:
-   * - method: textDocument/foldingRange
-   * - params: FoldingRangeParams defined as follows:
-   *
-   * export interface FoldingRangeParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   * }
+   * Represents a color range from a document.
    */
-  struct FoldingRangeParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
+  struct ColorInformation
+  {
     /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
+     * The range in the document where this color appears.
      */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    std::unique_ptr<Range> range;
+    /**
+     * The actual color value for this color range.
+     */
+    std::unique_ptr<Color> color;
+  };
+
+  struct SelectionRangeOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
   };
 
   /**
-   * The document symbol request is sent from the client to the server. The
-   * returned result is either:
-   * - SymbolInformation[] which is a flat list of all symbols found in a given
-   *   text document. Then neither the symbol’s location range nor the symbol’s
-   *   container name should be used to infer a hierarchy.
-   * - DocumentSymbol[] which is a hierarchy of symbols found in a given text
-   *   document.
+   * Call hierarchy options used during static registration.
    *
-   * Servers should whenever possible return DocumentSymbol since it is the
-   * richer data structure.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.documentSymbol
-   * - property type: DocumentSymbolClientCapabilities defined as follows:
-   *
-   * export interface DocumentSymbolClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   symbolKind?: {
-   *     valueSet?: SymbolKind[];
-   *   };
-   *   hierarchicalDocumentSymbolSupport?: boolean;
-   *   tagSupport?: {
-   *     valueSet: SymbolTag[];
-   *   };
-   *   labelSupport?: boolean;
-   * }
+   * @since 3.16.0
    */
-  struct DocumentSymbolClientCapabilities {
-
-    /**
-     * Whether document symbol supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Specific capabilities for the `SymbolKind` in the
-     * `textDocument/documentSymbol` request.
-     *
-     * symbolKind?: {
-     *   // The symbol kind values the client supports. When this property
-     *   // exists the client also guarantees that it will handle values outside
-     *   // its set gracefully and falls back to a default value when unknown.
-     *   //
-     *   // If this property is not present the client only supports the symbol
-     *   // kinds from `File` to `Array` as defined in the initial version of
-     *   // the protocol.
-     *   valueSet?: SymbolKind[];
-     * };
-     */
-    optional_ptr<OptionalValueSet<SymbolKind>> symbolKind;
-
-    /**
-     * The client supports hierarchical document symbols.
-     *
-     * hierarchicalDocumentSymbolSupport?: boolean;
-     */
-    std::optional<boolean> hierarchicalDocumentSymbolSupport;
-
-    /**
-     * The client supports tags on `SymbolInformation`. Tags are supported on
-     * `DocumentSymbol` if `hierarchicalDocumentSymbolSupport` is set to true.
-     * Clients supporting tags have to handle unknown tags gracefully.
-     *
-     * tagSupport?: {
-     *   // The tags supported by the client.
-     *   valueSet: SymbolTag[];
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ValueSet<SymbolTag>> tagSupport;
-
-    /**
-     * The client supports an additional label presented in the UI when
-     * registering a document symbol provider.
-     *
-     * labelSupport?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> labelSupport;
+  struct CallHierarchyOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
   };
 
   /**
-   * Server Capability:
-   * - property name (optional): documentSymbolProvider
-   * - property type: boolean | DocumentSymbolOptions where
-   *   DocumentSymbolOptions is defined as follows:
-   *
-   * export interface DocumentSymbolOptions extends WorkDoneProgressOptions {
-   *   label?: string;
-   * }
+   * @since 3.16.0
    */
-  struct DocumentSymbolOptions : public WorkDoneProgressOptions {
-
-    /**
-     * A human-readable string that is shown when multiple outlines trees
-     * are shown for the same document.
-     *
-     * label?: string;
-     *
-     * @since 3.16.0
-     */
-    std::optional<string> label;
-  };
-
-  /**
-   * Registration Options: DocumentSymbolRegistrationOptions defined as follows:
-   *
-   * export interface DocumentSymbolRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DocumentSymbolOptions {
-   * }
-   */
-  struct DocumentSymbolRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentSymbolOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/documentSymbol
-   * - params: DocumentSymbolParams defined as follows:
-   *
-   * export interface DocumentSymbolParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   * }
-   *
-   * Response:
-   * - result: DocumentSymbol[] | SymbolInformation[] | null
-   * - partial result: DocumentSymbol[] | SymbolInformation[]. DocumentSymbol[]
-   *   and SymbolInformation[] can not be mixed. That means the first chunk
-   *   defines the type of all the other chunks.
-   * - error: code and message set in case an exception happens during the
-   *   document symbol request.
-   */
-  struct DocumentSymbolParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * The request is sent from the client to the server to resolve semantic
-   * tokens for a given file. Semantic tokens are used to add additional color
-   * information to a file that depends on language specific symbol information.
-   * A semantic token request usually produces a large result. The protocol
-   * therefore supports encoding tokens with numbers. In addition optional
-   * support for deltas is available.
-   *
-   * General Concepts
-   *
-   * Tokens are represented using one token type combined with n token
-   * modifiers. A token type is something like class or function and token
-   * modifiers are like static or async. The protocol defines a set of token
-   * types and modifiers but clients are allowed to extend these and announce
-   * the values they support in the corresponding client capability. The
-   * predefined values are:
-   *
-   * export enum SemanticTokenTypes {
-   *   namespace = 'namespace',
-   *   type = 'type',
-   *   class = 'class',
-   *   enum = 'enum',
-   *   interface = 'interface',
-   *   struct = 'struct',
-   *   typeParameter = 'typeParameter',
-   *   parameter = 'parameter',
-   *   variable = 'variable',
-   *   property = 'property',
-   *   enumMember = 'enumMember',
-   *   event = 'event',
-   *   function = 'function',
-   *   method = 'method',
-   *   macro = 'macro',
-   *   keyword = 'keyword',
-   *   modifier = 'modifier',
-   *   comment = 'comment',
-   *   string = 'string',
-   *   number = 'number',
-   *   regexp = 'regexp',
-   *   operator = 'operator',
-   *   decorator = 'decorator'
-   * }
-   */
-  enum class SemanticTokenTypes {
-    Namespace,
-    Type,
-    Class,
-    Enum,
-    Interface,
-    Struct,
-    TypeParameter,
-    Parameter,
-    Variable,
-    Property,
-    EnumMember,
-    Event,
-    Function,
-    Method,
-    Macro,
-    Keyword,
-    Modifier,
-    Comment,
-    String,
-    Number,
-    Regexp,
-    Operator,
-    Decorator,
-  };
-
-  extern std::map<SemanticTokenTypes, std::string> SemanticTokenTypeNames;
-
-  auto semanticTokenTypesByName(const std::string &name) -> SemanticTokenTypes;
-
-  extern std::map<SemanticTokenTypes, std::string> SemanticTokenTypeValues;
-
-  auto semanticTokenTypesByValue(const std::string &value) -> SemanticTokenTypes;
-
-  /**
-   * export enum SemanticTokenModifiers {
-   *   declaration = 'declaration',
-   *   definition = 'definition',
-   *   readonly = 'readonly',
-   *   static = 'static',
-   *   deprecated = 'deprecated',
-   *   abstract = 'abstract',
-   *   async = 'async',
-   *   modification = 'modification',
-   *   documentation = 'documentation',
-   *   defaultLibrary = 'defaultLibrary'
-   * }
-   */
-  enum class SemanticTokenModifiers {
-    Declaration,
-    Definition,
-    Readonly,
-    Static,
-    Deprecated,
-    Abstract,
-    Async,
-    Modification,
-    Documentation,
-    DefaultLibrary,
-  };
-
-  extern std::map<SemanticTokenModifiers, std::string> SemanticTokenModifierNames;
-
-  auto semanticTokenModifiersByName(const std::string &name) -> SemanticTokenModifiers;
-
-  extern std::map<SemanticTokenModifiers, std::string> SemanticTokenModifierValues;
-
-  auto semanticTokenModifiersByValue(const std::string &value) -> SemanticTokenModifiers;
-
-  /**
-   * The protocol defines an additional token format capability to allow future
-   * extensions of the format. The only format that is currently specified is
-   * relative expressing that the tokens are described using relative positions.
-   *
-   * export namespace TokenFormat {
-   *   export const Relative: 'relative' = 'relative';
-   * }
-   * export type TokenFormat = 'relative';
-   */
-  enum class TokenFormat {
-    Relative,
-  };
-
-  extern std::map<TokenFormat, std::string> TokenFormatNames;
-
-  auto tokenFormatByName(const std::string &name) -> TokenFormat;
-
-  extern std::map<TokenFormat, std::string> TokenFormatValues;
-
-  auto tokenFormatByValue(const std::string &value) -> TokenFormat;
-
-  /**
-   * On the capability level types and modifiers are defined using strings.
-   * However the real encoding happens using numbers. The server therefore needs
-   * to let the client know which numbers it is using for which types and
-   * modifiers. They do so using a legend, which is defined as follows:
-   *
-   * export interface SemanticTokensLegend {
-   *   tokenTypes: string[];
-   *   tokenModifiers: string[];
-   * }
-   */
-  struct SemanticTokensLegend {
-
-    /**
-     * The token types a server uses.
-     *
-     * tokenTypes: string[];
-     */
-    std::vector<string> tokenTypes;
-
-    /**
-     * The token modifiers a server uses.
-     *
-     * tokenModifiers: string[];
-     */
-    std::vector<string> tokenModifiers;
-  };
-
-  struct RangeCapabilities {
-    // empty
-  };
-
-  enum class OptionalRangeCapabilitiesType {
-    BOOLEAN,
-    RANGE_CAPABILITIES,
-  };
-
-  typedef std::variant<
-    boolean,
-    std::unique_ptr<RangeCapabilities>
-  > OptionalRangeCapabilities;
-
-  struct FullCapabilities {
-    std::optional<boolean> delta;
-  };
-
-  enum class OptionalFullCapabilitiesType {
-    BOOLEAN,
-    FULL_CAPABILITIES,
-  };
-
-  typedef std::variant<
-    boolean,
-    std::unique_ptr<FullCapabilities>
-  > OptionalFullCapabilities;
-
-  struct SemanticTokensClientRequestCapabilities {
-
-    /**
-     * The client will send the `textDocument/semanticTokens/range` request
-     * if the server provides a corresponding handler.
-     *
-     * range?: boolean | {
-     * };
-     */
-    std::optional<OptionalRangeCapabilities> range;
-
-    /**
-     * The client will send the `textDocument/semanticTokens/full` request if
-     * the server provides a corresponding handler.
-     *
-     * full?: boolean | {
-     *   delta?: boolean;
-     * };
-     */
-    std::optional<OptionalFullCapabilities> full;
-  };
-
-  /**
-   * The following client capabilities are defined for semantic token requests
-   * sent from the client to the server:
-   * - property name (optional): textDocument.semanticTokens
-   * - property type: SemanticTokensClientCapabilities defined as follows:
-   *
-   * interface SemanticTokensClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   requests: {
-   *     range?: boolean | {
-   *     };
-   *     full?: boolean | {
-   *       delta?: boolean;
-   *     };
-   *   };
-   *   tokenTypes: string[];
-   *   tokenModifiers: string[];
-   *   formats: TokenFormat[];
-   *   overlappingTokenSupport?: boolean;
-   *   multilineTokenSupport?: boolean;
-   *   serverCancelSupport?: boolean;
-   *   augmentsSyntaxTokens?: boolean;
-   * }
-   */
-  struct SemanticTokensClientCapabilities {
-
-    /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new `(TextDocumentRegistrationOptions &
-     * StaticRegistrationOptions)` return value for the corresponding server
-     * capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Which requests the client supports and might send to the server depending
-     * on the server's capability. Please note that clients might not show
-     * semantic tokens or degrade some of the user experience if a range or full
-     * request is advertised by the client but not provided by the server. If
-     * for example the client capability `requests.full` and `request.range` are
-     * both set to true but the server only provides a range provider the client
-     * might not render a minimap correctly or might even decide to not show any
-     * semantic tokens at all.
-     *
-     * requests: {
-     *   range?: boolean | {
-     *   };
-     *   full?: boolean | {
-     *     delta?: boolean;
-     *   };
-     * };
-     */
-    std::unique_ptr<SemanticTokensClientRequestCapabilities> requests;
-
-    /**
-     * The token types that the client supports.
-     *
-     * tokenTypes: string[];
-     */
-    std::vector<string> tokenTypes;
-
-    /**
-     * The token modifiers that the client supports.
-     *
-     * tokenModifiers: string[];
-     */
-    std::vector<string> tokenModifiers;
-
-    /**
-     * The formats the clients supports.
-     *
-     * formats: TokenFormat[];
-     */
-    std::vector<TokenFormat> formats;
-
-    /**
-     * Whether the client supports tokens that can overlap each other.
-     *
-     * overlappingTokenSupport?: boolean;
-     */
-    std::optional<boolean> overlappingTokenSupport;
-
-    /**
-     * Whether the client supports tokens that can span multiple lines.
-     *
-     * multilineTokenSupport?: boolean;
-     */
-    std::optional<boolean> multilineTokenSupport;
-
-    /**
-     * Whether the client allows the server to actively cancel a
-     * semantic token request, e.g. supports returning
-     * ErrorCodes.ServerCancelled. If a server does the client
-     * needs to retrigger the request.
-     *
-     * serverCancelSupport?: boolean;
-     *
-     * @since 3.17.0
-     */
-    std::optional<boolean> serverCancelSupport;
-
-    /**
-     * Whether the client uses semantic tokens to augment existing
-     * syntax tokens. If set to `true` client side created syntax
-     * tokens and semantic tokens are both used for colorization. If
-     * set to `false` the client only uses the returned semantic tokens
-     * for colorization.
-     *
-     * If the value is `undefined` then the client behavior is not
-     * specified.
-     *
-     * augmentsSyntaxTokens?: boolean;
-     *
-     * @since 3.17.0
-     */
-    std::optional<boolean> augmentsSyntaxTokens;
-  };
-
-  /**
-   * The following server capabilities are defined for semantic tokens:
-   * - property name (optional): semanticTokensProvider
-   * - property type: SemanticTokensOptions | SemanticTokensRegistrationOptions
-   *   where SemanticTokensOptions is defined as follows:
-   *
-   * export interface SemanticTokensOptions extends WorkDoneProgressOptions {
-   *   legend: SemanticTokensLegend;
-   *   range?: boolean | {
-   *   };
-   *   full?: boolean | {
-   *     delta?: boolean;
-   *   };
-   * }
-   */
-  struct SemanticTokensOptions : public WorkDoneProgressOptions {
-
-    /**
-     * The legend used by the server
-     *
-     * legend: SemanticTokensLegend;
-     */
-    std::unique_ptr<SemanticTokensLegend> legend;
-
-    /**
-     * Server supports providing semantic tokens for a specific range of a
-     * document.
-     *
-     * range?: boolean | {
-     * };
-     */
-    std::optional<OptionalRangeCapabilities> range;
-
-    /**
-     * Server supports providing semantic tokens for a full document.
-     *
-     * full?: boolean | {
-     *   delta?: boolean;
-     * };
-     */
-    std::optional<OptionalFullCapabilities> full;
-  };
-
-  /**
-   * Registration Options: SemanticTokensRegistrationOptions defined as follows:
-   *
-   * export interface SemanticTokensRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, SemanticTokensOptions,
-   *   StaticRegistrationOptions {
-   * }
-   */
-  struct SemanticTokensRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public SemanticTokensOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/semanticTokens/full
-   * - params: SemanticTokensParams defined as follows:
-   *
-   * export interface SemanticTokensParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   * }
-   */
-  struct SemanticTokensParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * Response:
-   * - result: SemanticTokens | null where SemanticTokens is defined as follows:
-   *
-   * export interface SemanticTokens {
-   *   resultId?: string;
-   *   data: uinteger[];
-   * }
-   *
-   * - partial result: SemanticTokensPartialResult defines as follows:
-   *
-   * export interface SemanticTokensPartialResult {
-   *   data: uinteger[];
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/semanticTokens/full’ request
-   */
-  struct SemanticTokens {
-
-    /**
-     * An optional result id. If provided and clients support delta updating
-     * the client will include the result id in the next semantic token request.
-     * A server can then instead of computing all semantic tokens again simply
-     * send a delta.
-     *
-     * resultId?: string;
-     */
-    std::optional<string> resultId;
-
-    /**
-     * The actual tokens.
-     *
-     * data: uinteger[];
-     */
-    std::vector<uinteger> data;
-  };
-
-  /**
-   * export interface SemanticTokensPartialResult {
-   *   data: uinteger[];
-   * }
-   */
-  struct SemanticTokensPartialResult {
-
-    /**
-     * data: uinteger[];
-     */
-    std::vector<uinteger> data;
-  };
-
-  enum class SemanticTokensResultType {
-    SEMANTIC_TOKENS,
-    SEMANTIC_TOKENS_PARTIAL_RESULT,
-    LSP_NULL
-  };
-
-  typedef std::variant<
-    std::unique_ptr<SemanticTokens>,
-    std::unique_ptr<SemanticTokensPartialResult>,
-    null
-  > SemanticTokensResult;
-
-  /**
-   * Request:
-   * - method: textDocument/semanticTokens/full/delta
-   * - params: SemanticTokensDeltaParams defined as follows:
-   *
-   * export interface SemanticTokensDeltaParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   previousResultId: string;
-   * }
-   */
-  struct SemanticTokensDeltaParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The result id of a previous response. The result Id can either point to
-     * a full response or a delta response depending on what was received last.
-     *
-     * previousResultId: string;
-     */
-    string previousResultId;
-  };
-
-  /**
-   * Response:
-   * - result: SemanticTokens | SemanticTokensDelta | null where
-   *   SemanticTokensDelta is defined as follows:
-   *
-   *  export interface SemanticTokensDelta {
-   *    readonly resultId?: string;
-   *    edits: SemanticTokensEdit[];
-   *  }
-   *
-   * - partial result: SemanticTokensDeltaPartialResult defines as follows:
-   *
-   * export interface SemanticTokensDeltaPartialResult {
-   *   edits: SemanticTokensEdit[];
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/semanticTokens/full/delta’ request
-   */
-  struct SemanticTokensEdit {
-
+  struct SemanticTokensEdit
+  {
     /**
      * The start offset of the edit.
-     *
-     * start: uinteger;
      */
-    uinteger start;
-
+    uinteger_t start;
     /**
      * The count of elements to remove.
-     *
-     * deleteCount: uinteger;
      */
-    uinteger deleteCount;
-
+    uinteger_t deleteCount;
     /**
      * The elements to insert.
-     *
-     * data?: uinteger[];
      */
-    optional_vector<uinteger> data;
-  };
-
-  struct SemanticTokensDelta {
-
-    /**
-     * readonly resultId?: string;
-     */
-    std::optional<string> resultId;
-
-    /**
-     * The semantic token edits to transform a previous result into a new
-     * result.
-     *
-     * edits: SemanticTokensEdit[];
-     */
-    ptr_vector<SemanticTokensEdit> edits;
-  };
-
-  struct SemanticTokensDeltaPartialResult {
-
-    /**
-     * edits: SemanticTokensEdit[];
-     */
-    ptr_vector<SemanticTokensEdit> edits;
+    std::optional<std::vector<uinteger_t>> data;
   };
 
   /**
-   * There are two uses cases where it can be beneficial to only compute
-   * semantic tokens for a visible range:
-   * - for faster rendering of the tokens in the user interface when a user
-   *   opens a file. In this use cases servers should also implement the
-   *   textDocument/semanticTokens/full request as well to allow for flicker
-   *   free scrolling and semantic coloring of a minimap.
-   * - if computing semantic tokens for a full document is too expensive servers
-   *   can only provide a range call. In this case the client might not render a
-   *   minimap correctly or might even decide to not show any semantic tokens at
-   *   all.
-   *
-   * A server is allowed to compute the semantic tokens for a broader range than
-   * requested by the client. However if the server does the semantic tokens for
-   * the broader range must be complete and correct. If a token at the beginning
-   * or end only partially overlaps with the requested range the server should
-   * include those tokens in the response.
-   *
-   * Request:
-   * - method: textDocument/semanticTokens/range
-   * - params: SemanticTokensRangeParams defined as follows:
-   *
-   * export interface SemanticTokensRangeParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   range: Range;
-   * }
-   *
-   * Response:
-   * - result: SemanticTokens | null
-   * - partial result: SemanticTokensPartialResult
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/semanticTokens/range’ request
+   * @since 3.16.0
    */
-  struct SemanticTokensRangeParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
+  struct SemanticTokensDeltaPartialResult
+  {
+    std::vector<std::unique_ptr<SemanticTokensEdit>> edits;
+  };
 
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensDelta
+  {
+    std::optional<string_t> resultId;
     /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
+     * The semantic token edits to transform a previous result into a new result.
      */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    std::vector<std::unique_ptr<SemanticTokensEdit>> edits;
+  };
 
+  struct LinkedEditingRangeOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * Represents information on a file/folder create.
+   *
+   * @since 3.16.0
+   */
+  struct FileCreate
+  {
     /**
-     * The range the semantic tokens are requested for.
-     *
-     * range: Range;
+     * A file:// URI for the location of the file/folder being created.
+     */
+    string_t uri;
+  };
+
+  /**
+   * The parameters sent in notifications/requests for user-initiated creation of
+   * files.
+   *
+   * @since 3.16.0
+   */
+  struct CreateFilesParams
+  {
+    /**
+     * An array of all files/folders created in this operation.
+     */
+    std::vector<std::unique_ptr<FileCreate>> files;
+  };
+
+  /**
+   * Additional information that describes document changes.
+   *
+   * @since 3.16.0
+   */
+  struct ChangeAnnotation
+  {
+    /**
+     * A human-readable string describing the actual change. The string
+     * is rendered prominent in the user interface.
+     */
+    string_t label;
+    /**
+     * A flag which indicates that user confirmation is needed
+     * before applying the change.
+     */
+    std::optional<boolean_t> needsConfirmation;
+    /**
+     * A human-readable string which is rendered less prominent in
+     * the user interface.
+     */
+    std::optional<string_t> description;
+  };
+
+  /**
+   * Represents information on a file/folder rename.
+   *
+   * @since 3.16.0
+   */
+  struct FileRename
+  {
+    /**
+     * A file:// URI for the original location of the file/folder being renamed.
+     */
+    string_t oldUri;
+    /**
+     * A file:// URI for the new location of the file/folder being renamed.
+     */
+    string_t newUri;
+  };
+
+  /**
+   * The parameters sent in notifications/requests for user-initiated renames of
+   * files.
+   *
+   * @since 3.16.0
+   */
+  struct RenameFilesParams
+  {
+    /**
+     * An array of all files/folders renamed in this operation. When a folder is renamed, only
+     * the folder will be included, and not its children.
+     */
+    std::vector<std::unique_ptr<FileRename>> files;
+  };
+
+  /**
+   * Represents information on a file/folder delete.
+   *
+   * @since 3.16.0
+   */
+  struct FileDelete
+  {
+    /**
+     * A file:// URI for the location of the file/folder being deleted.
+     */
+    string_t uri;
+  };
+
+  /**
+   * The parameters sent in notifications/requests for user-initiated deletes of
+   * files.
+   *
+   * @since 3.16.0
+   */
+  struct DeleteFilesParams
+  {
+    /**
+     * An array of all files/folders deleted in this operation.
+     */
+    std::vector<std::unique_ptr<FileDelete>> files;
+  };
+
+  struct MonikerOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * Type hierarchy options used during static registration.
+   *
+   * @since 3.17.0
+   */
+  struct TypeHierarchyOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * @since 3.17.0
+   */
+  struct InlineValueContext
+  {
+    /**
+     * The stack frame (as a DAP Id) where the execution has stopped.
+     */
+    integer_t frameId;
+    /**
+     * The document range where execution has stopped.
+     * Typically the end position of the range denotes the line where the inline values are shown.
+     */
+    std::unique_ptr<Range> stoppedLocation;
+  };
+
+  /**
+   * Provide inline value as text.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueText
+  {
+    /**
+     * The document range for which the inline value applies.
      */
     std::unique_ptr<Range> range;
+    /**
+     * The text of the inline value.
+     */
+    string_t text;
   };
 
   /**
-   * The workspace/semanticTokens/refresh request is sent from the server to the
-   * client. Servers can use it to ask clients to refresh the editors for which
-   * this server provides semantic tokens. As a result the client should ask the
-   * server to recompute the semantic tokens for these editors. This is useful
-   * if a server detects a project wide configuration change which requires a
-   * re-calculation of all semantic tokens. Note that the client still has the
-   * freedom to delay the re-calculation of the semantic tokens if for example
-   * an editor is currently not visible.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.semanticTokens
-   * - property type: SemanticTokensWorkspaceClientCapabilities defined as
-   *   follows:
-   *
-   * export interface SemanticTokensWorkspaceClientCapabilities {
-   *   refreshSupport?: boolean;
-   * }
-   *
-   * Request:
-   * - method: workspace/semanticTokens/refresh
-   * - params: none
-   *
-   * Response:
-   * - result: void
-   * - error: code and message set in case an exception happens during the
-   *   ‘workspace/semanticTokens/refresh’ request
-   */
-  struct SemanticTokensWorkspaceClientCapabilities {
-
-    /**
-     * Whether the client implementation supports a refresh request sent from
-     * the server to the client.
-     *
-     * Note that this event is global and will force the client to refresh all
-     * semantic tokens currently shown. It should be used with absolute care
-     * and is useful for situation where a server for example detect a project
-     * wide change that requires such a calculation.
-     *
-     * refreshSupport?: boolean;
-     */
-    std::optional<boolean> refreshSupport;
-  };
-
-  struct ResolveSupportCapabilities {
-
-    /**
-     * The properties that a client can resolve lazily.
-     *
-     * properties: string[];
-     */
-    std::vector<string> properties;
-  };
-
-  /**
-   * Inlay hint client capabilities.
-   *
-   * The inlay hints request is sent from the client to the server to compute
-   * inlay hints for a given [text document, range] tuple that may be rendered
-   * in the editor in place with other text.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.inlayHint
-   * - property type: InlayHintClientCapabilities defined as follows:
-   *
-   * export interface InlayHintClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   resolveSupport?: {
-   *     properties: string[];
-   *   };
-   * }
+   * Provide inline value through a variable lookup.
+   * If only a range is specified, the variable name will be extracted from the underlying document.
+   * An optional variable name can be used to override the extracted name.
    *
    * @since 3.17.0
    */
-  struct InlayHintClientCapabilities {
-
+  struct InlineValueVariableLookup
+  {
     /**
-     * Whether inlay hints support dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Indicates which properties a client can resolve lazily on an inlay hint.
-     *
-     * resolveSupport?: {
-     *   properties: string[];
-     * };
-     */
-    optional_ptr<ResolveSupportCapabilities> resolveSupport;
-  };
-
-  /**
-   * Inlay hint options used during static registration.
-   *
-   * Server Capability:
-   * - property name (optional): inlayHintProvider
-   * - property type: InlayHintOptions defined as follows:
-   *
-   * export interface InlayHintOptions extends WorkDoneProgressOptions {
-   *   resolveProvider?: boolean;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct InlayHintOptions : public WorkDoneProgressOptions {
-
-    /**
-     * The server provides support to resolve additional
-     * information for an inlay hint item.
-     *
-     * resolveProvider?: boolean;
-     */
-    std::optional<boolean> resolveProvider;
-  };
-
-  /**
-   * Inlay hint options used during static or dynamic registration.
-   *
-   * Registration Options: InlayHintRegistrationOptions defined as follows:
-   *
-   * export interface InlayHintRegistrationOptions extends InlayHintOptions,
-   *   TextDocumentRegistrationOptions, StaticRegistrationOptions {
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct InlayHintRegistrationOptions
-    : public InlayHintOptions
-    , public TextDocumentRegistrationOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * A parameter literal used in inlay hint requests.
-   *
-   * Request:
-   * - method: textDocument/inlayHint
-   * - params: InlayHintParams defined as follows:
-   *
-   * export interface InlayHintParams extends WorkDoneProgressParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   range: Range;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct InlayHintParams : public WorkDoneProgressParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The visible document range for which inlay hints should be computed.
-     *
-     * range: Range;
+     * The document range for which the inline value applies.
+     * The range is used to extract the variable name from the underlying document.
      */
     std::unique_ptr<Range> range;
+    /**
+     * If specified the name of the variable to look up.
+     */
+    std::optional<string_t> variableName;
+    /**
+     * How to perform the lookup.
+     */
+    boolean_t caseSensitiveLookup;
   };
 
-  enum class StringOrMarkupContentType {
-    STRING,
+  /**
+   * Provide an inline value through an expression evaluation.
+   * If only a range is specified, the expression will be extracted from the underlying document.
+   * An optional expression can be used to override the extracted expression.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueEvaluatableExpression
+  {
+    /**
+     * The document range for which the inline value applies.
+     * The range is used to extract the evaluatable expression from the underlying document.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * If specified the expression overrides the extracted expression.
+     */
+    std::optional<string_t> expression;
+  };
+
+  /**
+   * Inline value options used during static registration.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * A `MarkupContent` literal represents a string value which content is interpreted base on its
+   * kind flag. Currently the protocol supports `plaintext` and `markdown` as markup kinds.
+   *
+   * If the kind is `markdown` then the value can contain fenced code blocks like in GitHub issues.
+   * See https://help.github.com/articles/creating-and-highlighting-code-blocks/#syntax-highlighting
+   *
+   * Here is an example how such a string can be constructed using JavaScript / TypeScript:
+   * ```ts
+   * let markdown: MarkdownContent = {
+   *  kind: MarkupKind.Markdown,
+   *  value: [
+   *    '# Header',
+   *    'Some text',
+   *    '```typescript',
+   *    'someCode();',
+   *    '```'
+   *  ].join('\n')
+   * };
+   * ```
+   *
+   * *Please Note* that clients might sanitize the return markdown. A client could decide to
+   * remove HTML from the markdown to avoid script execution.
+   */
+  struct MarkupContent
+  {
+    /**
+     * The type of the Markup
+     */
+    MarkupKind kind;
+    /**
+     * The content itself
+     */
+    string_t value;
+  };
+
+  enum class InlayHintLabelPart_tooltipType {
+    STRING_TYPE,
     MARKUP_CONTENT,
   };
 
   typedef std::variant<
-    string,
+    string_t,
     std::unique_ptr<MarkupContent>
-  > StringOrMarkupContent;
+  > InlayHintLabelPart_tooltip;
 
   /**
    * An inlay hint label part allows for interactive and composite labels
@@ -5787,26 +2866,21 @@ namespace LCompilers::LanguageServerProtocol {
    *
    * @since 3.17.0
    */
-  struct InlayHintLabelPart {
-
+  struct InlayHintLabelPart
+  {
     /**
      * The value of this label part.
-     *
-     * value: string;
      */
-    string value;
-
+    string_t value;
     /**
-     * The tooltip text when you hover over this label part. Depending on the
-     * client capability `inlayHint.resolveSupport` clients might resolve this
-     * property late using the resolve request.
-     *
-     * tooltip?: string | MarkupContent;
+     * The tooltip text when you hover over this label part. Depending on
+     * the client capability `inlayHint.resolveSupport` clients might resolve
+     * this property late using the resolve request.
      */
-    std::optional<StringOrMarkupContent> tooltip;
-
+    std::optional<InlayHintLabelPart_tooltip> tooltip;
     /**
-     * An optional source code location that represents this label part.
+     * An optional source code location that represents this
+     * label part.
      *
      * The editor will use this location for the hover and for code navigation
      * features: This part will become a clickable link that resolves to the
@@ -5816,1458 +2890,547 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * Depending on the client capability `inlayHint.resolveSupport` clients
      * might resolve this property late using the resolve request.
-     *
-     * location?: Location;
      */
-    optional_ptr<Location> location;
-
+    std::optional<std::unique_ptr<Location>> location;
     /**
      * An optional command for this label part.
      *
      * Depending on the client capability `inlayHint.resolveSupport` clients
      * might resolve this property late using the resolve request.
-     *
-     * command?: Command;
      */
-    optional_ptr<Command> command;
+    std::optional<std::unique_ptr<Command>> command;
   };
 
-  /**
-   * Inlay hint kinds.
-   *
-   * export namespace InlayHintKind {
-   *   export const Type = 1;
-   *   export const Parameter = 2;
-   * }
-   * export type InlayHintKind = 1 | 2;
-   *
-   * @since 3.17.0
-   */
-  enum class InlayHintKind {
-
-    /**
-     * An inlay hint that for a type annotation.
-     *
-     * export const Type = 1;
-     */
-    Type = 1,
-
-    /**
-     * An inlay hint that is for a parameter.
-     *
-     * export const Parameter = 2;
-     */
-    Parameter = 2,
-  };
-
-  extern std::map<InlayHintKind, std::string> InlayHintKindNames;
-
-  auto inlayHintKindByName(const std::string &name) -> InlayHintKind;
-
-  enum class StringOrInlayHintLabelPartsType {
-    STRING,
-    INLAY_HINT_LABEL_PART,
+  enum class InlayHint_labelType {
+    STRING_TYPE,
+    INLAY_HINT_LABEL_PART_ARRAY,
   };
 
   typedef std::variant<
-    string,
-    ptr_vector<InlayHintLabelPart>
-  > StringOrInlayHintLabelParts;
+    string_t,
+    std::vector<std::unique_ptr<InlayHintLabelPart>>
+  > InlayHint_label;
+
+  enum class InlayHint_tooltipType {
+    STRING_TYPE,
+    MARKUP_CONTENT,
+  };
+
+  typedef std::variant<
+    string_t,
+    std::unique_ptr<MarkupContent>
+  > InlayHint_tooltip;
 
   /**
    * Inlay hint information.
    *
-   * Response:
-   * - result: InlayHint[] | null defined as follows:
-   *
-   * export interface InlayHint {
-   *   position: Position;
-   *   label: string | InlayHintLabelPart[];
-   *   kind?: InlayHintKind;
-   *   textEdits?: TextEdit[];
-   *   tooltip?: string | MarkupContent;
-   *   paddingLeft?: boolean;
-   *   paddingRight?: boolean;
-   *   data?: LSPAny;
-   * }
-   *
-   * - error: code and message set in case an exception happens during the inlay
-   *   hint request.
-   *
    * @since 3.17.0
    */
-  struct InlayHint {
-
+  struct InlayHint
+  {
     /**
      * The position of this hint.
      *
      * If multiple hints have the same position, they will be shown in the order
      * they appear in the response.
-     *
-     * position: Position;
      */
     std::unique_ptr<Position> position;
-
     /**
      * The label of this hint. A human readable string or an array of
      * InlayHintLabelPart label parts.
      *
      * *Note* that neither the string nor the label part can be empty.
-     *
-     * label: string | InlayHintLabelPart[];
      */
-    StringOrInlayHintLabelParts label;
-
+    InlayHint_label label;
     /**
      * The kind of this hint. Can be omitted in which case the client
      * should fall back to a reasonable default.
-     *
-     * kind?: InlayHintKind;
      */
     std::optional<InlayHintKind> kind;
-
     /**
      * Optional text edits that are performed when accepting this inlay hint.
      *
      * *Note* that edits are expected to change the document so that the inlay
      * hint (or its nearest variant) is now part of the document and the inlay
      * hint itself is now obsolete.
-     *
-     * Depending on the client capability `inlayHint.resolveSupport` clients
-     * might resolve this property late using the resolve request.
-     *
-     * textEdits?: TextEdit[];
      */
-    optional_ptr_vector<TextEdit> textEdits;
-
+    std::optional<std::vector<std::unique_ptr<TextEdit>>> textEdits;
     /**
      * The tooltip text when you hover over this item.
-     *
-     * Depending on the client capability `inlayHint.resolveSupport` clients
-     * might resolve this property late using the resolve request.
-     *
-     * tooltip?: string | MarkupContent;
      */
-    std::optional<StringOrMarkupContent> tooltip;
-
+    std::optional<InlayHint_tooltip> tooltip;
     /**
      * Render padding before the hint.
      *
      * Note: Padding should use the editor's background color, not the
-     * background color of the hint itself. That means padding can be used to
-     * visually align/separate an inlay hint.
-     *
-     * paddingLeft?: boolean;
+     * background color of the hint itself. That means padding can be used
+     * to visually align/separate an inlay hint.
      */
-    std::optional<boolean> paddingLeft;
-
+    std::optional<boolean_t> paddingLeft;
     /**
      * Render padding after the hint.
      *
      * Note: Padding should use the editor's background color, not the
-     * background color of the hint itself. That means padding can be used to
-     * visually align/separate an inlay hint.
-     *
-     * paddingRight?: boolean;
+     * background color of the hint itself. That means padding can be used
+     * to visually align/separate an inlay hint.
      */
-    std::optional<boolean> paddingRight;
-
+    std::optional<boolean_t> paddingRight;
     /**
-     * A data entry field that is preserved on an inlay hint between a
-     * `textDocument/inlayHint` and a `inlayHint/resolve` request.
-     *
-     * data?: LSPAny;
+     * A data entry field that is preserved on an inlay hint between
+     * a `textDocument/inlayHint` and a `inlayHint/resolve` request.
      */
-    optional_ptr<LSPAny> data;
-  };
-
-  // ---------------------------------------------------------------------------
-  // Inlay Hint Resolve Request
-  // ---------------------------------------------------------------------------
-  // Since version 3.17.0
-  //
-  // The request is sent from the client to the server to resolve additional
-  // information for a given inlay hint. This is usually used to compute the
-  // tooltip, location or command properties of an inlay hint’s label part to
-  // avoid its unnecessary computation during the textDocument/inlayHint
-  // request.
-  //
-  // Consider the clients announces the label.location property as a property
-  // that can be resolved lazy using the client capability
-  //
-  // textDocument.inlayHint.resolveSupport = { properties: ['label.location'] };
-  //
-  // then an inlay hint with a label part without a location needs to be
-  // resolved using the inlayHint/resolve request before it can be used.
-  //
-  // Client Capability:
-  // - property name (optional): textDocument.inlayHint.resolveSupport
-  // - property type: { properties: string[]; }
-  //
-  // Request:
-  // - method: inlayHint/resolve
-  // - params: InlayHint
-  //
-  // Response:
-  // - result: InlayHint
-  // - error: code and message set in case an exception happens during the
-  // - completion resolve request.
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Client workspace capabilities specific to inlay hints.
-   *
-   * The workspace/inlayHint/refresh request is sent from the server to the
-   * client. Servers can use it to ask clients to refresh the inlay hints
-   * currently shown in editors. As a result the client should ask the server to
-   * recompute the inlay hints for these editors. This is useful if a server
-   * detects a configuration change which requires a re-calculation of all inlay
-   * hints. Note that the client still has the freedom to delay the
-   * re-calculation of the inlay hints if for example an editor is currently not
-   * visible.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.inlayHint
-   * - property type: InlayHintWorkspaceClientCapabilities defined as follows:
-   *
-   * export interface InlayHintWorkspaceClientCapabilities {
-   *   refreshSupport?: boolean;
-   * }
-   *
-   * Request:
-   * - method: workspace/inlayHint/refresh
-   * - params: none
-   *
-   * Response:
-   * - result: void
-   * - error: code and message set in case an exception happens during the
-   *   ‘workspace/inlayHint/refresh’ request
-   *
-   * @since 3.17.0
-   */
-  struct InlayHintWorkspaceClientCapabilities {
-
-    /**
-     * Whether the client implementation supports a refresh request sent from
-     * the server to the client.
-     *
-     * Note that this event is global and will force the client to refresh all
-     * inlay hints currently shown. It should be used with absolute care and
-     * is useful for situation where a server for example detects a project wide
-     * change that requires such a calculation.
-     *
-     * refreshSupport?: boolean;
-     */
-    std::optional<boolean> refreshSupport;
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
   /**
-   * Client capabilities specific to inline values.
-   *
-   * The inline value request is sent from the client to the server to compute
-   * inline values for a given text document that may be rendered in the editor
-   * at the end of lines.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.inlineValue
-   * - property type: InlineValueClientCapabilities defined as follows:
-   *
-   * export interface InlineValueClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
+   * Inlay hint options used during static registration.
    *
    * @since 3.17.0
    */
-  struct InlineValueClientCapabilities {
-
+  struct InlayHintOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
     /**
-     * Whether implementation supports dynamic registration for inline
-     * value providers.
-     *
-     * dynamicRegistration?: boolean;
+     * The server provides support to resolve additional
+     * information for an inlay hint item.
      */
-    std::optional<boolean> dynamicRegistration;
+    std::optional<boolean_t> resolveProvider;
   };
 
   /**
-   * Inline value options used during static registration.
-   *
-   * Server Capability:
-   * - property name (optional): inlineValueProvider
-   * - property type: InlineValueOptions defined as follows:
-   *
-   * export interface InlineValueOptions extends WorkDoneProgressOptions {
-   * }
+   * A diagnostic report indicating that the last returned
+   * report is still accurate.
    *
    * @since 3.17.0
    */
-  struct InlineValueOptions : public WorkDoneProgressOptions {
-    // empty
+  struct UnchangedDocumentDiagnosticReport
+  {
+    /**
+     * A document diagnostic report indicating
+     * no changes to the last result. A server can
+     * only return `unchanged` if result ids are
+     * provided.
+     */
+    string_t kind;
+    /**
+     * A result id which will be sent on the next
+     * diagnostic request for the same document.
+     */
+    string_t resultId;
   };
 
   /**
-   * Inline value options used during static or dynamic registration.
-   *
-   * Registration Options: InlineValueRegistrationOptions defined as follows:
-   *
-   * export interface InlineValueRegistrationOptions extends InlineValueOptions,
-   *   TextDocumentRegistrationOptions, StaticRegistrationOptions {
-   * }
+   * Diagnostic options.
    *
    * @since 3.17.0
    */
-  struct InlineValueRegistrationOptions
-    : public InlineValueOptions
-    , public TextDocumentRegistrationOptions
-    , public StaticRegistrationOptions {
-    // empty
+  struct DiagnosticOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * An optional identifier under which the diagnostics are
+     * managed by the client.
+     */
+    std::optional<string_t> identifier;
+    /**
+     * Whether the language has inter file dependencies meaning that
+     * editing code in one file can result in a different diagnostic
+     * set in another file. Inter file dependencies are common for
+     * most programming languages and typically uncommon for linters.
+     */
+    boolean_t interFileDependencies;
+    /**
+     * The server provides support for workspace diagnostics as well.
+     */
+    boolean_t workspaceDiagnostics;
   };
 
   /**
-   * export interface InlineValueContext {
-   *   frameId: integer;
-   *   stoppedLocation: Range;
-   * }
+   * A previous result id in a workspace pull request.
    *
    * @since 3.17.0
    */
-  struct InlineValueContext {
-
+  struct PreviousResultId
+  {
     /**
-     * The stack frame (as a DAP Id) where the execution has stopped.
-     *
-     * frameId: integer;
+     * The URI for which the client knowns a
+     * result id.
      */
-    integer frameId;
-
+    DocumentUri uri;
     /**
-     * The document range where execution has stopped. Typically the end
-     * position of the range denotes the line where the inline values are shown.
-     *
-     * stoppedLocation: Range;
+     * The value of the previous result id.
      */
-    std::unique_ptr<Range> stoppedLocation;
+    string_t value;
   };
 
   /**
-   * A parameter literal used in inline value requests.
-   *
-   * Request:
-   * - method: textDocument/inlineValue
-   * - params: InlineValueParams defined as follows:
-   *
-   * export interface InlineValueParams extends WorkDoneProgressParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   range: Range;
-   *   context: InlineValueContext;
-   * }
-   *
-   * @since 3.17.0
+   * An item to transfer a text document from the client to the
+   * server.
    */
-  struct InlineValueParams : public WorkDoneProgressParams {
-
+  struct TextDocumentItem
+  {
     /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
+     * The text document's uri.
      */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
+    DocumentUri uri;
     /**
-     * The document range for which inline values should be computed.
-     *
-     * range: Range;
+     * The text document's language identifier.
      */
-    std::unique_ptr<Range> range;
-
+    string_t languageId;
     /**
-     * Additional information about the context in which inline values were
-     * requested.
-     *
-     * context: InlineValueContext;
+     * The version number of this document (it will increase after each
+     * change, including undo/redo).
      */
-    std::unique_ptr<InlineValueContext> context;
+    integer_t version;
+    /**
+     * The content of the opened text document.
+     */
+    string_t text;
   };
 
   /**
-   * Provide inline value as text.
-   *
-   * export interface InlineValueText {
-   *   range: Range;
-   *   text: string;
-   * }
-   *
-   * @since 3.17.0
+   * The parameters sent in an open text document notification
    */
-  struct InlineValueText {
-
+  struct DidOpenTextDocumentParams
+  {
     /**
-     * The document range for which the inline value applies.
-     *
-     * range: Range;
+     * The document that was opened.
      */
-    std::unique_ptr<Range> range;
-
-    /**
-     * The text of the inline value.
-     *
-     * text: string;
-     */
-    string text;
+    std::unique_ptr<TextDocumentItem> textDocument;
   };
 
   /**
-   * Provide inline value through a variable lookup.
-   *
-   * If only a range is specified, the variable name will be extracted from the
-   * underlying document.
-   *
-   * An optional variable name can be used to override the extracted name.
-   *
-   * export interface InlineValueVariableLookup {
-   *   range: Range;
-   *   variableName?: string;
-   *   caseSensitiveLookup: boolean;
-   * }
+   * A versioned notebook document identifier.
    *
    * @since 3.17.0
    */
-  struct InlineValueVariableLookup {
-
+  struct VersionedNotebookDocumentIdentifier
+  {
     /**
-     * The document range for which the inline value applies. The range is used
-     * to extract the variable name from the underlying document.
-     *
-     * range: Range;
+     * The version number of this notebook document.
      */
-    std::unique_ptr<Range> range;
-
+    integer_t version;
     /**
-     * If specified the name of the variable to look up.
-     *
-     * variableName?: string;
+     * The notebook document's uri.
      */
-    std::optional<string> variableName;
-
-    /**
-     * How to perform the lookup.
-     *
-     * caseSensitiveLookup: boolean;
-     */
-    boolean caseSensitiveLookup;
+    URI uri;
   };
 
   /**
-   * Provide an inline value through an expression evaluation.
-   *
-   * If only a range is specified, the expression will be extracted from the
-   * underlying document.
-   *
-   * An optional expression can be used to override the extracted expression.
-   *
-   * export interface InlineValueEvaluatableExpression {
-   *   range: Range;
-   *   expression?: string;
-   * }
+   * A literal to identify a notebook document in the client.
    *
    * @since 3.17.0
    */
-  struct InlineValueEvaluatableExpression {
-
+  struct NotebookDocumentIdentifier
+  {
     /**
-     * The document range for which the inline value applies. The range is used
-     * to extract the evaluatable expression from the underlying document.
-     *
-     * range: Range;
+     * The notebook document's uri.
      */
-    std::unique_ptr<Range> range;
-
-    /**
-     * If specified the expression overrides the extracted expression.
-     *
-     * expression?: string;
-     */
-    std::optional<string> expression;
-  };
-
-  enum class InlineValueType {
-    INLINE_VALUE_TEXT,
-    INLINE_VALUE_VARIABLE_LOOKUP,
-    INLINE_VALUE_EVALUATABLE_EXPRESSION,
+    URI uri;
   };
 
   /**
-   * Inline value information can be provided by different means:
-   * - directly as a text value (class InlineValueText).
-   * - as a name to use for a variable lookup (class InlineValueVariableLookup)
-   * - as an evaluatable expression (class InlineValueEvaluatableExpression)
-   * The InlineValue types combines all inline value types into one type.
-   *
-   * Response:
-   * - result: InlineValue[] | null defined as follows:
-   * - error: code and message set in case an exception happens during the
-   *   inline values request.
+   * The params sent in a save notebook document notification.
    *
    * @since 3.17.0
    */
+  struct DidSaveNotebookDocumentParams
+  {
+    /**
+     * The notebook document that got saved.
+     */
+    std::unique_ptr<NotebookDocumentIdentifier> notebookDocument;
+  };
+
+  /**
+   * The params sent in a close notebook document notification.
+   *
+   * @since 3.17.0
+   */
+  struct DidCloseNotebookDocumentParams
+  {
+    /**
+     * The notebook document that got closed.
+     */
+    std::unique_ptr<NotebookDocumentIdentifier> notebookDocument;
+    /**
+     * The text documents that represent the content
+     * of a notebook cell that got closed.
+     */
+    std::vector<std::unique_ptr<TextDocumentIdentifier>> cellTextDocuments;
+  };
+
+  /**
+   * A string value used as a snippet is a template which allows to insert text
+   * and to control the editor cursor when insertion happens.
+   *
+   * A snippet can define tab stops and placeholders with `$1`, `$2`
+   * and `${3:foo}`. `$0` defines the final tab stop, it defaults to
+   * the end of the snippet. Variables are defined with `$name` and
+   * `${name:default value}`.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct StringValue
+  {
+    /**
+     * The kind of string value.
+     */
+    string_t kind;
+    /**
+     * The snippet string.
+     */
+    string_t value;
+  };
+
+  enum class InlineCompletionItem_insertTextType {
+    STRING_TYPE,
+    STRING_VALUE,
+  };
+
   typedef std::variant<
-    std::unique_ptr<InlineValueText>,
-    std::unique_ptr<InlineValueVariableLookup>,
-    std::unique_ptr<InlineValueEvaluatableExpression>
-  > InlineValue;
+    string_t,
+    std::unique_ptr<StringValue>
+  > InlineCompletionItem_insertText;
 
   /**
-   * Client workspace capabilities specific to inline values.
+   * An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
    *
-   * The workspace/inlineValue/refresh request is sent from the server to the
-   * client. Servers can use it to ask clients to refresh the inline values
-   * currently shown in editors. As a result the client should ask the server to
-   * recompute the inline values for these editors. This is useful if a server
-   * detects a configuration change which requires a re-calculation of all
-   * inline values. Note that the client still has the freedom to delay the
-   * re-calculation of the inline values if for example an editor is currently
-   * not visible.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.inlineValue
-   * - property type: InlineValueWorkspaceClientCapabilities defined as follows:
-   *
-   * export interface InlineValueWorkspaceClientCapabilities {
-   *   refreshSupport?: boolean;
-   * }
-   *
-   * Request:
-   * - method: workspace/inlineValue/refresh
-   * - params: none
-   *
-   * Response:
-   * - result: void
-   * - error: code and message set in case an exception happens during the
-   *   ‘workspace/inlineValue/refresh’ request
-   *
-   * @since 3.17.0
+   * @since 3.18.0
+   * @proposed
    */
-  struct InlineValueWorkspaceClientCapabilities {
-
+  struct InlineCompletionItem
+  {
     /**
-     * Whether the client implementation supports a refresh request sent from
-     * the server to the client.
-     *
-     * Note that this event is global and will force the client to refresh all
-     * inline values currently shown. It should be used with absolute care and
-     * is useful for situation where a server for example detect a project wide
-     * change that requires such a calculation.
-     *
-     * refreshSupport?: boolean;
+     * The text to replace the range with. Must be set.
      */
-    std::optional<boolean> refreshSupport;
+    InlineCompletionItem_insertText insertText;
+    /**
+     * A text that is used to decide if this inline completion should be shown. When `falsy` the {@link InlineCompletionItem.insertText} is used.
+     */
+    std::optional<string_t> filterText;
+    /**
+     * The range to replace. Must begin and end on the same line.
+     */
+    std::optional<std::unique_ptr<Range>> range;
+    /**
+     * An optional {@link Command} that is executed *after* inserting this completion.
+     */
+    std::optional<std::unique_ptr<Command>> command;
   };
 
   /**
-   * Language Server Index Format (LSIF) introduced the concept of symbol
-   * monikers to help associate symbols across different indexes. This request
-   * adds capability for LSP server implementations to provide the same symbol
-   * moniker information given a text document position. Clients can utilize
-   * this method to get the moniker at the current location in a file user is
-   * editing and do further code navigation queries in other services that rely
-   * on LSIF indexes and link symbols together.
+   * Represents a collection of {@link InlineCompletionItem inline completion items} to be presented in the editor.
    *
-   * The textDocument/moniker request is sent from the client to the server to
-   * get the symbol monikers for a given text document position. An array of
-   * Moniker types is returned as response to indicate possible monikers at the
-   * given location. If no monikers can be calculated, an empty array or null
-   * should be returned.
-   *
-   * Client Capabilities:
-   * - property name (optional): textDocument.moniker
-   * - property type: MonikerClientCapabilities defined as follows:
-   *
-   * interface MonikerClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
+   * @since 3.18.0
+   * @proposed
    */
-  struct MonikerClientCapabilities {
-
+  struct InlineCompletionList
+  {
     /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new `(TextDocumentRegistrationOptions &
-     * StaticRegistrationOptions)` return value for the corresponding server
-     * capability as well.
-     *
-     * dynamicRegistration?: boolean;
+     * The inline completion items
      */
-    std::optional<boolean> dynamicRegistration;
+    std::vector<std::unique_ptr<InlineCompletionItem>> items;
   };
 
   /**
-   * Server Capability:
-   * - property name (optional): monikerProvider
-   * - property type: boolean | MonikerOptions | MonikerRegistrationOptions is
-   *   defined as follows:
+   * Inline completion options used during static registration.
    *
-   * export interface MonikerOptions extends WorkDoneProgressOptions {
-   * }
+   * @since 3.18.0
+   * @proposed
    */
-  struct MonikerOptions : public WorkDoneProgressOptions {
-    // empty
+  struct InlineCompletionOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
   };
 
   /**
-   * Registration Options: MonikerRegistrationOptions defined as follows:
-   *
-   * export interface MonikerRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, MonikerOptions {
-   * }
+   * General parameters to register for a notification or to register a provider.
    */
-  struct MonikerRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public MonikerOptions {
-    // empty
+  struct Registration
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again.
+     */
+    string_t id;
+    /**
+     * The method / capability to register for.
+     */
+    string_t method;
+    /**
+     * Options necessary for the registration.
+     */
+    std::optional<std::unique_ptr<LSPAny>> registerOptions;
+  };
+
+  struct RegistrationParams
+  {
+    std::vector<std::unique_ptr<Registration>> registrations;
   };
 
   /**
-   * Request:
-   * - method: textDocument/moniker
-   * - params: MonikerParams defined as follows:
-   *
-   * export interface MonikerParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   * }
+   * General parameters to unregister a request or notification.
    */
-  struct MonikerParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-    // empty
+  struct Unregistration
+  {
+    /**
+     * The id used to unregister the request or notification. Usually an id
+     * provided during the register request.
+     */
+    string_t id;
+    /**
+     * The method to unregister for.
+     */
+    string_t method;
+  };
+
+  struct UnregistrationParams
+  {
+    std::vector<std::unique_ptr<Unregistration>> unregisterations;
+  };
+
+  enum class WorkspaceFoldersInitializeParams_workspaceFoldersType {
+    WORKSPACE_FOLDER_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<WorkspaceFolder>>,
+    null_t
+  > WorkspaceFoldersInitializeParams_workspaceFolders;
+
+  struct WorkspaceFoldersInitializeParams
+  {
+    /**
+     * The workspace folders configured in the client when the server starts.
+     *
+     * This property is only available if the client supports workspace folders.
+     * It can be `null` if the client supports workspace folders but none are
+     * configured.
+     *
+     * @since 3.6.0
+     */
+    std::optional<WorkspaceFoldersInitializeParams_workspaceFolders> workspaceFolders;
   };
 
   /**
-   * Moniker uniqueness level to define scope of the moniker.
+   * A text document identifier to denote a specific version of a text document.
    */
-  enum class UniquenessLevel {
-
+  struct VersionedTextDocumentIdentifier
+    : public TextDocumentIdentifier
+  {
     /**
-     * The moniker is only unique inside a document
-     *
-     * document = 'document',
+     * The version number of this document.
      */
-    Document,
-
-    /**
-     * The moniker is unique inside a project for which a dump got created
-     *
-     * project = 'project',
-     */
-    Project,
-
-    /**
-     * The moniker is unique inside the group to which a project belongs
-     *
-     * group = 'group',
-     */
-    Group,
-
-    /**
-     * The moniker is unique inside the moniker scheme.
-     *
-     * scheme = 'scheme',
-     */
-    Scheme,
-
-    /**
-     * The moniker is globally unique
-     *
-     * global = 'global'
-     */
-    Global,
-  };
-
-  extern std::map<UniquenessLevel, std::string> UniquenessLevelNames;
-
-  auto uniquenessLevelByName(const std::string &name) -> UniquenessLevel;
-
-  extern std::map<UniquenessLevel, std::string> UniquenessLevelValues;
-
-  auto uniquenessLevelByValue(const std::string &value) -> UniquenessLevel;
-
-  /**
-   * The moniker kind.
-   */
-  enum class MonikerKind {
-
-    /**
-     * The moniker represent a symbol that is imported into a project
-     *
-     * import = 'import',
-     */
-    Import,
-
-    /**
-     * The moniker represents a symbol that is exported from a project
-     *
-     * export = 'export',
-     */
-    Export,
-
-    /**
-     * The moniker represents a symbol that is local to a project (e.g. a local
-     * variable of a function, a class not visible outside the project, ...)
-     *
-     * local = 'local'
-     */
-    Local,
-  };
-
-  extern std::map<MonikerKind, std::string> MonikerKindNames;
-
-  auto monikerKindByName(const std::string &name) -> MonikerKind;
-
-  extern std::map<MonikerKind, std::string> MonikerKindValues;
-
-  auto monikerKindByValue(const std::string &value) -> MonikerKind;
-
-  /**
-   * Moniker definition to match LSIF 0.5 moniker definition.
-   *
-   * Response:
-   * - result: Moniker[] | null
-   * - partial result: Moniker[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/moniker’ request
-   *
-   * Moniker is defined as follows:
-   *
-   * export interface Moniker {
-   *   scheme: string;
-   *   identifier: string;
-   *   unique: UniquenessLevel;
-   *   kind?: MonikerKind;
-   * }
-   */
-  struct Moniker {
-
-    /**
-     * The scheme of the moniker. For example tsc or .Net
-     *
-     * scheme: string;
-     */
-    string scheme;
-
-    /**
-     * The identifier of the moniker. The value is opaque in LSIF however
-     * schema owners are allowed to define the structure if they want.
-     *
-     * identifier: string;
-     */
-    string identifier;
-
-    /**
-     * The scope in which the moniker is unique
-     *
-     * unique: UniquenessLevel;
-     */
-    UniquenessLevel unique;
-
-    /**
-     * The moniker kind if known.
-     *
-     * kind?: MonikerKind;
-     */
-    std::optional<MonikerKind> kind;
+    integer_t version;
   };
 
   /**
-   * Completion item tags are extra annotations that tweak the rendering of a
-   * completion item.
-   *
-   * export namespace CompletionItemTag {
-   *   export const Deprecated = 1;
-   * }
-   * export type CompletionItemTag = 1;
-   *
-   * @since 3.15.0
+   * Save options.
    */
-  enum class CompletionItemTag {
-
+  struct SaveOptions
+  {
     /**
-     * Render a completion as obsolete, usually using a strike-out.
-     *
-     * export const Deprecated = 1;
+     * The client is supposed to include the content on save.
      */
-    Deprecated = 1,
-  };
-
-  extern std::map<CompletionItemTag, std::string> CompletionItemTagNames;
-
-  auto completionItemTagByName(const std::string &name) -> CompletionItemTag;
-
-  auto completionItemTagByValue(int value) -> CompletionItemTag;
-
-  /**
-   * How whitespace and indentation is handled during completion item insertion.
-   *
-   * export namespace InsertTextMode {
-   *   export const asIs: 1 = 1;
-   *   export const adjustIndentation: 2 = 2;
-   * }
-   * export type InsertTextMode = 1 | 2;
-   *
-   * @since 3.16.0
-   */
-  enum class InsertTextMode {
-
-    /**
-     * The insertion or replace strings is taken as it is. If the value is multi
-     * line the lines below the cursor will be inserted using the indentation
-     * defined in the string value. The client will not apply any kind of
-     * adjustments to the string.
-     *
-     * export const asIs: 1 = 1;
-     */
-    asIs = 1,
-
-    /**
-     * The editor adjusts leading whitespace of new lines so that they match the
-     * indentation up to the cursor of the line for which the item is accepted.
-     *
-     * Consider a line like this: <2tabs><cursor><3tabs>foo. Accepting a multi
-     * line completion item is indented using 2 tabs and all following lines
-     * inserted will be indented using 2 tabs as well.
-     *
-     * export const adjustIndentation: 2 = 2;
-     */
-    adjustIndentation = 2,
-  };
-
-  extern std::map<InsertTextMode, std::string> InsertTextModeNames;
-
-  auto insertTextModeByName(const std::string &name) -> InsertTextMode;
-
-  auto insertTextModeByValue(int value) -> InsertTextMode;
-
-  struct CompletionItemCapabilities {
-
-    /**
-     * Client supports snippets as insert text.
-     *
-     * A snippet can define tab stops and placeholders with `$1`, `$2` and
-     * `${3:foo}`. `$0` defines the final tab stop, it defaults to the end of
-     * the snippet. Placeholders with equal identifiers are linked, that is
-     * typing in one will update others too.
-     *
-     * snippetSupport?: boolean;
-     */
-    std::optional<boolean> snippetSupport;
-
-    /**
-     * Client supports commit characters on a completion item.
-     *
-     * commitCharactersSupport?: boolean;
-     */
-    std::optional<boolean> commitCharactersSupport;
-
-    /**
-     * Client supports the follow content formats for the documentation
-     * property. The order describes the preferred format of the client.
-     *
-     * documentationFormat?: MarkupKind[];
-     */
-    optional_vector<MarkupKind> documentationFormat;
-
-    /**
-     * Client supports the deprecated property on a completion item.
-     *
-     * deprecatedSupport?: boolean;
-     */
-    std::optional<boolean> deprecatedSupport;
-
-    /**
-     * Client supports the preselect property on a completion item.
-     *
-     * preselectSupport?: boolean;
-     */
-    std::optional<boolean> preselectSupport;
-
-    /**
-     * Client supports the tag property on a completion item. Clients supporting
-     * tags have to handle unknown tags gracefully. Clients especially need to
-     * preserve unknown tags when sending a completion item back to the server
-     * in a resolve call.
-     *
-     * tagSupport?: {
-     *   valueSet: CompletionItemTag[];
-     * };
-     *
-     * @since 3.15.0
-     */
-    optional_ptr<ValueSet<CompletionItemTag>> tagSupport;
-
-    /**
-     * Client supports insert replace edit to control different behavior if
-     * a completion item is inserted in the text or should replace text.
-     *
-     * insertReplaceSupport?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> insertReplaceSupport;
-
-    /**
-     * Indicates which properties a client can resolve lazily on a completion
-     * item. Before version 3.16.0 only the predefined properties
-     * `documentation` and `detail` could be resolved lazily.
-     *
-     * resolveSupport?: {
-     *   properties: string[];
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ResolveSupportCapabilities> resolveSupport;
-
-    /**
-     * The client supports the `insertTextMode` property on a completion item to
-     * override the whitespace handling mode as defined by the client (see
-     * `insertTextMode`).
-     *
-     * insertTextModeSupport?: {
-     *   valueSet: InsertTextMode[];
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ValueSet<InsertTextMode>> insertTextModeSupport;
-
-    /**
-     * The client has support for completion item label
-     * details (see also `CompletionItemLabelDetails`).
-     *
-     * labelDetailsSupport?: boolean;
-     *
-     * @since 3.17.0
-     */
-    std::optional<boolean> labelDetailsSupport;
-  };
-
-  struct CompletionListCapabilities {
-
-    /**
-     * The client supports the following itemDefaults on a completion list.
-     *
-     * The value lists the supported property names of the
-     * `CompletionList.itemDefaults` object. If omitted no properties are
-     * supported.
-     *
-     * itemDefaults?: string[];
-     *
-     * @since 3.17.0
-     */
-    optional_vector<string> itemDefaults;
+    std::optional<boolean_t> includeText;
   };
 
   /**
-   * The kind of a completion entry.
-   *
-   * export namespace CompletionItemKind {
-   *   export const Text = 1;
-   *   export const Method = 2;
-   *   export const Function = 3;
-   *   export const Constructor = 4;
-   *   export const Field = 5;
-   *   export const Variable = 6;
-   *   export const Class = 7;
-   *   export const Interface = 8;
-   *   export const Module = 9;
-   *   export const Property = 10;
-   *   export const Unit = 11;
-   *   export const Value = 12;
-   *   export const Enum = 13;
-   *   export const Keyword = 14;
-   *   export const Snippet = 15;
-   *   export const Color = 16;
-   *   export const File = 17;
-   *   export const Reference = 18;
-   *   export const Folder = 19;
-   *   export const EnumMember = 20;
-   *   export const Constant = 21;
-   *   export const Struct = 22;
-   *   export const Event = 23;
-   *   export const Operator = 24;
-   *   export const TypeParameter = 25;
-   * }
-   * export type CompletionItemKind = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
-   *   11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25;
+   * An event describing a file change.
    */
-  enum class CompletionItemKind {
-    Text = 1,
-    Method = 2,
-    Function = 3,
-    Constructor = 4,
-    Field = 5,
-    Variable = 6,
-    Class = 7,
-    Interface = 8,
-    Module = 9,
-    Property = 10,
-    Unit = 11,
-    Value = 12,
-    Enum = 13,
-    Keyword = 14,
-    Snippet = 15,
-    Color = 16,
-    File = 17,
-    Reference = 18,
-    Folder = 19,
-    EnumMember = 20,
-    Constant = 21,
-    Struct = 22,
-    Event = 23,
-    Operator = 24,
-    TypeParameter = 25,
-  };
-
-  extern std::map<CompletionItemKind, std::string> CompletionItemKindNames;
-
-  auto completionItemKindByName(const std::string &name) -> CompletionItemKind;
-
-  auto completionItemKindByValue(int value) -> CompletionItemKind;
-
-  /**
-   * The Completion request is sent from the client to the server to compute
-   * completion items at a given cursor position. Completion items are presented
-   * in the IntelliSense user interface. If computing full completion items is
-   * expensive, servers can additionally provide a handler for the completion
-   * item resolve request (‘completionItem/resolve’). This request is sent when
-   * a completion item is selected in the user interface. A typical use case is
-   * for example: the textDocument/completion request doesn’t fill in the
-   * documentation property for returned completion items since it is expensive
-   * to compute. When the item is selected in the user interface then a
-   * ‘completionItem/resolve’ request is sent with the selected completion item
-   * as a parameter. The returned completion item should have the documentation
-   * property filled in. By default the request can only delay the computation
-   * of the detail and documentation properties. Since 3.16.0 the client can
-   * signal that it can resolve more properties lazily. This is done using the
-   * completionItem#resolveSupport client capability which lists all properties
-   * that can be filled in during a ‘completionItem/resolve’ request. All other
-   * properties (usually sortText, filterText, insertText and textEdit) must be
-   * provided in the textDocument/completion response and must not be changed
-   * during resolve.
-   *
-   * The language server protocol uses the following model around completions:
-   * - to achieve consistency across languages and to honor different clients
-   *   usually the client is responsible for filtering and sorting. This has
-   *   also the advantage that client can experiment with different filter and
-   *   sorting models. However servers can enforce different behavior by setting
-   *   a filterText / sortText
-   * - for speed clients should be able to filter an already received completion
-   *   list if the user continues typing. Servers can opt out of this using a
-   *   CompletionList and mark it as isIncomplete.
-   *
-   * A completion item provides additional means to influence filtering and
-   * sorting. They are expressed by either creating a CompletionItem with a
-   * insertText or with a textEdit. The two modes differ as follows:
-   * - Completion item provides an insertText / label without a text edit: in
-   *   the model the client should filter against what the user has already
-   *   typed using the word boundary rules of the language (e.g. resolving the
-   *   word under the cursor position). The reason for this mode is that it
-   *   makes it extremely easy for a server to implement a basic completion list
-   *   and get it filtered on the client.
-   * - Completion Item with text edits: in this mode the server tells the client
-   *   that it actually knows what it is doing. If you create a completion item
-   *   with a text edit at the current cursor position no word guessing takes
-   *   place and no automatic filtering (like with an insertText) should happen.
-   *   This mode can be combined with a sort text and filter text to customize
-   *   two things. If the text edit is a replace edit then the range denotes the
-   *   word used for filtering. If the replace changes the text it most likely
-   *   makes sense to specify a filter text to be used.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.completion
-   * - property type: CompletionClientCapabilities defined as follows:
-   *
-   * export interface CompletionClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   completionItem?: {
-   *     snippetSupport?: boolean;
-   *     commitCharactersSupport?: boolean;
-   *     documentationFormat?: MarkupKind[];
-   *     deprecatedSupport?: boolean;
-   *     preselectSupport?: boolean;
-   *     tagSupport?: {
-   *       valueSet: CompletionItemTag[];
-   *     };
-   *     insertReplaceSupport?: boolean;
-   *     resolveSupport?: {
-   *       properties: string[];
-   *     };
-   *     insertTextModeSupport?: {
-   *       valueSet: InsertTextMode[];
-   *     };
-   *     labelDetailsSupport?: boolean;
-   *   };
-   *   completionItemKind?: {
-   *     valueSet?: CompletionItemKind[];
-   *   };
-   *   contextSupport?: boolean;
-   *   insertTextMode?: InsertTextMode;
-   *   completionList?: {
-   *     itemDefaults?: string[];
-   *   }
-   * }
-   */
-  struct CompletionClientCapabilities {
-
+  struct FileEvent
+  {
     /**
-     * Whether completion supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
+     * The file's uri.
      */
-    std::optional<boolean> dynamicRegistration;
-
+    DocumentUri uri;
     /**
-     * The client supports the following `CompletionItem` specific capabilities.
-     *
-     * completionItem?: {
-     *   snippetSupport?: boolean;
-     *   commitCharactersSupport?: boolean;
-     *   documentationFormat?: MarkupKind[];
-     *   deprecatedSupport?: boolean;
-     *   preselectSupport?: boolean;
-     *   tagSupport?: {
-     *     valueSet: CompletionItemTag[];
-     *   };
-     *   insertReplaceSupport?: boolean;
-     *   resolveSupport?: {
-     *     properties: string[];
-     *   };
-     *   insertTextModeSupport?: {
-     *     valueSet: InsertTextMode[];
-     *   };
-     *   labelDetailsSupport?: boolean;
-     * };
+     * The change type.
      */
-    optional_ptr<CompletionItemCapabilities> completionItem;
-
-    /**
-     * completionItemKind?: {
-     *   // The completion item kind values the client supports. When this
-     *   // property exists the client also guarantees that it will handle
-     *   // values outside its set gracefully and falls back to a default value
-     *   // when unknown.
-     *   //
-     *   // If this property is not present the client only supports the
-     *   // completion items kinds from `Text` to `Reference` as defined in the
-     *   // initial version of the protocol.
-     *   valueSet?: CompletionItemKind[];
-     * };
-     */
-    optional_ptr<OptionalValueSet<CompletionItemKind>> completionItemKind;
-
-    /**
-     * The client supports to send additional context information for a
-     * `textDocument/completion` request.
-     *
-     * contextSupport?: boolean;
-     */
-    std::optional<boolean> contextSupport;
-
-    /**
-     * The client's default when the completion item doesn't provide a
-     * `insertTextMode` property.
-     *
-     * insertTextMode?: InsertTextMode;
-     *
-     * @since 3.17.0
-     */
-    std::optional<InsertTextMode> insertTextMode;
-
-    /**
-     * The client supports the following `CompletionList` specific
-     * capabilities.
-     * completionList?: {
-     *   itemDefaults?: string[];
-     * }
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<CompletionListCapabilities> completionList;
-  };
-
-  struct CompletionItemOptions {
-
-    /**
-     * The server has support for completion item label
-     * details (see also `CompletionItemLabelDetails`) when receiving
-     * a completion item in a resolve call.
-     *
-     * labelDetailsSupport?: boolean;
-     *
-     * @since 3.17.0
-     */
-    std::optional<boolean> labelDetailsSupport;
+    FileChangeType type;
   };
 
   /**
-   * Completion options.
-   *
-   * Server Capability:
-   * - property name (optional): completionProvider
-   * - property type: CompletionOptions defined as follows:
-   *
-   * export interface CompletionOptions extends WorkDoneProgressOptions {
-   *   triggerCharacters?: string[];
-   *   allCommitCharacters?: string[];
-   *   resolveProvider?: boolean;
-   *   completionItem?: {
-   *     labelDetailsSupport?: boolean;
-   *   }
-   * }
+   * The watched files change notification's parameters.
    */
-  struct CompletionOptions : public WorkDoneProgressOptions {
-
+  struct DidChangeWatchedFilesParams
+  {
     /**
-     * The additional characters, beyond the defaults provided by the client
-     * (typically [a-zA-Z]), that should automatically trigger a completion
-     * request. For example `.` in JavaScript represents the beginning of an
-     * object property or method and is thus a good candidate for triggering a
-     * completion request.
-     *
-     * Most tools trigger a completion request automatically without explicitly
-     * requesting it using a keyboard shortcut (e.g. Ctrl+Space). Typically they
-     * do so when the user starts to type an identifier. For example if the user
-     * types `c` in a JavaScript file code complete will automatically pop up
-     * present `console` besides others as a completion item. Characters that
-     * make up identifiers don't need to be listed here.
-     *
-     * triggerCharacters?: string[];
+     * The actual file events.
      */
-    optional_vector<string> triggerCharacters;
-
-    /**
-     * The list of all possible characters that commit a completion. This field
-     * can be used if clients don't support individual commit characters per
-     * completion item. See client capability
-     * `completion.completionItem.commitCharactersSupport`.
-     *
-     * If a server provides both `allCommitCharacters` and commit characters on
-     * an individual completion item the ones on the completion item win.
-     *
-     * allCommitCharacters?: string[];
-     *
-     * @since 3.2.0
-     */
-    optional_vector<string> allCommitCharacters;
-
-    /**
-     * The server provides support to resolve additional information for a
-     * completion item.
-     *
-     * resolveProvider?: boolean;
-     */
-    std::optional<boolean> resolveProvider;
-
-    /**
-     * The server supports the following `CompletionItem` specific capabilities.
-     *
-     * completionItem?: {
-     *   labelDetailsSupport?: boolean;
-     * }
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<CompletionItemOptions> completionItem;
+    std::vector<std::unique_ptr<FileEvent>> changes;
   };
 
   /**
-   * Registration Options: CompletionRegistrationOptions options defined as
-   * follows:
-   *
-   * export interface CompletionRegistrationOptions
-   *   extends TextDocumentRegistrationOptions, CompletionOptions {
-   * }
+   * Contains additional information about the context in which a completion request is triggered.
    */
-  struct CompletionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CompletionOptions {
-    // empty
-  };
-
-  /**
-   * How a completion was triggered.
-   *
-   * export namespace CompletionTriggerKind {
-   *   export const Invoked: 1 = 1;
-   *   export const TriggerCharacter: 2 = 2;
-   *   export const TriggerForIncompleteCompletions: 3 = 3;
-   * }
-   * export type CompletionTriggerKind = 1 | 2 | 3;
-   */
-  enum class CompletionTriggerKind {
-    Invoked = 1,
-    TriggerCharacter = 2,
-    TriggerForIncompleteCompletions = 3,
-  };
-
-  extern std::map<CompletionTriggerKind, std::string> CompletionTriggerKindNames;
-
-  auto completionTriggerKindByName(const std::string &name) -> CompletionTriggerKind;
-
-  /**
-   * Contains additional information about the context in which a completion
-   * request is triggered.
-   *
-   * export interface CompletionContext {
-   *   triggerKind: CompletionTriggerKind;
-   *   triggerCharacter?: string;
-   * }
-   */
-  struct CompletionContext {
-
+  struct CompletionContext
+  {
     /**
      * How the completion was triggered.
-     *
-     * triggerKind: CompletionTriggerKind;
      */
     CompletionTriggerKind triggerKind;
-
     /**
-     * The trigger character (a single character) that has trigger code
-     * complete. Is undefined if
-     * `triggerKind !== CompletionTriggerKind.TriggerCharacter`
-     *
-     * triggerCharacter?: string;
+     * The trigger character (a single character) that has trigger code complete.
+     * Is undefined if `triggerKind !== CompletionTriggerKind.TriggerCharacter`
      */
-    std::optional<string> triggerCharacter;
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/completion
-   * - params: CompletionParams defined as follows:
-   *
-   * export interface CompletionParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams, PartialResultParams {
-   *   context?: CompletionContext;
-   * }
-   */
-  struct CompletionParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The completion context. This is only available if the client specifies to
-     * send this using the client capability `completion.contextSupport ===
-     * true`
-     *
-     * context?: CompletionContext;
-     */
-    optional_ptr<CompletionContext> context;
-  };
-
-  /**
-   * Defines whether the insert text in a completion item should be interpreted
-   * as plain text or a snippet.
-   *
-   * export namespace InsertTextFormat {
-   *   export const PlainText = 1;
-   *   export const Snippet = 2;
-   * }
-   * export type InsertTextFormat = 1 | 2;
-   */
-  enum class InsertTextFormat {
-
-    /**
-     * The primary text to be inserted is treated as a plain string.
-     *
-     * export const PlainText = 1;
-     */
-    PlainText = 1,
-
-    /**
-     * The primary text to be inserted is treated as a snippet.
-     *
-     * A snippet can define tab stops and placeholders with `$1`, `$2` and
-     * `${3:foo}`. `$0` defines the final tab stop, it defaults to the end of
-     * the snippet. Placeholders with equal identifiers are linked, that is
-     * typing in one will update others too.
-     *
-     * export const Snippet = 2;
-     */
-    Snippet = 2,
-  };
-
-  extern std::map<InsertTextFormat, std::string> InsertTextFormatNames;
-
-  auto insertTextFormatByName(const std::string &name) -> InsertTextFormat;
-
-  /**
-   * A special text edit to provide an insert and a replace operation.
-   *
-   * export interface InsertReplaceEdit {
-   *   newText: string;
-   *   insert: Range;
-   *   replace: Range;
-   * }
-   *
-   * @since 3.16.0
-   */
-  struct InsertReplaceEdit {
-
-    /**
-     * The string to be inserted.
-     *
-     * newText: string;
-     */
-    string newText;
-
-    /**
-     * The range if the insert is requested
-     *
-     * insert: Range;
-     */
-    std::unique_ptr<Range> insert;
-
-    /**
-     * The range if the replace is requested.
-     *
-     * replace: Range;
-     */
-    std::unique_ptr<Range> replace;
+    std::optional<string_t> triggerCharacter;
   };
 
   /**
    * Additional details for a completion item label.
    *
-   * export interface CompletionItemLabelDetails {
-   *   detail?: string;
-   *   description?: string;
-   * }
-   *
    * @since 3.17.0
    */
-  struct CompletionItemLabelDetails {
-
+  struct CompletionItemLabelDetails
+  {
     /**
-     * An optional string which is rendered less prominently directly after
-     * {@link CompletionItem.label label}, without any spacing. Should be used
-     * for function signatures or type annotations.
-     *
-     * detail?: string;
+     * An optional string which is rendered less prominently directly after {@link CompletionItem.label label},
+     * without any spacing. Should be used for function signatures and type annotations.
      */
-    std::optional<string> detail;
-
+    std::optional<string_t> detail;
     /**
-     * An optional string which is rendered less prominently after {@link
-     * CompletionItemLabelDetails.detail}. Should be used for fully qualified
-     * names or file path.
-     *
-     * description?: string;
+     * An optional string which is rendered less prominently after {@link CompletionItem.detail}. Should be used
+     * for fully qualified names and file paths.
      */
-    std::optional<string> description;
+    std::optional<string_t> description;
   };
 
-  enum class TextEditOrInsertReplaceEditType {
+  /**
+   * A special text edit to provide an insert and a replace operation.
+   *
+   * @since 3.16.0
+   */
+  struct InsertReplaceEdit
+  {
+    /**
+     * The string to be inserted.
+     */
+    string_t newText;
+    /**
+     * The range if the insert is requested
+     */
+    std::unique_ptr<Range> insert;
+    /**
+     * The range if the replace is requested.
+     */
+    std::unique_ptr<Range> replace;
+  };
+
+  enum class CompletionItem_documentationType {
+    STRING_TYPE,
+    MARKUP_CONTENT,
+  };
+
+  typedef std::variant<
+    string_t,
+    std::unique_ptr<MarkupContent>
+  > CompletionItem_documentation;
+
+  enum class CompletionItem_textEditType {
     TEXT_EDIT,
     INSERT_REPLACE_EDIT,
   };
@@ -7275,117 +3438,89 @@ namespace LCompilers::LanguageServerProtocol {
   typedef std::variant<
     std::unique_ptr<TextEdit>,
     std::unique_ptr<InsertReplaceEdit>
-  > TextEditOrInsertReplaceEdit;
+  > CompletionItem_textEdit;
 
-  struct CompletionItem {
-
+  /**
+   * A completion item represents a text snippet that is
+   * proposed to complete text that is being typed.
+   */
+  struct CompletionItem
+  {
     /**
      * The label of this completion item.
      *
-     * The label property is also by default the text that is inserted when
-     * selecting this completion.
+     * The label property is also by default the text that
+     * is inserted when selecting this completion.
      *
-     * If label details are provided the label itself should be an unqualified
-     * name of the completion item.
-     *
-     * label: string;
+     * If label details are provided the label itself should
+     * be an unqualified name of the completion item.
      */
-    string label;
-
+    string_t label;
     /**
      * Additional details for the label
      *
-     * labelDetails?: CompletionItemLabelDetails;
-     *
      * @since 3.17.0
      */
-    optional_ptr<CompletionItemLabelDetails> labelDetails;
-
+    std::optional<std::unique_ptr<CompletionItemLabelDetails>> labelDetails;
     /**
-     * The kind of this completion item. Based of the kind an icon is chosen by
-     * the editor. The standardized set of available values is defined in
-     * `CompletionItemKind`.
-     *
-     * kind?: CompletionItemKind;
+     * The kind of this completion item. Based of the kind
+     * an icon is chosen by the editor.
      */
     std::optional<CompletionItemKind> kind;
-
     /**
      * Tags for this completion item.
      *
-     * tags?: CompletionItemTag[];
-     *
      * @since 3.15.0
      */
-    optional_vector<CompletionItemTag> tags;
-
+    std::optional<std::vector<CompletionItemTag>> tags;
     /**
-     * A human-readable string with additional information about this item, like
-     * type or symbol information.
-     *
-     * detail?: string;
+     * A human-readable string with additional information
+     * about this item, like type or symbol information.
      */
-    std::optional<string> detail;
-
+    std::optional<string_t> detail;
     /**
      * A human-readable string that represents a doc-comment.
-     *
-     * documentation?: string | MarkupContent;
      */
-    std::optional<StringOrMarkupContent> documentation;
-
+    std::optional<CompletionItem_documentation> documentation;
     /**
      * Indicates if this item is deprecated.
-     *
-     * deprecated?: boolean;
-     *
-     * @deprecated Use `tags` instead if supported.
+     * @deprecated Use `tags` instead.
      */
-    std::optional<boolean> deprecated;
-
+    std::optional<boolean_t> deprecated;
     /**
      * Select this item when showing.
      *
-     * *Note* that only one completion item can be selected and that the tool /
-     * client decides which item that is. The rule is that the *first* item of
-     * those that match best is selected.
-     *
-     * preselect?: boolean;
+     * *Note* that only one completion item can be selected and that the
+     * tool / client decides which item that is. The rule is that the *first*
+     * item of those that match best is selected.
      */
-    std::optional<boolean> preselect;
-
+    std::optional<boolean_t> preselect;
     /**
-     * A string that should be used when comparing this item with other items.
-     * When omitted the label is used as the sort text for this item.
-     *
-     * sortText?: string;
+     * A string that should be used when comparing this item
+     * with other items. When `falsy` the {@link CompletionItem.label label}
+     * is used.
      */
-    std::optional<string> sortText;
-
+    std::optional<string_t> sortText;
     /**
-     * A string that should be used when filtering a set of completion items.
-     * When omitted the label is used as the filter text for this item.
-     *
-     * filterText?: string;
+     * A string that should be used when filtering a set of
+     * completion items. When `falsy` the {@link CompletionItem.label label}
+     * is used.
      */
-    std::optional<string> filterText;
-
+    std::optional<string_t> filterText;
     /**
-     * A string that should be inserted into a document when selecting this
-     * completion. When omitted the label is used as the insert text for this
-     * item.
+     * A string that should be inserted into a document when selecting
+     * this completion. When `falsy` the {@link CompletionItem.label label}
+     * is used.
      *
-     * The `insertText` is subject to interpretation by the client side. Some
-     * tools might not take the string literally. For example VS Code when code
-     * complete is requested in this example `con<cursor position>` and a
-     * completion item with an `insertText` of `console` is provided it will
-     * only insert `sole`. Therefore it is recommended to use `textEdit` instead
-     * since it avoids additional client side interpretation.
-     *
-     * insertText?: string;
+     * The `insertText` is subject to interpretation by the client side.
+     * Some tools might not take the string literally. For example
+     * VS Code when code complete is requested in this example
+     * `con<cursor position>` and a completion item with an `insertText` of
+     * `console` is provided it will only insert `sole`. Therefore it is
+     * recommended to use `textEdit` instead since it avoids additional client
+     * side interpretation.
      */
-    std::optional<string> insertText;
-
+    std::optional<string_t> insertText;
     /**
      * The format of the insert text. The format applies to both the
      * `insertText` property and the `newText` property of a provided
@@ -7393,51 +3528,39 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * Please note that the insertTextFormat doesn't apply to
      * `additionalTextEdits`.
-     *
-     * insertTextFormat?: InsertTextFormat;
      */
     std::optional<InsertTextFormat> insertTextFormat;
-
     /**
-     * How whitespace and indentation is handled during completion item
-     * insertion. If not provided the client's default value depends on the
-     * `textDocument.completion.insertTextMode` client capability.
-     *
-     * insertTextMode?: InsertTextMode;
+     * How whitespace and indentation is handled during completion
+     * item insertion. If not provided the clients default value depends on
+     * the `textDocument.completion.insertTextMode` client capability.
      *
      * @since 3.16.0
-     * @since 3.17.0 - support for `textDocument.completion.insertTextMode`
      */
     std::optional<InsertTextMode> insertTextMode;
-
     /**
-     * An edit which is applied to a document when selecting this completion.
-     * When an edit is provided the value of `insertText` is ignored.
-     *
-     * *Note:* The range of the edit must be a single line range and it must
-     * contain the position at which completion has been requested.
+     * An {@link TextEdit edit} which is applied to a document when selecting
+     * this completion. When an edit is provided the value of
+     * {@link CompletionItem.insertText insertText} is ignored.
      *
      * Most editors support two different operations when accepting a completion
      * item. One is to insert a completion text and the other is to replace an
      * existing text with a completion text. Since this can usually not be
      * predetermined by a server it can report both ranges. Clients need to
-     * signal support for `InsertReplaceEdit`s via the
-     * `textDocument.completion.completionItem.insertReplaceSupport` client
-     * capability property.
+     * signal support for `InsertReplaceEdits` via the
+     * `textDocument.completion.insertReplaceSupport` client capability
+     * property.
      *
      * *Note 1:* The text edit's range as well as both ranges from an insert
      * replace edit must be a [single line] and they must contain the position
-     * at which completion has been requested. *Note 2:* If an
-     * `InsertReplaceEdit` is returned the edit's insert range must be a prefix
-     * of the edit's replace range, that means it must be contained and starting
-     * at the same position.
-     *
-     * textEdit?: TextEdit | InsertReplaceEdit;
+     * at which completion has been requested.
+     * *Note 2:* If an `InsertReplaceEdit` is returned the edit's insert range
+     * must be a prefix of the edit's replace range, that means it must be
+     * contained and starting at the same position.
      *
      * @since 3.16.0 additional type `InsertReplaceEdit`
      */
-    std::optional<TextEditOrInsertReplaceEdit> textEdit;
-
+    std::optional<CompletionItem_textEdit> textEdit;
     /**
      * The edit text used if the completion item is part of a CompletionList and
      * CompletionList defines an item default for the text edit range.
@@ -7448,162 +3571,76 @@ namespace LCompilers::LanguageServerProtocol {
      * If not provided and a list's default range is provided the label
      * property is used as a text.
      *
-     * textEditText?: string;
-     *
      * @since 3.17.0
      */
-    std::optional<string> textEditText;
-
+    std::optional<string_t> textEditText;
     /**
-     * An optional array of additional text edits that are applied when
-     * selecting this completion. Edits must not overlap (including the same
-     * insert position) with the main edit nor with themselves.
+     * An optional array of additional {@link TextEdit text edits} that are applied when
+     * selecting this completion. Edits must not overlap (including the same insert position)
+     * with the main {@link CompletionItem.textEdit edit} nor with themselves.
      *
-     * Additional text edits should be used to change text unrelated to the
-     * current cursor position (for example adding an import statement at the
-     * top of the file if the completion item will insert an unqualified type).
-     *
-     * additionalTextEdits?: TextEdit[];
+     * Additional text edits should be used to change text unrelated to the current cursor position
+     * (for example adding an import statement at the top of the file if the completion item will
+     * insert an unqualified type).
      */
-    optional_ptr_vector<TextEdit> additionalTextEdits;
-
+    std::optional<std::vector<std::unique_ptr<TextEdit>>> additionalTextEdits;
     /**
-     * An optional set of characters that when pressed while this completion is
-     * active will accept it first and then type that character. *Note* that all
-     * commit characters should have `length=1` and that superfluous characters
-     * will be ignored.
-     *
-     * commitCharacters?: string[];
+     * An optional set of characters that when pressed while this completion is active will accept it first and
+     * then type that character. *Note* that all commit characters should have `length=1` and that superfluous
+     * characters will be ignored.
      */
-    optional_vector<string> commitCharacters;
-
+    std::optional<std::vector<string_t>> commitCharacters;
     /**
-     * An optional command that is executed *after* inserting this completion.
-     * *Note* that additional modifications to the current document should be
-     * described with the additionalTextEdits-property.
-     *
-     * command?: Command;
+     * An optional {@link Command command} that is executed *after* inserting this completion. *Note* that
+     * additional modifications to the current document should be described with the
+     * {@link CompletionItem.additionalTextEdits additionalTextEdits}-property.
      */
-    optional_ptr<Command> command;
-
+    std::optional<std::unique_ptr<Command>> command;
     /**
      * A data entry field that is preserved on a completion item between a
-     * completion and a completion resolve request.
-     *
-     * data?: LSPAny;
+     * {@link CompletionRequest} and a {@link CompletionResolveRequest}.
      */
-    optional_ptr<LSPAny> data;
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
-  struct InsertReplace {
+  struct CompletionList_itemDefaults_editRange_1
+  {
     std::unique_ptr<Range> insert;
     std::unique_ptr<Range> replace;
   };
 
-  enum class RangeOrInsertReplaceType {
+  enum class CompletionList_itemDefaults_editRangeType {
     RANGE,
-    INSERT_REPLACE,
+    COMPLETION_LIST_ITEM_DEFAULTS_EDIT_RANGE_1,
   };
 
   typedef std::variant<
     std::unique_ptr<Range>,
-    std::unique_ptr<InsertReplace>
-  > RangeOrInsertReplace;
+    std::unique_ptr<CompletionList_itemDefaults_editRange_1>
+  > CompletionList_itemDefaults_editRange;
 
-  struct CompletionListItemDefaults {
-
-    /**
-     * A default commit character set.
-     *
-     * commitCharacters?: string[];
-     *
-     * @since 3.17.0
-     */
-    optional_vector<string> commitCharacters;
-
-    /**
-     * A default edit range
-     *
-     * editRange?: Range | {
-     *   insert: Range;
-     *   replace: Range;
-     * };
-     *
-     * @since 3.17.0
-     */
-    std::optional<RangeOrInsertReplace> editRange;
-
-    /**
-     * A default insert text format
-     *
-     * insertTextFormat?: InsertTextFormat;
-     *
-     * @since 3.17.0
-     */
+  struct CompletionList_itemDefaults
+  {
+    std::optional<std::vector<string_t>> commitCharacters;
+    std::optional<CompletionList_itemDefaults_editRange> editRange;
     std::optional<InsertTextFormat> insertTextFormat;
-
-    /**
-     * A default insert text mode
-     *
-     * insertTextMode?: InsertTextMode;
-     *
-     * @since 3.17.0
-     */
     std::optional<InsertTextMode> insertTextMode;
-
-    /**
-     * A default data value.
-     *
-     * data?: LSPAny;
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<LSPAny> data;
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
   /**
-   * Represents a collection of [completion items](#CompletionItem) to be
-   * presented in the editor.
-   *
-   * Response:
-   * - result: CompletionItem[] | CompletionList | null. If a CompletionItem[]
-   *   is provided it is interpreted to be complete. So it is the same as {
-   *   isIncomplete: false, items }
-   * - partial result: CompletionItem[] or CompletionList followed by
-   *   CompletionItem[]. If the first provided result item is of type
-   *   CompletionList subsequent partial results of CompletionItem[] add to the
-   *   items property of the CompletionList.
-   * - error: code and message set in case an exception happens during the
-   *   completion request.
-   *
-   * export interface CompletionList {
-   *   isIncomplete: boolean;
-   *   itemDefaults?: {
-   *     commitCharacters?: string[];
-   *     editRange?: Range | {
-   *       insert: Range;
-   *       replace: Range;
-   *     };
-   *     insertTextFormat?: InsertTextFormat;
-   *     insertTextMode?: InsertTextMode;
-   *     data?: LSPAny;
-   *   }
-   *   items: CompletionItem[];
-   * }
+   * Represents a collection of {@link CompletionItem completion items} to be presented
+   * in the editor.
    */
-  struct CompletionList {
-
+  struct CompletionList
+  {
     /**
-     * This list is not complete. Further typing should result in recomputing
-     * this list.
+     * This list it not complete. Further typing results in recomputing this list.
      *
      * Recomputed lists have all their items replaced (not appended) in the
      * incomplete completion sessions.
-     *
-     * isIncomplete: boolean;
      */
-    boolean isIncomplete;
-
+    boolean_t isIncomplete;
     /**
      * In many cases the items of an actual completion result share the same
      * value for properties like `commitCharacters` or the range of a text
@@ -7617,443 +3654,827 @@ namespace LCompilers::LanguageServerProtocol {
      * signals support for this via the `completionList.itemDefaults`
      * capability.
      *
-     * itemDefaults?: {
-     *   commitCharacters?: string[];
-     *   editRange?: Range | {
-     *     insert: Range;
-     *     replace: Range;
-     *   };
-     *   insertTextFormat?: InsertTextFormat;
-     *   insertTextMode?: InsertTextMode;
-     *   data?: LSPAny;
-     * }
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<CompletionList_itemDefaults>> itemDefaults;
+    /**
+     * The completion items.
+     */
+    std::vector<std::unique_ptr<CompletionItem>> items;
+  };
+
+  struct CompletionOptions_completionItem
+  {
+    std::optional<boolean_t> labelDetailsSupport;
+  };
+
+  /**
+   * Completion options.
+   */
+  struct CompletionOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * Most tools trigger completion request automatically without explicitly requesting
+     * it using a keyboard shortcut (e.g. Ctrl+Space). Typically they do so when the user
+     * starts to type an identifier. For example if the user types `c` in a JavaScript file
+     * code complete will automatically pop up present `console` besides others as a
+     * completion item. Characters that make up identifiers don't need to be listed here.
+     *
+     * If code complete should automatically be trigger on characters not being valid inside
+     * an identifier (for example `.` in JavaScript) list them in `triggerCharacters`.
+     */
+    std::optional<std::vector<string_t>> triggerCharacters;
+    /**
+     * The list of all possible characters that commit a completion. This field can be used
+     * if clients don't support individual commit characters per completion item. See
+     * `ClientCapabilities.textDocument.completion.completionItem.commitCharactersSupport`
+     *
+     * If a server provides both `allCommitCharacters` and commit characters on an individual
+     * completion item the ones on the completion item win.
+     *
+     * @since 3.2.0
+     */
+    std::optional<std::vector<string_t>> allCommitCharacters;
+    /**
+     * The server provides support to resolve additional
+     * information for a completion item.
+     */
+    std::optional<boolean_t> resolveProvider;
+    /**
+     * The server supports the following `CompletionItem` specific
+     * capabilities.
      *
      * @since 3.17.0
      */
-    optional_ptr<CompletionListItemDefaults> itemDefaults;
-
-    /**
-     * The completion items.
-     *
-     * items: CompletionItem[];
-     */
-    ptr_vector<CompletionItem> items;
-  };
-
-  // -----------------------------------------------------------------------
-  // Completion Item Resolve Request (:leftwards_arrow_with_hook:)
-  // -----------------------------------------------------------------------
-  // The request is sent from the client to the server to resolve additional
-  // information for a given completion item.
-  //
-  // Request:
-  // - method: completionItem/resolve
-  // - params: CompletionItem
-  //
-  // Response:
-  // - result: CompletionItem
-  // - error: code and message set in case an exception happens during the
-  //   completion resolve request.
-  // -----------------------------------------------------------------------
-
-  /**
-   * Diagnostics notifications are sent from the server to the client to signal
-   * results of validation runs.
-   *
-   * Diagnostics are “owned” by the server so it is the server’s responsibility
-   * to clear them if necessary. The following rule is used for VS Code servers
-   * that generate diagnostics:
-   * - if a language is single file only (for example HTML) then diagnostics are
-   *   cleared by the server when the file is closed. Please note that open /
-   *   close events don’t necessarily reflect what the user sees in the user
-   *   interface. These events are ownership events. So with the current version
-   *   of the specification it is possible that problems are not cleared
-   *   although the file is not visible in the user interface since the client
-   *   has not closed the file yet.
-   * - if a language has a project system (for example C#) diagnostics are not
-   *   cleared when a file closes. When a project is opened all diagnostics for
-   *   all files are recomputed (or read from a cache).
-   *
-   * When a file changes it is the server’s responsibility to re-compute
-   * diagnostics and push them to the client. If the computed set is empty it
-   * has to push the empty array to clear former diagnostics. Newly pushed
-   * diagnostics always replace previously pushed diagnostics. There is no
-   * merging that happens on the client side.
-   *
-   * See also the Diagnostic section.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.publishDiagnostics
-   * - property type: PublishDiagnosticsClientCapabilities defined as follows:
-   *
-   * export interface PublishDiagnosticsClientCapabilities {
-   *   relatedInformation?: boolean;
-   *   tagSupport?: {
-   *     valueSet: DiagnosticTag[];
-   *   };
-   *   versionSupport?: boolean;
-   *   codeDescriptionSupport?: boolean;
-   *   dataSupport?: boolean;
-   * }
-   */
-  struct PublishDiagnosticsClientCapabilities {
-
-    /**
-     * Whether the clients accepts diagnostics with related information.
-     *
-     * relatedInformation?: boolean;
-     */
-    std::optional<boolean> relatedInformation;
-
-    /**
-     * Client supports the tag property to provide meta data about a diagnostic.
-     * Clients supporting tags have to handle unknown tags gracefully.
-     *
-     * tagSupport?: {
-     *   // The tags supported by the client.
-     *   valueSet: DiagnosticTag[];
-     * };
-     *
-     * @since 3.15.0
-     */
-    optional_ptr<ValueSet<DiagnosticTag>> tagSupport;
-
-    /**
-     * Whether the client interprets the version property of the
-     * `textDocument/publishDiagnostics` notification's parameter.
-     *
-     * versionSupport?: boolean;
-     *
-     * @since 3.15.0
-     */
-    std::optional<boolean> versionSupport;
-
-    /**
-     * Client supports a codeDescription property
-     *
-     * codeDescriptionSupport?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> codeDescriptionSupport;
-
-    /**
-     * Whether code action supports the `data` property which is
-     * preserved between a `textDocument/publishDiagnostics` and
-     * `textDocument/codeAction` request.
-     *
-     * dataSupport?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> dataSupport;
+    std::optional<std::unique_ptr<CompletionOptions_completionItem>> completionItem;
   };
 
   /**
-   * Notification:
-   * - method: textDocument/publishDiagnostics
-   * - params: PublishDiagnosticsParams defined as follows:
-   *
-   * interface PublishDiagnosticsParams {
-   *   uri: DocumentUri;
-   *   version?: integer;
-   *   diagnostics: Diagnostic[];
-   * }
+   * Hover options.
    */
-  struct PublishDiagnosticsParams {
+  struct HoverOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
 
+  /**
+   * Server Capabilities for a {@link SignatureHelpRequest}.
+   */
+  struct SignatureHelpOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
     /**
-     * The URI for which diagnostic information is reported.
-     *
-     * uri: DocumentUri;
+     * List of characters that trigger signature help automatically.
      */
+    std::optional<std::vector<string_t>> triggerCharacters;
+    /**
+     * List of characters that re-trigger signature help.
+     *
+     * These trigger characters are only active when signature help is already showing. All trigger characters
+     * are also counted as re-trigger characters.
+     *
+     * @since 3.15.0
+     */
+    std::optional<std::vector<string_t>> retriggerCharacters;
+  };
+
+  /**
+   * Server Capabilities for a {@link DefinitionRequest}.
+   */
+  struct DefinitionOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * Value-object that contains additional information when
+   * requesting references.
+   */
+  struct ReferenceContext
+  {
+    /**
+     * Include the declaration of the current symbol.
+     */
+    boolean_t includeDeclaration;
+  };
+
+  /**
+   * Reference options.
+   */
+  struct ReferenceOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * Provider options for a {@link DocumentHighlightRequest}.
+   */
+  struct DocumentHighlightOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * A base for all symbol information.
+   */
+  struct BaseSymbolInformation
+  {
+    /**
+     * The name of this symbol.
+     */
+    string_t name;
+    /**
+     * The kind of this symbol.
+     */
+    SymbolKind kind;
+    /**
+     * Tags for this symbol.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::vector<SymbolTag>> tags;
+    /**
+     * The name of the symbol containing this symbol. This information is for
+     * user interface purposes (e.g. to render a qualifier in the user interface
+     * if necessary). It can't be used to re-infer a hierarchy for the document
+     * symbols.
+     */
+    std::optional<string_t> containerName;
+  };
+
+  /**
+   * Represents information about programming constructs like variables, classes,
+   * interfaces etc.
+   */
+  struct SymbolInformation
+    : public BaseSymbolInformation
+  {
+    /**
+     * Indicates if this symbol is deprecated.
+     *
+     * @deprecated Use tags instead
+     */
+    std::optional<boolean_t> deprecated;
+    /**
+     * The location of this symbol. The location's range is used by a tool
+     * to reveal the location in the editor. If the symbol is selected in the
+     * tool the range's start information is used to position the cursor. So
+     * the range usually spans more than the actual symbol's name and does
+     * normally include things like visibility modifiers.
+     *
+     * The range doesn't have to denote a node range in the sense of an abstract
+     * syntax tree. It can therefore not be used to re-construct a hierarchy of
+     * the symbols.
+     */
+    std::unique_ptr<Location> location;
+  };
+
+  struct WorkspaceSymbol_location_1
+  {
     DocumentUri uri;
+  };
 
+  enum class WorkspaceSymbol_locationType {
+    LOCATION,
+    WORKSPACE_SYMBOL_LOCATION_1,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<Location>,
+    std::unique_ptr<WorkspaceSymbol_location_1>
+  > WorkspaceSymbol_location;
+
+  /**
+   * A special workspace symbol that supports locations without a range.
+   *
+   * See also SymbolInformation.
+   *
+   * @since 3.17.0
+   */
+  struct WorkspaceSymbol
+    : public BaseSymbolInformation
+  {
     /**
-     * Optional the version number of the document the diagnostics are published
-     * for.
+     * The location of the symbol. Whether a server is allowed to
+     * return a location without a range depends on the client
+     * capability `workspace.symbol.resolveSupport`.
      *
-     * version?: integer;
+     * See SymbolInformation#location for more details.
+     */
+    WorkspaceSymbol_location location;
+    /**
+     * A data entry field that is preserved on a workspace symbol between a
+     * workspace symbol request and a workspace symbol resolve request.
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
+  };
+
+  /**
+   * Provider options for a {@link DocumentSymbolRequest}.
+   */
+  struct DocumentSymbolOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * A human-readable string that is shown when multiple outlines trees
+     * are shown for the same document.
+     *
+     * @since 3.16.0
+     */
+    std::optional<string_t> label;
+  };
+
+  /**
+   * Provider options for a {@link CodeActionRequest}.
+   */
+  struct CodeActionOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * CodeActionKinds that this server may return.
+     *
+     * The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server
+     * may list out every specific kind they provide.
+     */
+    std::optional<std::vector<CodeActionKind>> codeActionKinds;
+    /**
+     * The server provides support to resolve additional
+     * information for a code action.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> resolveProvider;
+  };
+
+  /**
+   * Server capabilities for a {@link WorkspaceSymbolRequest}.
+   */
+  struct WorkspaceSymbolOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * The server provides support to resolve additional
+     * information for a workspace symbol.
+     *
+     * @since 3.17.0
+     */
+    std::optional<boolean_t> resolveProvider;
+  };
+
+  /**
+   * Registration options for a {@link WorkspaceSymbolRequest}.
+   */
+  struct WorkspaceSymbolRegistrationOptions
+    : public WorkspaceSymbolOptions
+  {
+  };
+
+  /**
+   * Code Lens provider options of a {@link CodeLensRequest}.
+   */
+  struct CodeLensOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * Code lens has a resolve provider as well.
+     */
+    std::optional<boolean_t> resolveProvider;
+  };
+
+  /**
+   * Provider options for a {@link DocumentLinkRequest}.
+   */
+  struct DocumentLinkOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * Document links have a resolve provider as well.
+     */
+    std::optional<boolean_t> resolveProvider;
+  };
+
+  /**
+   * Value-object describing what options formatting should use.
+   */
+  struct FormattingOptions
+  {
+    /**
+     * Size of a tab in spaces.
+     */
+    uinteger_t tabSize;
+    /**
+     * Prefer spaces over tabs.
+     */
+    boolean_t insertSpaces;
+    /**
+     * Trim trailing whitespace on a line.
      *
      * @since 3.15.0
      */
-    std::optional<integer> version;
-
+    std::optional<boolean_t> trimTrailingWhitespace;
     /**
-     * An array of diagnostic information items.
+     * Insert a newline character at the end of the file if one does not exist.
      *
-     * diagnostics: Diagnostic[];
+     * @since 3.15.0
      */
-    ptr_vector<Diagnostic> diagnostics;
+    std::optional<boolean_t> insertFinalNewline;
+    /**
+     * Trim all newlines after the final newline at the end of the file.
+     *
+     * @since 3.15.0
+     */
+    std::optional<boolean_t> trimFinalNewlines;
   };
 
   /**
-   * Client capabilities specific to diagnostic pull requests.
-   *
-   * Diagnostics are currently published by the server to the client using a
-   * notification. This model has the advantage that for workspace wide
-   * diagnostics the server has the freedom to compute them at a server
-   * preferred point in time. On the other hand the approach has the
-   * disadvantage that the server can’t prioritize the computation for the file
-   * in which the user types or which are visible in the editor. Inferring the
-   * client’s UI state from the textDocument/didOpen and textDocument/didChange
-   * notifications might lead to false positives since these notifications are
-   * ownership transfer notifications.
-   *
-   * The specification therefore introduces the concept of diagnostic pull
-   * requests to give a client more control over the documents for which
-   * diagnostics should be computed and at which point in time.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.diagnostic
-   * - property type: DiagnosticClientCapabilities defined as follows:
-   *
-   * export interface DiagnosticClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   relatedDocumentSupport?: boolean;
-   * }
-   *
-   * @since 3.17.0
+   * The parameters of a {@link DocumentOnTypeFormattingRequest}.
    */
-  struct DiagnosticClientCapabilities {
-
+  struct DocumentOnTypeFormattingParams
+  {
     /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new `(TextDocumentRegistrationOptions &
-     * StaticRegistrationOptions)` return value for the corresponding server
-     * capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Whether the clients supports related documents for document diagnostic
-     * pulls.
-     *
-     * relatedDocumentSupport?: boolean;
-     */
-    std::optional<boolean> relatedDocumentSupport;
-  };
-
-  /**
-   * Diagnostic options.
-   *
-   * Server Capability:
-   * - property name (optional): diagnosticProvider
-   * - property type: DiagnosticOptions defined as follows:
-   *
-   * export interface DiagnosticOptions extends WorkDoneProgressOptions {
-   *   identifier?: string;
-   *   interFileDependencies: boolean;
-   *   workspaceDiagnostics: boolean;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct DiagnosticOptions : public WorkDoneProgressOptions {
-
-    /**
-     * An optional identifier under which the diagnostics are managed by the
-     * client.
-     *
-     * identifier?: string;
-     */
-    std::optional<string> identifier;
-
-    /**
-     * Whether the language has inter file dependencies meaning that editing
-     * code in one file can result in a different diagnostic set in another
-     * file. Inter file dependencies are common for most programming languages
-     * and typically uncommon for linters.
-     *
-     * interFileDependencies: boolean;
-     */
-    boolean interFileDependencies;
-
-    /**
-     * The server provides support for workspace diagnostics as well.
-     *
-     * workspaceDiagnostics: boolean;
-     */
-    boolean workspaceDiagnostics;
-  };
-
-  /**
-   * Diagnostic registration options.
-   *
-   * Registration Options: DiagnosticRegistrationOptions options defined as
-   * follows:
-   *
-   * export interface DiagnosticRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DiagnosticOptions,
-   *   StaticRegistrationOptions {
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct DiagnosticRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DiagnosticOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Parameters of the document diagnostic request.
-   *
-   * The text document diagnostic request is sent from the client to the server
-   * to ask the server to compute the diagnostics for a given document. As with
-   * other pull requests the server is asked to compute the diagnostics for the
-   * currently synced version of the document.
-   *
-   * Request:
-   * - method: textDocument/diagnostic.
-   * - params: DocumentDiagnosticParams defined as follows:
-   *
-   * export interface DocumentDiagnosticParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   identifier?: string;
-   *   previousResultId?: string;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct DocumentDiagnosticParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
+     * The document to format.
      */
     std::unique_ptr<TextDocumentIdentifier> textDocument;
-
     /**
-     * The additional identifier  provided during registration.
-     *
-     * identifier?: string;
+     * The position around which the on type formatting should happen.
+     * This is not necessarily the exact position where the character denoted
+     * by the property `ch` got typed.
      */
-    std::optional<string> identifier;
-
+    std::unique_ptr<Position> position;
     /**
-     * The result id of a previous response if provided.
-     *
-     * previousResultId?: string;
+     * The character that has been typed that triggered the formatting
+     * on type request. That is not necessarily the last character that
+     * got inserted into the document since the client could auto insert
+     * characters as well (e.g. like automatic brace completion).
      */
-    std::optional<string> previousResultId;
-  };
-
-  enum class DocumentDiagnosticReportType {
-    RELATED_FULL_DOCUMENT_DIAGNOSTIC_REPORT,
-    RELATED_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
+    string_t ch;
+    /**
+     * The formatting options.
+     */
+    std::unique_ptr<FormattingOptions> options;
   };
 
   /**
-   * The document diagnostic report kinds.
-   *
-   * export namespace DocumentDiagnosticReportKind {
-   *   export const Full = 'full';
-   *   export const Unchanged = 'unchanged';
-   * }
-   * export type DocumentDiagnosticReportKind = 'full' | 'unchanged';
+   * Provider options for a {@link DocumentFormattingRequest}.
+   */
+  struct DocumentFormattingOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+  };
+
+  /**
+   * Provider options for a {@link DocumentRangeFormattingRequest}.
+   */
+  struct DocumentRangeFormattingOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * Whether the server supports formatting multiple ranges at once.
+     *
+     * @since 3.18.0
+     * @proposed
+     */
+    std::optional<boolean_t> rangesSupport;
+  };
+
+  /**
+   * Provider options for a {@link DocumentOnTypeFormattingRequest}.
+   */
+  struct DocumentOnTypeFormattingOptions
+  {
+    /**
+     * A character on which formatting should be triggered, like `{`.
+     */
+    string_t firstTriggerCharacter;
+    /**
+     * More trigger characters.
+     */
+    std::optional<std::vector<string_t>> moreTriggerCharacter;
+  };
+
+  /**
+   * Provider options for a {@link RenameRequest}.
+   */
+  struct RenameOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * Renames should be checked and tested before being executed.
+     *
+     * @since version 3.12.0
+     */
+    std::optional<boolean_t> prepareProvider;
+  };
+
+  /**
+   * The server capabilities of a {@link ExecuteCommandRequest}.
+   */
+  struct ExecuteCommandOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * The commands to be executed on the server
+     */
+    std::vector<string_t> commands;
+  };
+
+  /**
+   * Registration options for a {@link ExecuteCommandRequest}.
+   */
+  struct ExecuteCommandRegistrationOptions
+    : public ExecuteCommandOptions
+  {
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensLegend
+  {
+    /**
+     * The token types a server uses.
+     */
+    std::vector<string_t> tokenTypes;
+    /**
+     * The token modifiers a server uses.
+     */
+    std::vector<string_t> tokenModifiers;
+  };
+
+  struct SemanticTokensOptions_range_1
+  {
+  };
+
+  enum class SemanticTokensOptions_rangeType {
+    BOOLEAN_TYPE,
+    SEMANTIC_TOKENS_OPTIONS_RANGE_1,
+  };
+
+  typedef std::variant<
+    boolean_t,
+    std::unique_ptr<SemanticTokensOptions_range_1>
+  > SemanticTokensOptions_range;
+
+  struct SemanticTokensOptions_full_1
+  {
+    std::optional<boolean_t> delta;
+  };
+
+  enum class SemanticTokensOptions_fullType {
+    BOOLEAN_TYPE,
+    SEMANTIC_TOKENS_OPTIONS_FULL_1,
+  };
+
+  typedef std::variant<
+    boolean_t,
+    std::unique_ptr<SemanticTokensOptions_full_1>
+  > SemanticTokensOptions_full;
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensOptions
+  {
+    std::optional<boolean_t> workDoneProgress;
+    /**
+     * The legend used by the server
+     */
+    std::unique_ptr<SemanticTokensLegend> legend;
+    /**
+     * Server supports providing semantic tokens for a specific range
+     * of a document.
+     */
+    std::optional<SemanticTokensOptions_range> range;
+    /**
+     * Server supports providing semantic tokens for a full document.
+     */
+    std::optional<SemanticTokensOptions_full> full;
+  };
+
+  enum class OptionalVersionedTextDocumentIdentifier_versionType {
+    INTEGER_TYPE,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    null_t
+  > OptionalVersionedTextDocumentIdentifier_version;
+
+  /**
+   * A text document identifier to optionally denote a specific version of a text document.
+   */
+  struct OptionalVersionedTextDocumentIdentifier
+    : public TextDocumentIdentifier
+  {
+    /**
+     * The version number of this document. If a versioned text document identifier
+     * is sent from the server to the client and the file is not open in the editor
+     * (the server has not received an open notification before) the server can send
+     * `null` to indicate that the version is unknown and the content on disk is the
+     * truth (as specified with document content ownership).
+     */
+    OptionalVersionedTextDocumentIdentifier_version version;
+  };
+
+  /**
+   * Options to create a file.
+   */
+  struct CreateFileOptions
+  {
+    /**
+     * Overwrite existing file. Overwrite wins over `ignoreIfExists`
+     */
+    std::optional<boolean_t> overwrite;
+    /**
+     * Ignore if exists.
+     */
+    std::optional<boolean_t> ignoreIfExists;
+  };
+
+  /**
+   * Rename file options
+   */
+  struct RenameFileOptions
+  {
+    /**
+     * Overwrite target if existing. Overwrite wins over `ignoreIfExists`
+     */
+    std::optional<boolean_t> overwrite;
+    /**
+     * Ignores if target exists.
+     */
+    std::optional<boolean_t> ignoreIfExists;
+  };
+
+  /**
+   * Delete file options
+   */
+  struct DeleteFileOptions
+  {
+    /**
+     * Delete the content recursively if a folder is denoted.
+     */
+    std::optional<boolean_t> recursive;
+    /**
+     * Ignore the operation if the file doesn't exist.
+     */
+    std::optional<boolean_t> ignoreIfNotExists;
+  };
+
+  enum class WorkspaceUnchangedDocumentDiagnosticReport_versionType {
+    INTEGER_TYPE,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    null_t
+  > WorkspaceUnchangedDocumentDiagnosticReport_version;
+
+  /**
+   * An unchanged document diagnostic report for a workspace diagnostic result.
    *
    * @since 3.17.0
    */
-  enum class DocumentDiagnosticReportKind {
-
+  struct WorkspaceUnchangedDocumentDiagnosticReport
+    : public UnchangedDocumentDiagnosticReport
+  {
     /**
-     * A diagnostic report with a full set of problems.
-     *
-     * export const Full = 'full';
+     * The URI for which diagnostic information is reported.
      */
-    Full,
-
+    DocumentUri uri;
     /**
-     * A report indicating that the last returned report is still accurate.
-     *
-     * export const Unchanged = 'unchanged';
+     * The version number for which the diagnostics are reported.
+     * If the document is not marked as open `null` can be provided.
      */
-    Unchanged,
+    WorkspaceUnchangedDocumentDiagnosticReport_version version;
   };
 
-  extern std::map<DocumentDiagnosticReportKind, std::string> DocumentDiagnosticReportKindNames;
+  /**
+   * Describes the currently selected completion item.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct SelectedCompletionInfo
+  {
+    /**
+     * The range that will be replaced if this completion item is accepted.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The text the range will be replaced with if this completion is accepted.
+     */
+    string_t text;
+  };
 
-  auto documentDiagnosticReportKindByName(const std::string &name) -> DocumentDiagnosticReportKind;
+  /**
+   * Provides information about the context in which an inline completion was requested.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct InlineCompletionContext
+  {
+    /**
+     * Describes how the inline completion was triggered.
+     */
+    InlineCompletionTriggerKind triggerKind;
+    /**
+     * Provides information about the currently selected item in the autocomplete widget if it is visible.
+     */
+    std::optional<std::unique_ptr<SelectedCompletionInfo>> selectedCompletionInfo;
+  };
 
-  extern std::map<DocumentDiagnosticReportKind, std::string> DocumentDiagnosticReportKindValues;
+  enum class TextDocumentSyncOptions_saveType {
+    BOOLEAN_TYPE,
+    SAVE_OPTIONS,
+  };
 
-  auto documentDiagnosticReportKindByValue(const std::string &value) -> DocumentDiagnosticReportKind;
+  typedef std::variant<
+    boolean_t,
+    std::unique_ptr<SaveOptions>
+  > TextDocumentSyncOptions_save;
+
+  struct TextDocumentSyncOptions
+  {
+    /**
+     * Open and close notifications are sent to the server. If omitted open close notification should not
+     * be sent.
+     */
+    std::optional<boolean_t> openClose;
+    /**
+     * Change notifications are sent to the server. See TextDocumentSyncKind.None, TextDocumentSyncKind.Full
+     * and TextDocumentSyncKind.Incremental. If omitted it defaults to TextDocumentSyncKind.None.
+     */
+    std::optional<TextDocumentSyncKind> change;
+    /**
+     * If present will save notifications are sent to the server. If omitted the notification should not be
+     * sent.
+     */
+    std::optional<boolean_t> willSave;
+    /**
+     * If present will save wait until requests are sent to the server. If omitted the request should not be
+     * sent.
+     */
+    std::optional<boolean_t> willSaveWaitUntil;
+    /**
+     * If present save notifications are sent to the server. If omitted the notification should not be
+     * sent.
+     */
+    std::optional<TextDocumentSyncOptions_save> save;
+  };
+
+  enum class WorkspaceFoldersServerCapabilities_changeNotificationsType {
+    STRING_TYPE,
+    BOOLEAN_TYPE,
+  };
+
+  typedef std::variant<
+    string_t,
+    boolean_t
+  > WorkspaceFoldersServerCapabilities_changeNotifications;
+
+  struct WorkspaceFoldersServerCapabilities
+  {
+    /**
+     * The server has support for workspace folders
+     */
+    std::optional<boolean_t> supported;
+    /**
+     * Whether the server wants to receive workspace folder
+     * change notifications.
+     *
+     * If a string is provided the string is treated as an ID
+     * under which the notification is registered on the client
+     * side. The ID can be used to unregister for these events
+     * using the `client/unregisterCapability` request.
+     */
+    std::optional<WorkspaceFoldersServerCapabilities_changeNotifications> changeNotifications;
+  };
+
+  /**
+   * Structure to capture a description for an error code.
+   *
+   * @since 3.16.0
+   */
+  struct CodeDescription
+  {
+    /**
+     * An URI to open with more information about the diagnostic error.
+     */
+    URI href;
+  };
+
+  /**
+   * Represents a related message and source code location for a diagnostic. This should be
+   * used to point to code locations that cause or related to a diagnostics, e.g when duplicating
+   * a symbol in a scope.
+   */
+  struct DiagnosticRelatedInformation
+  {
+    /**
+     * The location of this related diagnostic information.
+     */
+    std::unique_ptr<Location> location;
+    /**
+     * The message of this related diagnostic information.
+     */
+    string_t message;
+  };
+
+  enum class Diagnostic_codeType {
+    INTEGER_TYPE,
+    STRING_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    string_t
+  > Diagnostic_code;
+
+  /**
+   * Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
+   * are only valid in the scope of a resource.
+   */
+  struct Diagnostic
+  {
+    /**
+     * The range at which the message applies
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The diagnostic's severity. Can be omitted. If omitted it is up to the
+     * client to interpret diagnostics as error, warning, info or hint.
+     */
+    std::optional<DiagnosticSeverity> severity;
+    /**
+     * The diagnostic's code, which usually appear in the user interface.
+     */
+    std::optional<Diagnostic_code> code;
+    /**
+     * An optional property to describe the error code.
+     * Requires the code field (above) to be present/not null.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<CodeDescription>> codeDescription;
+    /**
+     * A human-readable string describing the source of this
+     * diagnostic, e.g. 'typescript' or 'super lint'. It usually
+     * appears in the user interface.
+     */
+    std::optional<string_t> source;
+    /**
+     * The diagnostic's message. It usually appears in the user interface
+     */
+    string_t message;
+    /**
+     * Additional metadata about the diagnostic.
+     *
+     * @since 3.15.0
+     */
+    std::optional<std::vector<DiagnosticTag>> tags;
+    /**
+     * An array of related diagnostic information, e.g. when symbol-names within
+     * a scope collide all definitions can be marked via this property.
+     */
+    std::optional<std::vector<std::unique_ptr<DiagnosticRelatedInformation>>> relatedInformation;
+    /**
+     * A data entry field that is preserved between a `textDocument/publishDiagnostics`
+     * notification and `textDocument/codeAction` request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
+  };
 
   /**
    * A diagnostic report with a full set of problems.
    *
-   * export interface FullDocumentDiagnosticReport {
-   *   kind: DocumentDiagnosticReportKind.Full;
-   *   resultId?: string;
-   *   items: Diagnostic[];
-   * }
-   *
    * @since 3.17.0
    */
-  struct FullDocumentDiagnosticReport {
-
+  struct FullDocumentDiagnosticReport
+  {
     /**
      * A full document diagnostic report.
-     *
-     * kind: DocumentDiagnosticReportKind.Full;
      */
-    const DocumentDiagnosticReportKind kind = DocumentDiagnosticReportKind::Full;
-
+    string_t kind;
     /**
-     * An optional result id. If provided it will be sent on the next diagnostic
-     * request for the same document.
-     *
-     * resultId?: string;
+     * An optional result id. If provided it will
+     * be sent on the next diagnostic request for the
+     * same document.
      */
-    std::optional<string> resultId;
-
+    std::optional<string_t> resultId;
     /**
      * The actual items.
-     *
-     * items: Diagnostic[];
      */
-    ptr_vector<Diagnostic> items;
+    std::vector<std::unique_ptr<Diagnostic>> items;
   };
 
-  /**
-   * A diagnostic report indicating that the last returned
-   * report is still accurate.
-   *
-   * export interface UnchangedDocumentDiagnosticReport {
-   *   kind: DocumentDiagnosticReportKind.Unchanged;
-   *   resultId: string;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct UnchangedDocumentDiagnosticReport {
-
-    /**
-     * A document diagnostic report indicating no changes to the last result. A
-     * server can only return `unchanged` if result ids are provided.
-     *
-     * kind: DocumentDiagnosticReportKind.Unchanged;
-     */
-    const DocumentDiagnosticReportKind kind = DocumentDiagnosticReportKind::Unchanged;
-
-    /**
-     * A result id which will be sent on the next diagnostic request for the
-     * same document.
-     *
-     * resultId: string;
-     */
-    string resultId;
-  };
-
-  enum class FullOrUnchangedDocumentDiagnosticReportType {
+  enum class RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType {
     FULL_DOCUMENT_DIAGNOSTIC_REPORT,
     UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
   };
@@ -8061,1240 +4482,130 @@ namespace LCompilers::LanguageServerProtocol {
   typedef std::variant<
     std::unique_ptr<FullDocumentDiagnosticReport>,
     std::unique_ptr<UnchangedDocumentDiagnosticReport>
-  > FullOrUnchangedDocumentDiagnosticReport;
-
-  /**
-   * A full diagnostic report with a set of related documents.
-   *
-   * export interface RelatedFullDocumentDiagnosticReport extends
-   *   FullDocumentDiagnosticReport {
-   *   relatedDocuments?: {
-   *     [uri: string]:
-   *       FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
-   *   };
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct RelatedFullDocumentDiagnosticReport : public FullDocumentDiagnosticReport {
-
-    /**
-     * Diagnostics of related documents. This information is useful
-     * in programming languages where code in a file A can generate
-     * diagnostics in a file B which A depends on. An example of
-     * such a language is C/C++ where macro definitions in a file
-     * a.cpp and result in errors in a header file b.hpp.
-     *
-     * relatedDocuments?: {
-     *   [uri: string]:  // DocumentUri
-     *     FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
-     * };
-     *
-     * @since 3.17.0
-     */
-    std::optional<std::map<string, FullOrUnchangedDocumentDiagnosticReport>> relatedDocuments;
-  };
+  > RelatedUnchangedDocumentDiagnosticReport_relatedDocuments;
 
   /**
    * An unchanged diagnostic report with a set of related documents.
    *
-   * export interface RelatedUnchangedDocumentDiagnosticReport extends
-   *   UnchangedDocumentDiagnosticReport {
-   *   relatedDocuments?: {
-   *     [uri: string]:
-   *       FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
-   *   };
-   * }
-   *
    * @since 3.17.0
    */
-  struct RelatedUnchangedDocumentDiagnosticReport : public UnchangedDocumentDiagnosticReport {
-
+  struct RelatedUnchangedDocumentDiagnosticReport
+    : public UnchangedDocumentDiagnosticReport
+  {
     /**
      * Diagnostics of related documents. This information is useful
      * in programming languages where code in a file A can generate
      * diagnostics in a file B which A depends on. An example of
-     * such a language is C/C++ where macro definitions in a file
+     * such a language is C/C++ where marco definitions in a file
      * a.cpp and result in errors in a header file b.hpp.
-     *
-     * relatedDocuments?: {
-     *   [uri: string]:  // DocumentUri
-     *     FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
-     * };
      *
      * @since 3.17.0
      */
-    std::optional<std::map<string, FullOrUnchangedDocumentDiagnosticReport>> relatedDocuments;
+    std::optional<std::map<DocumentUri, RelatedUnchangedDocumentDiagnosticReport_relatedDocuments>> relatedDocuments;
   };
 
-  /**
-   * The result of a document diagnostic pull request. A report can either be a
-   * full report containing all diagnostics for the requested document or a
-   * unchanged report indicating that nothing has changed in terms of
-   * diagnostics in comparison to the last pull request.
-   *
-   * Response:
-   * - result: DocumentDiagnosticReport defined as follows:
-   *
-   * export type DocumentDiagnosticReport = RelatedFullDocumentDiagnosticReport
-   *   | RelatedUnchangedDocumentDiagnosticReport;
-   *
-   * - partial result: The first literal send need to be a
-   *   DocumentDiagnosticReport followed by n
-   *   DocumentDiagnosticReportPartialResult literals defined as follows:
-   *
-   * export interface DocumentDiagnosticReportPartialResult {
-   *   relatedDocuments: {
-   *     [uri: string]:
-   *       FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
-   *   };
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   diagnostic request. A server is also allowed to return an error with code
-   *   ServerCancelled indicating that the server can’t compute the result right
-   *   now. A server can return a DiagnosticServerCancellationData data to
-   *   indicate whether the client should re-trigger the request. If no data is
-   *   provided it defaults to { retriggerRequest: true }:
-   *
-   * export interface DiagnosticServerCancellationData {
-   *   retriggerRequest: boolean;
-   * }
-   *
-   * @since 3.17.0
-   */
+  enum class RelatedFullDocumentDiagnosticReport_relatedDocumentsType {
+    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
+    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
+  };
+
   typedef std::variant<
-    std::unique_ptr<RelatedFullDocumentDiagnosticReport>,
-    std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport>
-  > DocumentDiagnosticReport;
+    std::unique_ptr<FullDocumentDiagnosticReport>,
+    std::unique_ptr<UnchangedDocumentDiagnosticReport>
+  > RelatedFullDocumentDiagnosticReport_relatedDocuments;
 
   /**
-   * A partial result for a document diagnostic report.
-   *
-   * export interface DocumentDiagnosticReportPartialResult {
-   *   relatedDocuments: {
-   *     [uri: string]:
-   *       FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
-   *   };
-   * }
+   * A full diagnostic report with a set of related documents.
    *
    * @since 3.17.0
    */
-  struct DocumentDiagnosticReportPartialResult {
-
+  struct RelatedFullDocumentDiagnosticReport
+    : public FullDocumentDiagnosticReport
+  {
     /**
-     * relatedDocuments: {
-     *   [uri: string]:  // DocumentUri
-     *     FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
-     * };
-     */
-    std::map<string, FullOrUnchangedDocumentDiagnosticReport> relatedDocuments;
-  };
-
-  /**
-   * Cancellation data returned from a diagnostic request.
-   *
-   * export interface DiagnosticServerCancellationData {
-   *   retriggerRequest: boolean;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct DiagnosticServerCancellationData {
-
-    /**
-     * retriggerRequest: boolean;
-     */
-    boolean retriggerRequest;
-  };
-
-  /**
-   * A previous result id in a workspace pull request.
-   *
-   * export interface PreviousResultId {
-   *   uri: DocumentUri;
-   *   value: string;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct PreviousResultId {
-
-    /**
-     * The URI for which the client knows a result id.
+     * Diagnostics of related documents. This information is useful
+     * in programming languages where code in a file A can generate
+     * diagnostics in a file B which A depends on. An example of
+     * such a language is C/C++ where marco definitions in a file
+     * a.cpp and result in errors in a header file b.hpp.
      *
-     * uri: DocumentUri;
+     * @since 3.17.0
      */
-    DocumentUri uri;
-
-    /**
-     * The value of the previous result id.
-     *
-     * value: string;
-     */
-    string value;
+    std::optional<std::map<DocumentUri, RelatedFullDocumentDiagnosticReport_relatedDocuments>> relatedDocuments;
   };
+
+  enum class WorkspaceFullDocumentDiagnosticReport_versionType {
+    INTEGER_TYPE,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    null_t
+  > WorkspaceFullDocumentDiagnosticReport_version;
 
   /**
    * A full document diagnostic report for a workspace diagnostic result.
    *
-   * export interface WorkspaceFullDocumentDiagnosticReport extends
-   *   FullDocumentDiagnosticReport {
-   *   uri: DocumentUri;
-   *   version: integer | null;
-   * }
-   *
    * @since 3.17.0
    */
   struct WorkspaceFullDocumentDiagnosticReport
-    : public FullDocumentDiagnosticReport {
-
+    : public FullDocumentDiagnosticReport
+  {
     /**
      * The URI for which diagnostic information is reported.
-     *
-     * uri: DocumentUri;
      */
     DocumentUri uri;
-
     /**
-     * The version number for which the diagnostics are reported. If the
-     * document is not marked as open `null` can be provided.
-     *
-     * version: integer | null;
+     * The version number for which the diagnostics are reported.
+     * If the document is not marked as open `null` can be provided.
      */
-    std::optional<integer> version;
+    WorkspaceFullDocumentDiagnosticReport_version version;
   };
 
-  /**
-   * An unchanged document diagnostic report for a workspace diagnostic result.
-   *
-   * export interface WorkspaceUnchangedDocumentDiagnosticReport extends
-   *   UnchangedDocumentDiagnosticReport {
-   *   uri: DocumentUri;
-   *   version: integer | null;
-   * };
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceUnchangedDocumentDiagnosticReport
-    : public UnchangedDocumentDiagnosticReport {
-
-    /**
-     * The URI for which diagnostic information is reported.
-     *
-     * uri: DocumentUri;
-     */
-    DocumentUri uri;
-
-    /**
-     * The version number for which the diagnostics are reported. If the
-     * document is not marked as open `null` can be provided.
-     *
-     * version: integer | null;
-     */
-    std::optional<integer> version;
-  };
-
-  enum class WorkspaceDocumentDiagnosticReportType {
-    WORKSPACE_FULL_DOCUMENT_DIAGNOSTIC_REPORT,
-    WORKSPACE_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
-  };
-
-  /**
-   * A workspace diagnostic document report.
-   *
-   * export type WorkspaceDocumentDiagnosticReport =
-   *   WorkspaceFullDocumentDiagnosticReport
-   *   | WorkspaceUnchangedDocumentDiagnosticReport;
-   *
-   * @since 3.17.0
-   */
-  typedef std::variant<
-    std::unique_ptr<WorkspaceFullDocumentDiagnosticReport>,
-    std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport>
-  > WorkspaceDocumentDiagnosticReport;
-
-  /**
-   * A workspace diagnostic report.
-   *
-   * Response:
-   * - result: WorkspaceDiagnosticReport defined as follows:
-   *
-   * export interface WorkspaceDiagnosticReport {
-   *   items: WorkspaceDocumentDiagnosticReport[];
-   * }
-   *
-   * - partial result: The first literal send need to be a
-   *   WorkspaceDiagnosticReport followed by n
-   *   WorkspaceDiagnosticReportPartialResult literals.
-   * - error: code and message set in case an exception happens during the
-   *   diagnostic request. A server is also allowed to return and error with
-   *   code ServerCancelled indicating that the server can’t compute the result
-   *   right now. A server can return a DiagnosticServerCancellationData data to
-   *   indicate whether the client should re-trigger the request. If no data is
-   *   provided it defaults to { retriggerRequest: true }
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceDiagnosticReport {
-
-    /**
-     * items: WorkspaceDocumentDiagnosticReport[];
-     */
-    std::vector<WorkspaceDocumentDiagnosticReport> items;
-  };
-
-  /**
-   * A partial result for a workspace diagnostic report.
-   *
-   * export interface WorkspaceDiagnosticReportPartialResult {
-   *   items: WorkspaceDocumentDiagnosticReport[];
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceDiagnosticReportPartialResult {
-
-    /**
-     * items: WorkspaceDocumentDiagnosticReport[];
-     */
-    std::vector<WorkspaceDocumentDiagnosticReport> items;
-  };
-
-  /**
-   * Parameters of the workspace diagnostic request.
-   *
-   * The workspace diagnostic request is sent from the client to the server to
-   * ask the server to compute workspace wide diagnostics which previously where
-   * pushed from the server to the client. In contrast to the document
-   * diagnostic request the workspace request can be long running and is not
-   * bound to a specific workspace or document state. If the client supports
-   * streaming for the workspace diagnostic pull it is legal to provide a
-   * document diagnostic report multiple times for the same document URI. The
-   * last one reported will win over previous reports.
-   *
-   * If a client receives a diagnostic report for a document in a workspace
-   * diagnostic request for which the client also issues individual document
-   * diagnostic pull requests the client needs to decide which diagnostics win
-   * and should be presented. In general:
-   * - diagnostics for a higher document version should win over those from a
-   *   lower document version (e.g. note that document versions are steadily
-   *   increasing)
-   * - diagnostics from a document pull should win over diagnostics from a
-   *   workspace pull.
-   *
-   * Request:
-   * - method: workspace/diagnostic.
-   * - params: WorkspaceDiagnosticParams defined as follows:
-   *
-   * export interface WorkspaceDiagnosticParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   identifier?: string;
-   *   previousResultIds: PreviousResultId[];
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceDiagnosticParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The additional identifier provided during registration.
-     *
-     * identifier?: string;
-     */
-    std::optional<string> identifier;
-
-    /**
-     * The currently known diagnostic reports with their previous result ids.
-     *
-     * previousResultIds: PreviousResultId[];
-     */
-    ptr_vector<PreviousResultId> previousResultIds;
-  };
-
-  /**
-   * Workspace client capabilities specific to diagnostic pull requests.
-   *
-   * The workspace/diagnostic/refresh request is sent from the server to the
-   * client. Servers can use it to ask clients to refresh all needed document
-   * and workspace diagnostics. This is useful if a server detects a project
-   * wide configuration change which requires a re-calculation of all
-   * diagnostics.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.diagnostics
-   * - property type: DiagnosticWorkspaceClientCapabilities defined as follows:
-   *
-   * export interface DiagnosticWorkspaceClientCapabilities {
-   *   refreshSupport?: boolean;
-   * }
-   *
-   * Request:
-   * - method: workspace/diagnostic/refresh
-   * - params: none
-   *
-   * Response:
-   * - result: void
-   * - error: code and message set in case an exception happens during the
-   *   ‘workspace/diagnostic/refresh’ request
-   *
-   * Implementation Considerations
-   * -----------------------------
-   *
-   * Generally the language server specification doesn’t enforce any specific
-   * client implementation since those usually depend on how the client UI
-   * behaves. However since diagnostics can be provided on a document and
-   * workspace level here are some tips:
-   * - a client should pull actively for the document the users types in.
-   * - if the server signals inter file dependencies a client should also pull
-   *   for visible documents to ensure accurate diagnostics. However the pull
-   *   should happen less frequently.
-   * - if the server signals workspace pull support a client should also pull
-   *   for workspace diagnostics. It is recommended for clients to implement
-   *   partial result progress for the workspace pull to allow servers to keep
-   *   the request open for a long time. If a server closes a workspace
-   *   diagnostic pull request the client should re-trigger the request.
-   *
-   * @since 3.17.0
-   */
-  struct DiagnosticWorkspaceClientCapabilities {
-
-    /**
-     * Whether the client implementation supports a refresh request sent from
-     * the server to the client.
-     *
-     * Note that this event is global and will force the client to refresh all
-     * pulled diagnostics currently shown. It should be used with absolute care
-     * and is useful for situation where a server for example detects a project
-     * wide change that requires such a calculation.
-     *
-     * refreshSupport?: boolean;
-     */
-    std::optional<boolean> refreshSupport;
-  };
-
-  struct ParameterInformationCapabilities {
-
-    /**
-     * The client supports processing label offsets instead of a
-     * simple label string.
-     *
-     * labelOffsetSupport?: boolean;
-     *
-     * @since 3.14.0
-     */
-    std::optional<boolean> labelOffsetSupport;
-  };
-
-  struct SignatureInformationCapabilities {
-
-    /**
-     * Client supports the follow content formats for the documentation
-     * property. The order describes the preferred format of the client.
-     *
-     * documentationFormat?: MarkupKind[];
-     */
-    optional_vector<MarkupKind> documentationFormat;
-
-    /**
-     * Client capabilities specific to parameter information.
-     *
-     * parameterInformation?: {
-     *   labelOffsetSupport?: boolean;
-     * };
-     */
-    optional_ptr<ParameterInformationCapabilities> parameterInformation;
-
-    /**
-     * The client supports the `activeParameter` property on
-     * `SignatureInformation` literal.
-     *
-     * activeParameterSupport?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> activeParameterSupport;
-  };
-
-  /**
-   * The signature help request is sent from the client to the server to request
-   * signature information at a given cursor position.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.signatureHelp
-   * - property type: SignatureHelpClientCapabilities defined as follows:
-   *
-   * export interface SignatureHelpClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   signatureInformation?: {
-   *     documentationFormat?: MarkupKind[];
-   *     parameterInformation?: {
-   *       labelOffsetSupport?: boolean;
-   *     };
-   *     activeParameterSupport?: boolean;
-   *   };
-   *   contextSupport?: boolean;
-   * }
-   */
-  struct SignatureHelpClientCapabilities {
-
-    /**
-     * Whether signature help supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * The client supports the following `SignatureInformation`
-     * specific properties.
-     *
-     * signatureInformation?: {
-     *   documentationFormat?: MarkupKind[];
-     *   parameterInformation?: {
-     *     labelOffsetSupport?: boolean;
-     *   };
-     *   activeParameterSupport?: boolean;
-     * };
-     */
-    optional_ptr<SignatureInformationCapabilities> signatureInformation;
-
-    /**
-     * The client supports to send additional context information for a
-     * `textDocument/signatureHelp` request. A client that opts into
-     * contextSupport will also support the `retriggerCharacters` on
-     * `SignatureHelpOptions`.
-     *
-     * contextSupport?: boolean;
-     *
-     * @since 3.15.0
-     */
-    std::optional<boolean> contextSupport;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): signatureHelpProvider
-   * - property type: SignatureHelpOptions defined as follows:
-   *
-   * export interface SignatureHelpOptions extends WorkDoneProgressOptions {
-   *   triggerCharacters?: string[];
-   *   retriggerCharacters?: string[];
-   * }
-   */
-  struct SignatureHelpOptions : public WorkDoneProgressOptions {
-
-    /**
-     * The characters that trigger signature help automatically.
-     *
-     * triggerCharacters?: string[];
-     */
-    optional_vector<string> triggerCharacters;
-
-    /**
-     * List of characters that re-trigger signature help.
-     *
-     * These trigger characters are only active when signature help is already
-     * showing. All trigger characters are also counted as re-trigger
-     * characters.
-     *
-     * retriggerCharacters?: string[];
-     *
-     * @since 3.15.0
-     */
-    optional_vector<string> retriggerCharacters;
-  };
-
-  /**
-   * Registration Options: SignatureHelpRegistrationOptions defined as follows:
-   *
-   * export interface SignatureHelpRegistrationOptions
-   *   extends TextDocumentRegistrationOptions, SignatureHelpOptions {
-   * }
-   */
-  struct SignatureHelpRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public SignatureHelpOptions {
-    // empty
-  };
-
-  /**
-   * How a signature help was triggered.
-   *
-   * export namespace SignatureHelpTriggerKind {
-   *   export const Invoked: 1 = 1;
-   *   export const TriggerCharacter: 2 = 2;
-   *   export const ContentChange: 3 = 3;
-   * }
-   * export type SignatureHelpTriggerKind = 1 | 2 | 3;
-   *
-   * @since 3.15.0
-   */
-  enum class SignatureHelpTriggerKind {
-
-    /**
-     * Signature help was invoked manually by the user or by a command.
-     *
-     * export const Invoked: 1 = 1;
-     */
-    Invoked = 1,
-
-    /**
-     * Signature help was triggered by a trigger character.
-     *
-     * export const TriggerCharacter: 2 = 2;
-     */
-    TriggerCharacter = 2,
-
-    /**
-     * Signature help was triggered by the cursor moving or by the document
-     * content changing.
-     *
-     * export const ContentChange: 3 = 3;
-     */
-    ContentChange = 3,
-  };
-
-  extern std::map<SignatureHelpTriggerKind, std::string> SignatureHelpTriggerKindNames;
-
-  auto signatureHelpTriggerKindByName(const std::string &name) -> SignatureHelpTriggerKind;
-
-  enum class StringOrUintegerPairType {
-    STRING,
-    UINTEGER_PAIR,
+  enum class DocumentDiagnosticReportPartialResult_relatedDocumentsType {
+    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
+    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
   };
 
   typedef std::variant<
-    string,
-    std::unique_ptr<std::pair<uinteger, uinteger>>
-  > StringOrUintegerPair;
+    std::unique_ptr<FullDocumentDiagnosticReport>,
+    std::unique_ptr<UnchangedDocumentDiagnosticReport>
+  > DocumentDiagnosticReportPartialResult_relatedDocuments;
 
   /**
-   * Represents a parameter of a callable-signature. A parameter can have a
-   * label and a doc-comment.
-   *
-   * export interface ParameterInformation {
-   *   label: string | [uinteger, uinteger];
-   *   documentation?: string | MarkupContent;
-   * }
-   */
-  struct ParameterInformation {
-
-    /**
-     * The label of this parameter information.
-     *
-     * Either a string or an inclusive start and exclusive end offsets within
-     * its containing signature label. (see SignatureInformation.label). The
-     * offsets are based on a UTF-16 string representation as `Position` and
-     * `Range` does.
-     *
-     * *Note*: a label of type string should be a substring of its containing
-     * signature label. Its intended use case is to highlight the parameter
-     * label part in the `SignatureInformation.label`.
-     *
-     * label: string | [uinteger, uinteger];
-     */
-    StringOrUintegerPair label;
-
-    /**
-     * The human-readable doc-comment of this parameter. Will be shown in the UI
-     * but can be omitted.
-     *
-     * documentation?: string | MarkupContent;
-     */
-    std::optional<StringOrMarkupContent> documentation;
-  };
-
-  /**
-   * Represents the signature of something callable. A signature can have a
-   * label, like a function-name, a doc-comment, and a set of parameters.
-   *
-   * export interface SignatureInformation {
-   *   label: string;
-   *   documentation?: string | MarkupContent;
-   *   parameters?: ParameterInformation[];
-   *   activeParameter?: uinteger;
-   * }
-   */
-  struct SignatureInformation {
-
-    /**
-     * The label of this signature. Will be shown in the UI.
-     *
-     * label: string;
-     */
-    string label;
-
-    /**
-     * The human-readable doc-comment of this signature. Will be shown in the UI
-     * but can be omitted.
-     *
-     * documentation?: string | MarkupContent;
-     */
-    std::optional<StringOrMarkupContent> documentation;
-
-    /**
-     * The parameters of this signature.
-     *
-     * parameters?: ParameterInformation[];
-     */
-    optional_ptr_vector<ParameterInformation> parameters;
-
-    /**
-     * The index of the active parameter.
-     *
-     * If provided, this is used in place of `SignatureHelp.activeParameter`.
-     *
-     * activeParameter?: uinteger;
-     *
-     * @since 3.16.0
-     */
-    std::optional<uinteger> activeParameter;
-  };
-
-  /**
-   * Signature help represents the signature of something callable. There can be
-   * multiple signature but only one active and only one active parameter.
-   *
-   * Response:
-   * - result: SignatureHelp | null defined as follows:
-   *
-   * export interface SignatureHelp {
-   *   signatures: SignatureInformation[];
-   *   activeSignature?: uinteger;
-   *   activeParameter?: uinteger;
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   signature help request.
-   */
-  struct SignatureHelp {
-
-    /**
-     * One or more signatures. If no signatures are available the signature help
-     * request should return `null`.
-     *
-     * signatures: SignatureInformation[];
-     */
-    ptr_vector<SignatureInformation> signatures;
-
-    /**
-     * The active signature. If omitted or the value lies outside the range of
-     * `signatures` the value defaults to zero or is ignore if the
-     * `SignatureHelp` as no signatures.
-     *
-     * Whenever possible implementors should make an active decision about the
-     * active signature and shouldn't rely on a default value.
-     *
-     * In future version of the protocol this property might become mandatory to
-     * better express this.
-     *
-     * activeSignature?: uinteger;
-     */
-    std::optional<uinteger> activeSignature;
-
-    /**
-     * The active parameter of the active signature. If omitted or the value
-     * lies outside the range of `signatures[activeSignature].parameters`
-     * defaults to 0 if the active signature has parameters. If the active
-     * signature has no parameters it is ignored. In future version of the
-     * protocol this property might become mandatory to better express the
-     * active parameter if the active signature does have any.
-     *
-     * activeParameter?: uinteger;
-     */
-    std::optional<uinteger> activeParameter;
-  };
-
-  /**
-   * Additional information about the context in which a signature help request
-   * was triggered.
-   *
-   * export interface SignatureHelpContext {
-   *   triggerKind: SignatureHelpTriggerKind;
-   *   triggerCharacter?: string;
-   *   isRetrigger: boolean;
-   *   activeSignatureHelp?: SignatureHelp;
-   * }
-   *
-   * @since 3.15.0
-   */
-  struct SignatureHelpContext {
-
-    /**
-     * Action that caused signature help to be triggered.
-     *
-     * triggerKind: SignatureHelpTriggerKind;
-     */
-    SignatureHelpTriggerKind triggerKind;
-
-    /**
-     * Character that caused signature help to be triggered.
-     *
-     * This is undefined when triggerKind !==
-     * SignatureHelpTriggerKind.TriggerCharacter
-     *
-     * triggerCharacter?: string;
-     */
-    std::optional<string> triggerCharacter;
-
-    /**
-     * `true` if signature help was already showing when it was triggered.
-     *
-     * Retriggers occur when the signature help is already active and can be
-     * caused by actions such as typing a trigger character, a cursor move, or
-     * document content changes.
-     *
-     * isRetrigger: boolean;
-     */
-    boolean isRetrigger;
-
-    /**
-     * The currently active `SignatureHelp`.
-     *
-     * The `activeSignatureHelp` has its `SignatureHelp.activeSignature` field
-     * updated based on the user navigating through available signatures.
-     *
-     * activeSignatureHelp?: SignatureHelp;
-     */
-    optional_ptr<SignatureHelp> activeSignatureHelp;
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/signatureHelp
-   * - params: SignatureHelpParams defined as follows:
-   *
-   * export interface SignatureHelpParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams {
-   *   context?: SignatureHelpContext;
-   * }
-   */
-  struct SignatureHelpParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams {
-
-    /**
-     * The signature help context. This is only available if the client
-     * specifies to send this using the client capability
-     * `textDocument.signatureHelp.contextSupport === true`
-     *
-     * context?: SignatureHelpContext;
-     *
-     * @since 3.15.0
-     */
-    optional_ptr<SignatureHelpContext> context;
-  };
-
-  /**
-   * The kind of a code action.
-   *
-   * Kinds are a hierarchical list of identifiers separated by `.`, e.g.
-   * `"refactor.extract.function"`.
-   *
-   * The set of kinds is open and client needs to announce the kinds it supports
-   * to the server during initialization.
-   *
-   * export type CodeActionKind = string;
-   * export namespace CodeActionKind {
-   *   export const Empty: CodeActionKind = '';
-   *   export const QuickFix: CodeActionKind = 'quickfix';
-   *   export const Refactor: CodeActionKind = 'refactor';
-   *   export const RefactorExtract: CodeActionKind = 'refactor.extract';
-   *   export const RefactorInline: CodeActionKind = 'refactor.inline';
-   *   export const RefactorRewrite: CodeActionKind = 'refactor.rewrite';
-   *   export const Source: CodeActionKind = 'source';
-   *   export const SourceOrganizeImports: CodeActionKind =
-   *     'source.organizeImports';
-   *   export const SourceFixAll: CodeActionKind = 'source.fixAll';
-   * }
-   */
-  enum class CodeActionKind {
-
-    /**
-     * Empty kind.
-     *
-     * export const Empty: CodeActionKind = '';
-     */
-    Empty,
-
-    /**
-     * Base kind for quickfix actions: 'quickfix'.
-     *
-     * export const QuickFix: CodeActionKind = 'quickfix';
-     */
-    QuickFix,
-
-    /**
-     * Base kind for refactoring actions: 'refactor'.
-     *
-     * export const Refactor: CodeActionKind = 'refactor';
-     */
-    Refactor,
-
-    /**
-     * Base kind for refactoring extraction actions: 'refactor.extract'.
-     *
-     * Example extract actions:
-     *
-     * - Extract method
-     * - Extract function
-     * - Extract variable
-     * - Extract interface from class
-     * - ...
-     *
-     * export const RefactorExtract: CodeActionKind = 'refactor.extract';
-     */
-    RefactorExtract,
-
-    /**
-     * Base kind for refactoring inline actions: 'refactor.inline'.
-     *
-     * Example inline actions:
-     *
-     * - Inline function
-     * - Inline variable
-     * - Inline constant
-     * - ...
-     *
-     * export const RefactorInline: CodeActionKind = 'refactor.inline';
-     */
-    RefactorInline,
-
-    /**
-     * Base kind for refactoring rewrite actions: 'refactor.rewrite'.
-     *
-     * Example rewrite actions:
-     *
-     * - Convert JavaScript function to class
-     * - Add or remove parameter
-     * - Encapsulate field
-     * - Make method static
-     * - Move method to base class
-     * - ...
-     *
-     * export const RefactorRewrite: CodeActionKind = 'refactor.rewrite';
-     */
-    RefactorRewrite,
-
-    /**
-     * Base kind for source actions: `source`.
-     *
-     * Source code actions apply to the entire file.
-     *
-     * export const Source: CodeActionKind = 'source';
-     */
-    Source,
-
-    /**
-     * Base kind for an organize imports source action:
-     * `source.organizeImports`.
-     *
-     * export const SourceOrganizeImports: CodeActionKind =
-     *   'source.organizeImports';
-     */
-    SourceOrganizeImports,
-
-    /**
-     * Base kind for a 'fix all' source action: `source.fixAll`.
-     *
-     * 'Fix all' actions automatically fix errors that have a clear fix that do
-     * not require user input. They should not suppress errors or perform unsafe
-     * fixes such as generating new types or classes.
-     *
-     * export const SourceFixAll: CodeActionKind = 'source.fixAll';
-     *
-     * @since 3.17.0
-     */
-    SourceFixAll,
-  };
-
-  extern std::map<CodeActionKind, std::string> CodeActionKindNames;
-
-  auto codeActionKindByName(const std::string &name) -> CodeActionKind;
-
-  extern std::map<CodeActionKind, std::string> CodeActionKindValues;
-
-  auto codeActionKindByValue(const std::string &value) -> CodeActionKind;
-
-  struct CodeActionLiteralSupportCapabilities {
-
-    /**
-     * The code action kind is supported with the following value
-     * set.
-     *
-     * codeActionKind: {
-     *   // The code action kind values the client supports. When this
-     *   // property exists the client also guarantees that it will
-     *   // handle values outside its set gracefully and falls back
-     *   // to a default value when unknown.
-     *   valueSet: CodeActionKind[];
-     * };
-     */
-    std::unique_ptr<ValueSet<CodeActionKind>> codeActionKind;
-  };
-
-  /**
-   * The code action request is sent from the client to the server to compute
-   * commands for a given text document and range. These commands are typically
-   * code fixes to either fix problems or to beautify/refactor code. The result
-   * of a textDocument/codeAction request is an array of Command literals which
-   * are typically presented in the user interface. To ensure that a server is
-   * useful in many clients the commands specified in a code actions should be
-   * handled by the server and not by the client (see workspace/executeCommand
-   * and ServerCapabilities.executeCommandProvider). If the client supports
-   * providing edits with a code action then that mode should be used.
-   *
-   * Since version 3.16.0: a client can offer a server to delay the computation
-   * of code action properties during a ‘textDocument/codeAction’ request:
-   *
-   * This is useful for cases where it is expensive to compute the value of a
-   * property (for example the edit property). Clients signal this through the
-   * codeAction.resolveSupport capability which lists all properties a client
-   * can resolve lazily. The server capability
-   * codeActionProvider.resolveProvider signals that a server will offer a
-   * codeAction/resolve route. To help servers to uniquely identify a code
-   * action in the resolve request, a code action literal can optional carry a
-   * data property. This is also guarded by an additional client capability
-   * codeAction.dataSupport. In general, a client should offer data support if
-   * it offers resolve support. It should also be noted that servers shouldn’t
-   * alter existing attributes of a code action in a codeAction/resolve request.
-   *
-   * Since version 3.8.0: support for CodeAction literals to enable the
-   * following scenarios:
-   * - the ability to directly return a workspace edit from the code action
-   *   request. This avoids having another server roundtrip to execute an actual
-   *   code action. However server providers should be aware that if the code
-   *   action is expensive to compute or the edits are huge it might still be
-   *   beneficial if the result is simply a command and the actual edit is only
-   *   computed when needed.
-   * - the ability to group code actions using a kind. Clients are allowed to
-   *   ignore that information. However it allows them to better group code
-   *   action for example into corresponding menus (e.g. all refactor code
-   *   actions into a refactor menu).
-   *
-   * Clients need to announce their support for code action literals (e.g.
-   * literals of type CodeAction) and code action kinds via the corresponding
-   * client capability codeAction.codeActionLiteralSupport.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.codeAction
-   * - property type: CodeActionClientCapabilities defined as follows:
-   *
-   * export interface CodeActionClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   codeActionLiteralSupport?: {
-   *     codeActionKind: {
-   *       valueSet: CodeActionKind[];
-   *     };
-   *   };
-   *   isPreferredSupport?: boolean;
-   *   disabledSupport?: boolean;
-   *   dataSupport?: boolean;
-   *   resolveSupport?: {
-   *     properties: string[];
-   *   };
-   *   honorsChangeAnnotations?: boolean;
-   * }
-   */
-  struct CodeActionClientCapabilities {
-
-    /**
-     * Whether code action supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * The client supports code action literals as a valid
-     * response of the `textDocument/codeAction` request.
-     *
-     * codeActionLiteralSupport?: {
-     *   codeActionKind: {
-     *     valueSet: CodeActionKind[];
-     *   };
-     * };
-     *
-     * @since 3.8.0
-     */
-    optional_ptr<CodeActionLiteralSupportCapabilities> codeActionLiteralSupport;
-
-    /**
-     * Whether code action supports the `isPreferred` property.
-     *
-     * isPreferredSupport?: boolean;
-     *
-     * @since 3.15.0
-     */
-    std::optional<boolean> isPreferredSupport;
-
-    /**
-     * Whether code action supports the `disabled` property.
-     *
-     * disabledSupport?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> disabledSupport;
-
-    /**
-     * Whether code action supports the `data` property which is preserved
-     * between a `textDocument/codeAction` and a `codeAction/resolve` request.
-     *
-     * dataSupport?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> dataSupport;
-
-    /**
-     * Whether the client supports resolving additional code action
-     * properties via a separate `codeAction/resolve` request.
-     *
-     * resolveSupport?: {
-     *   properties: string[];
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ResolveSupportCapabilities> resolveSupport;
-
-    /**
-     * Whether the client honors the change annotations in text edits and
-     * resource operations returned via the `CodeAction#edit` property by for
-     * example presenting the workspace edit in the user interface and asking
-     * for confirmation.
-     *
-     * honorsChangeAnnotations?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> honorsChangeAnnotations;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): codeActionProvider
-   * - property type: boolean | CodeActionOptions where CodeActionOptions is
-   *   defined as follows:
-   *
-   * export interface CodeActionOptions extends WorkDoneProgressOptions {
-   *   codeActionKinds?: CodeActionKind[];
-   *   resolveProvider?: boolean;
-   * }
-   */
-  struct CodeActionOptions : public WorkDoneProgressOptions {
-
-    /**
-     * CodeActionKinds that this server may return.
-     *
-     * The list of kinds may be generic, such as `CodeActionKind.Refactor`, or
-     * the server may list out every specific kind they provide.
-     *
-     * codeActionKinds?: CodeActionKind[];
-     */
-    optional_vector<CodeActionKind> codeActionKinds;
-
-    /**
-     * The server provides support to resolve additional information for a code
-     * action.
-     *
-     * resolveProvider?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> resolveProvider;
-  };
-
-  /**
-   * Registration Options: CodeActionRegistrationOptions defined as follows:
-   *
-   * export interface CodeActionRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, CodeActionOptions {
-   * }
-   */
-  struct CodeActionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CodeActionOptions {
-    // empty
-  };
-
-  /**
-   * The reason why code actions were requested.
-   *
-   * export namespace CodeActionTriggerKind {
-   *   export const Invoked: 1 = 1;
-   *   export const Automatic: 2 = 2;
-   * }
-   * export type CodeActionTriggerKind = 1 | 2;
+   * A partial result for a document diagnostic report.
    *
    * @since 3.17.0
    */
-  enum class CodeActionTriggerKind {
-
-    /**
-     * Code actions were explicitly requested by the user or by an extension.
-     *
-     * export const Invoked: 1 = 1;
-     */
-    Invoked = 1,
-
-    /**
-     * Code actions were requested automatically.
-     *
-     * This typically happens when current selection in a file changes, but can
-     * also be triggered when file content changes.
-     *
-     * export const Automatic: 2 = 2;
-     */
-    Automatic = 2,
+  struct DocumentDiagnosticReportPartialResult
+  {
+    std::map<DocumentUri, DocumentDiagnosticReportPartialResult_relatedDocuments> relatedDocuments;
   };
 
-  extern std::map<CodeActionTriggerKind, std::string> CodeActionTriggerKindNames;
-
-  auto codeActionTriggerKindByName(const std::string &name) -> CodeActionTriggerKind;
-
   /**
-   * Contains additional diagnostic information about the context in which a
-   * code action is run.
-   *
-   * export interface CodeActionContext {
-   *   diagnostics: Diagnostic[];
-   *   only?: CodeActionKind[];
-   *   triggerKind?: CodeActionTriggerKind;
-   * }
+   * Contains additional diagnostic information about the context in which
+   * a {@link CodeActionProvider.provideCodeActions code action} is run.
    */
-  struct CodeActionContext {
-
+  struct CodeActionContext
+  {
     /**
-     * An array of diagnostics known on the client side overlapping the range
-     * provided to the `textDocument/codeAction` request. They are provided so
-     * that the server knows which errors are currently presented to the user
-     * for the given range. There is no guarantee that these accurately reflect
-     * the error state of the resource. The primary parameter to compute code
-     * actions is the provided range.
-     *
-     * diagnostics: Diagnostic[];
+     * An array of diagnostics known on the client side overlapping the range provided to the
+     * `textDocument/codeAction` request. They are provided so that the server knows which
+     * errors are currently presented to the user for the given range. There is no guarantee
+     * that these accurately reflect the error state of the resource. The primary parameter
+     * to compute code actions is the provided range.
      */
-    ptr_vector<Diagnostic> diagnostics;
-
+    std::vector<std::unique_ptr<Diagnostic>> diagnostics;
     /**
      * Requested kind of actions to return.
      *
-     * Actions not of this kind are filtered out by the client before being
-     * shown. So servers can omit computing them.
-     *
-     * only?: CodeActionKind[];
+     * Actions not of this kind are filtered out by the client before being shown. So servers
+     * can omit computing them.
      */
-    optional_vector<CodeActionKind> only;
-
+    std::optional<std::vector<CodeActionKind>> only;
     /**
      * The reason why code actions were requested.
-     *
-     * triggerKind?: CodeActionTriggerKind;
      *
      * @since 3.17.0
      */
@@ -9302,1742 +4613,236 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * Params for the CodeActionRequest.
-   *
-   * Request:
-   * - method: textDocument/codeAction
-   * - params: CodeActionParams defined as follows:
-   *
-   * export interface CodeActionParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   range: Range;
-   *   context: CodeActionContext;
-   * }
+   * The publish diagnostic notification's parameters.
    */
-  struct CodeActionParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
+  struct PublishDiagnosticsParams
+  {
     /**
-     * The document in which the command was invoked.
-     *
-     * textDocument: TextDocumentIdentifier;
+     * The URI for which diagnostic information is reported.
      */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The range for which the command was invoked.
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-
-    /**
-     * Context carrying additional information.
-     *
-     * context: CodeActionContext;
-     */
-    std::unique_ptr<CodeActionContext> context;
-  };
-
-  struct Reason {
-
-    /**
-     * Human readable description of why the code action is currently disabled.
-     *
-     * This is displayed in the code actions UI.
-     *
-     * reason: string;
-     */
-    string reason;
-  };
-
-  /**
-   * A code action represents a change that can be performed in code, e.g. to
-   * fix a problem or to refactor code.
-   *
-   * A CodeAction must set either `edit` and/or a `command`. If both are
-   * supplied, the `edit` is applied first, then the `command` is executed.
-   *
-   * Response:
-   * - result: (Command | CodeAction)[] | null where CodeAction is defined as
-   *   follows:
-   *
-   * export interface CodeAction {
-   *   title: string;
-   *   kind?: CodeActionKind;
-   *   diagnostics?: Diagnostic[];
-   *   isPreferred?: boolean;
-   *   disabled?: {
-   *     reason: string;
-   *   };
-   *   edit?: WorkspaceEdit;
-   *   command?: Command;
-   *   data?: LSPAny;
-   * }
-   *
-   * - partial result: (Command | CodeAction)[]
-   * - error: code and message set in case an exception happens during the code
-   *   action request.
-   */
-  struct CodeAction {
-
-    /**
-     * A short, human-readable, title for this code action.
-     *
-     * title: string;
-     */
-    string title;
-
-    /**
-     * The kind of the code action.
-     *
-     * Used to filter code actions.
-     *
-     * kind?: CodeActionKind;
-     */
-    std::optional<CodeActionKind> kind;
-
-    /**
-     * The diagnostics that this code action resolves.
-     *
-     * diagnostics?: Diagnostic[];
-     */
-    ptr_vector<Diagnostic> diagnostics;
-
-    /**
-     * Marks this as a preferred action. Preferred actions are used by the `auto
-     * fix` command and can be targeted by keybindings.
-     *
-     * A quick fix should be marked preferred if it properly addresses the
-     * underlying error. A refactoring should be marked preferred if it is the
-     * most reasonable choice of actions to take.
-     *
-     * isPreferred?: boolean;
-     *
-     * @since 3.15.0
-     */
-    std::optional<boolean> isPreferred;
-
-    /**
-     * Marks that the code action cannot currently be applied.
-     *
-     * Clients should follow the following guidelines regarding disabled code
-     * actions:
-     *
-     * - Disabled code actions are not shown in automatic lightbulbs code
-     *   action menus.
-     *
-     * - Disabled actions are shown as faded out in the code action menu when
-     *   the user request a more specific type of code action, such as
-     *   refactorings.
-     *
-     * - If the user has a keybinding that auto applies a code action and only
-     *   a disabled code actions are returned, the client should show the user
-     *   an error message with `reason` in the editor.
-     *
-     * disabled?: {
-     *   reason: string;
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<Reason> disabled;
-
-    /**
-     * The workspace edit this code action performs.
-     *
-     * edit?: WorkspaceEdit;
-     */
-    optional_ptr<WorkspaceEdit> edit;
-
-    /**
-     * A command this code action executes. If a code action provides an edit
-     * and a command, first the edit is executed and then the command.
-     *
-     * command?: Command;
-     */
-    optional_ptr<Command> command;
-
-    /**
-     * A data entry field that is preserved on a code action between
-     * a `textDocument/codeAction` and a `codeAction/resolve` request.
-     *
-     * data?: LSPAny;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<LSPAny> data;
-  };
-
-  // --------------------------------------------------------------------------
-  // Code Action Resolve Request
-  // --------------------------------------------------------------------------
-  // Since version 3.16.0
-  //
-  // The request is sent from the client to the server to resolve additional
-  // information for a given code action. This is usually used to compute the
-  // edit property of a code action to avoid its unnecessary computation during
-  // the textDocument/codeAction request.
-  //
-  // Client Capability:
-  // - property name (optional): textDocument.codeAction.resolveSupport
-  // - property type: { properties: string[]; }
-  //
-  // Request:
-  // - method: codeAction/resolve
-  // - params: CodeAction
-  //
-  // Response:
-  // - result: CodeAction
-  // - error: code and message set in case an exception happens during the code
-  // - action resolve request.
-  // --------------------------------------------------------------------------
-
-  /**
-   * The document color request is sent from the client to the server to list
-   * all color references found in a given text document. Along with the range,
-   * a color value in RGB is returned.
-   *
-   * Clients can use the result to decorate color references in an editor. For
-   * example:
-   * - Color boxes showing the actual color next to the reference
-   * - Show a color picker when a color reference is edited
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.colorProvider
-   * - property type: DocumentColorClientCapabilities defined as follows:
-   *
-   * export interface DocumentColorClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct DocumentColorClientCapabilities {
-
-    /**
-     * Whether document color supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): colorProvider
-   * - property type: boolean | DocumentColorOptions |
-   *   DocumentColorRegistrationOptions where DocumentColorOptions is defined as
-   *   follows:
-   *
-   * export interface DocumentColorOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct DocumentColorOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: DocumentColorRegistrationOptions defined as follows:
-   *
-   * export interface DocumentColorRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, StaticRegistrationOptions,
-   *   DocumentColorOptions {
-   * }
-   */
-  struct DocumentColorRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public StaticRegistrationOptions
-    , public DocumentColorOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/documentColor
-   * - params: DocumentColorParams defined as follows:
-   *
-   * interface DocumentColorParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   * }
-   */
-  struct DocumentColorParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * Represents a color in RGBA space.
-   *
-   * interface Color {
-   *   readonly red: decimal;
-   *   readonly green: decimal;
-   *   readonly blue: decimal;
-   *   readonly alpha: decimal;
-   * }
-   */
-  struct Color {
-
-    /**
-     * The red component of this color in the range [0-1].
-     *
-     * readonly red: decimal;
-     */
-    decimal red;
-
-    /**
-     * The green component of this color in the range [0-1].
-     *
-     * readonly green: decimal;
-     */
-    decimal green;
-
-    /**
-     * The blue component of this color in the range [0-1].
-     *
-     * readonly blue: decimal;
-     */
-    decimal blue;
-
-    /**
-     * The alpha component of this color in the range [0-1].
-     *
-     * readonly alpha: decimal;
-     */
-    decimal alpha;
-  };
-
-  /**
-   * Response:
-   * - result: ColorInformation[] defined as follows:
-   *
-   * interface ColorInformation {
-   *   range: Range;
-   *   color: Color;
-   * }
-   *
-   * - partial result: ColorInformation[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/documentColor’ request
-   */
-  struct ColorInformation {
-
-    /**
-     * The range in the document where this color appears.
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-
-    /**
-     * The actual color value for this color range.
-     *
-     * color: Color;
-     */
-    std::unique_ptr<Color> color;
-  };
-
-  /**
-   * The color presentation request is sent from the client to the server to
-   * obtain a list of presentations for a color value at a given location.
-   * Clients can use the result to
-   * - modify a color reference.
-   * - show in a color picker and let users pick one of the presentations
-   *
-   * This request has no special capabilities and registration options since it
-   * is send as a resolve request for the textDocument/documentColor request.
-   *
-   * Request:
-   * - method: textDocument/colorPresentation
-   * - params: ColorPresentationParams defined as follows:
-   *
-   * interface ColorPresentationParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   color: Color;
-   *   range: Range;
-   * }
-   */
-  struct ColorPresentationParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * The text document.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The color information to request presentations for.
-     *
-     * color: Color;
-     */
-    std::unique_ptr<Color> color;
-
-    /**
-     * The range where the color would be inserted. Serves as a context.
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-  };
-
-  /**
-   * Response:
-   * - result: ColorPresentation[] defined as follows:
-   *
-   * interface ColorPresentation {
-   *   label: string;
-   *   textEdit?: TextEdit;
-   *   additionalTextEdits?: TextEdit[];
-   * }
-   *
-   * - partial result: ColorPresentation[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/colorPresentation’ request
-   */
-  struct ColorPresentation {
-
-    /**
-     * The label of this color presentation. It will be shown on the color
-     * picker header. By default this is also the text that is inserted when
-     * selecting this color presentation.
-     *
-     * label: string;
-     */
-    string label;
-
-    /**
-     * An [edit](#TextEdit) which is applied to a document when selecting this
-     * presentation for the color. When omitted the
-     * [label](#ColorPresentation.label) is used.
-     *
-     * textEdit?: TextEdit;
-     */
-    optional_ptr<TextEdit> textEdit;
-
-    /**
-     * An optional array of additional [text edits](#TextEdit) that are applied
-     * when selecting this color presentation. Edits must not overlap with the
-     * main [edit](#ColorPresentation.textEdit) nor with themselves.
-     *
-     * additionalTextEdits?: TextEdit[];
-     */
-    optional_ptr_vector<TextEdit> additionalTextEdits;
-  };
-
-  /**
-   * Client Capability:
-   * - property name (optional): textDocument.formatting
-   * - property type: DocumentFormattingClientCapabilities defined as follows:
-   *
-   * export interface DocumentFormattingClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct DocumentFormattingClientCapabilities {
-
-    /**
-     * Whether formatting supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): documentFormattingProvider
-   * - property type: boolean | DocumentFormattingOptions where
-   *   DocumentFormattingOptions is defined as follows:
-   *
-   * export interface DocumentFormattingOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct DocumentFormattingOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: DocumentFormattingRegistrationOptions defined as
-   * follows:
-   *
-   * export interface DocumentFormattingRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DocumentFormattingOptions {
-   * }
-   */
-  struct DocumentFormattingRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentFormattingOptions {
-    // empty
-  };
-
-  enum class BooleanOrIntegerOrStringType {
-    BOOLEAN,
-    INTEGER,
-    STRING,
-  };
-
-  typedef std::variant<
-    boolean,
-    integer,
-    string
-  > BooleanOrIntegerOrString;
-
-  /**
-   * Value-object describing what options formatting should use.
-   *
-   * interface FormattingOptions {
-   *   tabSize: uinteger;
-   *   insertSpaces: boolean;
-   *   trimTrailingWhitespace?: boolean;
-   *   insertFinalNewline?: boolean;
-   *   trimFinalNewlines?: boolean;
-   *   [key: string]: boolean | integer | string;
-   * }
-   */
-  struct FormattingOptions {
-
-    /**
-     * Size of a tab in spaces.
-     *
-     * tabSize: uinteger;
-     */
-    uinteger tabSize;
-
-    /**
-     * Prefer spaces over tabs.
-     *
-     * insertSpaces: boolean;
-     */
-    boolean insertSpaces;
-
-    /**
-     * Trim trailing whitespace on a line.
-     *
-     * trimTrailingWhitespace?: boolean;
-     *
-     * @since 3.15.0
-     */
-    boolean trimTrailingWhitespace;
-
-    /**
-     * Insert a newline character at the end of the file if one does not exist.
-     *
-     * insertFinalNewline?: boolean;
-     *
-     * @since 3.15.0
-     */
-    std::optional<boolean> insertFinalNewline;
-
-    /**
-     * Trim all newlines after the final newline at the end of the file.
-     *
-     * trimFinalNewlines?: boolean;
-     *
-     * @since 3.15.0
-     */
-    std::optional<boolean> trimFinalNewlines;
-
-    /**
-     * Signature for further properties.
-     *
-     * [key: string]: boolean | integer | string;
-     */
-    std::optional<std::map<string, BooleanOrIntegerOrString>> additionalProperties;
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/formatting
-   * - params: DocumentFormattingParams defined as follows:
-   *
-   * interface DocumentFormattingParams extends WorkDoneProgressParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   options: FormattingOptions;
-   * }
-   *
-   * Response:
-   * - result: TextEdit[] | null describing the modification to the document to
-   *   be formatted.
-   * - error: code and message set in case an exception happens during the
-   *   formatting request.
-   */
-  struct DocumentFormattingParams : public WorkDoneProgressParams {
-
-    /**
-     * The document to format.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The format options.
-     *
-     * options: FormattingOptions;
-     */
-    std::unique_ptr<FormattingOptions> options;
-  };
-
-  /**
-   * The document range formatting request is sent from the client to the server
-   * to format a given range in a document.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.rangeFormatting
-   * - property type: DocumentRangeFormattingClientCapabilities defined as
-   *   follows:
-   *
-   * export interface DocumentRangeFormattingClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct DocumentRangeFormattingClientCapabilities {
-
-    /**
-     * Whether formatting supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): documentRangeFormattingProvider
-   * - property type: boolean | DocumentRangeFormattingOptions where
-   *   DocumentRangeFormattingOptions is defined as follows:
-   *
-   * export interface DocumentRangeFormattingOptions extends
-   *   WorkDoneProgressOptions {
-   * }
-   */
-  struct DocumentRangeFormattingOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: DocumentFormattingRegistrationOptions defined as
-   * follows:
-   *
-   * export interface DocumentRangeFormattingRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DocumentRangeFormattingOptions {
-   * }
-   */
-  struct DocumentRangeFormattingRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentRangeFormattingOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/rangeFormatting,
-   * - params: DocumentRangeFormattingParams defined as follows:
-   *
-   * interface DocumentRangeFormattingParams extends WorkDoneProgressParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   range: Range;
-   *   options: FormattingOptions;
-   * }
-   *
-   * Response:
-   * - result: TextEdit[] | null describing the modification to the document to
-   *   be formatted.
-   * - error: code and message set in case an exception happens during the range
-   *   formatting request.
-   */
-  struct DocumentRangeFormattingParams : public WorkDoneProgressParams {
-
-    /**
-     * The document to format.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The range to format
-     *
-     * range: Range;
-     */
-    std::unique_ptr<Range> range;
-
-    /**
-     * The format options
-     *
-     * options: FormattingOptions;
-     */
-    std::unique_ptr<FormattingOptions> options;
-  };
-
-  /**
-   * The document on type formatting request is sent from the client to the
-   * server to format parts of the document during typing.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.onTypeFormatting
-   * - property type: DocumentOnTypeFormattingClientCapabilities defined as
-   *   follows:
-   *
-   * export interface DocumentOnTypeFormattingClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct DocumentOnTypeFormattingClientCapabilities {
-
-    /**
-     * Whether on type formatting supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): documentOnTypeFormattingProvider
-   * - property type: DocumentOnTypeFormattingOptions defined as follows:
-   *
-   * export interface DocumentOnTypeFormattingOptions {
-   *   firstTriggerCharacter: string;
-   *   moreTriggerCharacter?: string[];
-   * }
-   */
-  struct DocumentOnTypeFormattingOptions {
-
-    /**
-     * A character on which formatting should be triggered, like `{`.
-     *
-     * firstTriggerCharacter: string;
-     */
-    string firstTriggerCharacter;
-
-    /**
-     * More trigger characters.
-     *
-     * moreTriggerCharacter?: string[];
-     */
-    optional_vector<string> moreTriggerCharacter;
-  };
-
-  /**
-   * Registration Options: DocumentOnTypeFormattingRegistrationOptions defined
-   * as follows:
-   *
-   * export interface DocumentOnTypeFormattingRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, DocumentOnTypeFormattingOptions {
-   * }
-   */
-  struct DocumentOnTypeFormattingRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentOnTypeFormattingOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/onTypeFormatting
-   * - params: DocumentOnTypeFormattingParams defined as follows:
-   *
-   * interface DocumentOnTypeFormattingParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   position: Position;
-   *   ch: string;
-   *   options: FormattingOptions;
-   * }
-   *
-   * Response:
-   * - result: TextEdit[] | null describing the modification to the document.
-   * - error: code and message set in case an exception happens during the range
-   *   formatting request.
-   */
-  struct DocumentOnTypeFormattingParams {
-
-    /**
-     * The document to format.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The position around which the on type formatting should happen. This is
-     * not necessarily the exact position where the character denoted by the
-     * property `ch` got typed.
-     *
-     * position: Position;
-     */
-    std::unique_ptr<Position> position;
-
-    /**
-     * The character that has been typed that triggered the formatting on type
-     * request. That is not necessarily the last character that got inserted
-     * into the document since the client could auto insert characters as well
-     * (e.g. like automatic brace completion).
-     *
-     * ch: string;
-     */
-    string ch;
-
-    /**
-     * The formatting options.
-     *
-     * options: FormattingOptions;
-     */
-    std::unique_ptr<FormattingOptions> options;
-  };
-
-  /**
-   * export namespace PrepareSupportDefaultBehavior {
-   *   export const Identifier: 1 = 1;
-   * }
-   * export type PrepareSupportDefaultBehavior = 1;
-   */
-  enum class PrepareSupportDefaultBehavior {
-
-    /**
-     * The client's default behavior is to select the identifier
-     * according to the language's syntax rule.
-     *
-     * export const Identifier: 1 = 1;
-     */
-    Identifier = 1,
-  };
-
-  extern std::map<PrepareSupportDefaultBehavior, std::string> PrepareSupportDefaultBehaviorNames;
-
-  auto prepareSupportDefaultBehaviorByName(const std::string &name) -> PrepareSupportDefaultBehavior;
-
-  auto prepareSupportDefaultBehaviorByValue(int value) -> PrepareSupportDefaultBehavior;
-
-  /**
-   * The rename request is sent from the client to the server to ask the server
-   * to compute a workspace change so that the client can perform a
-   * workspace-wide rename of a symbol.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.rename
-   * - property type: RenameClientCapabilities defined as follows:
-   *
-   * export interface RenameClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   prepareSupport?: boolean;
-   *   prepareSupportDefaultBehavior?: PrepareSupportDefaultBehavior;
-   *   honorsChangeAnnotations?: boolean;
-   * }
-   */
-  struct RenameClientCapabilities {
-
-    /**
-     * Whether rename supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Client supports testing for validity of rename operations
-     * before execution.
-     *
-     * prepareSupport?: boolean;
-     *
-     * @since version 3.12.0
-     */
-    std::optional<boolean> prepareSupport;
-
-    /**
-     * Client supports the default behavior result
-     * (`{ defaultBehavior: boolean }`).
-     *
-     * The value indicates the default behavior used by the
-     * client.
-     *
-     * prepareSupportDefaultBehavior?: PrepareSupportDefaultBehavior;
-     *
-     * @since version 3.16.0
-     */
-    std::optional<PrepareSupportDefaultBehavior> prepareSupportDefaultBehavior;
-
-    /**
-     * Whether the client honors the change annotations in text edits and
-     * resource operations returned via the rename request's workspace edit by
-     * for example presenting the workspace edit in the user interface and
-     * asking for confirmation.
-     *
-     * honorsChangeAnnotations?: boolean;
-     *
-     * @since 3.16.0
-     */
-    std::optional<boolean> honorsChangeAnnotations;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): renameProvider
-   * - property type: boolean | RenameOptions where RenameOptions is defined as
-   *   follows:
-   *
-   * export interface RenameOptions extends WorkDoneProgressOptions {
-   *   prepareProvider?: boolean;
-   * }
-   *
-   * RenameOptions may only be specified if the client states that it supports
-   * prepareSupport in its initial initialize request.
-   */
-  struct RenameOptions : public WorkDoneProgressOptions {
-
-    /**
-     * Renames should be checked and tested before being executed.
-     *
-     * prepareProvider?: boolean;
-     */
-    std::optional<boolean> prepareProvider;
-  };
-
-  /**
-   * Registration Options: RenameRegistrationOptions defined as follows:
-   *
-   * export interface RenameRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, RenameOptions {
-   * }
-   */
-  struct RenameRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public RenameOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/rename
-   * - params: RenameParams defined as follows:
-   *
-   * interface RenameParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams {
-   *   newName: string;
-   * }
-   *
-   * Response:
-   * - result: WorkspaceEdit | null describing the modification to the
-   *   workspace. null should be treated the same was as WorkspaceEdit with no
-   *   changes (no change was required).
-   * - error: code and message set in case when rename could not be performed
-   *   for any reason. Examples include: there is nothing at given position to
-   *   rename (like a space), given symbol does not support renaming by the
-   *   server or the code is invalid (e.g. does not compile).
-   */
-  struct RenameParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams {
-
-    /**
-     * The new name of the symbol. If the given name is not valid the request
-     * must return a [ResponseError](#ResponseError) with an appropriate message
-     * set.
-     *
-     * newName: string;
-     */
-    string newName;
-  };
-
-  /**
-   * The prepare rename request is sent from the client to the server to setup
-   * and test the validity of a rename operation at a given location.
-   *
-   * Request:
-   * - method: textDocument/prepareRename
-   * - params: PrepareRenameParams defined as follows:
-   *
-   * export interface PrepareRenameParams extends TextDocumentPositionParams, WorkDoneProgressParams {
-   * }
-   *
-   * Response:
-   * - result: Range | { range: Range, placeholder: string } | {
-   *   defaultBehavior: boolean } | null describing a Range of the string to
-   *   rename and optionally a placeholder text of the string content to be
-   *   renamed. If { defaultBehavior: boolean } is returned (since 3.16) the
-   *   rename position is valid and the client should use its default behavior
-   *   to compute the rename range. If null is returned then it is deemed that a
-   *   ‘textDocument/rename’ request is not valid at the given position.
-   * - error: code and message set in case the element can’t be renamed. Clients
-   *   should show the information in their user interface.
-   */
-  struct PrepareRenameParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams {
-    // empty
-  };
-
-  /**
-   * The linked editing request is sent from the client to the server to return
-   * for a given position in a document the range of the symbol at the position
-   * and all ranges that have the same content. Optionally a word pattern can be
-   * returned to describe valid contents. A rename to one of the ranges can be
-   * applied to all other ranges if the new content is valid. If no
-   * result-specific word pattern is provided, the word pattern from the
-   * client’s language configuration is used.
-   *
-   * Client Capabilities:
-   * - property name (optional): textDocument.linkedEditingRange
-   * - property type: LinkedEditingRangeClientCapabilities defined as follows:
-   *
-   * export interface LinkedEditingRangeClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct LinkedEditingRangeClientCapabilities {
-
-    /**
-     * Whether the implementation supports dynamic registration.
-     * If this is set to `true` the client supports the new
-     * `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
-     * return value for the corresponding server capability as well.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property name (optional): linkedEditingRangeProvider
-   * - property type: boolean | LinkedEditingRangeOptions |
-   *   LinkedEditingRangeRegistrationOptions defined as follows:
-   *
-   * export interface LinkedEditingRangeOptions extends WorkDoneProgressOptions {
-   * }
-   */
-  struct LinkedEditingRangeOptions : public WorkDoneProgressOptions {
-    // empty
-  };
-
-  /**
-   * Registration Options: LinkedEditingRangeRegistrationOptions defined as
-   * follows:
-   *
-   * export interface LinkedEditingRangeRegistrationOptions extends
-   *   TextDocumentRegistrationOptions, LinkedEditingRangeOptions,
-   *   StaticRegistrationOptions {
-   * }
-   */
-  struct LinkedEditingRangeRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public LinkedEditingRangeOptions
-    , public StaticRegistrationOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: textDocument/linkedEditingRange
-   * - params: LinkedEditingRangeParams defined as follows:
-   *
-   * export interface LinkedEditingRangeParams extends TextDocumentPositionParams,
-   *   WorkDoneProgressParams {
-   * }
-   */
-  struct LinkedEditingRangeParams
-    : public TextDocumentPositionParams
-    , public WorkDoneProgressParams {
-    // empty
-  };
-
-  /**
-   * Response:
-   * - result: LinkedEditingRanges | null defined as follows:
-   *
-   * export interface LinkedEditingRanges {
-   *   ranges: Range[];
-   *   wordPattern?: string;
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   ‘textDocument/linkedEditingRange’ request
-   */
-  struct LinkedEditingRanges {
-
-    /**
-     * A list of ranges that can be renamed together. The ranges must have
-     * identical length and contain identical text content. The ranges cannot
-     * overlap.
-     *
-     * ranges: Range[];
-     */
-    ptr_vector<Range> ranges;
-
-    /**
-     * An optional word pattern (regular expression) that describes valid
-     * contents for the given ranges. If no pattern is provided, the client
-     * configuration's word pattern will be used.
-     *
-     *
-     wordPattern?: string;
-     */
-    std::optional<string> wordPattern;
-  };
-
-  /**
-   * The workspace symbol request is sent from the client to the server to list
-   * project-wide symbols matching the query string. Since 3.17.0 servers can
-   * also provide a handler for workspaceSymbol/resolve requests. This allows
-   * servers to return workspace symbols without a range for a workspace/symbol
-   * request. Clients then need to resolve the range when necessary using the
-   * workspaceSymbol/resolve request. Servers can only use this new model if
-   * clients advertise support for it via the workspace.symbol.resolveSupport
-   * capability.
-   *
-   * Client Capability:
-   * - property path (optional): workspace.symbol
-   * - property type: WorkspaceSymbolClientCapabilities defined as follows:
-   *
-   * interface WorkspaceSymbolClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   symbolKind?: {
-   *     valueSet?: SymbolKind[];
-   *   };
-   *   tagSupport?: {
-   *     valueSet: SymbolTag[];
-   *   };
-   *   resolveSupport?: {
-   *     properties: string[];
-   *   };
-   * }
-   */
-  struct WorkspaceSymbolClientCapabilities {
-
-    /**
-     * Symbol request supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Specific capabilities for the `SymbolKind` in the `workspace/symbol`
-     * request.
-     *
-     * symbolKind?: {
-     *   // The symbol kind values the client supports. When this
-     *   // property exists the client also guarantees that it will
-     *   // handle values outside its set gracefully and falls back
-     *   // to a default value when unknown.
-     *   //
-     *   // If this property is not present the client only supports
-     *   // the symbol kinds from `File` to `Array` as defined in
-     *   // the initial version of the protocol.
-     *   valueSet?: SymbolKind[];
-     * };
-     */
-    optional_ptr<OptionalValueSet<SymbolKind>> symbolKind;
-
-    /**
-     * The client supports tags on `SymbolInformation` and `WorkspaceSymbol`.
-     * Clients supporting tags have to handle unknown tags gracefully.
-     *
-     * tagSupport?: {
-     *   // The tags supported by the client.
-     *   valueSet: SymbolTag[];
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<ValueSet<SymbolTag>> tagSupport;
-
-    /**
-     * The client support partial workspace symbols. The client will send the
-     * request `workspaceSymbol/resolve` to the server to resolve additional
-     * properties.
-     *
-     * resolveSupport?: {
-     *   // The properties that a client can resolve lazily. Usually
-     *   // `location.range`
-     *   properties: string[];
-     * };
-     *
-     * @since 3.17.0 - proposedState
-     */
-    optional_ptr<ResolveSupportCapabilities> resolveSupport;
-  };
-
-  /**
-   * Server Capability:
-   * - property path (optional): workspaceSymbolProvider
-   * - property type: boolean | WorkspaceSymbolOptions where
-   *   WorkspaceSymbolOptions is defined as follows:
-   *
-   * export interface WorkspaceSymbolOptions extends WorkDoneProgressOptions {
-   *   resolveProvider?: boolean;
-   * }
-   */
-  struct WorkspaceSymbolOptions : public WorkDoneProgressOptions {
-
-    /**
-     * The server provides support to resolve additional
-     * information for a workspace symbol.
-     *
-     * resolveProvider?: boolean;
-     *
-     * @since 3.17.0
-     */
-    std::optional<boolean> resolveProvider;
-  };
-
-  /**
-   * Registration Options: WorkspaceSymbolRegistrationOptions defined as
-   * follows:
-   *
-   * export interface WorkspaceSymbolRegistrationOptions
-   *   extends WorkspaceSymbolOptions {
-   * }
-   */
-  struct WorkspaceSymbolRegistrationOptions : public WorkspaceSymbolOptions {
-    // empty
-  };
-
-  /**
-   * The parameters of a Workspace Symbol Request.
-   *
-   * Request:
-   * - method: ‘workspace/symbol’
-   * - params: WorkspaceSymbolParams defined as follows:
-   *
-   * interface WorkspaceSymbolParams extends WorkDoneProgressParams,
-   *   PartialResultParams {
-   *   query: string;
-   * }
-   */
-  struct WorkspaceSymbolParams
-    : public WorkDoneProgressParams
-    , public PartialResultParams {
-
-    /**
-     * A query string to filter symbols by. Clients may send an empty string
-     * here to request all symbols.
-     *
-     * query: string;
-     */
-    string query;
-  };
-
-  struct DocumentUriLocation {
     DocumentUri uri;
+    /**
+     * Optional the version number of the document the diagnostics are published for.
+     *
+     * @since 3.15.0
+     */
+    std::optional<integer_t> version;
+    /**
+     * An array of diagnostic information items.
+     */
+    std::vector<std::unique_ptr<Diagnostic>> diagnostics;
   };
 
-  enum class LocationOrDocumentUriType {
-    LOCATION,
-    DOCUMENT_URI,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<Location>,
-    std::unique_ptr<DocumentUriLocation>
-  > LocationOrDocumentUri;
-
-  /**
-   * A special workspace symbol that supports locations without a range
-   *
-   * Response:
-   * - result: SymbolInformation[] | WorkspaceSymbol[] | null. See above for the
-   *   definition of SymbolInformation. It is recommended that you use the new
-   *   WorkspaceSymbol. However whether the workspace symbol can return a
-   *   location without a range depends on the client capability
-   *   workspace.symbol.resolveSupport. WorkspaceSymbolwhich is defined as
-   *   follows:
-   *
-   * export interface WorkspaceSymbol {
-   *   name: string;
-   *   kind: SymbolKind;
-   *   tags?: SymbolTag[];
-   *   containerName?: string;
-   *   location: Location | { uri: DocumentUri };
-   *   data?: LSPAny;
-   * }
-   *
-   * - partial result: SymbolInformation[] | WorkspaceSymbol[] as defined above.
-   * - error: code and message set in case an exception happens during the
-   *   workspace symbol request.
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceSymbol {
-
-    /**
-     * The name of this symbol.
-     *
-     * name: string;
-     */
-    string name;
-
-    /**
-     * The kind of this symbol.
-     *
-     * kind: SymbolKind;
-     */
-    SymbolKind kind;
-
-    /**
-     * Tags for this completion item.
-     *
-     * tags?: SymbolTag[];
-     */
-    optional_vector<SymbolTag> tags;
-
-    /**
-     * The name of the symbol containing this symbol. This information is for
-     * user interface purposes (e.g. to render a qualifier in the user interface
-     * if necessary). It can't be used to re-infer a hierarchy for the document
-     * symbols.
-     *
-     * containerName?: string;
-     */
-    std::optional<string> containerName;
-
-    /**
-     * The location of this symbol. Whether a server is allowed to return a
-     * location without a range depends on the client capability
-     * `workspace.symbol.resolveSupport`.
-     *
-     * location: Location | { uri: DocumentUri };
-     *
-     * See also `SymbolInformation.location`.
-     */
-    LocationOrDocumentUri location;
-
-    /**
-     * A data entry field that is preserved on a workspace symbol between a
-     * workspace symbol request and a workspace symbol resolve request.
-     *
-     * data?: LSPAny;
-     */
-    optional_ptr<LSPAny> data;
-  };
-
-  // The request is sent from the client to the server to resolve additional
-  // information for a given workspace symbol.
-  //
-  // Request:
-  // - method: ‘workspaceSymbol/resolve’
-  // - params: WorkspaceSymbol
-  //
-  // Response:
-  // - result: WorkspaceSymbol
-  // - error: code and message set in case an exception happens during the
-  //   workspace symbol resolve request.
-
-  /**
-   * export interface ConfigurationItem {
-   *   scopeUri?: URI;
-   *   section?: string;
-   * }
-   */
-  struct ConfigurationItem {
-
-    /**
-     * The scope to get the configuration section for.
-     *
-     * scopeUri?: URI;
-     */
-    std::optional<URI> scopeUri;
-
-    /**
-     * The configuration section asked for.
-     *
-     * section?: string;
-     */
-    std::optional<string> section;
-  };
-
-  /**
-   * The workspace/configuration request is sent from the server to the client
-   * to fetch configuration settings from the client. The request can fetch
-   * several configuration settings in one roundtrip. The order of the returned
-   * configuration settings correspond to the order of the passed
-   * ConfigurationItems (e.g. the first item in the response is the result for
-   * the first configuration item in the params).
-   *
-   * A ConfigurationItem consists of the configuration section to ask for and an
-   * additional scope URI. The configuration section asked for is defined by the
-   * server and doesn’t necessarily need to correspond to the configuration
-   * store used by the client. So a server might ask for a configuration
-   * cpp.formatterOptions but the client stores the configuration in an XML
-   * store layout differently. It is up to the client to do the necessary
-   * conversion. If a scope URI is provided the client should return the setting
-   * scoped to the provided resource. If the client for example uses
-   * EditorConfig to manage its settings the configuration should be returned
-   * for the passed resource URI. If the client can’t provide a configuration
-   * setting for a given scope then null needs to be present in the returned
-   * array.
-   *
-   * This pull model replaces the old push model were the client signaled
-   * configuration change via an event. If the server still needs to react to
-   * configuration changes (since the server caches the result of
-   * workspace/configuration requests) the server should register for an empty
-   * configuration change using the following registration pattern:
-   *
-   * connection.client.register(DidChangeConfigurationNotification.type, undefined);
-   *
-   * Client Capability:
-   * - property path (optional): workspace.configuration
-   * - property type: boolean
-   *
-   * Request:
-   * - method: ‘workspace/configuration’
-   * - params: ConfigurationParams defined as follows:
-   *
-   * export interface ConfigurationParams {
-   *   items: ConfigurationItem[];
-   * }
-   *
-   * Response:
-   * - result: LSPAny[]
-   * - error: code and message set in case an exception happens during the
-   *   ‘workspace/configuration’ request
-   */
-  struct ConfigurationParams {
-
-    /**
-     * items: ConfigurationItem[];
-     */
-    ptr_vector<ConfigurationItem> items;
-  };
-
-  /**
-   * A notification sent from the client to the server to signal the change of
-   * configuration settings.
-   *
-   * Client Capability:
-   * - property path (optional): workspace.didChangeConfiguration
-   * - property type: DidChangeConfigurationClientCapabilities defined as
-   *   follows:
-   *
-   * export interface DidChangeConfigurationClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct DidChangeConfigurationClientCapabilities {
-
-    /**
-     * Did change configuration notification supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     *
-     * @since 3.6.0 to support the new pull model.
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Notification:
-   * - method: ‘workspace/didChangeConfiguration’,
-   * - params: DidChangeConfigurationParams defined as follows:
-   *
-   * interface DidChangeConfigurationParams {
-   *   settings: LSPAny;
-   * }
-   */
-  struct DidChangeConfigurationParams {
-
-    /**
-     * The actual changed settings
-     *
-     * settings: LSPAny;
-     */
-    std::unique_ptr<LSPAny> settings;
-  };
-
-  enum class StringOrBooleanType {
-    STRING,
-    BOOLEAN,
+  enum class ParameterInformation_labelType {
+    STRING_TYPE,
+    PAIR_OF_UINTEGER_TYPE_AND_UINTEGER_TYPE,
   };
 
   typedef std::variant<
-    string,
-    boolean
-  > StringOrBoolean;
+    string_t,
+    std::pair<uinteger_t, uinteger_t>
+  > ParameterInformation_label;
+
+  enum class ParameterInformation_documentationType {
+    STRING_TYPE,
+    MARKUP_CONTENT,
+  };
+
+  typedef std::variant<
+    string_t,
+    std::unique_ptr<MarkupContent>
+  > ParameterInformation_documentation;
 
   /**
-   * Many tools support more than one root folder per workspace. Examples for
-   * this are VS Code’s multi-root support, Atom’s project folder support or
-   * Sublime’s project support. If a client workspace consists of multiple roots
-   * then a server typically needs to know about this. The protocol up to now
-   * assumes one root folder which is announced to the server by the rootUri
-   * property of the InitializeParams. If the client supports workspace folders
-   * and announces them via the corresponding workspaceFolders client
-   * capability, the InitializeParams contain an additional property
-   * workspaceFolders with the configured workspace folders when the server
-   * starts.
-   *
-   * The workspace/workspaceFolders request is sent from the server to the
-   * client to fetch the current open list of workspace folders. Returns null in
-   * the response if only a single file is open in the tool. Returns an empty
-   * array if a workspace is open but no folders are configured.
-   *
-   * Client Capability:
-   * - property path (optional): workspace.workspaceFolders
-   * - property type: boolean
-   *
-   * Server Capability:
-   * - property path (optional): workspace.workspaceFolders
-   * - property type: WorkspaceFoldersServerCapabilities defined as follows:
-   *
-   * export interface WorkspaceFoldersServerCapabilities {
-   *   supported?: boolean;
-   *   changeNotifications?: string | boolean;
-   * }
+   * Represents a parameter of a callable-signature. A parameter can
+   * have a label and a doc-comment.
    */
-  struct WorkspaceFoldersServerCapabilities {
-
+  struct ParameterInformation
+  {
     /**
-     * The server has support for workspace folders
+     * The label of this parameter information.
      *
-     * supported?: boolean;
+     * Either a string or an inclusive start and exclusive end offsets within its containing
+     * signature label. (see SignatureInformation.label). The offsets are based on a UTF-16
+     * string representation as `Position` and `Range` does.
+     *
+     * *Note*: a label of type string should be a substring of its containing signature label.
+     * Its intended use case is to highlight the parameter label part in the `SignatureInformation.label`.
      */
-    std::optional<boolean> supported;
-
+    ParameterInformation_label label;
     /**
-     * Whether the server wants to receive workspace folder change
-     * notifications.
-     *
-     * If a string is provided, the string is treated as an ID under which the
-     * notification is registered on the client side. The ID can be used to
-     * unregister for these events using the `client/unregisterCapability`
-     * request.
-     *
-     * changeNotifications?: string | boolean;
+     * The human-readable doc-comment of this parameter. Will be shown
+     * in the UI but can be omitted.
      */
-    std::optional<StringOrBoolean> changeNotifications;
+    std::optional<ParameterInformation_documentation> documentation;
+  };
+
+  enum class SignatureInformation_documentationType {
+    STRING_TYPE,
+    MARKUP_CONTENT,
+  };
+
+  typedef std::variant<
+    string_t,
+    std::unique_ptr<MarkupContent>
+  > SignatureInformation_documentation;
+
+  /**
+   * Represents the signature of something callable. A signature
+   * can have a label, like a function-name, a doc-comment, and
+   * a set of parameters.
+   */
+  struct SignatureInformation
+  {
+    /**
+     * The label of this signature. Will be shown in
+     * the UI.
+     */
+    string_t label;
+    /**
+     * The human-readable doc-comment of this signature. Will be shown
+     * in the UI but can be omitted.
+     */
+    std::optional<SignatureInformation_documentation> documentation;
+    /**
+     * The parameters of this signature.
+     */
+    std::optional<std::vector<std::unique_ptr<ParameterInformation>>> parameters;
+    /**
+     * The index of the active parameter.
+     *
+     * If provided, this is used in place of `SignatureHelp.activeParameter`.
+     *
+     * @since 3.16.0
+     */
+    std::optional<uinteger_t> activeParameter;
   };
 
   /**
-   * Request:
-   * - method: workspace/workspaceFolders
-   * - params: none
-   *
-   * Response:
-   * - result: WorkspaceFolder[] | null defined as follows:
-   *
-   * export interface WorkspaceFolder {
-   *   uri: URI;
-   *   name: string;
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   ‘workspace/workspaceFolders’ request
+   * Signature help represents the signature of something
+   * callable. There can be multiple signature but only one
+   * active and only one active parameter.
    */
-  struct WorkspaceFolder {
-
+  struct SignatureHelp
+  {
     /**
-     * The associated URI for this workspace folder.
-     *
-     * uri: URI;
+     * One or more signatures.
      */
-    URI uri;
-
+    std::vector<std::unique_ptr<SignatureInformation>> signatures;
     /**
-     * The name of the workspace folder. Used to refer to this
-     * workspace folder in the user interface.
+     * The active signature. If omitted or the value lies outside the
+     * range of `signatures` the value defaults to zero or is ignored if
+     * the `SignatureHelp` has no signatures.
      *
-     * name: string;
+     * Whenever possible implementors should make an active decision about
+     * the active signature and shouldn't rely on a default value.
+     *
+     * In future version of the protocol this property might become
+     * mandatory to better express this.
      */
-    string name;
+    std::optional<uinteger_t> activeSignature;
+    /**
+     * The active parameter of the active signature. If omitted or the value
+     * lies outside the range of `signatures[activeSignature].parameters`
+     * defaults to 0 if the active signature has parameters. If
+     * the active signature has no parameters it is ignored.
+     * In future version of the protocol this property might become
+     * mandatory to better express the active parameter if the
+     * active signature does have any.
+     */
+    std::optional<uinteger_t> activeParameter;
   };
 
   /**
-   * The workspace folder change event.
+   * Additional information about the context in which a signature help request was triggered.
    *
-   * export interface WorkspaceFoldersChangeEvent {
-   *   added: WorkspaceFolder[];
-   *   removed: WorkspaceFolder[];
-   * }
+   * @since 3.15.0
    */
-  struct WorkspaceFoldersChangeEvent {
-
+  struct SignatureHelpContext
+  {
     /**
-     * The array of added workspace folders
-     *
-     * added: WorkspaceFolder[];
+     * Action that caused signature help to be triggered.
      */
-    ptr_vector<WorkspaceFolder> added;
-
+    SignatureHelpTriggerKind triggerKind;
     /**
-     * The array of the removed workspace folders
+     * Character that caused signature help to be triggered.
      *
-     * removed: WorkspaceFolder[];
+     * This is undefined when `triggerKind !== SignatureHelpTriggerKind.TriggerCharacter`
      */
-    ptr_vector<WorkspaceFolder> removed;
+    std::optional<string_t> triggerCharacter;
+    /**
+     * `true` if signature help was already showing when it was triggered.
+     *
+     * Retriggers occurs when the signature help is already active and can be caused by actions such as
+     * typing a trigger character, a cursor move, or document content changes.
+     */
+    boolean_t isRetrigger;
+    /**
+     * The currently active `SignatureHelp`.
+     *
+     * The `activeSignatureHelp` has its `SignatureHelp.activeSignature` field updated based on
+     * the user navigating through available signatures.
+     */
+    std::optional<std::unique_ptr<SignatureHelp>> activeSignatureHelp;
   };
-
-  /**
-   * The workspace/didChangeWorkspaceFolders notification is sent from the
-   * client to the server to inform the server about workspace folder
-   * configuration changes. A server can register for this notification by using
-   * either the server capability workspace.workspaceFolders.changeNotifications
-   * or by using the dynamic capability registration mechanism. To dynamically
-   * register for the workspace/didChangeWorkspaceFolders send a
-   * client/registerCapability request from the server to the client. The
-   * registration parameter must have a registrations item of the following
-   * form, where id is a unique id used to unregister the capability (the
-   * example uses a UUID):
-   *
-   * {
-   *   id: "28c6150c-bd7b-11e7-abc4-cec278b6b50a",
-   *   method: "workspace/didChangeWorkspaceFolders"
-   * }
-   *
-   * Notification:
-   * - method: ‘workspace/didChangeWorkspaceFolders’
-   * - params: DidChangeWorkspaceFoldersParams defined as follows:
-   *
-   * export interface DidChangeWorkspaceFoldersParams {
-   *   event: WorkspaceFoldersChangeEvent;
-   * }
-   */
-  struct DidChangeWorkspaceFoldersParams {
-
-    /**
-     * The actual workspace folder change event.
-     *
-     * event: WorkspaceFoldersChangeEvent;
-     */
-    std::unique_ptr<WorkspaceFoldersChangeEvent> event;
-  };
-
-  /**
-   * A pattern kind describing if a glob pattern matches a file a folder or
-   * both.
-   *
-   * export namespace FileOperationPatternKind {
-   *   export const file: 'file' = 'file';
-   *   export const folder: 'folder' = 'folder';
-   * }
-   * export type FileOperationPatternKind = 'file' | 'folder';
-   *
-   * @since 3.16.0
-   */
-  enum class FileOperationPatternKind {
-
-    /**
-     * The pattern matches a file only.
-     *
-     * export const file: 'file' = 'file';
-     */
-    File,
-
-    /**
-     * The pattern matches a folder only.
-     *
-     * export const folder: 'folder' = 'folder';
-     */
-    Folder,
-  };
-
-  extern std::map<FileOperationPatternKind, std::string> FileOperationPatternKindNames;
-
-  auto fileOperationPatternKindByName(const std::string &name) -> FileOperationPatternKind;
-
-  extern std::map<FileOperationPatternKind, std::string> FileOperationPatternKindValues;
-
-  auto fileOperationPatternKindByValue(const std::string &value) -> FileOperationPatternKind;
 
   /**
    * Matching options for the file operation pattern.
    *
-   * export interface FileOperationPatternOptions {
-   *   ignoreCase?: boolean;
-   * }
-   *
    * @since 3.16.0
    */
-  struct FileOperationPatternOptions {
-
+  struct FileOperationPatternOptions
+  {
     /**
      * The pattern should be matched ignoring casing.
-     *
-     * ignoreCase?: boolean;
      */
-    std::optional<boolean> ignoreCase;
+    std::optional<boolean_t> ignoreCase;
   };
 
   /**
-   * A pattern to describe in which file operation requests or notifications the
-   * server is interested in.
-   *
-   * interface FileOperationPattern {
-   *   glob: string;
-   *   matches?: FileOperationPatternKind;
-   *   options?: FileOperationPatternOptions;
-   * }
+   * A pattern to describe in which file operation requests or notifications
+   * the server is interested in receiving.
    *
    * @since 3.16.0
    */
-  struct FileOperationPattern {
-
+  struct FileOperationPattern
+  {
     /**
      * The glob pattern to match. Glob patterns can have the following syntax:
      * - `*` to match one or more characters in a path segment
      * - `?` to match on one character in a path segment
      * - `**` to match any number of path segments, including none
-     * - `{}` to group sub patterns into an OR expression.
-     * - `[]` to declare a range of characters to match in a path segment.
-     * - `[!...]` to negate a range of characters to match in a path segment
-     *
-     * glob: string;
+     * - `{}` to group sub patterns into an OR expression. (e.g. `**​/​*.{ts,js}` matches all TypeScript and JavaScript files)
+     * - `[]` to declare a range of characters to match in a path segment (e.g., `example.[0-9]` to match on `example.0`, `example.1`, …)
+     * - `[!...]` to negate a range of characters to match in a path segment (e.g., `example.[!0-9]` to match on `example.a`, `example.b`, but not `example.0`)
      */
-    string glob;
-
+    string_t glob;
     /**
      * Whether to match files or folders with this pattern.
      *
      * Matches both if undefined.
-     *
-     * matches?: FileOperationPatternKind;
      */
     std::optional<FileOperationPatternKind> matches;
-
     /**
      * Additional options used during matching.
-     *
-     * options?: FileOperationPatternOptions;
      */
-    optional_ptr<FileOperationPatternOptions> options;
+    std::optional<std::unique_ptr<FileOperationPatternOptions>> options;
   };
 
   /**
    * A filter to describe in which file operation requests or notifications
-   * the server is interested in.
-   *
-   * export interface FileOperationFilter {
-   *   scheme?: string;
-   *   pattern: FileOperationPattern;
-   * }
+   * the server is interested in receiving.
    *
    * @since 3.16.0
    */
-  struct FileOperationFilter {
-
+  struct FileOperationFilter
+  {
     /**
-     * A Uri like `file` or `untitled`.
-     *
-     * scheme?: string;
+     * A Uri scheme like `file` or `untitled`.
      */
-    std::optional<string> scheme;
-
+    std::optional<string_t> scheme;
     /**
      * The actual file operation pattern.
-     *
-     * pattern: FileOperationPattern;
      */
     std::unique_ptr<FileOperationPattern> pattern;
   };
@@ -11045,1995 +4850,1567 @@ namespace LCompilers::LanguageServerProtocol {
   /**
    * The options to register for file operations.
    *
-   * The will create files request is sent from the client to the server before
-   * files are actually created as long as the creation is triggered from within
-   * the client either by a user action or by applying a workspace edit. The
-   * request can return a WorkspaceEdit which will be applied to workspace
-   * before the files are created. Hence the WorkspaceEdit can not manipulate
-   * the content of the files to be created. Please note that clients might drop
-   * results if computing the edit took too long or if a server constantly fails
-   * on this request. This is done to keep creates fast and reliable.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.fileOperations.willCreate
-   * - property type: boolean
-   *
-   * The capability indicates that the client supports sending
-   * workspace/willCreateFiles requests.
-   *
-   * Server Capability:
-   * - property name (optional): workspace.fileOperations.willCreate
-   * - property type: FileOperationRegistrationOptions where
-   *   FileOperationRegistrationOptions is defined as follows:
-   *
-   * interface FileOperationRegistrationOptions {
-   *   filters: FileOperationFilter[];
-   * }
-   *
    * @since 3.16.0
    */
-  struct FileOperationRegistrationOptions {
-
+  struct FileOperationRegistrationOptions
+  {
     /**
      * The actual filters.
-     *
-     * filters: FileOperationFilter[];
      */
-    ptr_vector<FileOperationFilter> filters;
+    std::vector<std::unique_ptr<FileOperationFilter>> filters;
   };
 
   /**
-   * Represents information on a file/folder create.
-   *
-   * export interface FileCreate {
-   *   uri: string;
-   * }
+   * Options for notifications/requests for user operations on files.
    *
    * @since 3.16.0
    */
-  struct FileCreate {
-
+  struct FileOperationOptions
+  {
     /**
-     * A file:// URI for the location of the file/folder being created.
-     *
-     * uri: string;
+     * The server is interested in receiving didCreateFiles notifications.
      */
-    string uri;
+    std::optional<std::unique_ptr<FileOperationRegistrationOptions>> didCreate;
+    /**
+     * The server is interested in receiving willCreateFiles requests.
+     */
+    std::optional<std::unique_ptr<FileOperationRegistrationOptions>> willCreate;
+    /**
+     * The server is interested in receiving didRenameFiles notifications.
+     */
+    std::optional<std::unique_ptr<FileOperationRegistrationOptions>> didRename;
+    /**
+     * The server is interested in receiving willRenameFiles requests.
+     */
+    std::optional<std::unique_ptr<FileOperationRegistrationOptions>> willRename;
+    /**
+     * The server is interested in receiving didDeleteFiles file notifications.
+     */
+    std::optional<std::unique_ptr<FileOperationRegistrationOptions>> didDelete;
+    /**
+     * The server is interested in receiving willDeleteFiles file requests.
+     */
+    std::optional<std::unique_ptr<FileOperationRegistrationOptions>> willDelete;
   };
 
-  /**
-   * The parameters sent in notifications/requests for user-initiated creation
-   * of files.
-   *
-   * The capability indicates that the server is interested in receiving workspace/willCreateFiles requests.
-   *
-   * Registration Options: none
-   *
-   * Request:
-   * - method: ‘workspace/willCreateFiles’
-   * - params: CreateFilesParams defined as follows:
-   *
-   * export interface CreateFilesParams {
-   *   files: FileCreate[];
-   * }
-   *
-   * Response:
-   * - result:WorkspaceEdit | null
-   * - error: code and message set in case an exception happens during the
-   *   willCreateFiles request.
-   *
-   * @since 3.16.0
-   */
-  struct CreateFilesParams {
-
+  struct ExecutionSummary
+  {
     /**
-     * An array of all files/folders created in this operation.
-     *
-     * files: FileCreate[];
+     * A strict monotonically increasing value
+     * indicating the execution order of a cell
+     * inside a notebook.
      */
-    ptr_vector<FileCreate> files;
-  };
-
-  // -----------------------------------------------------------------------
-  // DidCreateFiles Notification
-  // -----------------------------------------------------------------------
-  // The did create files notification is sent from the client to the server
-  // when files were created from within the client.
-  //
-  // Client Capability:
-  // - property name (optional): workspace.fileOperations.didCreate
-  // - property type: boolean
-  //
-  // The capability indicates that the client supports sending
-  // workspace/didCreateFiles notifications.
-  //
-  // Server Capability:
-  // - property name (optional): workspace.fileOperations.didCreate
-  // - property type: FileOperationRegistrationOptions
-  //
-  // The capability indicates that the server is interested in receiving
-  // workspace/didCreateFiles notifications.
-  //
-  // Notification:
-  // - method: ‘workspace/didCreateFiles’
-  // - params: CreateFilesParams
-  // -----------------------------------------------------------------------
-
-  /**
-   * Represents information on a file/folder rename.
-   *
-   * @since 3.16.0
-   */
-  struct FileRename {
-
+    uinteger_t executionOrder;
     /**
-     * A file:// URI for the original location of the file/folder being renamed.
-     *
-     * oldUri: string;
+     * Whether the execution was successful or
+     * not if known by the client.
      */
-    string oldUri;
-
-    /**
-     * A file:// URI for the new location of the file/folder being renamed.
-     *
-     * newUri: string;
-     */
-    string newUri;
-  };
-
-  /**
-   * The parameters sent in notifications/requests for user-initiated renames of
-   * files.
-   *
-   * The will rename files request is sent from the client to the server before
-   * files are actually renamed as long as the rename is triggered from within
-   * the client either by a user action or by applying a workspace edit. The
-   * request can return a WorkspaceEdit which will be applied to workspace
-   * before the files are renamed. Please note that clients might drop results
-   * if computing the edit took too long or if a server constantly fails on this
-   * request. This is done to keep renames fast and reliable.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.fileOperations.willRename
-   * - property type: boolean
-   *
-   * The capability indicates that the client supports sending
-   * workspace/willRenameFiles requests.
-   *
-   * Server Capability:
-   * - property name (optional): workspace.fileOperations.willRename
-   * - property type: FileOperationRegistrationOptions
-   *
-   * The capability indicates that the server is interested in receiving
-   * workspace/willRenameFiles requests.
-   *
-   * Registration Options: none
-   *
-   * Request:
-   * - method: ‘workspace/willRenameFiles’
-   * - params: RenameFilesParams defined as follows:
-   *
-   * export interface RenameFilesParams {
-   *   files: FileRename[];
-   * }
-   *
-   * Response:
-   * - result:WorkspaceEdit | null
-   * - error: code and message set in case an exception happens during the
-   *   workspace/willRenameFiles request.
-   *
-   * @since 3.16.0
-   */
-  struct RenameFilesParams {
-
-    /**
-     * An array of all files/folders renamed in this operation. When a folder
-     * is renamed, only the folder will be included, and not its children.
-     *
-     * files: FileRename[];
-     */
-    ptr_vector<FileRename> files;
-  };
-
-  // -----------------------------------------------------------------------
-  // DidRenameFiles Notification
-  // -----------------------------------------------------------------------
-  // The did rename files notification is sent from the client to the server
-  // when files were renamed from within the client.
-  //
-  // Client Capability:
-  // - property name (optional): workspace.fileOperations.didRename
-  // - property type: boolean
-  //
-  // The capability indicates that the client supports sending
-  // workspace/didRenameFiles notifications.
-  //
-  // Server Capability:
-  // - property name (optional): workspace.fileOperations.didRename
-  // - property type: FileOperationRegistrationOptions
-  //
-  // The capability indicates that the server is interested in receiving
-  // workspace/didRenameFiles notifications.
-  //
-  // Notification:
-  // - method: ‘workspace/didRenameFiles’
-  // - params: RenameFilesParams
-  // -----------------------------------------------------------------------
-
-  /**
-   * Represents information on a file/folder delete.
-   *
-   * export interface FileDelete {
-   *   uri: string;
-   * }
-   *
-   * @since 3.16.0
-   */
-  struct FileDelete {
-
-    /**
-     * A file:// URI for the location of the file/folder being deleted.
-     *
-     * uri: string;
-     */
-    string uri;
-  };
-
-  /**
-   * The parameters sent in notifications/requests for user-initiated deletes of
-   * files.
-   *
-   * The will delete files request is sent from the client to the server before
-   * files are actually deleted as long as the deletion is triggered from within
-   * the client either by a user action or by applying a workspace edit. The
-   * request can return a WorkspaceEdit which will be applied to workspace
-   * before the files are deleted. Please note that clients might drop results
-   * if computing the edit took too long or if a server constantly fails on this
-   * request. This is done to keep deletes fast and reliable.
-   *
-   * Client Capability:
-   * - property name (optional): workspace.fileOperations.willDelete
-   * - property type: boolean
-   *
-   * The capability indicates that the client supports sending
-   * workspace/willDeleteFiles requests.
-   *
-   * Server Capability:
-   * - property name (optional): workspace.fileOperations.willDelete
-   * - property type: FileOperationRegistrationOptions
-   *
-   * The capability indicates that the server is interested in receiving
-   * workspace/willDeleteFiles requests.
-   *
-   * Registration Options: none
-   *
-   * Request:
-   * - method: workspace/willDeleteFiles
-   * - params: DeleteFilesParams defined as follows:
-   *
-   * export interface DeleteFilesParams {
-   *   files: FileDelete[];
-   * }
-   *
-   * - result:WorkspaceEdit | null
-   * - error: code and message set in case an exception happens during the
-   *   workspace/willDeleteFiles request.
-   *
-   * @since 3.16.0
-   */
-  struct DeleteFilesParams {
-
-    /**
-     * An array of all files/folders deleted in this operation.
-     *
-     * files: FileDelete[];
-     */
-    ptr_vector<FileDelete> files;
-  };
-
-  // -----------------------------------------------------------------------
-  // DidDeleteFiles Notification
-  // -----------------------------------------------------------------------
-  // The did delete files notification is sent from the client to the server
-  // when files were deleted from within the client.
-  //
-  // Client Capability:
-  // - property name (optional): workspace.fileOperations.didDelete
-  // - property type: boolean
-  //
-  // The capability indicates that the client supports sending
-  // workspace/didDeleteFiles notifications.
-  //
-  // Server Capability:
-  // - property name (optional): workspace.fileOperations.didDelete
-  // - property type: FileOperationRegistrationOptions
-  //
-  // The capability indicates that the server is interested in receiving
-  // workspace/didDeleteFiles notifications.
-  //
-  // Notification:
-  // - method: ‘workspace/didDeleteFiles’
-  // - params: DeleteFilesParams
-  // -----------------------------------------------------------------------
-
-  /**
-   * The watched files notification is sent from the client to the server when
-   * the client detects changes to files and folders watched by the language
-   * client (note although the name suggest that only file events are sent it is
-   * about file system events which include folders as well). It is recommended
-   * that servers register for these file system events using the registration
-   * mechanism. In former implementations clients pushed file events without the
-   * server actively asking for it.
-   *
-   * Servers are allowed to run their own file system watching mechanism and not
-   * rely on clients to provide file system events. However this is not
-   * recommended due to the following reasons:
-   * - to our experience getting file system watching on disk right is
-   *   challenging, especially if it needs to be supported across multiple OSes.
-   * - file system watching is not for free especially if the implementation
-   *   uses some sort of polling and keeps a file system tree in memory to
-   *   compare time stamps (as for example some node modules do)
-   * - a client usually starts more than one server. If every server runs its
-   *   own file system watching it can become a CPU or memory problem.
-   * - in general there are more server than client implementations. So this
-   *   problem is better solved on the client side.
-   *
-   * Client Capability:
-   * - property path (optional): workspace.didChangeWatchedFiles
-   * - property type: DidChangeWatchedFilesClientCapabilities defined as follows:
-   *
-   * export interface DidChangeWatchedFilesClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   relativePatternSupport?: boolean;
-   * }
-   */
-  struct DidChangeWatchedFilesClientCapabilities {
-
-    /**
-     * Did change watched files notification supports dynamic registration.
-     * Please note that the current protocol doesn't support static
-     * configuration for file changes from the server side.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * Whether the client has support for relative patterns
-     * or not.
-     *
-     * relativePatternSupport?: boolean;
-     *
-     * @since 3.17.0
-     */
-    std::optional<boolean> relativePatternSupport;
-  };
-
-  /**
-   * The glob pattern to watch relative to the base path. Glob patterns can have
-   * the following syntax:
-   * - `*` to match one or more characters in a path segment
-   * - `?` to match on one character in a path segment
-   * - `**` to match any number of path segments, including none
-   * - `{}` to group conditions
-   * - `[]` to declare a range of characters to match in a path segment
-   * - `[!...]` to negate a range of characters to match in a path segment
-   *
-   * export type Pattern = string;
-   *
-   * @since 3.17.0
-   */
-  typedef string Pattern;
-
-  enum class WorkspaceFolderOrUriType {
-    WORKSPACE_FOLDER,
-    URI,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<WorkspaceFolder>,
-    URI
-  > WorkspaceFolderOrUri;
-
-  /**
-   * A relative pattern is a helper to construct glob patterns that are matched
-   * relatively to a base URI. The common value for a `baseUri` is a workspace
-   * folder root, but it can be another absolute URI as well.
-   *
-   * export interface RelativePattern {
-   *   baseUri: WorkspaceFolder | URI;
-   *   pattern: Pattern;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct RelativePattern {
-
-    /**
-     * A workspace folder or a base URI to which this pattern will be matched
-     * against relatively.
-     *
-     * baseUri: WorkspaceFolder | URI;
-     */
-    WorkspaceFolderOrUri baseUri;
-
-    /**
-     * The actual glob pattern;
-     *
-     * pattern: Pattern;
-     */
-    Pattern pattern;
-  };
-
-  /**
-   * export namespace WatchKind {
-   *   export const Create = 1;
-   *   export const Change = 2;
-   *   export const Delete = 4;
-   * }
-   * export type WatchKind = uinteger;
-   */
-  enum class WatchKind {
-
-    /**
-     * Interested in create events.
-     *
-     * export const Create = 1;
-     */
-    Create = 1,
-
-    /**
-     * Interested in change events
-     *
-     * export const Change = 2;
-     */
-    Change = 2,
-
-    /**
-     * Interested in delete events
-     *
-     * export const Delete = 4;
-     */
-    Delete = 4,
-  };
-
-  extern std::map<WatchKind, std::string> WatchKindNames;
-
-  auto watchKindByName(const std::string &name) -> WatchKind;
-
-  enum class GlobPatternType {
-    PATTERN,
-    RELATIVE_PATTERN,
-  };
-
-  /**
-   * The glob pattern. Either a string pattern or a relative pattern.
-   *
-   * export type GlobPattern = Pattern | RelativePattern;
-   *
-   * @since 3.17.0
-   */
-  typedef std::variant<
-    Pattern,
-    std::unique_ptr<RelativePattern>
-  > GlobPattern;
-
-  /**
-   * export interface FileSystemWatcher {
-   *   globPattern: GlobPattern;
-   *   kind?: WatchKind;
-   * }
-   */
-  struct FileSystemWatcher {
-
-    /**
-     * The glob pattern to watch. See {@link GlobPattern glob pattern}
-     * for more detail.
-     *
-     * globPattern: GlobPattern;
-     *
-     * @since 3.17.0 support for relative patterns.
-     */
-    GlobPattern globPattern;
-
-    /**
-     * The kind of events of interest. If omitted it defaults to
-     * WatchKind.Create | WatchKind.Change | WatchKind.Delete which is 7.
-     *
-     * kind?: WatchKind;
-     */
-    std::optional<WatchKind> kind;
-  };
-
-  /**
-   * Describe options to be used when registering for file system change events.
-   *
-   * Registration Options: DidChangeWatchedFilesRegistrationOptions defined as
-   * follows:
-   *
-   * export interface DidChangeWatchedFilesRegistrationOptions {
-   *   watchers: FileSystemWatcher[];
-   * }
-   */
-  struct DidChangeWatchedFilesRegistrationOptions {
-
-    /**
-     * The watchers to register.
-     *
-     * watchers: FileSystemWatcher[];
-     */
-    ptr_vector<FileSystemWatcher> watchers;
-  };
-
-  /**
-   * The file event type.
-   *
-   * export namespace FileChangeType {
-   *   export const Created = 1;
-   *   export const Changed = 2;
-   *   export const Deleted = 3;
-   * }
-   * export type FileChangeType = 1 | 2 | 3;
-   */
-  enum class FileChangeType {
-
-    /**
-     * The file got created.
-     *
-     * export const Created = 1;
-     */
-    Created = 1,
-
-    /**
-     * The file got changed.
-     *
-     * export const Changed = 2;
-     */
-    Changed = 2,
-
-    /**
-     * The file got deleted.
-     *
-     * export const Deleted = 3;
-     */
-    Deleted = 3,
-  };
-
-  extern std::map<FileChangeType, std::string> FileChangeTypeNames;
-
-  auto fileChangeTypeByName(const std::string &name) -> FileChangeType;
-
-  /**
-   * An event describing a file change.
-   *
-   * interface FileEvent {
-   *   uri: DocumentUri;
-   *   type: FileChangeType;
-   * }
-   */
-  struct FileEvent {
-
-    /**
-     * The file's URI.
-     *
-     * uri: DocumentUri;
-     */
-    DocumentUri uri;
-
-    /**
-     * The change type.
-     *
-     * type: FileChangeType;
-     */
-    FileChangeType type;
-  };
-
-  /**
-   * Notification:
-   * - method: ‘workspace/didChangeWatchedFiles’
-   * - params: DidChangeWatchedFilesParams defined as follows:
-   *
-   * interface DidChangeWatchedFilesParams {
-   *   changes: FileEvent[];
-   * }
-   */
-  struct DidChangeWatchedFilesParams {
-
-    /**
-     * The actual file events.
-     *
-     * changes: FileEvent[];
-     */
-    ptr_vector<FileEvent> changes;
-  };
-
-  /**
-   * The workspace/executeCommand request is sent from the client to the server
-   * to trigger command execution on the server. In most cases the server
-   * creates a WorkspaceEdit structure and applies the changes to the workspace
-   * using the request workspace/applyEdit which is sent from the server to the
-   * client.
-   *
-   * Client Capability:
-   * - property path (optional): workspace.executeCommand
-   * - property type: ExecuteCommandClientCapabilities defined as follows:
-   *
-   * export interface ExecuteCommandClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   * }
-   */
-  struct ExecuteCommandClientCapabilities {
-
-    /**
-     * Execute command supports dynamic registration.
-     *
-     * dynamicRegistration?: boolean;
-     */
-    std::optional<boolean> dynamicRegistration;
-  };
-
-  /**
-   * Server Capability:
-   * - property path (optional): executeCommandProvider
-   * - property type: ExecuteCommandOptions defined as follows:
-   *
-   * export interface ExecuteCommandOptions extends WorkDoneProgressOptions {
-   *   commands: string[];
-   * }
-   */
-  struct ExecuteCommandOptions : public WorkDoneProgressOptions {
-
-    /**
-     * The commands to be executed on the server
-     *
-     * commands: string[];
-     */
-    std::vector<string> commands;
-  };
-
-  /**
-   * Execute command registration options.
-   *
-   * Registration Options: ExecuteCommandRegistrationOptions defined as follows:
-   *
-   * export interface ExecuteCommandRegistrationOptions
-   *   extends ExecuteCommandOptions {
-   * }
-   */
-  struct ExecuteCommandRegistrationOptions : public ExecuteCommandOptions {
-    // empty
-  };
-
-  /**
-   * Request:
-   * - method: ‘workspace/executeCommand’
-   * - params: ExecuteCommandParams defined as follows:
-   *
-   * export interface ExecuteCommandParams extends WorkDoneProgressParams {
-   *   command: string;
-   *   arguments?: LSPAny[];
-   * }
-   *
-   * The arguments are typically specified when a command is returned from the
-   * server to the client. Example requests that return a command are
-   * textDocument/codeAction or textDocument/codeLens.
-   *
-   * Response:
-   * - result: LSPAny
-   * - error: code and message set in case an exception happens during the
-   *   request.
-   */
-  struct ExecuteCommandParams : public WorkDoneProgressParams {
-
-    /**
-     * The identifier of the actual command handler.
-     *
-     * command: string;
-     */
-    string command;
-
-    /**
-     * Arguments that the command should be invoked with.
-     *
-     * arguments?: LSPAny[];
-     */
-    optional_ptr_vector<LSPAny> arguments;
-  };
-
-  /**
-   * The workspace/applyEdit request is sent from the server to the client to
-   * modify resource on the client side.
-   *
-   * Client Capability:
-   * - property path (optional): workspace.applyEdit
-   * - property type: boolean
-   *
-   * See also the WorkspaceEditClientCapabilities for the supported capabilities
-   * of a workspace edit.
-   *
-   * Request:
-   * - method: ‘workspace/applyEdit’
-   * - params: ApplyWorkspaceEditParams defined as follows:
-   *
-   * export interface ApplyWorkspaceEditParams {
-   *   label?: string;
-   *   edit: WorkspaceEdit;
-   * }
-   */
-  struct ApplyWorkspaceEditParams {
-
-    /**
-     * An optional label of the workspace edit. This label is
-     * presented in the user interface for example on an undo
-     * stack to undo the workspace edit.
-     *
-     * label?: string;
-     */
-    std::optional<string> label;
-
-    /**
-     * The edits to apply.
-     *
-     * edit: WorkspaceEdit;
-     */
-    std::unique_ptr<WorkspaceEdit> edit;
-  };
-
-  /**
-   * Response:
-   * - result: ApplyWorkspaceEditResult defined as follows:
-   *
-   * export interface ApplyWorkspaceEditResult {
-   *   applied: boolean;
-   *   failureReason?: string;
-   *   failedChange?: uinteger;
-   * }
-   *
-   * - error: code and message set in case an exception happens during the
-   *   request.
-   */
-  struct ApplyWorkspaceEditResult {
-
-    /**
-     * Indicates whether the edit was applied or not.
-     *
-     * applied: boolean;
-     */
-    boolean applied;
-
-    /**
-     * An optional textual description for why the edit was not applied. This
-     * may be used by the server for diagnostic logging or to provide a suitable
-     * error for a request that triggered the edit.
-     *
-     * failureReason?: string;
-     */
-    std::optional<string> failureReason;
-
-    /**
-     * Depending on the client's failure handling strategy `failedChange` might
-     * contain the index of the change that failed. This property is only
-     * available if the client signals a `failureHandling` strategy in its
-     * client capabilities.
-     *
-     * failedChange?: uinteger;
-     */
-    std::optional<uinteger> failedChange;
-  };
-
-  /**
-   * export namespace MessageType {
-   *   export const Error = 1;
-   *   export const Warning = 2;
-   *   export const Info = 3;
-   *   export const Log = 4;
-   *   export const Debug = 5;
-   * }
-   * export type MessageType = 1 | 2 | 3 | 4 | 5;
-   */
-  enum class MessageType {
-
-    /**
-     * An error message.
-     *
-     * export const Error = 1;
-     */
-    Error = 1,
-
-    /**
-     * A warning message.
-     *
-     * export const Warning = 2;
-     */
-    Warning = 2,
-
-    /**
-     * An information message.
-     *
-     * export const Info = 3;
-     */
-    Info = 3,
-
-    /**
-     * A log message.
-     *
-     * export const Log = 4;
-     */
-    Log = 4,
-
-    /**
-     * A debug message.
-     *
-     * export const Debug = 5;
-     *
-     * @since 3.18.0
-     * @proposed
-     */
-    Debug = 5,
-  };
-
-  extern std::map<MessageType, std::string> MessageTypeNames;
-
-  auto messageTypeByName(const std::string &name) -> MessageType;
-
-  /**
-   * The show message notification is sent from a server to a client to ask the
-   * client to display a particular message in the user interface.
-   *
-   * Notification:
-   * - method: ‘window/showMessage’
-   * - params: ShowMessageParams defined as follows:
-   *
-   * interface ShowMessageParams {
-   *   type: MessageType;
-   *   message: string;
-   * }
-   */
-  struct ShowMessageParams {
-
-    /**
-     * The message type. See {@link MessageType}.
-     *
-     * type: MessageType;
-     */
-    MessageType type;
-
-    /**
-     * The actual message.
-     *
-     * message: string;
-     */
-    string message;
-  };
-
-  struct MessageActionItemCapabilities {
-
-    /**
-     * Whether the client supports additional attributes which are preserved and
-     * sent back to the server in the request's response.
-     *
-     * additionalPropertiesSupport?: boolean;
-     */
-    std::optional<boolean> additionalPropertiesSupport;
-  };
-
-  /**
-   * Show message request client capabilities.
-   *
-   * The show message request is sent from a server to a client to ask the
-   * client to display a particular message in the user interface. In addition
-   * to the show message notification the request allows to pass actions and to
-   * wait for an answer from the client.
-   *
-   * Client Capability:
-   * - property path (optional): window.showMessage
-   * - property type: ShowMessageRequestClientCapabilities defined as follows:
-   *
-   * export interface ShowMessageRequestClientCapabilities {
-   *   messageActionItem?: {
-   *     additionalPropertiesSupport?: boolean;
-   *   };
-   * }
-   */
-  struct ShowMessageRequestClientCapabilities {
-
-    /**
-     * Capabilities specific to the `MessageActionItem` type.
-     *
-     * messageActionItem?: {
-     *   additionalPropertiesSupport?: boolean;
-     * };
-     */
-    optional_ptr<MessageActionItemCapabilities> messageActionItem;
-  };
-
-  /**
-   * interface MessageActionItem {
-   *   title: string;
-   * }
-   */
-  struct MessageActionItem {
-
-    /**
-     * A short title like 'Retry', 'Open Log' etc.
-     *
-     * title: string;
-     */
-    string title;
-  };
-
-  /**
-   * Request:
-   * - method: ‘window/showMessageRequest’
-   * - params: ShowMessageRequestParams defined as follows:
-   *
-   * interface ShowMessageRequestParams {
-   *   type: MessageType;
-   *   message: string;
-   *   actions?: MessageActionItem[];
-   * }
-   *
-   * Response:
-   * - result: the selected MessageActionItem | null if none got selected.
-   * - error: code and message set in case an exception happens during showing a
-   *   message.
-   */
-  struct ShowMessageRequestParams {
-
-    /**
-     * The message type. See {@link MessageType}
-     *
-     * type: MessageType;
-     */
-    MessageType type;
-
-    /**
-     * The actual message
-     *
-     * message: string;
-     */
-    string message;
-
-    /**
-     * The message action items to present.
-     *
-     * actions?: MessageActionItem[];
-     */
-    optional_ptr_vector<MessageActionItem> actions;
-  };
-
-  /**
-   * Client capabilities for the show document request.
-   *
-   * The show document request is sent from a server to a client to ask the
-   * client to display a particular resource referenced by a URI in the user
-   * interface.
-   *
-   * Client Capability:
-   * - property path (optional): window.showDocument
-   * - property type: ShowDocumentClientCapabilities defined as follows:
-   *
-   * export interface ShowDocumentClientCapabilities {
-   *   support: boolean;
-   * }
-   *
-   * @since 3.16.0
-   */
-  struct ShowDocumentClientCapabilities {
-
-    /**
-     * The client has support for the show document
-     * request.
-     *
-     * support: boolean;
-     */
-    boolean support;
-  };
-
-  /**
-   * Params to show a resource.
-   *
-   * Request:
-   * - method: ‘window/showDocument’
-   * - params: ShowDocumentParams defined as follows:
-   *
-   * export interface ShowDocumentParams {
-   *   uri: URI;
-   *   external?: boolean;
-   *   takeFocus?: boolean;
-   *   selection?: Range;
-   * }
-   *
-   * @since 3.16.0
-   */
-  struct ShowDocumentParams {
-
-    /**
-     * The uri to show.
-     *
-     * uri: URI;
-     */
-    URI uri;
-
-    /**
-     * Indicates to show the resource in an external program. To show, for
-     * example, `https://code.visualstudio.com/` in the default WEB browser set
-     * `external` to `true`.
-     *
-     * external?: boolean;
-     */
-    std::optional<boolean> external;
-
-    /**
-     * An optional property to indicate whether the editor showing the document
-     * should take focus or not. Clients might ignore this property if an
-     * external program is started.
-     *
-     * takeFocus?: boolean;
-     */
-    std::optional<boolean> takeFocus;
-
-    /**
-     * An optional selection range if the document is a text document. Clients
-     * might ignore the property if an external program is started or the file
-     * is not a text file.
-     *
-     * selection?: Range;
-     */
-    optional_ptr<Range> selection;
-  };
-
-  /**
-   * The result of an show document request.
-   *
-   * Response:
-   * - result: ShowDocumentResult defined as follows:
-   *
-   * export interface ShowDocumentResult {
-   *   success: boolean;
-   * }
-   *
-   * - error: code and message set in case an exception happens during showing a
-   *   document.
-   *
-   * @since 3.16.0
-   */
-  struct ShowDocumentResult {
-
-    /**
-     * A boolean indicating if the show was successful.
-     *
-     * success: boolean;
-     */
-    boolean success;
-  };
-
-  /**
-   * The log message notification is sent from the server to the client to ask
-   * the client to log a particular message.
-   *
-   * Notification:
-   * - method: ‘window/logMessage’
-   * - params: LogMessageParams defined as follows:
-   *
-   * interface LogMessageParams {
-   *   type: MessageType;
-   *   message: string;
-   * }
-   */
-  struct LogMessageParams {
-
-    /**
-     * The message type. See {@link MessageType}
-     *
-     * type: MessageType;
-     */
-    MessageType type;
-
-    /**
-     * The actual message
-     *
-     * message: string;
-     */
-    string message;
-  };
-
-  /**
-   * The window/workDoneProgress/create request is sent from the server to the
-   * client to ask the client to create a work done progress.
-   *
-   * Client Capability:
-   * - property name (optional): window.workDoneProgress
-   * - property type: boolean
-   *
-   * Request:
-   * - method: ‘window/workDoneProgress/create’
-   * - params: WorkDoneProgressCreateParams defined as follows:
-   *
-   * export interface WorkDoneProgressCreateParams {
-   *   token: ProgressToken;
-   * }
-   *
-   * Response:
-   * - result: void
-   * - error: code and message set in case an exception happens during the
-   *   ‘window/workDoneProgress/create’ request. In case an error occurs a
-   *   server must not send any progress notification using the token provided
-   *   in the WorkDoneProgressCreateParams.
-   */
-  struct WorkDoneProgressCreateParams {
-
-    /**
-     * The token to be used to report progress.
-     *
-     * token: ProgressToken;
-     */
-    ProgressToken token;
-  };
-
-  /**
-   * The window/workDoneProgress/cancel notification is sent from the client to
-   * the server to cancel a progress initiated on the server side using the
-   * window/workDoneProgress/create. The progress need not be marked as
-   * cancellable to be cancelled and a client may cancel a progress for any
-   * number of reasons: in case of error, reloading a workspace etc.
-   *
-   * Notification:
-   * - method: ‘window/workDoneProgress/cancel’
-   * - params: WorkDoneProgressCancelParams defined as follows:
-   *
-   * export interface WorkDoneProgressCancelParams {
-   *   token: ProgressToken;
-   * }
-   */
-  struct WorkDoneProgressCancelParams {
-
-    /**
-     * The token to be used to report progress.
-     *
-     * token: ProgressToken;
-     */
-    ProgressToken token;
-  };
-
-  // ---------------------------------------------------------------------------
-  // Telemetry Notification
-  // ---------------------------------------------------------------------------
-  // The telemetry notification is sent from the server to the client to ask the
-  // client to log a telemetry event. The protocol doesn’t specify the payload
-  // since no interpretation of the data happens in the protocol. Most clients
-  // even don’t handle the event directly but forward them to the extensions
-  // owing the corresponding server issuing the event.
-  //
-  // Notification:
-  // - method: ‘telemetry/event’
-  // - params: ‘object’ | ‘array’;
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Text document specific client capabilities.
-   *
-   * export interface TextDocumentClientCapabilities {
-   *   synchronization?: TextDocumentSyncClientCapabilities;
-   *   completion?: CompletionClientCapabilities;
-   *   hover?: HoverClientCapabilities;
-   *   signatureHelp?: SignatureHelpClientCapabilities;
-   *   declaration?: DeclarationClientCapabilities;
-   *   definition?: DefinitionClientCapabilities;
-   *   typeDefinition?: TypeDefinitionClientCapabilities;
-   *   implementation?: ImplementationClientCapabilities;
-   *   references?: ReferenceClientCapabilities;
-   *   documentHighlight?: DocumentHighlightClientCapabilities;
-   *   documentSymbol?: DocumentSymbolClientCapabilities;
-   *   codeAction?: CodeActionClientCapabilities;
-   *   codeLens?: CodeLensClientCapabilities;
-   *   documentLink?: DocumentLinkClientCapabilities;
-   *   colorProvider?: DocumentColorClientCapabilities;
-   *   formatting?: DocumentFormattingClientCapabilities;
-   *   rangeFormatting?: DocumentRangeFormattingClientCapabilities;
-   *   onTypeFormatting?: DocumentOnTypeFormattingClientCapabilities;
-   *   rename?: RenameClientCapabilities;
-   *   publishDiagnostics?: PublishDiagnosticsClientCapabilities;
-   *   foldingRange?: FoldingRangeClientCapabilities;
-   *   selectionRange?: SelectionRangeClientCapabilities;
-   *   linkedEditingRange?: LinkedEditingRangeClientCapabilities;
-   *   callHierarchy?: CallHierarchyClientCapabilities;
-   *   semanticTokens?: SemanticTokensClientCapabilities;
-   *   moniker?: MonikerClientCapabilities;
-   *   typeHierarchy?: TypeHierarchyClientCapabilities;
-   *   inlineValue?: InlineValueClientCapabilities;
-   *   inlayHint?: InlayHintClientCapabilities;
-   *   diagnostic?: DiagnosticClientCapabilities;
-   * }
-   */
-  struct TextDocumentClientCapabilities {
-
-    /**
-     * synchronization?: TextDocumentSyncClientCapabilities;
-     */
-    optional_ptr<TextDocumentSyncClientCapabilities> synchronization;
-
-    /**
-     * Capabilities specific to the `textDocument/completion` request.
-     *
-     * completion?: CompletionClientCapabilities;
-     */
-    optional_ptr<CompletionClientCapabilities> completion;
-
-    /**
-     * Capabilities specific to the `textDocument/hover` request.
-     *
-     * hover?: HoverClientCapabilities;
-     */
-    optional_ptr<HoverClientCapabilities> hover;
-
-    /**
-     * Capabilities specific to the `textDocument/signatureHelp` request.
-     *
-     * signatureHelp?: SignatureHelpClientCapabilities;
-     */
-    optional_ptr<SignatureHelpClientCapabilities> signatureHelp;
-
-    /**
-     * Capabilities specific to the `textDocument/declaration` request.
-     *
-     * declaration?: DeclarationClientCapabilities;
-     *
-     * @since 3.14.0
-     */
-    optional_ptr<DeclarationClientCapabilities> declaration;
-
-    /**
-     * Capabilities specific to the `textDocument/definition` request.
-     *
-     * definition?: DefinitionClientCapabilities;
-     */
-    optional_ptr<DefinitionClientCapabilities> definition;
-
-    /**
-     * Capabilities specific to the `textDocument/typeDefinition` request.
-     *
-     * typeDefinition?: TypeDefinitionClientCapabilities;
-     *
-     * @since 3.6.0
-     */
-    optional_ptr<TypeDefinitionClientCapabilities> typeDefinition;
-
-    /**
-     * Capabilities specific to the `textDocument/implementation` request.
-     *
-     * implementation?: ImplementationClientCapabilities;
-     *
-     * @since 3.6.0
-     */
-    optional_ptr<ImplementationClientCapabilities> implementation;
-
-    /**
-     * Capabilities specific to the `textDocument/references` request.
-     *
-     * references?: ReferenceClientCapabilities;
-     */
-    optional_ptr<ReferenceClientCapabilities> references;
-
-    /**
-     * Capabilities specific to the `textDocument/documentHighlight` request.
-     *
-     * documentHighlight?: DocumentHighlightClientCapabilities;
-     */
-    optional_ptr<DocumentHighlightClientCapabilities> documentHighlight;
-
-    /**
-     * Capabilities specific to the `textDocument/documentSymbol` request.
-     *
-     * documentSymbol?: DocumentSymbolClientCapabilities;
-     */
-    optional_ptr<DocumentSymbolClientCapabilities> documentSymbol;
-
-    /**
-     * Capabilities specific to the `textDocument/codeAction` request.
-     *
-     * codeAction?: CodeActionClientCapabilities;
-     */
-    optional_ptr<CodeActionClientCapabilities> codeAction;
-
-    /**
-     * Capabilities specific to the `textDocument/codeLens` request.
-     *
-     * codeLens?: CodeLensClientCapabilities;
-     */
-    optional_ptr<CodeLensClientCapabilities> codeLens;
-
-    /**
-     * Capabilities specific to the `textDocument/documentLink` request.
-     *
-     * documentLink?: DocumentLinkClientCapabilities;
-     */
-    optional_ptr<DocumentLinkClientCapabilities> documentLink;
-
-    /**
-     * Capabilities specific to the `textDocument/documentColor` and the
-     * `textDocument/colorPresentation` request.
-     *
-     * colorProvider?: DocumentColorClientCapabilities;
-     *
-     * @since 3.6.0
-     */
-    optional_ptr<DocumentColorClientCapabilities> colorProvider;
-
-    /**
-     * Capabilities specific to the `textDocument/formatting` request.
-     *
-     * formatting?: DocumentFormattingClientCapabilities;
-     */
-    optional_ptr<DocumentFormattingClientCapabilities> formatting;
-
-    /**
-     * Capabilities specific to the `textDocument/rangeFormatting` request.
-     *
-     * rangeFormatting?: DocumentRangeFormattingClientCapabilities;
-     */
-    optional_ptr<DocumentRangeFormattingClientCapabilities> rangeFormatting;
-
-    /**
-     * Capabilities specific to the `textDocument/onTypeFormatting` request.
-     *
-     * onTypeFormatting?: DocumentOnTypeFormattingClientCapabilities;
-     */
-    optional_ptr<DocumentOnTypeFormattingClientCapabilities> onTypeFormatting;
-
-    /**
-     * Capabilities specific to the `textDocument/rename` request.
-     *
-     * rename?: RenameClientCapabilities;
-     */
-    optional_ptr<RenameClientCapabilities> rename;
-
-    /**
-     * Capabilities specific to the `textDocument/publishDiagnostics`
-     * notification.
-     *
-     * publishDiagnostics?: PublishDiagnosticsClientCapabilities;
-     */
-    optional_ptr<PublishDiagnosticsClientCapabilities> publishDiagnostics;
-
-    /**
-     * Capabilities specific to the `textDocument/foldingRange` request.
-     *
-     * foldingRange?: FoldingRangeClientCapabilities;
-     *
-     * @since 3.10.0
-     */
-    optional_ptr<FoldingRangeClientCapabilities> foldingRange;
-
-    /**
-     * Capabilities specific to the `textDocument/selectionRange` request.
-     *
-     * selectionRange?: SelectionRangeClientCapabilities;
-     *
-     * @since 3.15.0
-     */
-    optional_ptr<SelectionRangeClientCapabilities> selectionRange;
-
-    /**
-     * Capabilities specific to the `textDocument/linkedEditingRange` request.
-     *
-     * linkedEditingRange?: LinkedEditingRangeClientCapabilities;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<LinkedEditingRangeClientCapabilities> linkedEditingRange;
-
-    /**
-     * Capabilities specific to the various call hierarchy requests.
-     *
-     * callHierarchy?: CallHierarchyClientCapabilities;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<CallHierarchyClientCapabilities> callHierarchy;
-
-    /**
-     * Capabilities specific to the various semantic token requests.
-     *
-     * semanticTokens?: SemanticTokensClientCapabilities;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<SemanticTokensClientCapabilities> semanticTokens;
-
-    /**
-     * Capabilities specific to the `textDocument/moniker` request.
-     *
-     * moniker?: MonikerClientCapabilities;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<MonikerClientCapabilities> moniker;
-
-    /**
-     * Capabilities specific to the various type hierarchy requests.
-     *
-     * typeHierarchy?: TypeHierarchyClientCapabilities;
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<TypeHierarchyClientCapabilities> typeHierarchy;
-
-    /**
-     * Capabilities specific to the `textDocument/inlineValue` request.
-     *
-     * inlineValue?: InlineValueClientCapabilities;
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<InlineValueClientCapabilities> inlineValue;
-
-    /**
-     * Capabilities specific to the `textDocument/inlayHint` request.
-     *
-     * inlayHint?: InlayHintClientCapabilities;
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<InlayHintClientCapabilities> inlayHint;
-
-    /**
-     * Capabilities specific to the diagnostic pull model.
-     *
-     * diagnostic?: DiagnosticClientCapabilities;
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<DiagnosticClientCapabilities> diagnostic;
-  };
-
-  // Notebooks are becoming more and more popular. Adding support for them to
-  // the language server protocol allows notebook editors to reuse language
-  // smarts provided by the server inside a notebook or a notebook cell,
-  // respectively. To reuse protocol parts and therefore server implementations
-  // notebooks are modeled in the following way in LSP:
-  // - notebook document: a collection of notebook cells typically stored in a
-  //   file on disk. A notebook document has a type and can be uniquely
-  //   identified using a resource URI.
-  // - notebook cell: holds the actual text content. Cells have a kind (either
-  //   code or markdown). The actual text content of the cell is stored in a
-  //   text document which can be synced to the server like all other text
-  //   documents. Cell text documents have an URI however servers should not
-  //   rely on any format for this URI since it is up to the client on how it
-  //   will create these URIs. The URIs must be unique across ALL notebook cells
-  //   and can therefore be used to uniquely identify a notebook cell or the
-  //   cell’s text document.
-
-  /**
-   * A notebook cell kind.
-   *
-   * export namespace NotebookCellKind {
-   *   export const Markup: 1 = 1;
-   *   export const Code: 2 = 2;
-   * }
-   *
-   * @since 3.17.0
-   */
-  enum class NotebookCellKind {
-
-    /**
-     * A markup-cell is formatted source that is used for display.
-     *
-     * export const Markup: 1 = 1;
-     */
-    Markup = 1,
-
-    /**
-     * A code-cell is source code.
-     *
-     * export const Code: 2 = 2;
-     */
-    Code = 2,
-  };
-
-  extern std::map<NotebookCellKind, std::string> NotebookCellKindNames;
-
-  auto notebookCellKindByName(const std::string &name) -> NotebookCellKind;
-
-  auto notebookCellKindByValue(int value) -> NotebookCellKind;
-
-  /**
-   * export interface ExecutionSummary {
-   *   executionOrder: uinteger;
-   *   success?: boolean;
-   * }
-   */
-  struct ExecutionSummary {
-
-    /**
-     * A strict monotonically increasing value indicating the execution order of
-     * a cell inside a notebook.
-     *
-     * executionOrder: uinteger;
-     */
-    uinteger executionOrder;
-
-    /**
-     * Whether the execution was successful or not if known by the client.
-     *
-     * success?: boolean;
-     */
-    std::optional<boolean> success;
+    std::optional<boolean_t> success;
   };
 
   /**
    * A notebook cell.
    *
-   * A cell's document URI must be unique across ALL notebook cells and can
-   * therefore be used to uniquely identify a notebook cell or the cell's text
-   * document.
-   *
-   * export interface NotebookCell {
-   *   kind: NotebookCellKind;
-   *   document: DocumentUri;
-   *   metadata?: LSPObject;
-   *   executionSummary?: ExecutionSummary;
-   * }
+   * A cell's document URI must be unique across ALL notebook
+   * cells and can therefore be used to uniquely identify a
+   * notebook cell or the cell's text document.
    *
    * @since 3.17.0
    */
-  struct NotebookCell {
-
+  struct NotebookCell
+  {
     /**
      * The cell's kind
-     *
-     * kind: NotebookCellKind;
      */
     NotebookCellKind kind;
-
     /**
-     * The URI of the cell's text document content.
-     *
-     * document: DocumentUri;
+     * The URI of the cell's text document
+     * content.
      */
     DocumentUri document;
-
     /**
      * Additional metadata stored with the cell.
      *
-     * metadata?: LSPObject;
+     * Note: should always be an object literal (e.g. LSPObject)
      */
-    optional_ptr<LSPObject> metadata;
-
+    std::optional<LSPObject> metadata;
     /**
-     * Additional execution summary information if supported by the client.
-     *
-     * executionSummary?: ExecutionSummary;
+     * Additional execution summary information
+     * if supported by the client.
      */
-    optional_ptr<ExecutionSummary> executionSummary;
+    std::optional<std::unique_ptr<ExecutionSummary>> executionSummary;
+  };
+
+  /**
+   * A change describing how to move a `NotebookCell`
+   * array from state S to S'.
+   *
+   * @since 3.17.0
+   */
+  struct NotebookCellArrayChange
+  {
+    /**
+     * The start oftest of the cell that changed.
+     */
+    uinteger_t start;
+    /**
+     * The deleted cells
+     */
+    uinteger_t deleteCount;
+    /**
+     * The new cells, if any
+     */
+    std::optional<std::vector<std::unique_ptr<NotebookCell>>> cells;
   };
 
   /**
    * A notebook document.
    *
-   * export interface NotebookDocument {
-   *   uri: URI;
-   *   notebookType: string;
-   *   version: integer;
-   *   metadata?: LSPObject;
-   *   cells: NotebookCell[];
-   * }
-   *
    * @since 3.17.0
    */
-  struct NotebookDocument {
-
+  struct NotebookDocument
+  {
     /**
-     * The notebook document's URI.
-     *
-     * uri: URI;
+     * The notebook document's uri.
      */
     URI uri;
-
     /**
      * The type of the notebook.
-     *
-     * notebookType: string;
      */
-    string notebookType;
-
+    string_t notebookType;
     /**
-     * The version number of this document (it will increase after each change,
-     * including undo/redo).
-     *
-     * version: integer;
+     * The version number of this document (it will increase after each
+     * change, including undo/redo).
      */
-    integer version;
-
+    integer_t version;
     /**
-     * Additional metadata stored with the notebook document.
+     * Additional metadata stored with the notebook
+     * document.
      *
-     * metadata?: LSPObject;
+     * Note: should always be an object literal (e.g. LSPObject)
      */
-    optional_ptr<LSPObject> metadata;
-
+    std::optional<LSPObject> metadata;
     /**
      * The cells of a notebook.
-     *
-     * cells: NotebookCell[];
      */
-    ptr_vector<NotebookCell> cells;
+    std::vector<std::unique_ptr<NotebookCell>> cells;
   };
-
-  enum class NotebookDocumentFilterType {
-    NOTEBOOK_TYPE_REQUIRED,
-    SCHEME_REQUIRED,
-    PATTERN_REQUIRED,
-  };
-
-  struct NotebookTypeDocumentFilter {
-
-    /**
-     * The type of the enclosing notebook.
-     *
-     * notebookType: string;
-     */
-    string notebookType;
-
-    /**
-     * A Uri scheme, like `file` or `untitled`.
-     *
-     * scheme?: string;
-     */
-    std::optional<string> scheme;
-
-    /**
-     * A glob pattern.
-     *
-     * pattern?: string;
-     */
-    std::optional<string> pattern;
-  };
-
-  struct NotebookSchemeDocumentFilter {
-
-    /**
-     * The type of the enclosing notebook.
-     *
-     * notebookType: string;
-     */
-    std::optional<string> notebookType;
-
-    /**
-     * A Uri scheme, like `file` or `untitled`.
-     *
-     * scheme?: string;
-     */
-    string scheme;
-
-    /**
-     * A glob pattern.
-     *
-     * pattern?: string;
-     */
-    std::optional<string> pattern;
-  };
-
-  struct NotebookPatternDocumentFilter {
-
-    /**
-     * The type of the enclosing notebook.
-     *
-     * notebookType: string;
-     */
-    std::optional<string> notebookType;
-
-    /**
-     * A Uri scheme, like `file` or `untitled`.
-     *
-     * scheme?: string;
-     */
-    std::optional<string> scheme;
-
-    /**
-     * A glob pattern.
-     *
-     * pattern?: string;
-     */
-    string pattern;
-  };
-
-  typedef std::variant<
-    std::unique_ptr<NotebookTypeDocumentFilter>,
-    std::unique_ptr<NotebookSchemeDocumentFilter>,
-    std::unique_ptr<NotebookPatternDocumentFilter>
-  > NotebookDocumentFilter;
-
-  enum class StringOrNotebookDocumentFilterType {
-    STRING,
-    NOTEBOOK_DOCUMENT_FILTER,
-  };
-
-  typedef std::variant<
-    string,
-    std::unique_ptr<NotebookDocumentFilter>
-  > StringOrNotebookDocumentFilter;
 
   /**
-   * A notebook cell text document filter denotes a cell text
-   * document by different properties.
-   *
-   * export interface NotebookCellTextDocumentFilter {
-   *   notebook: string | NotebookDocumentFilter;
-   *   language?: string;
-   * }
+   * The params sent in an open notebook document notification.
    *
    * @since 3.17.0
    */
-  struct NotebookCellTextDocumentFilter {
-
+  struct DidOpenNotebookDocumentParams
+  {
     /**
-     * A filter that matches against the notebook containing the notebook cell.
-     * If a string value is provided it matches against the notebook type. '*'
-     * matches every notebook.
-     *
-     * notebook: string | NotebookDocumentFilter;
+     * The notebook document that got opened.
      */
-    std::unique_ptr<StringOrNotebookDocumentFilterType> notebook;
-
+    std::unique_ptr<NotebookDocument> notebookDocument;
     /**
-     * A language id like `python`.
-     *
-     * Will be matched against the language id of the notebook cell document.
-     * '*' matches every language.
-     *
-     * language?: string;
+     * The text documents that represent the content
+     * of a notebook cell.
      */
-    std::optional<string> language;
+    std::vector<std::unique_ptr<TextDocumentItem>> cellTextDocuments;
+  };
+
+  struct WorkspaceEditClientCapabilities_changeAnnotationSupport
+  {
+    std::optional<boolean_t> groupsOnLabel;
+  };
+
+  struct WorkspaceEditClientCapabilities
+  {
+    /**
+     * The client supports versioned document changes in `WorkspaceEdit`s
+     */
+    std::optional<boolean_t> documentChanges;
+    /**
+     * The resource operations the client supports. Clients should at least
+     * support 'create', 'rename' and 'delete' files and folders.
+     *
+     * @since 3.13.0
+     */
+    std::optional<std::vector<ResourceOperationKind>> resourceOperations;
+    /**
+     * The failure handling strategy of a client if applying the workspace edit
+     * fails.
+     *
+     * @since 3.13.0
+     */
+    std::optional<FailureHandlingKind> failureHandling;
+    /**
+     * Whether the client normalizes line endings to the client specific
+     * setting.
+     * If set to `true` the client will normalize line ending characters
+     * in a workspace edit to the client-specified new line
+     * character.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> normalizesLineEndings;
+    /**
+     * Whether the client in general supports change annotations on text edits,
+     * create file, rename file and delete file changes.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<WorkspaceEditClientCapabilities_changeAnnotationSupport>> changeAnnotationSupport;
+  };
+
+  struct DidChangeConfigurationClientCapabilities
+  {
+    /**
+     * Did change configuration notification supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  struct DidChangeWatchedFilesClientCapabilities
+  {
+    /**
+     * Did change watched files notification supports dynamic registration. Please note
+     * that the current protocol doesn't support static configuration for file changes
+     * from the server side.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Whether the client has support for {@link  RelativePattern relative pattern}
+     * or not.
+     *
+     * @since 3.17.0
+     */
+    std::optional<boolean_t> relativePatternSupport;
+  };
+
+  struct WorkspaceSymbolClientCapabilities_symbolKind
+  {
+    std::optional<std::vector<SymbolKind>> valueSet;
+  };
+
+  struct WorkspaceSymbolClientCapabilities_tagSupport
+  {
+    std::vector<SymbolTag> valueSet;
+  };
+
+  struct WorkspaceSymbolClientCapabilities_resolveSupport
+  {
+    std::vector<string_t> properties;
+  };
+
+  /**
+   * Client capabilities for a {@link WorkspaceSymbolRequest}.
+   */
+  struct WorkspaceSymbolClientCapabilities
+  {
+    /**
+     * Symbol request supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Specific capabilities for the `SymbolKind` in the `workspace/symbol` request.
+     */
+    std::optional<std::unique_ptr<WorkspaceSymbolClientCapabilities_symbolKind>> symbolKind;
+    /**
+     * The client supports tags on `SymbolInformation`.
+     * Clients supporting tags have to handle unknown tags gracefully.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<WorkspaceSymbolClientCapabilities_tagSupport>> tagSupport;
+    /**
+     * The client support partial workspace symbols. The client will send the
+     * request `workspaceSymbol/resolve` to the server to resolve additional
+     * properties.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<WorkspaceSymbolClientCapabilities_resolveSupport>> resolveSupport;
+  };
+
+  /**
+   * The client capabilities of a {@link ExecuteCommandRequest}.
+   */
+  struct ExecuteCommandClientCapabilities
+  {
+    /**
+     * Execute command supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensWorkspaceClientCapabilities
+  {
+    /**
+     * Whether the client implementation supports a refresh request sent from
+     * the server to the client.
+     *
+     * Note that this event is global and will force the client to refresh all
+     * semantic tokens currently shown. It should be used with absolute care
+     * and is useful for situation where a server for example detects a project
+     * wide change that requires such a calculation.
+     */
+    std::optional<boolean_t> refreshSupport;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct CodeLensWorkspaceClientCapabilities
+  {
+    /**
+     * Whether the client implementation supports a refresh request sent from the
+     * server to the client.
+     *
+     * Note that this event is global and will force the client to refresh all
+     * code lenses currently shown. It should be used with absolute care and is
+     * useful for situation where a server for example detect a project wide
+     * change that requires such a calculation.
+     */
+    std::optional<boolean_t> refreshSupport;
+  };
+
+  /**
+   * Capabilities relating to events from file operations by the user in the client.
+   *
+   * These events do not come from the file system, they come from user operations
+   * like renaming a file in the UI.
+   *
+   * @since 3.16.0
+   */
+  struct FileOperationClientCapabilities
+  {
+    /**
+     * Whether the client supports dynamic registration for file requests/notifications.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client has support for sending didCreateFiles notifications.
+     */
+    std::optional<boolean_t> didCreate;
+    /**
+     * The client has support for sending willCreateFiles requests.
+     */
+    std::optional<boolean_t> willCreate;
+    /**
+     * The client has support for sending didRenameFiles notifications.
+     */
+    std::optional<boolean_t> didRename;
+    /**
+     * The client has support for sending willRenameFiles requests.
+     */
+    std::optional<boolean_t> willRename;
+    /**
+     * The client has support for sending didDeleteFiles notifications.
+     */
+    std::optional<boolean_t> didDelete;
+    /**
+     * The client has support for sending willDeleteFiles requests.
+     */
+    std::optional<boolean_t> willDelete;
+  };
+
+  /**
+   * Client workspace capabilities specific to inline values.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueWorkspaceClientCapabilities
+  {
+    /**
+     * Whether the client implementation supports a refresh request sent from the
+     * server to the client.
+     *
+     * Note that this event is global and will force the client to refresh all
+     * inline values currently shown. It should be used with absolute care and is
+     * useful for situation where a server for example detects a project wide
+     * change that requires such a calculation.
+     */
+    std::optional<boolean_t> refreshSupport;
+  };
+
+  /**
+   * Client workspace capabilities specific to inlay hints.
+   *
+   * @since 3.17.0
+   */
+  struct InlayHintWorkspaceClientCapabilities
+  {
+    /**
+     * Whether the client implementation supports a refresh request sent from
+     * the server to the client.
+     *
+     * Note that this event is global and will force the client to refresh all
+     * inlay hints currently shown. It should be used with absolute care and
+     * is useful for situation where a server for example detects a project wide
+     * change that requires such a calculation.
+     */
+    std::optional<boolean_t> refreshSupport;
+  };
+
+  /**
+   * Workspace client capabilities specific to diagnostic pull requests.
+   *
+   * @since 3.17.0
+   */
+  struct DiagnosticWorkspaceClientCapabilities
+  {
+    /**
+     * Whether the client implementation supports a refresh request sent from
+     * the server to the client.
+     *
+     * Note that this event is global and will force the client to refresh all
+     * pulled diagnostics currently shown. It should be used with absolute care and
+     * is useful for situation where a server for example detects a project wide
+     * change that requires such a calculation.
+     */
+    std::optional<boolean_t> refreshSupport;
+  };
+
+  /**
+   * Client workspace capabilities specific to folding ranges
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct FoldingRangeWorkspaceClientCapabilities
+  {
+    /**
+     * Whether the client implementation supports a refresh request sent from the
+     * server to the client.
+     *
+     * Note that this event is global and will force the client to refresh all
+     * folding ranges currently shown. It should be used with absolute care and is
+     * useful for situation where a server for example detects a project wide
+     * change that requires such a calculation.
+     *
+     * @since 3.18.0
+     * @proposed
+     */
+    std::optional<boolean_t> refreshSupport;
+  };
+
+  /**
+   * Workspace specific client capabilities.
+   */
+  struct WorkspaceClientCapabilities
+  {
+    /**
+     * The client supports applying batch edits
+     * to the workspace by supporting the request
+     * 'workspace/applyEdit'
+     */
+    std::optional<boolean_t> applyEdit;
+    /**
+     * Capabilities specific to `WorkspaceEdit`s.
+     */
+    std::optional<std::unique_ptr<WorkspaceEditClientCapabilities>> workspaceEdit;
+    /**
+     * Capabilities specific to the `workspace/didChangeConfiguration` notification.
+     */
+    std::optional<std::unique_ptr<DidChangeConfigurationClientCapabilities>> didChangeConfiguration;
+    /**
+     * Capabilities specific to the `workspace/didChangeWatchedFiles` notification.
+     */
+    std::optional<std::unique_ptr<DidChangeWatchedFilesClientCapabilities>> didChangeWatchedFiles;
+    /**
+     * Capabilities specific to the `workspace/symbol` request.
+     */
+    std::optional<std::unique_ptr<WorkspaceSymbolClientCapabilities>> symbol;
+    /**
+     * Capabilities specific to the `workspace/executeCommand` request.
+     */
+    std::optional<std::unique_ptr<ExecuteCommandClientCapabilities>> executeCommand;
+    /**
+     * The client has support for workspace folders.
+     *
+     * @since 3.6.0
+     */
+    std::optional<boolean_t> workspaceFolders;
+    /**
+     * The client supports `workspace/configuration` requests.
+     *
+     * @since 3.6.0
+     */
+    std::optional<boolean_t> configuration;
+    /**
+     * Capabilities specific to the semantic token requests scoped to the
+     * workspace.
+     *
+     * @since 3.16.0.
+     */
+    std::optional<std::unique_ptr<SemanticTokensWorkspaceClientCapabilities>> semanticTokens;
+    /**
+     * Capabilities specific to the code lens requests scoped to the
+     * workspace.
+     *
+     * @since 3.16.0.
+     */
+    std::optional<std::unique_ptr<CodeLensWorkspaceClientCapabilities>> codeLens;
+    /**
+     * The client has support for file notifications/requests for user operations on files.
+     *
+     * Since 3.16.0
+     */
+    std::optional<std::unique_ptr<FileOperationClientCapabilities>> fileOperations;
+    /**
+     * Capabilities specific to the inline values requests scoped to the
+     * workspace.
+     *
+     * @since 3.17.0.
+     */
+    std::optional<std::unique_ptr<InlineValueWorkspaceClientCapabilities>> inlineValue;
+    /**
+     * Capabilities specific to the inlay hint requests scoped to the
+     * workspace.
+     *
+     * @since 3.17.0.
+     */
+    std::optional<std::unique_ptr<InlayHintWorkspaceClientCapabilities>> inlayHint;
+    /**
+     * Capabilities specific to the diagnostic requests scoped to the
+     * workspace.
+     *
+     * @since 3.17.0.
+     */
+    std::optional<std::unique_ptr<DiagnosticWorkspaceClientCapabilities>> diagnostics;
+    /**
+     * Capabilities specific to the folding range requests scoped to the workspace.
+     *
+     * @since 3.18.0
+     * @proposed
+     */
+    std::optional<std::unique_ptr<FoldingRangeWorkspaceClientCapabilities>> foldingRange;
+  };
+
+  struct TextDocumentSyncClientCapabilities
+  {
+    /**
+     * Whether text document synchronization supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client supports sending will save notifications.
+     */
+    std::optional<boolean_t> willSave;
+    /**
+     * The client supports sending a will save request and
+     * waits for a response providing text edits which will
+     * be applied to the document before it is saved.
+     */
+    std::optional<boolean_t> willSaveWaitUntil;
+    /**
+     * The client supports did save notifications.
+     */
+    std::optional<boolean_t> didSave;
+  };
+
+  struct CompletionClientCapabilities_completionItem_insertTextModeSupport
+  {
+    std::vector<InsertTextMode> valueSet;
+  };
+
+  struct CompletionClientCapabilities_completionItem_resolveSupport
+  {
+    std::vector<string_t> properties;
+  };
+
+  struct CompletionClientCapabilities_completionItem_tagSupport
+  {
+    std::vector<CompletionItemTag> valueSet;
+  };
+
+  struct CompletionClientCapabilities_completionItem
+  {
+    std::optional<boolean_t> snippetSupport;
+    std::optional<boolean_t> commitCharactersSupport;
+    std::optional<std::vector<MarkupKind>> documentationFormat;
+    std::optional<boolean_t> deprecatedSupport;
+    std::optional<boolean_t> preselectSupport;
+    std::optional<std::unique_ptr<CompletionClientCapabilities_completionItem_tagSupport>> tagSupport;
+    std::optional<boolean_t> insertReplaceSupport;
+    std::optional<std::unique_ptr<CompletionClientCapabilities_completionItem_resolveSupport>> resolveSupport;
+    std::optional<std::unique_ptr<CompletionClientCapabilities_completionItem_insertTextModeSupport>> insertTextModeSupport;
+    std::optional<boolean_t> labelDetailsSupport;
+  };
+
+  struct CompletionClientCapabilities_completionItemKind
+  {
+    std::optional<std::vector<CompletionItemKind>> valueSet;
+  };
+
+  struct CompletionClientCapabilities_completionList
+  {
+    std::optional<std::vector<string_t>> itemDefaults;
+  };
+
+  /**
+   * Completion client capabilities
+   */
+  struct CompletionClientCapabilities
+  {
+    /**
+     * Whether completion supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client supports the following `CompletionItem` specific
+     * capabilities.
+     */
+    std::optional<std::unique_ptr<CompletionClientCapabilities_completionItem>> completionItem;
+    std::optional<std::unique_ptr<CompletionClientCapabilities_completionItemKind>> completionItemKind;
+    /**
+     * Defines how the client handles whitespace and indentation
+     * when accepting a completion item that uses multi line
+     * text in either `insertText` or `textEdit`.
+     *
+     * @since 3.17.0
+     */
+    std::optional<InsertTextMode> insertTextMode;
+    /**
+     * The client supports to send additional context information for a
+     * `textDocument/completion` request.
+     */
+    std::optional<boolean_t> contextSupport;
+    /**
+     * The client supports the following `CompletionList` specific
+     * capabilities.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<CompletionClientCapabilities_completionList>> completionList;
+  };
+
+  struct HoverClientCapabilities
+  {
+    /**
+     * Whether hover supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Client supports the following content formats for the content
+     * property. The order describes the preferred format of the client.
+     */
+    std::optional<std::vector<MarkupKind>> contentFormat;
+  };
+
+  struct SignatureHelpClientCapabilities_signatureInformation_parameterInformation
+  {
+    std::optional<boolean_t> labelOffsetSupport;
+  };
+
+  struct SignatureHelpClientCapabilities_signatureInformation
+  {
+    std::optional<std::vector<MarkupKind>> documentationFormat;
+    std::optional<std::unique_ptr<SignatureHelpClientCapabilities_signatureInformation_parameterInformation>> parameterInformation;
+    std::optional<boolean_t> activeParameterSupport;
+  };
+
+  /**
+   * Client Capabilities for a {@link SignatureHelpRequest}.
+   */
+  struct SignatureHelpClientCapabilities
+  {
+    /**
+     * Whether signature help supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client supports the following `SignatureInformation`
+     * specific properties.
+     */
+    std::optional<std::unique_ptr<SignatureHelpClientCapabilities_signatureInformation>> signatureInformation;
+    /**
+     * The client supports to send additional context information for a
+     * `textDocument/signatureHelp` request. A client that opts into
+     * contextSupport will also support the `retriggerCharacters` on
+     * `SignatureHelpOptions`.
+     *
+     * @since 3.15.0
+     */
+    std::optional<boolean_t> contextSupport;
+  };
+
+  /**
+   * @since 3.14.0
+   */
+  struct DeclarationClientCapabilities
+  {
+    /**
+     * Whether declaration supports dynamic registration. If this is set to `true`
+     * the client supports the new `DeclarationRegistrationOptions` return value
+     * for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client supports additional metadata in the form of declaration links.
+     */
+    std::optional<boolean_t> linkSupport;
+  };
+
+  /**
+   * Client Capabilities for a {@link DefinitionRequest}.
+   */
+  struct DefinitionClientCapabilities
+  {
+    /**
+     * Whether definition supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client supports additional metadata in the form of definition links.
+     *
+     * @since 3.14.0
+     */
+    std::optional<boolean_t> linkSupport;
+  };
+
+  /**
+   * Since 3.6.0
+   */
+  struct TypeDefinitionClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `TypeDefinitionRegistrationOptions` return value
+     * for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client supports additional metadata in the form of definition links.
+     *
+     * Since 3.14.0
+     */
+    std::optional<boolean_t> linkSupport;
+  };
+
+  /**
+   * @since 3.6.0
+   */
+  struct ImplementationClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `ImplementationRegistrationOptions` return value
+     * for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client supports additional metadata in the form of definition links.
+     *
+     * @since 3.14.0
+     */
+    std::optional<boolean_t> linkSupport;
+  };
+
+  /**
+   * Client Capabilities for a {@link ReferencesRequest}.
+   */
+  struct ReferenceClientCapabilities
+  {
+    /**
+     * Whether references supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * Client Capabilities for a {@link DocumentHighlightRequest}.
+   */
+  struct DocumentHighlightClientCapabilities
+  {
+    /**
+     * Whether document highlight supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  struct DocumentSymbolClientCapabilities_symbolKind
+  {
+    std::optional<std::vector<SymbolKind>> valueSet;
+  };
+
+  struct DocumentSymbolClientCapabilities_tagSupport
+  {
+    std::vector<SymbolTag> valueSet;
+  };
+
+  /**
+   * Client Capabilities for a {@link DocumentSymbolRequest}.
+   */
+  struct DocumentSymbolClientCapabilities
+  {
+    /**
+     * Whether document symbol supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Specific capabilities for the `SymbolKind` in the
+     * `textDocument/documentSymbol` request.
+     */
+    std::optional<std::unique_ptr<DocumentSymbolClientCapabilities_symbolKind>> symbolKind;
+    /**
+     * The client supports hierarchical document symbols.
+     */
+    std::optional<boolean_t> hierarchicalDocumentSymbolSupport;
+    /**
+     * The client supports tags on `SymbolInformation`. Tags are supported on
+     * `DocumentSymbol` if `hierarchicalDocumentSymbolSupport` is set to true.
+     * Clients supporting tags have to handle unknown tags gracefully.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<DocumentSymbolClientCapabilities_tagSupport>> tagSupport;
+    /**
+     * The client supports an additional label presented in the UI when
+     * registering a document symbol provider.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> labelSupport;
+  };
+
+  struct CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind
+  {
+    std::vector<CodeActionKind> valueSet;
+  };
+
+  struct CodeActionClientCapabilities_codeActionLiteralSupport
+  {
+    std::unique_ptr<CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind> codeActionKind;
+  };
+
+  struct CodeActionClientCapabilities_resolveSupport
+  {
+    std::vector<string_t> properties;
+  };
+
+  /**
+   * The Client Capabilities of a {@link CodeActionRequest}.
+   */
+  struct CodeActionClientCapabilities
+  {
+    /**
+     * Whether code action supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The client support code action literals of type `CodeAction` as a valid
+     * response of the `textDocument/codeAction` request. If the property is not
+     * set the request can only return `Command` literals.
+     *
+     * @since 3.8.0
+     */
+    std::optional<std::unique_ptr<CodeActionClientCapabilities_codeActionLiteralSupport>> codeActionLiteralSupport;
+    /**
+     * Whether code action supports the `isPreferred` property.
+     *
+     * @since 3.15.0
+     */
+    std::optional<boolean_t> isPreferredSupport;
+    /**
+     * Whether code action supports the `disabled` property.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> disabledSupport;
+    /**
+     * Whether code action supports the `data` property which is
+     * preserved between a `textDocument/codeAction` and a
+     * `codeAction/resolve` request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> dataSupport;
+    /**
+     * Whether the client supports resolving additional code action
+     * properties via a separate `codeAction/resolve` request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<CodeActionClientCapabilities_resolveSupport>> resolveSupport;
+    /**
+     * Whether the client honors the change annotations in
+     * text edits and resource operations returned via the
+     * `CodeAction#edit` property by for example presenting
+     * the workspace edit in the user interface and asking
+     * for confirmation.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> honorsChangeAnnotations;
+  };
+
+  /**
+   * The client capabilities  of a {@link CodeLensRequest}.
+   */
+  struct CodeLensClientCapabilities
+  {
+    /**
+     * Whether code lens supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * The client capabilities of a {@link DocumentLinkRequest}.
+   */
+  struct DocumentLinkClientCapabilities
+  {
+    /**
+     * Whether document link supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Whether the client supports the `tooltip` property on `DocumentLink`.
+     *
+     * @since 3.15.0
+     */
+    std::optional<boolean_t> tooltipSupport;
+  };
+
+  struct DocumentColorClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `DocumentColorRegistrationOptions` return value
+     * for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * Client capabilities of a {@link DocumentFormattingRequest}.
+   */
+  struct DocumentFormattingClientCapabilities
+  {
+    /**
+     * Whether formatting supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * Client capabilities of a {@link DocumentRangeFormattingRequest}.
+   */
+  struct DocumentRangeFormattingClientCapabilities
+  {
+    /**
+     * Whether range formatting supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Whether the client supports formatting multiple ranges at once.
+     *
+     * @since 3.18.0
+     * @proposed
+     */
+    std::optional<boolean_t> rangesSupport;
+  };
+
+  /**
+   * Client capabilities of a {@link DocumentOnTypeFormattingRequest}.
+   */
+  struct DocumentOnTypeFormattingClientCapabilities
+  {
+    /**
+     * Whether on type formatting supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  struct RenameClientCapabilities
+  {
+    /**
+     * Whether rename supports dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Client supports testing for validity of rename operations
+     * before execution.
+     *
+     * @since 3.12.0
+     */
+    std::optional<boolean_t> prepareSupport;
+    /**
+     * Client supports the default behavior result.
+     *
+     * The value indicates the default behavior used by the
+     * client.
+     *
+     * @since 3.16.0
+     */
+    std::optional<PrepareSupportDefaultBehavior> prepareSupportDefaultBehavior;
+    /**
+     * Whether the client honors the change annotations in
+     * text edits and resource operations returned via the
+     * rename request's workspace edit by for example presenting
+     * the workspace edit in the user interface and asking
+     * for confirmation.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> honorsChangeAnnotations;
+  };
+
+  struct FoldingRangeClientCapabilities_foldingRangeKind
+  {
+    std::optional<std::vector<FoldingRangeKind>> valueSet;
+  };
+
+  struct FoldingRangeClientCapabilities_foldingRange
+  {
+    std::optional<boolean_t> collapsedText;
+  };
+
+  struct FoldingRangeClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration for folding range
+     * providers. If this is set to `true` the client supports the new
+     * `FoldingRangeRegistrationOptions` return value for the corresponding
+     * server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * The maximum number of folding ranges that the client prefers to receive
+     * per document. The value serves as a hint, servers are free to follow the
+     * limit.
+     */
+    std::optional<uinteger_t> rangeLimit;
+    /**
+     * If set, the client signals that it only supports folding complete lines.
+     * If set, client will ignore specified `startCharacter` and `endCharacter`
+     * properties in a FoldingRange.
+     */
+    std::optional<boolean_t> lineFoldingOnly;
+    /**
+     * Specific options for the folding range kind.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<FoldingRangeClientCapabilities_foldingRangeKind>> foldingRangeKind;
+    /**
+     * Specific options for the folding range.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<FoldingRangeClientCapabilities_foldingRange>> foldingRange;
+  };
+
+  struct SelectionRangeClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration for selection range providers. If this is set to `true`
+     * the client supports the new `SelectionRangeRegistrationOptions` return value for the corresponding server
+     * capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  struct PublishDiagnosticsClientCapabilities_tagSupport
+  {
+    std::vector<DiagnosticTag> valueSet;
+  };
+
+  /**
+   * The publish diagnostic client capabilities.
+   */
+  struct PublishDiagnosticsClientCapabilities
+  {
+    /**
+     * Whether the clients accepts diagnostics with related information.
+     */
+    std::optional<boolean_t> relatedInformation;
+    /**
+     * Client supports the tag property to provide meta data about a diagnostic.
+     * Clients supporting tags have to handle unknown tags gracefully.
+     *
+     * @since 3.15.0
+     */
+    std::optional<std::unique_ptr<PublishDiagnosticsClientCapabilities_tagSupport>> tagSupport;
+    /**
+     * Whether the client interprets the version property of the
+     * `textDocument/publishDiagnostics` notification's parameter.
+     *
+     * @since 3.15.0
+     */
+    std::optional<boolean_t> versionSupport;
+    /**
+     * Client supports a codeDescription property
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> codeDescriptionSupport;
+    /**
+     * Whether code action supports the `data` property which is
+     * preserved between a `textDocument/publishDiagnostics` and
+     * `textDocument/codeAction` request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<boolean_t> dataSupport;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct CallHierarchyClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
+     * return value for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  struct SemanticTokensClientCapabilities_requests_full_1
+  {
+    std::optional<boolean_t> delta;
+  };
+
+  enum class SemanticTokensClientCapabilities_requests_fullType {
+    BOOLEAN_TYPE,
+    SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_FULL_1,
+  };
+
+  typedef std::variant<
+    boolean_t,
+    std::unique_ptr<SemanticTokensClientCapabilities_requests_full_1>
+  > SemanticTokensClientCapabilities_requests_full;
+
+  struct SemanticTokensClientCapabilities_requests_range_1
+  {
+  };
+
+  enum class SemanticTokensClientCapabilities_requests_rangeType {
+    BOOLEAN_TYPE,
+    SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_RANGE_1,
+  };
+
+  typedef std::variant<
+    boolean_t,
+    std::unique_ptr<SemanticTokensClientCapabilities_requests_range_1>
+  > SemanticTokensClientCapabilities_requests_range;
+
+  struct SemanticTokensClientCapabilities_requests
+  {
+    std::optional<SemanticTokensClientCapabilities_requests_range> range;
+    std::optional<SemanticTokensClientCapabilities_requests_full> full;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
+     * return value for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Which requests the client supports and might send to the server
+     * depending on the server's capability. Please note that clients might not
+     * show semantic tokens or degrade some of the user experience if a range
+     * or full request is advertised by the client but not provided by the
+     * server. If for example the client capability `requests.full` and
+     * `request.range` are both set to true but the server only provides a
+     * range provider the client might not render a minimap correctly or might
+     * even decide to not show any semantic tokens at all.
+     */
+    std::unique_ptr<SemanticTokensClientCapabilities_requests> requests;
+    /**
+     * The token types that the client supports.
+     */
+    std::vector<string_t> tokenTypes;
+    /**
+     * The token modifiers that the client supports.
+     */
+    std::vector<string_t> tokenModifiers;
+    /**
+     * The token formats the clients supports.
+     */
+    std::vector<TokenFormat> formats;
+    /**
+     * Whether the client supports tokens that can overlap each other.
+     */
+    std::optional<boolean_t> overlappingTokenSupport;
+    /**
+     * Whether the client supports tokens that can span multiple lines.
+     */
+    std::optional<boolean_t> multilineTokenSupport;
+    /**
+     * Whether the client allows the server to actively cancel a
+     * semantic token request, e.g. supports returning
+     * LSPErrorCodes.ServerCancelled. If a server does the client
+     * needs to retrigger the request.
+     *
+     * @since 3.17.0
+     */
+    std::optional<boolean_t> serverCancelSupport;
+    /**
+     * Whether the client uses semantic tokens to augment existing
+     * syntax tokens. If set to `true` client side created syntax
+     * tokens and semantic tokens are both used for colorization. If
+     * set to `false` the client only uses the returned semantic tokens
+     * for colorization.
+     *
+     * If the value is `undefined` then the client behavior is not
+     * specified.
+     *
+     * @since 3.17.0
+     */
+    std::optional<boolean_t> augmentsSyntaxTokens;
+  };
+
+  /**
+   * Client capabilities for the linked editing range request.
+   *
+   * @since 3.16.0
+   */
+  struct LinkedEditingRangeClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
+     * return value for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * Client capabilities specific to the moniker request.
+   *
+   * @since 3.16.0
+   */
+  struct MonikerClientCapabilities
+  {
+    /**
+     * Whether moniker supports dynamic registration. If this is set to `true`
+     * the client supports the new `MonikerRegistrationOptions` return value
+     * for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * @since 3.17.0
+   */
+  struct TypeHierarchyClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
+     * return value for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * Client capabilities specific to inline values.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration for inline value providers.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  struct InlayHintClientCapabilities_resolveSupport
+  {
+    std::vector<string_t> properties;
+  };
+
+  /**
+   * Inlay hint client capabilities.
+   *
+   * @since 3.17.0
+   */
+  struct InlayHintClientCapabilities
+  {
+    /**
+     * Whether inlay hints support dynamic registration.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Indicates which properties a client can resolve lazily on an inlay
+     * hint.
+     */
+    std::optional<std::unique_ptr<InlayHintClientCapabilities_resolveSupport>> resolveSupport;
+  };
+
+  /**
+   * Client capabilities specific to diagnostic pull requests.
+   *
+   * @since 3.17.0
+   */
+  struct DiagnosticClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration. If this is set to `true`
+     * the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
+     * return value for the corresponding server capability as well.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+    /**
+     * Whether the clients supports related documents for document diagnostic pulls.
+     */
+    std::optional<boolean_t> relatedDocumentSupport;
+  };
+
+  /**
+   * Client capabilities specific to inline completions.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct InlineCompletionClientCapabilities
+  {
+    /**
+     * Whether implementation supports dynamic registration for inline completion providers.
+     */
+    std::optional<boolean_t> dynamicRegistration;
+  };
+
+  /**
+   * Text document specific client capabilities.
+   */
+  struct TextDocumentClientCapabilities
+  {
+    /**
+     * Defines which synchronization capabilities the client supports.
+     */
+    std::optional<std::unique_ptr<TextDocumentSyncClientCapabilities>> synchronization;
+    /**
+     * Capabilities specific to the `textDocument/completion` request.
+     */
+    std::optional<std::unique_ptr<CompletionClientCapabilities>> completion;
+    /**
+     * Capabilities specific to the `textDocument/hover` request.
+     */
+    std::optional<std::unique_ptr<HoverClientCapabilities>> hover;
+    /**
+     * Capabilities specific to the `textDocument/signatureHelp` request.
+     */
+    std::optional<std::unique_ptr<SignatureHelpClientCapabilities>> signatureHelp;
+    /**
+     * Capabilities specific to the `textDocument/declaration` request.
+     *
+     * @since 3.14.0
+     */
+    std::optional<std::unique_ptr<DeclarationClientCapabilities>> declaration;
+    /**
+     * Capabilities specific to the `textDocument/definition` request.
+     */
+    std::optional<std::unique_ptr<DefinitionClientCapabilities>> definition;
+    /**
+     * Capabilities specific to the `textDocument/typeDefinition` request.
+     *
+     * @since 3.6.0
+     */
+    std::optional<std::unique_ptr<TypeDefinitionClientCapabilities>> typeDefinition;
+    /**
+     * Capabilities specific to the `textDocument/implementation` request.
+     *
+     * @since 3.6.0
+     */
+    std::optional<std::unique_ptr<ImplementationClientCapabilities>> implementation;
+    /**
+     * Capabilities specific to the `textDocument/references` request.
+     */
+    std::optional<std::unique_ptr<ReferenceClientCapabilities>> references;
+    /**
+     * Capabilities specific to the `textDocument/documentHighlight` request.
+     */
+    std::optional<std::unique_ptr<DocumentHighlightClientCapabilities>> documentHighlight;
+    /**
+     * Capabilities specific to the `textDocument/documentSymbol` request.
+     */
+    std::optional<std::unique_ptr<DocumentSymbolClientCapabilities>> documentSymbol;
+    /**
+     * Capabilities specific to the `textDocument/codeAction` request.
+     */
+    std::optional<std::unique_ptr<CodeActionClientCapabilities>> codeAction;
+    /**
+     * Capabilities specific to the `textDocument/codeLens` request.
+     */
+    std::optional<std::unique_ptr<CodeLensClientCapabilities>> codeLens;
+    /**
+     * Capabilities specific to the `textDocument/documentLink` request.
+     */
+    std::optional<std::unique_ptr<DocumentLinkClientCapabilities>> documentLink;
+    /**
+     * Capabilities specific to the `textDocument/documentColor` and the
+     * `textDocument/colorPresentation` request.
+     *
+     * @since 3.6.0
+     */
+    std::optional<std::unique_ptr<DocumentColorClientCapabilities>> colorProvider;
+    /**
+     * Capabilities specific to the `textDocument/formatting` request.
+     */
+    std::optional<std::unique_ptr<DocumentFormattingClientCapabilities>> formatting;
+    /**
+     * Capabilities specific to the `textDocument/rangeFormatting` request.
+     */
+    std::optional<std::unique_ptr<DocumentRangeFormattingClientCapabilities>> rangeFormatting;
+    /**
+     * Capabilities specific to the `textDocument/onTypeFormatting` request.
+     */
+    std::optional<std::unique_ptr<DocumentOnTypeFormattingClientCapabilities>> onTypeFormatting;
+    /**
+     * Capabilities specific to the `textDocument/rename` request.
+     */
+    std::optional<std::unique_ptr<RenameClientCapabilities>> rename;
+    /**
+     * Capabilities specific to the `textDocument/foldingRange` request.
+     *
+     * @since 3.10.0
+     */
+    std::optional<std::unique_ptr<FoldingRangeClientCapabilities>> foldingRange;
+    /**
+     * Capabilities specific to the `textDocument/selectionRange` request.
+     *
+     * @since 3.15.0
+     */
+    std::optional<std::unique_ptr<SelectionRangeClientCapabilities>> selectionRange;
+    /**
+     * Capabilities specific to the `textDocument/publishDiagnostics` notification.
+     */
+    std::optional<std::unique_ptr<PublishDiagnosticsClientCapabilities>> publishDiagnostics;
+    /**
+     * Capabilities specific to the various call hierarchy requests.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<CallHierarchyClientCapabilities>> callHierarchy;
+    /**
+     * Capabilities specific to the various semantic token request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<SemanticTokensClientCapabilities>> semanticTokens;
+    /**
+     * Capabilities specific to the `textDocument/linkedEditingRange` request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<LinkedEditingRangeClientCapabilities>> linkedEditingRange;
+    /**
+     * Client capabilities specific to the `textDocument/moniker` request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<MonikerClientCapabilities>> moniker;
+    /**
+     * Capabilities specific to the various type hierarchy requests.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<TypeHierarchyClientCapabilities>> typeHierarchy;
+    /**
+     * Capabilities specific to the `textDocument/inlineValue` request.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<InlineValueClientCapabilities>> inlineValue;
+    /**
+     * Capabilities specific to the `textDocument/inlayHint` request.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<InlayHintClientCapabilities>> inlayHint;
+    /**
+     * Capabilities specific to the diagnostic pull model.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::unique_ptr<DiagnosticClientCapabilities>> diagnostic;
+    /**
+     * Client capabilities specific to inline completions.
+     *
+     * @since 3.18.0
+     * @proposed
+     */
+    std::optional<std::unique_ptr<InlineCompletionClientCapabilities>> inlineCompletion;
   };
 
   /**
    * Notebook specific client capabilities.
    *
-   * export interface NotebookDocumentSyncClientCapabilities {
-   *   dynamicRegistration?: boolean;
-   *   executionSummarySupport?: boolean;
-   * }
-   *
    * @since 3.17.0
    */
-  struct NotebookDocumentSyncClientCapabilities {
-
+  struct NotebookDocumentSyncClientCapabilities
+  {
     /**
-     * Whether implementation supports dynamic registration. If this is set to
-     * `true` the client supports the new
-     * `(NotebookDocumentSyncRegistrationOptions & NotebookDocumentSyncOptions)`
+     * Whether implementation supports dynamic registration. If this is
+     * set to `true` the client supports the new
+     * `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
      * return value for the corresponding server capability as well.
-     *
-     * dynamicRegistration?: boolean;
      */
-    std::optional<boolean> dynamicRegistration;
-
+    std::optional<boolean_t> dynamicRegistration;
     /**
      * The client supports sending execution summary data per cell.
-     *
-     * executionSummarySupport?: boolean;
      */
-    std::optional<boolean> executionSummarySupport;
+    std::optional<boolean_t> executionSummarySupport;
   };
 
   /**
    * Capabilities specific to the notebook document support.
    *
-   * export interface NotebookDocumentClientCapabilities {
-   *   synchronization: NotebookDocumentSyncClientCapabilities;
-   * }
-   *
    * @since 3.17.0
    */
-  struct NotebookDocumentClientCapabilities {
-
+  struct NotebookDocumentClientCapabilities
+  {
     /**
      * Capabilities specific to notebook document synchronization
-     *
-     * synchronization: NotebookDocumentSyncClientCapabilities;
      *
      * @since 3.17.0
      */
     std::unique_ptr<NotebookDocumentSyncClientCapabilities> synchronization;
   };
 
+  struct ShowMessageRequestClientCapabilities_messageActionItem
+  {
+    std::optional<boolean_t> additionalPropertiesSupport;
+  };
+
   /**
-   * The client has support for file requests/notifications.
+   * Show message request client capabilities
+   */
+  struct ShowMessageRequestClientCapabilities
+  {
+    /**
+     * Capabilities specific to the `MessageActionItem` type.
+     */
+    std::optional<std::unique_ptr<ShowMessageRequestClientCapabilities_messageActionItem>> messageActionItem;
+  };
+
+  /**
+   * Client capabilities for the showDocument request.
    *
    * @since 3.16.0
    */
-  struct FileCapabilities {
-
+  struct ShowDocumentClientCapabilities
+  {
     /**
-     * Whether the client supports dynamic registration for file
-     * requests/notifications.
-     *
-     * dynamicRegistration?: boolean;
+     * The client has support for the showDocument
+     * request.
      */
-    std::optional<boolean> dynamicRegistration;
-
-    /**
-     * The client has support for sending didCreateFiles notifications.
-     *
-     * didCreate?: boolean;
-     */
-    std::optional<boolean> didCreate;
-
-    /**
-     * The client has support for sending willCreateFiles requests.
-     *
-     * willCreate?: boolean;
-     */
-    std::optional<boolean> willCreate;
-
-    /**
-     * The client has support for sending didRenameFiles notifications.
-     *
-     * didRename?: boolean;
-     */
-    std::optional<boolean> didRename;
-
-    /**
-     * The client has support for sending willRenameFiles requests.
-     *
-     * willRename?: boolean;
-     */
-    std::optional<boolean> willRename;
-
-    /**
-     * The client has support for sending didDeleteFiles notifications.
-     *
-     * didDelete?: boolean;
-     */
-    std::optional<boolean> didDelete;
-
-    /**
-     * The client has support for sending willDeleteFiles requests.
-     *
-     * willDelete?: boolean;
-     */
-    std::optional<boolean> willDelete;
+    boolean_t support;
   };
 
-  /**
-   * Workspace specific client capabilities.
-   */
-  struct WorkspaceCapabilities {
-
-    /**
-     * The client supports applying batch edits to the workspace by supporting
-     * the request 'workspace/applyEdit'
-     *
-     * applyEdit?: boolean;
-     */
-    std::optional<boolean> applyEdit;
-
-    /**
-     * Capabilities specific to `WorkspaceEdit`s
-     *
-     * workspaceEdit?: WorkspaceEditClientCapabilities;
-     */
-    optional_ptr<WorkspaceEditClientCapabilities> workspaceEdit;
-
-    /**
-     * Capabilities specific to the `workspace/didChangeConfiguration`
-     * notification.
-     *
-     * didChangeConfiguration?: DidChangeConfigurationClientCapabilities;
-     */
-    optional_ptr<DidChangeConfigurationClientCapabilities> didChangeConfiguration;
-
-    /**
-     * Capabilities specific to the `workspace/didChangeWatchedFiles`
-     * notification.
-     *
-     * didChangeWatchedFiles?: DidChangeWatchedFilesClientCapabilities;
-     */
-    optional_ptr<DidChangeWatchedFilesClientCapabilities> didChangeWatchedFiles;
-
-    /**
-     * Capabilities specific to the `workspace/symbol` request.
-     *
-     * symbol?: WorkspaceSymbolClientCapabilities;
-     */
-    optional_ptr<WorkspaceSymbolClientCapabilities> symbol;
-
-    /**
-     * Capabilities specific to the `workspace/executeCommand` request.
-     *
-     * executeCommand?: ExecuteCommandClientCapabilities;
-     */
-    optional_ptr<ExecuteCommandClientCapabilities> executeCommand;
-
-    /**
-     * The client has support for workspace folders.
-     *
-     * workspaceFolders?: boolean;
-     *
-     * @since 3.6.0
-     */
-    std::optional<boolean> workspaceFolders;
-
-    /**
-     * The client supports `workspace/configuration` requests.
-     *
-     * configuration?: boolean;
-     *
-     * @since 3.6.0
-     */
-    std::optional<boolean> configuration;
-
-    /**
-     * Capabilities specific to the semantic token requests scoped to the
-     * workspace.
-     *
-     * semanticTokens?: SemanticTokensWorkspaceClientCapabilities;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<SemanticTokensWorkspaceClientCapabilities> semanticTokens;
-
-    /**
-     * Capabilities specific to the code lens requests scoped to the
-     * workspace.
-     *
-     * codeLens?: CodeLensWorkspaceClientCapabilities;
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<CodeLensWorkspaceClientCapabilities> codeLens;
-
-    /**
-     * The client has support for file requests/notifications.
-     *
-     * fileOperations?: {
-     *   dynamicRegistration?: boolean;
-     *   didCreate?: boolean;
-     *   willCreate?: boolean;
-     *   didRename?: boolean;
-     *   willRename?: boolean;
-     *   didDelete?: boolean;
-     *   willDelete?: boolean;
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<FileCapabilities> fileOperations;
-
-    /**
-     * Client workspace capabilities specific to inline values.
-     *
-     * inlineValue?: InlineValueWorkspaceClientCapabilities;
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<InlineValueWorkspaceClientCapabilities> inlineValue;
-
-    /**
-     * Client workspace capabilities specific to inlay hints.
-     *
-     * inlayHint?: InlayHintWorkspaceClientCapabilities;
-     *
-     * @since 3.17.0
-     */
-    optional_ptr<InlayHintWorkspaceClientCapabilities> inlayHint;
-
-    /**
-     * Client workspace capabilities specific to diagnostics.
-     *
-     * diagnostics?: DiagnosticWorkspaceClientCapabilities;
-     *
-     * @since 3.17.0.
-     */
-    optional_ptr<DiagnosticWorkspaceClientCapabilities> diagnostics;
-  };
-
-  /**
-   * Window specific client capabilities.
-   */
-  struct WindowCapabilities {
-
+  struct WindowClientCapabilities
+  {
     /**
      * It indicates whether the client supports server initiated
      * progress using the `window/workDoneProgress/create` request.
@@ -13043,54 +6420,68 @@ namespace LCompilers::LanguageServerProtocol {
      * `workDoneProgress` property in the request specific server
      * capabilities.
      *
-     * workDoneProgress?: boolean;
-     *
      * @since 3.15.0
      */
-    std::optional<boolean> workDoneProgress;
-
+    std::optional<boolean_t> workDoneProgress;
     /**
-     * Capabilities specific to the showMessage request
-     *
-     * showMessage?: ShowMessageRequestClientCapabilities;
+     * Capabilities specific to the showMessage request.
      *
      * @since 3.16.0
      */
-    optional_ptr<ShowMessageRequestClientCapabilities> showMessage;
-
+    std::optional<std::unique_ptr<ShowMessageRequestClientCapabilities>> showMessage;
     /**
-     * Client capabilities for the show document request.
-     *
-     * showDocument?: ShowDocumentClientCapabilities;
+     * Capabilities specific to the showDocument request.
      *
      * @since 3.16.0
      */
-    optional_ptr<ShowDocumentClientCapabilities> showDocument;
+    std::optional<std::unique_ptr<ShowDocumentClientCapabilities>> showDocument;
   };
 
   /**
-   * Client capability that signals how the client handles stale requests (e.g.
-   * a request for which the client will not process the response anymore since
-   * the information is outdated).
+   * Client capabilities specific to regular expressions.
    *
-   * @since 3.17.0
+   * @since 3.16.0
    */
-  struct StaleRequestSupport {
-
+  struct RegularExpressionsClientCapabilities
+  {
     /**
-     * The client will actively cancel the request.
-     *
-     * cancel: boolean;
+     * The engine's name.
      */
-    boolean cancel;
-
+    string_t engine;
     /**
-     * The list of requests for which the client will retry the request if it
-     * receives a response with error code `ContentModified``
-     *
-     * retryOnContentModified: string[];
+     * The engine's version.
      */
-    std::vector<string> retryOnContentModified;
+    std::optional<string_t> version;
+  };
+
+  /**
+   * Client capabilities specific to the used markdown parser.
+   *
+   * @since 3.16.0
+   */
+  struct MarkdownClientCapabilities
+  {
+    /**
+     * The name of the parser.
+     */
+    string_t parser;
+    /**
+     * The version of the parser.
+     */
+    std::optional<string_t> version;
+    /**
+     * A list of HTML tags that the client allows / supports in
+     * Markdown.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::vector<string_t>> allowedTags;
+  };
+
+  struct GeneralClientCapabilities_staleRequestSupport
+  {
+    boolean_t cancel;
+    std::vector<string_t> retryOnContentModified;
   };
 
   /**
@@ -13098,46 +6489,34 @@ namespace LCompilers::LanguageServerProtocol {
    *
    * @since 3.16.0
    */
-  struct GeneralCapabilities {
-
+  struct GeneralClientCapabilities
+  {
     /**
      * Client capability that signals how the client
      * handles stale requests (e.g. a request
      * for which the client will not process the response
      * anymore since the information is outdated).
      *
-     * staleRequestSupport?: {
-     *   cancel: boolean;
-     *   retryOnContentModified: string[];
-     * }
-     *
      * @since 3.17.0
      */
-    optional_ptr<StaleRequestSupport> staleRequestSupport;
-
+    std::optional<std::unique_ptr<GeneralClientCapabilities_staleRequestSupport>> staleRequestSupport;
     /**
      * Client capabilities specific to regular expressions.
      *
-     * regularExpressions?: RegularExpressionsClientCapabilities;
-     *
      * @since 3.16.0
      */
-    optional_ptr<RegularExpressionsClientCapabilities> regularExpressions;
-
+    std::optional<std::unique_ptr<RegularExpressionsClientCapabilities>> regularExpressions;
     /**
      * Client capabilities specific to the client's markdown parser.
      *
-     * markdown?: MarkdownClientCapabilities;
-     *
      * @since 3.16.0
      */
-    optional_ptr<MarkdownClientCapabilities> markdown;
-
+    std::optional<std::unique_ptr<MarkdownClientCapabilities>> markdown;
     /**
      * The position encodings supported by the client. Client and server
      * have to agree on the same position encoding to ensure that offsets
      * (e.g. character position in a line) are interpreted the same on both
-     * side.
+     * sides.
      *
      * To keep the protocol backwards compatible the following applies: if
      * the value 'utf-16' is missing from the array of position encodings
@@ -13151,861 +6530,2123 @@ namespace LCompilers::LanguageServerProtocol {
      * is best done where the file is read which is usually on the server
      * side.
      *
-     * positionEncodings?: PositionEncodingKind[];
-     *
      * @since 3.17.0
      */
-    optional_vector<PositionEncodingKind> positionEncodings;
+    std::optional<std::vector<PositionEncodingKind>> positionEncodings;
   };
 
   /**
-   * ClientCapabilities define capabilities for dynamic registration, workspace
-   * and text document features the client supports. The experimental can be
-   * used to pass experimental capabilities under development. For future
-   * compatibility a ClientCapabilities object literal can have more properties
-   * set than currently defined. Servers receiving a ClientCapabilities object
-   * literal with unknown properties should ignore these properties. A missing
-   * property should be interpreted as an absence of the capability. If a
-   * missing property normally defines sub properties, all missing sub
-   * properties should be interpreted as an absence of the corresponding
-   * capability.
-   *
-   * Client capabilities got introduced with version 3.0 of the protocol. They
-   * therefore only describe capabilities that got introduced in 3.x or later.
-   * Capabilities that existed in the 2.x version of the protocol are still
-   * mandatory for clients. Clients cannot opt out of providing them. So even if
-   * a client omits the ClientCapabilities.textDocument.synchronization it is
-   * still required that the client provides text document synchronization (e.g.
-   * open, changed and close notifications).
-   *
-   * interface ClientCapabilities {
-   *   workspace?: {
-   *     applyEdit?: boolean;
-   *     workspaceEdit?: WorkspaceEditClientCapabilities;
-   *     didChangeConfiguration?: DidChangeConfigurationClientCapabilities;
-   *     didChangeWatchedFiles?: DidChangeWatchedFilesClientCapabilities;
-   *     symbol?: WorkspaceSymbolClientCapabilities;
-   *     executeCommand?: ExecuteCommandClientCapabilities;
-   *     workspaceFolders?: boolean;
-   *     configuration?: boolean;
-   *     semanticTokens?: SemanticTokensWorkspaceClientCapabilities;
-   *     codeLens?: CodeLensWorkspaceClientCapabilities;
-   *     fileOperations?: {
-   *       dynamicRegistration?: boolean;
-   *       didCreate?: boolean;
-   *       willCreate?: boolean;
-   *       didRename?: boolean;
-   *       willRename?: boolean;
-   *       didDelete?: boolean;
-   *       willDelete?: boolean;
-   *     };
-   *     inlineValue?: InlineValueWorkspaceClientCapabilities;
-   *     inlayHint?: InlayHintWorkspaceClientCapabilities;
-   *     diagnostics?: DiagnosticWorkspaceClientCapabilities;
-   *   };
-   *   textDocument?: TextDocumentClientCapabilities;
-   *   notebookDocument?: NotebookDocumentClientCapabilities;
-   *   window?: {
-   *     workDoneProgress?: boolean;
-   *     showMessage?: ShowMessageRequestClientCapabilities;
-   *     showDocument?: ShowDocumentClientCapabilities;
-   *   };
-   *   general?: {
-   *     staleRequestSupport?: {
-   *       cancel: boolean;
-   *       retryOnContentModified: string[];
-   *     }
-   *     regularExpressions?: RegularExpressionsClientCapabilities;
-   *     markdown?: MarkdownClientCapabilities;
-   *     positionEncodings?: PositionEncodingKind[];
-   *   };
-   *   experimental?: LSPAny;
-   * }
+   * Defines the capabilities provided by the client.
    */
-  struct ClientCapabilities {
-
+  struct ClientCapabilities
+  {
     /**
      * Workspace specific client capabilities.
-     *
-     * workspace?: {
-     *   applyEdit?: boolean;
-     *   workspaceEdit?: WorkspaceEditClientCapabilities;
-     *   didChangeConfiguration?: DidChangeConfigurationClientCapabilities;
-     *   didChangeWatchedFiles?: DidChangeWatchedFilesClientCapabilities;
-     *   symbol?: WorkspaceSymbolClientCapabilities;
-     *   executeCommand?: ExecuteCommandClientCapabilities;
-     *   workspaceFolders?: boolean;
-     *   configuration?: boolean;
-     *   semanticTokens?: SemanticTokensWorkspaceClientCapabilities;
-     *   codeLens?: CodeLensWorkspaceClientCapabilities;
-     *   fileOperations?: {
-     *     dynamicRegistration?: boolean;
-     *     didCreate?: boolean;
-     *     willCreate?: boolean;
-     *     didRename?: boolean;
-     *     willRename?: boolean;
-     *     didDelete?: boolean;
-     *     willDelete?: boolean;
-     *   };
-     *   inlineValue?: InlineValueWorkspaceClientCapabilities;
-     *   inlayHint?: InlayHintWorkspaceClientCapabilities;
-     *   diagnostics?: DiagnosticWorkspaceClientCapabilities;
-     * };
      */
-    optional_ptr<WorkspaceCapabilities> workspace;
-
+    std::optional<std::unique_ptr<WorkspaceClientCapabilities>> workspace;
     /**
      * Text document specific client capabilities.
-     *
-     * textDocument?: TextDocumentClientCapabilities;
      */
-    optional_ptr<TextDocumentClientCapabilities> textDocument;
-
+    std::optional<std::unique_ptr<TextDocumentClientCapabilities>> textDocument;
     /**
      * Capabilities specific to the notebook document support.
      *
-     * notebookDocument?: NotebookDocumentClientCapabilities;
-     *
      * @since 3.17.0
      */
-    optional_ptr<NotebookDocumentClientCapabilities> notebookDocument;
-
+    std::optional<std::unique_ptr<NotebookDocumentClientCapabilities>> notebookDocument;
     /**
      * Window specific client capabilities.
-     *
-     * window?: {
-     *   workDoneProgress?: boolean;
-     *   showMessage?: ShowMessageRequestClientCapabilities;
-     *   showDocument?: ShowDocumentClientCapabilities;
-     * };
      */
-    optional_ptr<WindowCapabilities> window;
-
+    std::optional<std::unique_ptr<WindowClientCapabilities>> window;
     /**
      * General client capabilities.
      *
-     * general?: {
-     *   staleRequestSupport?: {
-     *     cancel: boolean;
-     *     retryOnContentModified: string[];
-     *   }
-     *   regularExpressions?: RegularExpressionsClientCapabilities;
-     *   markdown?: MarkdownClientCapabilities;
-     *   positionEncodings?: PositionEncodingKind[];
-     * };
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<GeneralClientCapabilities>> general;
+    /**
+     * Experimental client capabilities.
+     */
+    std::optional<std::unique_ptr<LSPAny>> experimental;
+  };
+
+  enum class DefinitionType {
+    LOCATION,
+    LOCATION_ARRAY,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<Location>,
+    std::vector<std::unique_ptr<Location>>
+  > Definition;
+
+  /**
+   * Information about where a symbol is defined.
+   *
+   * Provides additional metadata over normal {@link Location location} definitions, including the range of
+   * the defining symbol
+   */
+  typedef LocationLink DefinitionLink;
+
+  enum class DeclarationType {
+    LOCATION,
+    LOCATION_ARRAY,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<Location>,
+    std::vector<std::unique_ptr<Location>>
+  > Declaration;
+
+  /**
+   * Information about where a symbol is declared.
+   *
+   * Provides additional metadata over normal {@link Location location} declarations, including the range of
+   * the declaring symbol.
+   *
+   * Servers should prefer returning `DeclarationLink` over `Declaration` if supported
+   * by the client.
+   */
+  typedef LocationLink DeclarationLink;
+
+  enum class InlineValueType {
+    INLINE_VALUE_TEXT,
+    INLINE_VALUE_VARIABLE_LOOKUP,
+    INLINE_VALUE_EVALUATABLE_EXPRESSION,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<InlineValueText>,
+    std::unique_ptr<InlineValueVariableLookup>,
+    std::unique_ptr<InlineValueEvaluatableExpression>
+  > InlineValue;
+
+  enum class DocumentDiagnosticReportType {
+    RELATED_FULL_DOCUMENT_DIAGNOSTIC_REPORT,
+    RELATED_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<RelatedFullDocumentDiagnosticReport>,
+    std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport>
+  > DocumentDiagnosticReport;
+
+  struct PrepareRenameResult_2
+  {
+    boolean_t defaultBehavior;
+  };
+
+  struct PrepareRenameResult_1
+  {
+    std::unique_ptr<Range> range;
+    string_t placeholder;
+  };
+
+  enum class PrepareRenameResultType {
+    RANGE,
+    PREPARE_RENAME_RESULT_1,
+    PREPARE_RENAME_RESULT_2,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<Range>,
+    std::unique_ptr<PrepareRenameResult_1>,
+    std::unique_ptr<PrepareRenameResult_2>
+  > PrepareRenameResult;
+
+  enum class ProgressTokenType {
+    INTEGER_TYPE,
+    STRING_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    string_t
+  > ProgressToken;
+
+  struct PartialResultParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+  };
+
+  struct ProgressParams
+  {
+    /**
+     * The progress token provided by the client or server.
+     */
+    ProgressToken token;
+    /**
+     * The progress data.
+     */
+    std::unique_ptr<LSPAny> value;
+  };
+
+  struct WorkDoneProgressCreateParams
+  {
+    /**
+     * The token to be used to report progress.
+     */
+    ProgressToken token;
+  };
+
+  struct WorkDoneProgressCancelParams
+  {
+    /**
+     * The token to be used to report progress.
+     */
+    ProgressToken token;
+  };
+
+  struct WorkDoneProgressParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * Parameters for a {@link DocumentSymbolRequest}.
+   */
+  struct DocumentSymbolParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * The parameter of a `textDocument/prepareCallHierarchy` request.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyPrepareParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * A parameter literal used in inline value requests.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The document range for which inline values should be computed.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * Additional information about the context in which inline values were
+     * requested.
+     */
+    std::unique_ptr<InlineValueContext> context;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensDeltaParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The result id of a previous response. The result Id can either point to a full response
+     * or a delta response depending on what was received last.
+     */
+    string_t previousResultId;
+  };
+
+  struct TypeDefinitionParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * The parameters of a {@link RenameRequest}.
+   */
+  struct RenameParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document to rename.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The position at which this request was sent.
+     */
+    std::unique_ptr<Position> position;
+    /**
+     * The new name of the symbol. If the given name is not valid the
+     * request must return a {@link ResponseError} with an
+     * appropriate message set.
+     */
+    string_t newName;
+  };
+
+  /**
+   * Parameters for a {@link FoldingRangeRequest}.
+   */
+  struct FoldingRangeParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * Parameters for a {@link ColorPresentationRequest}.
+   */
+  struct ColorPresentationParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The color to request presentations for.
+     */
+    std::unique_ptr<Color> color;
+    /**
+     * The range where the color would be inserted. Serves as a context.
+     */
+    std::unique_ptr<Range> range;
+  };
+
+  /**
+   * A parameter literal used in inlay hint requests.
+   *
+   * @since 3.17.0
+   */
+  struct InlayHintParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The document range for which inlay hints should be computed.
+     */
+    std::unique_ptr<Range> range;
+  };
+
+  struct MonikerParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * The parameters of a {@link DocumentRangesFormattingRequest}.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct DocumentRangesFormattingParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document to format.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The ranges to format
+     */
+    std::vector<std::unique_ptr<Range>> ranges;
+    /**
+     * The format options
+     */
+    std::unique_ptr<FormattingOptions> options;
+  };
+
+  /**
+   * The parameters of a {@link DocumentLinkRequest}.
+   */
+  struct DocumentLinkParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document to provide document links for.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * Completion parameters
+   */
+  struct CompletionParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The completion context. This is only available if the client specifies
+     * to send this using the client capability `textDocument.completion.contextSupport === true`
+     */
+    std::optional<std::unique_ptr<CompletionContext>> context;
+  };
+
+  /**
+   * Parameters for a {@link DefinitionRequest}.
+   */
+  struct DefinitionParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * The parameters of a {@link ExecuteCommandRequest}.
+   */
+  struct ExecuteCommandParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The identifier of the actual command handler.
+     */
+    string_t command;
+    /**
+     * Arguments that the command should be invoked with.
+     */
+    std::optional<std::vector<std::unique_ptr<LSPAny>>> arguments;
+  };
+
+  struct ImplementationParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * Parameters for a {@link DocumentColorRequest}.
+   */
+  struct DocumentColorParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * Parameters of the workspace diagnostic request.
+   *
+   * @since 3.17.0
+   */
+  struct WorkspaceDiagnosticParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The additional identifier provided during registration.
+     */
+    std::optional<string_t> identifier;
+    /**
+     * The currently known diagnostic reports with their
+     * previous result ids.
+     */
+    std::vector<std::unique_ptr<PreviousResultId>> previousResultIds;
+  };
+
+  enum class _InitializeParams_processIdType {
+    INTEGER_TYPE,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    integer_t,
+    null_t
+  > _InitializeParams_processId;
+
+  struct _InitializeParams_clientInfo
+  {
+    string_t name;
+    std::optional<string_t> version;
+  };
+
+  enum class _InitializeParams_rootPathType {
+    STRING_TYPE,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    string_t,
+    null_t
+  > _InitializeParams_rootPath;
+
+  enum class _InitializeParams_rootUriType {
+    DOCUMENT_URI,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    DocumentUri,
+    null_t
+  > _InitializeParams_rootUri;
+
+  /**
+   * The initialize parameters
+   */
+  struct _InitializeParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The process Id of the parent process that started
+     * the server.
+     *
+     * Is `null` if the process has not been started by another process.
+     * If the parent process is not alive then the server should exit.
+     */
+    _InitializeParams_processId processId;
+    /**
+     * Information about the client
+     *
+     * @since 3.15.0
+     */
+    std::optional<std::unique_ptr<_InitializeParams_clientInfo>> clientInfo;
+    /**
+     * The locale the client is currently showing the user interface
+     * in. This must not necessarily be the locale of the operating
+     * system.
+     *
+     * Uses IETF language tags as the value's syntax
+     * (See https://en.wikipedia.org/wiki/IETF_language_tag)
      *
      * @since 3.16.0
      */
-    optional_ptr<GeneralCapabilities> general;
-
+    std::optional<string_t> locale;
     /**
-     * Experimental client capabilities.
+     * The rootPath of the workspace. Is null
+     * if no folder is open.
      *
-     * experimental?: LSPAny;
+     * @deprecated in favour of rootUri.
      */
-    optional_ptr<LSPAny> experimental;
+    std::optional<_InitializeParams_rootPath> rootPath;
+    /**
+     * The rootUri of the workspace. Is null if no
+     * folder is open. If both `rootPath` and `rootUri` are set
+     * `rootUri` wins.
+     *
+     * @deprecated in favour of workspaceFolders.
+     */
+    _InitializeParams_rootUri rootUri;
+    /**
+     * The capabilities provided by the client (editor or tool)
+     */
+    std::unique_ptr<ClientCapabilities> capabilities;
+    /**
+     * User provided initialization options.
+     */
+    std::optional<std::unique_ptr<LSPAny>> initializationOptions;
+    /**
+     * The initial trace setting. If omitted trace is disabled ('off').
+     */
+    std::optional<TraceValues> trace;
+  };
+
+  struct InitializeParams
+    : public _InitializeParams
+    , public WorkspaceFoldersInitializeParams
+  {
+  };
+
+  struct PrepareRenameParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
   };
 
   /**
-   * Information about the server.
+   * The parameters of a {@link CodeLensRequest}.
    */
-  struct ServerInfo {
-
+  struct CodeLensParams
+  {
     /**
-     * The name of the server as defined by the server.
-     *
-     * name: string;
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
      */
-    string name;
-
+    std::optional<ProgressToken> partialResultToken;
     /**
-     * The server's version as defined by the server.
-     *
-     * version?: string;
+     * An optional token that a server can use to report work done progress.
      */
-    std::optional<string> version;
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document to request code lens for.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  struct LinkedEditingRangeParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
   };
 
   /**
-   * Defines how the host (editor) should sync document changes to the language
-   * server.
+   * Parameters of the document diagnostic request.
    *
-   * Client support for textDocument/didOpen, textDocument/didChange and
-   * textDocument/didClose notifications is mandatory in the protocol and
-   * clients can not opt out supporting them. This includes both full and
-   * incremental synchronization in the textDocument/didChange notification. In
-   * addition a server must either implement all three of them or none. Their
-   * capabilities are therefore controlled via a combined client and server
-   * capability. Opting out of text document synchronization makes only sense if
-   * the documents shown by the client are read only. Otherwise the server might
-   * receive request for documents, for which the content is managed in the
-   * client (e.g. they might have changed).
-   *
-   * Client Capability:
-   *   property path (optional): textDocument.synchronization.dynamicRegistration
-   *   property type: boolean
-   *
-   * Controls whether text document synchronization supports dynamic registration.
-   *
-   * Server Capability:
-   *   property path (optional): textDocumentSync
-   *   property type: TextDocumentSyncKind | TextDocumentSyncOptions. The below
-   *   definition of the TextDocumentSyncOptions only covers the properties
-   *   specific to the open, change and close notifications. A complete
-   *   definition covering all properties can be found here:
-   *
-   * export namespace TextDocumentSyncKind {
-   *   export const None = 0;
-   *   export const Full = 1;
-   *   export const Incremental = 2;
-   * }
-   * export type TextDocumentSyncKind = 0 | 1 | 2;
+   * @since 3.17.0
    */
-  enum class TextDocumentSyncKind {
-
+  struct DocumentDiagnosticParams
+  {
     /**
-     * Documents should not be synced at all.
-     *
-     * export const None = 0;
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
      */
-    None = 0,
-
+    std::optional<ProgressToken> partialResultToken;
     /**
-     * Documents are synced by always sending the full content of the document.
-     *
-     * export const Full = 1;
+     * An optional token that a server can use to report work done progress.
      */
-    Full = 1,
-
+    std::optional<ProgressToken> workDoneToken;
     /**
-     * Documents are synced by sending the full content on open. After that only
-     * incremental updates to the document are sent.
-     *
-     * export const Incremental = 2;
+     * The text document.
      */
-    Incremental = 2,
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The additional identifier  provided during registration.
+     */
+    std::optional<string_t> identifier;
+    /**
+     * The result id of a previous response if provided.
+     */
+    std::optional<string_t> previousResultId;
   };
 
-  extern std::map<TextDocumentSyncKind, std::string> TextDocumentSyncKindNames;
-
-  auto textDocumentSyncKindByName(const std::string &name) -> TextDocumentSyncKind;
-
-  /**
-   * The document save notification is sent from the client to the server when
-   * the document was saved in the client.
-   *
-   * Client Capability:
-   *   property name (optional): textDocument.synchronization.didSave
-   *   property type: boolean
-   *
-   * The capability indicates that the client supports textDocument/didSave
-   * notifications.
-   *
-   * Server Capability:
-   *   property name (optional): textDocumentSync.save
-   *   property type: boolean | SaveOptions where SaveOptions is defined as follows:
-   *
-   * export interface SaveOptions {
-   *   includeText?: boolean;
-   * }
-   */
-  struct SaveOptions {
-
+  struct DeclarationParams
+    : public TextDocumentPositionParams
+  {
     /**
-     * The client is supposed to include the content on save.
-     *
-     * includeText?: boolean;
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
      */
-    std::optional<boolean> includeText;
-  };
-
-  enum class SaveOrOptionsType {
-    BOOLEAN,
-    SAVE_OPTIONS,
-  };
-
-  typedef std::variant<
-    boolean,
-    std::unique_ptr<SaveOptions>
-  > SaveOrOptions;
-
-  /**
-   * export interface TextDocumentSyncOptions {
-   *   openClose?: boolean;
-   *   change?: TextDocumentSyncKind;
-   *   willSave?: boolean;
-   *   willSaveWaitUntil?: boolean;
-   *   save?: boolean | SaveOptions;
-   * }
-   */
-  struct TextDocumentSyncOptions {
-
+    std::optional<ProgressToken> partialResultToken;
     /**
-     * Open and close notifications are sent to the server. If omitted open
-     * close notifications should not be sent.
-     *
-     * openClose?: boolean;
+     * An optional token that a server can use to report work done progress.
      */
-    std::optional<boolean> openClose;
-
-    /**
-     * Change notifications are sent to the server. See
-     * TextDocumentSyncKind.None, TextDocumentSyncKind.Full and
-     * TextDocumentSyncKind.Incremental. If omitted it defaults to
-     * TextDocumentSyncKind.None.
-     *
-     * change?: TextDocumentSyncKind;
-     */
-    std::optional<TextDocumentSyncKind> change;
-
-    /**
-     * If present will save notifications are sent to the server. If omitted
-     * the notification should not be sent.
-     *
-     * willSave?: boolean;
-     */
-    std::optional<boolean> willSave;
-
-    /**
-     * If present will save wait until requests are sent to the server. If
-     * omitted the request should not be sent.
-     *
-     * willSaveWaitUntil?: boolean;
-     */
-    std::optional<boolean> willSaveWaitUntil;
-
-    /**
-     * If present save notifications are sent to the server. If omitted the
-     * notification should not be sent.
-     *
-     * save?: boolean | SaveOptions;
-     */
-    std::optional<SaveOrOptions> save;
-  };
-
-  enum class TextDocumentSyncType {
-    TEXT_DOCUMENT_SYNC_OPTIONS,
-    TEXT_DOCUMENT_SYNC_KIND,
+    std::optional<ProgressToken> workDoneToken;
   };
 
   /**
-   * Defines how text documents are synced. Is either a detailed structure
-   * defining each notification or for backwards compatibility the
-   * TextDocumentSyncKind number. If omitted it defaults to
-   * `TextDocumentSyncKind.None`.
+   * The parameter of a `typeHierarchy/supertypes` request.
+   *
+   * @since 3.17.0
    */
-  typedef std::variant<
-    std::unique_ptr<TextDocumentSyncOptions>,
-    TextDocumentSyncKind
-  > TextDocumentSync;
-
-  struct PartialTextDocumentContentChangeEvent {
-
+  struct TypeHierarchySupertypesParams
+  {
     /**
-     * The range of the document that changed.
-     *
-     * range: Range;
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<TypeHierarchyItem> item;
+  };
+
+  /**
+   * The parameters of a {@link DocumentRangeFormattingRequest}.
+   */
+  struct DocumentRangeFormattingParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document to format.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The range to format
      */
     std::unique_ptr<Range> range;
-
     /**
-     * The optional length of the range that got replaced.
-     *
-     * rangeLength?: uinteger;
-     *
-     * @deprecated use range instead.
+     * The format options
      */
-    std::optional<uinteger> rangeLength;
-
-    /**
-     * The new text for the provided range.
-     *
-     * text: string;
-     */
-    string text;
+    std::unique_ptr<FormattingOptions> options;
   };
 
-  struct WholeTextDocumentContentChangeEvent {
-
+  /**
+   * The parameter of a `callHierarchy/incomingCalls` request.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyIncomingCallsParams
+  {
     /**
-     * The new text of the whole document.
-     *
-     * text: string;
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
      */
-    string text;
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<CallHierarchyItem> item;
+  };
+
+  /**
+   * Parameters for a {@link DocumentHighlightRequest}.
+   */
+  struct DocumentHighlightParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensRangeParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The range the semantic tokens are requested for.
+     */
+    std::unique_ptr<Range> range;
+  };
+
+  /**
+   * Parameters for a {@link ReferencesRequest}.
+   */
+  struct ReferenceParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<ReferenceContext> context;
+  };
+
+  /**
+   * The parameters of a {@link DocumentFormattingRequest}.
+   */
+  struct DocumentFormattingParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document to format.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The format options.
+     */
+    std::unique_ptr<FormattingOptions> options;
+  };
+
+  /**
+   * A parameter literal used in inline completion requests.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct InlineCompletionParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * Additional information about the context in which inline completions were
+     * requested.
+     */
+    std::unique_ptr<InlineCompletionContext> context;
+  };
+
+  /**
+   * Parameters for a {@link SignatureHelpRequest}.
+   */
+  struct SignatureHelpParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The signature help context. This is only available if the client specifies
+     * to send this using the client capability `textDocument.signatureHelp.contextSupport === true`
+     *
+     * @since 3.15.0
+     */
+    std::optional<std::unique_ptr<SignatureHelpContext>> context;
+  };
+
+  /**
+   * The parameter of a `callHierarchy/outgoingCalls` request.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyOutgoingCallsParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<CallHierarchyItem> item;
+  };
+
+  /**
+   * The parameter of a `typeHierarchy/subtypes` request.
+   *
+   * @since 3.17.0
+   */
+  struct TypeHierarchySubtypesParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<TypeHierarchyItem> item;
+  };
+
+  /**
+   * Parameters for a {@link HoverRequest}.
+   */
+  struct HoverParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * The parameter of a `textDocument/prepareTypeHierarchy` request.
+   *
+   * @since 3.17.0
+   */
+  struct TypeHierarchyPrepareParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * The parameters of a {@link WorkspaceSymbolRequest}.
+   */
+  struct WorkspaceSymbolParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * A query string to filter symbols by. Clients may send an empty
+     * string here to request all symbols.
+     */
+    string_t query;
+  };
+
+  /**
+   * A parameter literal used in selection range requests.
+   */
+  struct SelectionRangeParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The positions inside the text document.
+     */
+    std::vector<std::unique_ptr<Position>> positions;
+  };
+
+  /**
+   * The parameters of a {@link CodeActionRequest}.
+   */
+  struct CodeActionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document in which the command was invoked.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The range for which the command was invoked.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * Context carrying additional information.
+     */
+    std::unique_ptr<CodeActionContext> context;
+  };
+
+  /**
+   * An identifier to refer to a change annotation stored with a workspace edit.
+   */
+  typedef string_t ChangeAnnotationIdentifier;
+
+  /**
+   * A special text edit with an additional change annotation.
+   *
+   * @since 3.16.0.
+   */
+  struct AnnotatedTextEdit
+    : public TextEdit
+  {
+    /**
+     * The actual identifier of the change annotation
+     */
+    ChangeAnnotationIdentifier annotationId;
+  };
+
+  enum class TextDocumentEdit_editsType {
+    TEXT_EDIT,
+    ANNOTATED_TEXT_EDIT,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<TextEdit>,
+    std::unique_ptr<AnnotatedTextEdit>
+  > TextDocumentEdit_edits;
+
+  /**
+   * Describes textual changes on a text document. A TextDocumentEdit describes all changes
+   * on a document version Si and after they are applied move the document to version Si+1.
+   * So the creator of a TextDocumentEdit doesn't need to sort the array of edits or do any
+   * kind of ordering. However the edits must be non overlapping.
+   */
+  struct TextDocumentEdit
+  {
+    /**
+     * The text document to change.
+     */
+    std::unique_ptr<OptionalVersionedTextDocumentIdentifier> textDocument;
+    /**
+     * The edits to be applied.
+     *
+     * @since 3.16.0 - support for AnnotatedTextEdit. This is guarded using a
+     * client capability.
+     */
+    std::vector<TextDocumentEdit_edits> edits;
+  };
+
+  /**
+   * A generic resource operation.
+   */
+  struct ResourceOperation
+  {
+    /**
+     * The resource operation kind.
+     */
+    string_t kind;
+    /**
+     * An optional annotation identifier describing the operation.
+     *
+     * @since 3.16.0
+     */
+    std::optional<ChangeAnnotationIdentifier> annotationId;
+  };
+
+  /**
+   * Create file operation.
+   */
+  struct CreateFile
+    : public ResourceOperation
+  {
+    /**
+     * A create
+     */
+    string_t kind;
+    /**
+     * The resource to create.
+     */
+    DocumentUri uri;
+    /**
+     * Additional options
+     */
+    std::optional<std::unique_ptr<CreateFileOptions>> options;
+  };
+
+  /**
+   * Rename file operation
+   */
+  struct RenameFile
+    : public ResourceOperation
+  {
+    /**
+     * A rename
+     */
+    string_t kind;
+    /**
+     * The old (existing) location.
+     */
+    DocumentUri oldUri;
+    /**
+     * The new location.
+     */
+    DocumentUri newUri;
+    /**
+     * Rename options.
+     */
+    std::optional<std::unique_ptr<RenameFileOptions>> options;
+  };
+
+  /**
+   * Delete file operation
+   */
+  struct DeleteFile
+    : public ResourceOperation
+  {
+    /**
+     * A delete
+     */
+    string_t kind;
+    /**
+     * The file to delete.
+     */
+    DocumentUri uri;
+    /**
+     * Delete options.
+     */
+    std::optional<std::unique_ptr<DeleteFileOptions>> options;
+  };
+
+  enum class WorkspaceEdit_documentChangesType {
+    TEXT_DOCUMENT_EDIT,
+    CREATE_FILE,
+    RENAME_FILE,
+    DELETE_FILE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<TextDocumentEdit>,
+    std::unique_ptr<CreateFile>,
+    std::unique_ptr<RenameFile>,
+    std::unique_ptr<DeleteFile>
+  > WorkspaceEdit_documentChanges;
+
+  /**
+   * A workspace edit represents changes to many resources managed in the workspace. The edit
+   * should either provide `changes` or `documentChanges`. If documentChanges are present
+   * they are preferred over `changes` if the client can handle versioned document edits.
+   *
+   * Since version 3.13.0 a workspace edit can contain resource operations as well. If resource
+   * operations are present clients need to execute the operations in the order in which they
+   * are provided. So a workspace edit for example can consist of the following two changes:
+   * (1) a create file a.txt and (2) a text document edit which insert text into file a.txt.
+   *
+   * An invalid sequence (e.g. (1) delete file a.txt and (2) insert text into file a.txt) will
+   * cause failure of the operation. How the client recovers from the failure is described by
+   * the client capability: `workspace.workspaceEdit.failureHandling`
+   */
+  struct WorkspaceEdit
+  {
+    /**
+     * Holds changes to existing resources.
+     */
+    std::optional<std::map<DocumentUri, std::vector<std::unique_ptr<TextEdit>>>> changes;
+    /**
+     * Depending on the client capability `workspace.workspaceEdit.resourceOperations` document changes
+     * are either an array of `TextDocumentEdit`s to express changes to n different text documents
+     * where each text document edit addresses a specific version of a text document. Or it can contain
+     * above `TextDocumentEdit`s mixed with create, rename and delete file / folder operations.
+     *
+     * Whether a client supports versioned document edits is expressed via
+     * `workspace.workspaceEdit.documentChanges` client capability.
+     *
+     * If a client neither supports `documentChanges` nor `workspace.workspaceEdit.resourceOperations` then
+     * only plain `TextEdit`s using the `changes` property are supported.
+     */
+    std::optional<std::vector<WorkspaceEdit_documentChanges>> documentChanges;
+    /**
+     * A map of change annotations that can be referenced in `AnnotatedTextEdit`s or create, rename and
+     * delete file / folder operations.
+     *
+     * Whether clients honor this property depends on the client capability `workspace.changeAnnotationSupport`.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::map<ChangeAnnotationIdentifier, std::unique_ptr<ChangeAnnotation>>> changeAnnotations;
+  };
+
+  /**
+   * The parameters passed via an apply workspace edit request.
+   */
+  struct ApplyWorkspaceEditParams
+  {
+    /**
+     * An optional label of the workspace edit. This label is
+     * presented in the user interface for example on an undo
+     * stack to undo the workspace edit.
+     */
+    std::optional<string_t> label;
+    /**
+     * The edits to apply.
+     */
+    std::unique_ptr<WorkspaceEdit> edit;
+  };
+
+  struct CodeAction_disabled
+  {
+    string_t reason;
+  };
+
+  /**
+   * A code action represents a change that can be performed in code, e.g. to fix a problem or
+   * to refactor code.
+   *
+   * A CodeAction must set either `edit` and/or a `command`. If both are supplied, the `edit` is applied first, then the `command` is executed.
+   */
+  struct CodeAction
+  {
+    /**
+     * A short, human-readable, title for this code action.
+     */
+    string_t title;
+    /**
+     * The kind of the code action.
+     *
+     * Used to filter code actions.
+     */
+    std::optional<CodeActionKind> kind;
+    /**
+     * The diagnostics that this code action resolves.
+     */
+    std::optional<std::vector<std::unique_ptr<Diagnostic>>> diagnostics;
+    /**
+     * Marks this as a preferred action. Preferred actions are used by the `auto fix` command and can be targeted
+     * by keybindings.
+     *
+     * A quick fix should be marked preferred if it properly addresses the underlying error.
+     * A refactoring should be marked preferred if it is the most reasonable choice of actions to take.
+     *
+     * @since 3.15.0
+     */
+    std::optional<boolean_t> isPreferred;
+    /**
+     * Marks that the code action cannot currently be applied.
+     *
+     * Clients should follow the following guidelines regarding disabled code actions:
+     *
+     *   - Disabled code actions are not shown in automatic [lightbulbs](https://code.visualstudio.com/docs/editor/editingevolved#_code-action)
+     *     code action menus.
+     *
+     *   - Disabled actions are shown as faded out in the code action menu when the user requests a more specific type
+     *     of code action, such as refactorings.
+     *
+     *   - If the user has a [keybinding](https://code.visualstudio.com/docs/editor/refactoring#_keybindings-for-code-actions)
+     *     that auto applies a code action and only disabled code actions are returned, the client should show the user an
+     *     error message with `reason` in the editor.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<CodeAction_disabled>> disabled;
+    /**
+     * The workspace edit this code action performs.
+     */
+    std::optional<std::unique_ptr<WorkspaceEdit>> edit;
+    /**
+     * A command this code action executes. If a code action
+     * provides an edit and a command, first the edit is
+     * executed and then the command.
+     */
+    std::optional<std::unique_ptr<Command>> command;
+    /**
+     * A data entry field that is preserved on a code action between
+     * a `textDocument/codeAction` and a `codeAction/resolve` request.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
+  };
+
+  enum class WorkspaceDocumentDiagnosticReportType {
+    WORKSPACE_FULL_DOCUMENT_DIAGNOSTIC_REPORT,
+    WORKSPACE_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<WorkspaceFullDocumentDiagnosticReport>,
+    std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport>
+  > WorkspaceDocumentDiagnosticReport;
+
+  /**
+   * A workspace diagnostic report.
+   *
+   * @since 3.17.0
+   */
+  struct WorkspaceDiagnosticReport
+  {
+    std::vector<WorkspaceDocumentDiagnosticReport> items;
+  };
+
+  /**
+   * A partial result for a workspace diagnostic report.
+   *
+   * @since 3.17.0
+   */
+  struct WorkspaceDiagnosticReportPartialResult
+  {
+    std::vector<WorkspaceDocumentDiagnosticReport> items;
+  };
+
+  struct TextDocumentContentChangeEvent_1
+  {
+    string_t text;
+  };
+
+  struct TextDocumentContentChangeEvent_0
+  {
+    std::unique_ptr<Range> range;
+    std::optional<uinteger_t> rangeLength;
+    string_t text;
   };
 
   enum class TextDocumentContentChangeEventType {
-    PARTIAL_TEXT_DOCUMENT,
-    WHOLE_TEXT_DOCUMENT,
+    TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_0,
+    TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_1,
   };
 
-  /**
-   * An event describing a change to a text document. If only a text is provided
-   * it is considered to be the full content of the document.
-   */
   typedef std::variant<
-    std::unique_ptr<PartialTextDocumentContentChangeEvent>,
-    std::unique_ptr<WholeTextDocumentContentChangeEvent>
+    std::unique_ptr<TextDocumentContentChangeEvent_0>,
+    std::unique_ptr<TextDocumentContentChangeEvent_1>
   > TextDocumentContentChangeEvent;
 
-  struct NotebookSelectorCell {
-    string language;
-  };
-
-  struct NotebookRequiredNotebookSelector {
-
-    /**
-     * The notebook to be synced. If a string value is provided it matches
-     * against the notebook type. '*' matches every notebook.
-     *
-     * notebook: string | NotebookDocumentFilter;
-     */
-    StringOrNotebookDocumentFilter notebook;
-
-    /**
-     * The cells of the matching notebook to be synced.
-     *
-     * cells?: { language: string }[];
-     */
-    optional_ptr_vector<NotebookSelectorCell> cells;
-  };
-
-  struct CellsRequiredNotebookSelector {
-
-    /**
-     * The notebook to be synced. If a string value is provided it matches
-     * against the notebook type. '*' matches every notebook.
-     *
-     * notebook: string | NotebookDocumentFilter;
-     */
-    std::optional<StringOrNotebookDocumentFilter> notebook;
-
-    /**
-     * The cells of the matching notebook to be synced.
-     *
-     * cells?: { language: string }[];
-     */
-    ptr_vector<NotebookSelectorCell> cells;
-  };
-
-  enum class NotebookSelectorType {
-    NOTEBOOK_REQUIRED,
-    CELLS_REQUIRED,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<NotebookRequiredNotebookSelector>,
-    std::unique_ptr<CellsRequiredNotebookSelector>
-  > NotebookSelector;
-
   /**
-   * Options specific to a notebook plus its cells to be synced to the server.
-   *
-   * If a selector provides a notebook document filter but no cell selector all
-   * cells of a matching notebook document will be synced.
-   *
-   * If a selector provides no notebook document filter but only a cell selector
-   * all notebook documents that contain at least one matching cell will be
-   * synced.
-   *
-   * export interface NotebookDocumentSyncOptions {
-   *   notebookSelector: ({
-   *     notebook: string | NotebookDocumentFilter;
-   *     cells?: { language: string }[];
-   *   } | {
-   *     notebook?: string | NotebookDocumentFilter;
-   *     cells: { language: string }[];
-   *   })[];
-   *   save?: boolean;
-   * }
-   *
-   * @since 3.17.0
+   * The change text document notification's parameters.
    */
-  struct NotebookDocumentSyncOptions {
-
+  struct DidChangeTextDocumentParams
+  {
     /**
-     * The notebooks to be synced.
-     *
-     * notebookSelector: ({
-     *   notebook: string | NotebookDocumentFilter;
-     *   cells?: { language: string }[];
-     * } | {
-     *   notebook?: string | NotebookDocumentFilter;
-     *   cells: { language: string }[];
-     * })[];
+     * The document that did change. The version number points
+     * to the version after all provided content changes have
+     * been applied.
      */
-    std::vector<NotebookSelector> notebookSelector;
-
+    std::unique_ptr<VersionedTextDocumentIdentifier> textDocument;
     /**
-     * Whether save notification should be forwarded to the server. Will only be
-     * honored if mode === `notebook`.
+     * The actual content changes. The content changes describe single state changes
+     * to the document. So if there are two content changes c1 (at array index 0) and
+     * c2 (at array index 1) for a document in state S then c1 moves the document from
+     * S to S' and c2 from S' to S''. So c1 is computed on the state S and c2 is computed
+     * on the state S'.
      *
-     * save?: boolean;
+     * To mirror the content of a document using change events use the following approach:
+     * - start with the same initial content
+     * - apply the 'textDocument/didChange' notifications in the order you receive them.
+     * - apply the `TextDocumentContentChangeEvent`s in a single notification in the order
+     *   you receive them.
      */
-    std::optional<boolean> save;
+    std::vector<TextDocumentContentChangeEvent> contentChanges;
   };
 
-  /**
-   * Registration options specific to a notebook.
-   *
-   * export interface NotebookDocumentSyncRegistrationOptions extends
-   *   NotebookDocumentSyncOptions, StaticRegistrationOptions {
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct NotebookDocumentSyncRegistrationOptions
-    : public NotebookDocumentSyncOptions
-    , public StaticRegistrationOptions {
-  };
-
-  /**
-   * The params sent in an open notebook document notification.
-   *
-   * The open notification is sent from the client to the server when a notebook
-   * document is opened. It is only sent by a client if the server requested the
-   * synchronization mode notebook in its notebookDocumentSync capability.
-   *
-   * Notification:
-   *   method: notebookDocument/didOpen
-   *   params: DidOpenNotebookDocumentParams defined as follows:
-   *
-   * export interface DidOpenNotebookDocumentParams {
-   *   notebookDocument: NotebookDocument;
-   *   cellTextDocuments: TextDocumentItem[];
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct DidOpenNotebookDocumentParams {
-
-    /**
-     * The notebook document that got opened.
-     *
-     * notebookDocument: NotebookDocument;
-     */
-    std::unique_ptr<NotebookDocument> notebookDocument;
-
-    /**
-     * The text documents that represent the content of a notebook cell.
-     *
-     * cellTextDocuments: TextDocumentItem[];
-     */
-    ptr_vector<TextDocumentItem> cellTextDocuments;
-  };
-
-  /**
-   * A literal to identify a notebook document in the client.
-   *
-   * export interface NotebookDocumentIdentifier {
-   *   uri: URI;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct NotebookDocumentIdentifier {
-
-    /**
-     * The notebook document's URI.
-     *
-     * uri: URI;
-     */
-    URI uri;
-  };
-
-  /**
-   * A versioned notebook document identifier.
-   *
-   * export interface VersionedNotebookDocumentIdentifier {
-   *   version: integer;
-   *   uri: URI;
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct VersionedNotebookDocumentIdentifier {
-
-    /**
-     * The version number of this notebook document.
-     *
-     * version: integer;
-     */
-    integer version;
-
-    /**
-     * The notebook document's URI.
-     *
-     * uri: URI;
-     */
-    URI uri;
-  };
-
-  /**
-   * A change describing how to move a `NotebookCell` array from state S to S'.
-   *
-   * export interface NotebookCellArrayChange {
-   *   start: uinteger;
-   *   deleteCount: uinteger;
-   *   cells?: NotebookCell[];
-   * }
-   *
-   * @since 3.17.0
-   */
-  struct NotebookCellArrayChange {
-
-    /**
-     * The start offset of the cell that changed.
-     *
-     * start: uinteger;
-     */
-    uinteger start;
-
-    /**
-     * The deleted cells
-     *
-     * deleteCount: uinteger;
-     */
-    uinteger deleteCount;
-
-    /**
-     * The new cells, if any
-     *
-     * cells?: NotebookCell[];
-     */
-    optional_ptr_vector<NotebookCell> cells;
-  };
-
-  struct NotebookDocumentChangeEventCellsStructure {
-
-    /**
-     * The change to the cell array.
-     *
-     * array: NotebookCellArrayChange;
-     */
-    std::unique_ptr<NotebookCellArrayChange> array;
-
-    /**
-     * Additional opened cell text documents.
-     *
-     * didOpen?: TextDocumentItem[];
-     */
-    optional_ptr_vector<TextDocumentItem> didOpen;
-
-    /**
-     * Additional closed cell text documents.
-     *
-     * didClose?: TextDocumentIdentifier[];
-     */
-    optional_ptr_vector<TextDocumentIdentifier> didClose;
-  };
-
-  struct NotebookDocumentChangeEventCellsTextContent {
-
-    /**
-     * document: VersionedTextDocumentIdentifier;
-     */
+  struct NotebookDocumentChangeEvent_cells_textContent
+  {
     std::unique_ptr<VersionedTextDocumentIdentifier> document;
-
-    /**
-     * changes: TextDocumentContentChangeEvent[];
-     */
     std::vector<TextDocumentContentChangeEvent> changes;
   };
 
-  struct NotebookDocumentChangeEventCells {
+  struct NotebookDocumentChangeEvent_cells_structure
+  {
+    std::unique_ptr<NotebookCellArrayChange> array;
+    std::optional<std::vector<std::unique_ptr<TextDocumentItem>>> didOpen;
+    std::optional<std::vector<std::unique_ptr<TextDocumentIdentifier>>> didClose;
+  };
 
-    /**
-     * Changes to the cell structure to add or remove cells.
-     *
-     * structure?: {
-     *   array: NotebookCellArrayChange;
-     *   didOpen?: TextDocumentItem[];
-     *   didClose?: TextDocumentIdentifier[];
-     * };
-     */
-    optional_ptr<NotebookDocumentChangeEventCellsStructure> structure;
-
-    /**
-     * Changes to notebook cells properties like its
-     * kind, execution summary or metadata.
-     *
-     * data?: NotebookCell[];
-     */
-    optional_ptr_vector<NotebookCell> data;
-
-    /**
-     * Changes to the text content of notebook cells.
-     *
-     * textContent?: {
-     *   document: VersionedTextDocumentIdentifier;
-     *   changes: TextDocumentContentChangeEvent[];
-     * }[];
-     */
-    optional_ptr_vector<NotebookDocumentChangeEventCellsTextContent> textContent;
+  struct NotebookDocumentChangeEvent_cells
+  {
+    std::optional<std::unique_ptr<NotebookDocumentChangeEvent_cells_structure>> structure;
+    std::optional<std::vector<std::unique_ptr<NotebookCell>>> data;
+    std::optional<std::vector<std::unique_ptr<NotebookDocumentChangeEvent_cells_textContent>>> textContent;
   };
 
   /**
    * A change event for a notebook document.
    *
-   * export interface NotebookDocumentChangeEvent {
-   *   metadata?: LSPObject;
-   *   cells?: {
-   *      structure?: {
-   *       array: NotebookCellArrayChange;
-   *       didOpen?: TextDocumentItem[];
-   *       didClose?: TextDocumentIdentifier[];
-   *     };
-   *     data?: NotebookCell[];
-   *     textContent?: {
-   *       document: VersionedTextDocumentIdentifier;
-   *       changes: TextDocumentContentChangeEvent[];
-   *     }[];
-   *   };
-   * }
-   *
    * @since 3.17.0
    */
-  struct NotebookDocumentChangeEvent {
-
+  struct NotebookDocumentChangeEvent
+  {
     /**
      * The changed meta data if any.
      *
-     * metadata?: LSPObject;
+     * Note: should always be an object literal (e.g. LSPObject)
      */
-    optional_ptr<LSPObject> metadata;
-
+    std::optional<LSPObject> metadata;
     /**
      * Changes to cells
-     *
-     * cells?: {
-     *   structure?: {
-     *     array: NotebookCellArrayChange;
-     *     didOpen?: TextDocumentItem[];
-     *     didClose?: TextDocumentIdentifier[];
-     *   };
-     *   data?: NotebookCell[];
-     *   textContent?: {
-     *     document: VersionedTextDocumentIdentifier;
-     *     changes: TextDocumentContentChangeEvent[];
-     *   }[];
-     * };
      */
-    optional_ptr<NotebookDocumentChangeEventCells> cells;
+    std::optional<std::unique_ptr<NotebookDocumentChangeEvent_cells>> cells;
   };
 
   /**
    * The params sent in a change notebook document notification.
    *
-   * The change notification is sent from the client to the server when a
-   * notebook document changes. It is only sent by a client if the server
-   * requested the synchronization mode notebook in its notebookDocumentSync
-   * capability.
-   *
-   * Notification:
-   *   method: notebookDocument/didChange
-   *   params: DidChangeNotebookDocumentParams defined as follows:
-   *
-   * export interface DidChangeNotebookDocumentParams {
-   *   notebookDocument: VersionedNotebookDocumentIdentifier;
-   *   change: NotebookDocumentChangeEvent;
-   * }
-   *
    * @since 3.17.0
    */
-  struct DidChangeNotebookDocumentParams {
-
+  struct DidChangeNotebookDocumentParams
+  {
     /**
-     * The notebook document that did change. The version number points to the
-     * version after all provided changes have been applied.
-     *
-     * notebookDocument: VersionedNotebookDocumentIdentifier;
+     * The notebook document that did change. The version number points
+     * to the version after all provided changes have been applied. If
+     * only the text document content of a cell changes the notebook version
+     * doesn't necessarily have to change.
      */
     std::unique_ptr<VersionedNotebookDocumentIdentifier> notebookDocument;
-
     /**
      * The actual changes to the notebook document.
      *
-     * The change describes single state change to the notebook document. So it
-     * moves a notebook document, its cells and its cell text document contents
-     * from state S to S'.
+     * The changes describe single state changes to the notebook document.
+     * So if there are two changes c1 (at array index 0) and c2 (at array
+     * index 1) for a notebook in state S then c1 moves the notebook from
+     * S to S' and c2 from S' to S''. So c1 is computed on the state S and
+     * c2 is computed on the state S'.
      *
-     * To mirror the content of a notebook using change events use the following
-     * approach:
+     * To mirror the content of a notebook using change events use the following approach:
      * - start with the same initial content
-     * - apply the 'notebookDocument/didChange' notifications in the order you
-     *   receive them.
-     *
-     * change: NotebookDocumentChangeEvent;
+     * - apply the 'notebookDocument/didChange' notifications in the order you receive them.
+     * - apply the `NotebookChangeEvent`s in a single notification in the order
+     *   you receive them.
      */
     std::unique_ptr<NotebookDocumentChangeEvent> change;
   };
 
+  struct MarkedString_1
+  {
+    string_t language;
+    string_t value;
+  };
+
+  enum class MarkedStringType {
+    STRING_TYPE,
+    MARKED_STRING_1,
+  };
+
+  typedef std::variant<
+    string_t,
+    std::unique_ptr<MarkedString_1>
+  > MarkedString;
+
+  enum class Hover_contentsType {
+    MARKUP_CONTENT,
+    MARKED_STRING,
+    MARKED_STRING_ARRAY,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<MarkupContent>,
+    MarkedString,
+    std::vector<MarkedString>
+  > Hover_contents;
+
   /**
-   * The params sent in a save notebook document notification.
+   * The result of a hover request.
+   */
+  struct Hover
+  {
+    /**
+     * The hover's content
+     */
+    Hover_contents contents;
+    /**
+     * An optional range inside the text document that is used to
+     * visualize the hover, e.g. by changing the background color.
+     */
+    std::optional<std::unique_ptr<Range>> range;
+  };
+
+  struct TextDocumentFilter_2
+  {
+    std::optional<string_t> language;
+    std::optional<string_t> scheme;
+    string_t pattern;
+  };
+
+  struct TextDocumentFilter_1
+  {
+    std::optional<string_t> language;
+    string_t scheme;
+    std::optional<string_t> pattern;
+  };
+
+  struct TextDocumentFilter_0
+  {
+    string_t language;
+    std::optional<string_t> scheme;
+    std::optional<string_t> pattern;
+  };
+
+  enum class TextDocumentFilterType {
+    TEXT_DOCUMENT_FILTER_0,
+    TEXT_DOCUMENT_FILTER_1,
+    TEXT_DOCUMENT_FILTER_2,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<TextDocumentFilter_0>,
+    std::unique_ptr<TextDocumentFilter_1>,
+    std::unique_ptr<TextDocumentFilter_2>
+  > TextDocumentFilter;
+
+  struct NotebookDocumentFilter_2
+  {
+    std::optional<string_t> notebookType;
+    std::optional<string_t> scheme;
+    string_t pattern;
+  };
+
+  struct NotebookDocumentFilter_1
+  {
+    std::optional<string_t> notebookType;
+    string_t scheme;
+    std::optional<string_t> pattern;
+  };
+
+  struct NotebookDocumentFilter_0
+  {
+    string_t notebookType;
+    std::optional<string_t> scheme;
+    std::optional<string_t> pattern;
+  };
+
+  enum class NotebookDocumentFilterType {
+    NOTEBOOK_DOCUMENT_FILTER_0,
+    NOTEBOOK_DOCUMENT_FILTER_1,
+    NOTEBOOK_DOCUMENT_FILTER_2,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<NotebookDocumentFilter_0>,
+    std::unique_ptr<NotebookDocumentFilter_1>,
+    std::unique_ptr<NotebookDocumentFilter_2>
+  > NotebookDocumentFilter;
+
+  struct NotebookDocumentSyncOptions_notebookSelector_1_cells
+  {
+    string_t language;
+  };
+
+  enum class NotebookDocumentSyncOptions_notebookSelector_1_notebookType {
+    STRING_TYPE,
+    NOTEBOOK_DOCUMENT_FILTER,
+  };
+
+  typedef std::variant<
+    string_t,
+    NotebookDocumentFilter
+  > NotebookDocumentSyncOptions_notebookSelector_1_notebook;
+
+  struct NotebookDocumentSyncOptions_notebookSelector_1
+  {
+    std::optional<NotebookDocumentSyncOptions_notebookSelector_1_notebook> notebook;
+    std::vector<std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_1_cells>> cells;
+  };
+
+  struct NotebookDocumentSyncOptions_notebookSelector_0_cells
+  {
+    string_t language;
+  };
+
+  enum class NotebookDocumentSyncOptions_notebookSelector_0_notebookType {
+    STRING_TYPE,
+    NOTEBOOK_DOCUMENT_FILTER,
+  };
+
+  typedef std::variant<
+    string_t,
+    NotebookDocumentFilter
+  > NotebookDocumentSyncOptions_notebookSelector_0_notebook;
+
+  struct NotebookDocumentSyncOptions_notebookSelector_0
+  {
+    NotebookDocumentSyncOptions_notebookSelector_0_notebook notebook;
+    std::optional<std::vector<std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_0_cells>>> cells;
+  };
+
+  enum class NotebookDocumentSyncOptions_notebookSelectorType {
+    NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_0,
+    NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_1,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_0>,
+    std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_1>
+  > NotebookDocumentSyncOptions_notebookSelector;
+
+  /**
+   * Options specific to a notebook plus its cells
+   * to be synced to the server.
    *
-   * The save notification is sent from the client to the server when a notebook
-   * document is saved. It is only sent by a client if the server requested the
-   * synchronization mode notebook in its notebookDocumentSync capability.
+   * If a selector provides a notebook document
+   * filter but no cell selector all cells of a
+   * matching notebook document will be synced.
    *
-   * Notification:
-   *   method: notebookDocument/didSave
-   *   params: DidSaveNotebookDocumentParams defined as follows:
-   *
-   * export interface DidSaveNotebookDocumentParams {
-   *   notebookDocument: NotebookDocumentIdentifier;
-   * }
+   * If a selector provides no notebook document
+   * filter but only a cell selector all notebook
+   * document that contain at least one matching
+   * cell will be synced.
    *
    * @since 3.17.0
    */
-  struct DidSaveNotebookDocumentParams {
-
+  struct NotebookDocumentSyncOptions
+  {
     /**
-     * The notebook document that got saved.
-     *
-     * notebookDocument: NotebookDocumentIdentifier;
+     * The notebooks to be synced
      */
-    std::unique_ptr<NotebookDocumentIdentifier> notebookDocument;
+    std::vector<NotebookDocumentSyncOptions_notebookSelector> notebookSelector;
+    /**
+     * Whether save notification should be forwarded to
+     * the server. Will only be honored if mode === `notebook`.
+     */
+    std::optional<boolean_t> save;
   };
 
   /**
-   * The params sent in a close notebook document notification.
-   *
-   * The close notification is sent from the client to the server when a
-   * notebook document is closed. It is only sent by a client if the server
-   * requested the synchronization mode notebook in its notebookDocumentSync
-   * capability.
-   *
-   * Notification:
-   *   method: notebookDocument/didClose
-   *   params: DidCloseNotebookDocumentParams defined as follows:
-   *
-   * export interface DidCloseNotebookDocumentParams {
-   *   notebookDocument: NotebookDocumentIdentifier;
-   *   cellTextDocuments: TextDocumentIdentifier[];
-   * }
+   * Registration options specific to a notebook.
    *
    * @since 3.17.0
    */
-  struct DidCloseNotebookDocumentParams {
-
+  struct NotebookDocumentSyncRegistrationOptions
+    : public NotebookDocumentSyncOptions
+  {
     /**
-     * The notebook document that got closed.
-     *
-     * notebookDocument: NotebookDocumentIdentifier;
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
      */
-    std::unique_ptr<NotebookDocumentIdentifier> notebookDocument;
-
-    /**
-     * The text documents that represent the content
-     * of a notebook cell that got closed.
-     *
-     * cellTextDocuments: TextDocumentIdentifier[];
-     */
-    ptr_vector<TextDocumentIdentifier> cellTextDocuments;
+    std::optional<string_t> id;
   };
 
-  enum class NotebookDocumentSyncType {
+  enum class NotebookCellTextDocumentFilter_notebookType {
+    STRING_TYPE,
+    NOTEBOOK_DOCUMENT_FILTER,
+  };
+
+  typedef std::variant<
+    string_t,
+    NotebookDocumentFilter
+  > NotebookCellTextDocumentFilter_notebook;
+
+  /**
+   * A notebook cell text document filter denotes a cell text
+   * document by different properties.
+   *
+   * @since 3.17.0
+   */
+  struct NotebookCellTextDocumentFilter
+  {
+    /**
+     * A filter that matches against the notebook
+     * containing the notebook cell. If a string
+     * value is provided it matches against the
+     * notebook type. '*' matches every notebook.
+     */
+    NotebookCellTextDocumentFilter_notebook notebook;
+    /**
+     * A language id like `python`.
+     *
+     * Will be matched against the language id of the
+     * notebook cell document. '*' matches every language.
+     */
+    std::optional<string_t> language;
+  };
+
+  enum class DocumentFilterType {
+    TEXT_DOCUMENT_FILTER,
+    NOTEBOOK_CELL_TEXT_DOCUMENT_FILTER,
+  };
+
+  typedef std::variant<
+    TextDocumentFilter,
+    std::unique_ptr<NotebookCellTextDocumentFilter>
+  > DocumentFilter;
+
+  /**
+   * A document selector is the combination of one or many document filters.
+   *
+   * @sample `let sel:DocumentSelector = [{ language: 'typescript' }, { language: 'json', pattern: '**∕tsconfig.json' }]`;
+   *
+   * The use of a string as a document filter is deprecated @since 3.16.0.
+   */
+  typedef std::vector<DocumentFilter> DocumentSelector;
+
+  enum class TextDocumentRegistrationOptions_documentSelectorType {
+    DOCUMENT_SELECTOR,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    DocumentSelector,
+    null_t
+  > TextDocumentRegistrationOptions_documentSelector;
+
+  /**
+   * General text document registration options.
+   */
+  struct TextDocumentRegistrationOptions
+  {
+    /**
+     * A document selector to identify the scope of the registration. If set to null
+     * the document selector provided on the client side will be used.
+     */
+    TextDocumentRegistrationOptions_documentSelector documentSelector;
+  };
+
+  struct LinkedEditingRangeRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public LinkedEditingRangeOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Describe options to be used when registered for text document change events.
+   */
+  struct TextDocumentChangeRegistrationOptions
+    : public TextDocumentRegistrationOptions
+  {
+    /**
+     * How documents are synced to the server.
+     */
+    TextDocumentSyncKind syncKind;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public SemanticTokensOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Diagnostic registration options.
+   *
+   * @since 3.17.0
+   */
+  struct DiagnosticRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DiagnosticOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link CompletionRequest}.
+   */
+  struct CompletionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CompletionOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link CodeActionRequest}.
+   */
+  struct CodeActionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CodeActionOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link SignatureHelpRequest}.
+   */
+  struct SignatureHelpRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public SignatureHelpOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link CodeLensRequest}.
+   */
+  struct CodeLensRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CodeLensOptions
+  {
+  };
+
+  struct ImplementationRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public ImplementationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link HoverRequest}.
+   */
+  struct HoverRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public HoverOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link DocumentFormattingRequest}.
+   */
+  struct DocumentFormattingRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentFormattingOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link RenameRequest}.
+   */
+  struct RenameRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public RenameOptions
+  {
+  };
+
+  /**
+   * Call hierarchy options used during static or dynamic registration.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CallHierarchyOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct FoldingRangeRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public FoldingRangeOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct TypeDefinitionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public TypeDefinitionOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link DocumentOnTypeFormattingRequest}.
+   */
+  struct DocumentOnTypeFormattingRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentOnTypeFormattingOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link DefinitionRequest}.
+   */
+  struct DefinitionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DefinitionOptions
+  {
+  };
+
+  /**
+   * Inline value options used during static or dynamic registration.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueRegistrationOptions
+    : public InlineValueOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct MonikerRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public MonikerOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link ReferencesRequest}.
+   */
+  struct ReferenceRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public ReferenceOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link DocumentLinkRequest}.
+   */
+  struct DocumentLinkRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentLinkOptions
+  {
+  };
+
+  /**
+   * Inline completion options used during static or dynamic registration.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct InlineCompletionRegistrationOptions
+    : public InlineCompletionOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link DocumentSymbolRequest}.
+   */
+  struct DocumentSymbolRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentSymbolOptions
+  {
+  };
+
+  /**
+   * Inlay hint options used during static or dynamic registration.
+   *
+   * @since 3.17.0
+   */
+  struct InlayHintRegistrationOptions
+    : public InlayHintOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct DocumentColorRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentColorOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Type hierarchy options used during static or dynamic registration.
+   *
+   * @since 3.17.0
+   */
+  struct TypeHierarchyRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public TypeHierarchyOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct DeclarationRegistrationOptions
+    : public DeclarationOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link DocumentRangeFormattingRequest}.
+   */
+  struct DocumentRangeFormattingRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentRangeFormattingOptions
+  {
+  };
+
+  struct SelectionRangeRegistrationOptions
+    : public SelectionRangeOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  enum class ServerCapabilities_textDocumentSyncType {
+    TEXT_DOCUMENT_SYNC_OPTIONS,
+    TEXT_DOCUMENT_SYNC_KIND,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<TextDocumentSyncOptions>,
+    TextDocumentSyncKind
+  > ServerCapabilities_textDocumentSync;
+
+  enum class ServerCapabilities_notebookDocumentSyncType {
     NOTEBOOK_DOCUMENT_SYNC_OPTIONS,
     NOTEBOOK_DOCUMENT_SYNC_REGISTRATION_OPTIONS,
   };
@@ -14013,195 +8654,205 @@ namespace LCompilers::LanguageServerProtocol {
   typedef std::variant<
     std::unique_ptr<NotebookDocumentSyncOptions>,
     std::unique_ptr<NotebookDocumentSyncRegistrationOptions>
-  > NotebookDocumentSync;
+  > ServerCapabilities_notebookDocumentSync;
 
-  enum class HoverProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_hoverProviderType {
+    BOOLEAN_TYPE,
     HOVER_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<HoverOptions>
-  > HoverProvider;
+  > ServerCapabilities_hoverProvider;
 
-  enum class DeclarationProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_declarationProviderType {
+    BOOLEAN_TYPE,
     DECLARATION_OPTIONS,
     DECLARATION_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<DeclarationOptions>,
     std::unique_ptr<DeclarationRegistrationOptions>
-  > DeclarationProvider;
+  > ServerCapabilities_declarationProvider;
 
-  enum class DefinitionProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_definitionProviderType {
+    BOOLEAN_TYPE,
     DEFINITION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<DefinitionOptions>
-  > DefinitionProvider;
+  > ServerCapabilities_definitionProvider;
 
-  enum class TypeDefinitionProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_typeDefinitionProviderType {
+    BOOLEAN_TYPE,
     TYPE_DEFINITION_OPTIONS,
     TYPE_DEFINITION_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<TypeDefinitionOptions>,
     std::unique_ptr<TypeDefinitionRegistrationOptions>
-  > TypeDefinitionProvider;
+  > ServerCapabilities_typeDefinitionProvider;
 
-  enum class ImplementationProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_implementationProviderType {
+    BOOLEAN_TYPE,
     IMPLEMENTATION_OPTIONS,
     IMPLEMENTATION_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<ImplementationOptions>,
     std::unique_ptr<ImplementationRegistrationOptions>
-  > ImplementationProvider;
+  > ServerCapabilities_implementationProvider;
 
-  enum class ReferencesProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_referencesProviderType {
+    BOOLEAN_TYPE,
     REFERENCE_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<ReferenceOptions>
-  > ReferencesProvider;
+  > ServerCapabilities_referencesProvider;
 
-  enum class DocumentHighlightProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_documentHighlightProviderType {
+    BOOLEAN_TYPE,
     DOCUMENT_HIGHLIGHT_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<DocumentHighlightOptions>
-  > DocumentHighlightProvider;
+  > ServerCapabilities_documentHighlightProvider;
 
-  enum class DocumentSymbolProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_documentSymbolProviderType {
+    BOOLEAN_TYPE,
     DOCUMENT_SYMBOL_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<DocumentSymbolOptions>
-  > DocumentSymbolProvider;
+  > ServerCapabilities_documentSymbolProvider;
 
-  enum class CodeActionProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_codeActionProviderType {
+    BOOLEAN_TYPE,
     CODE_ACTION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<CodeActionOptions>
-  > CodeActionProvider;
+  > ServerCapabilities_codeActionProvider;
 
-  enum class ColorProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_colorProviderType {
+    BOOLEAN_TYPE,
     DOCUMENT_COLOR_OPTIONS,
     DOCUMENT_COLOR_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<DocumentColorOptions>,
     std::unique_ptr<DocumentColorRegistrationOptions>
-  > ColorProvider;
+  > ServerCapabilities_colorProvider;
 
-  enum class DocumentFormattingProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_workspaceSymbolProviderType {
+    BOOLEAN_TYPE,
+    WORKSPACE_SYMBOL_OPTIONS,
+  };
+
+  typedef std::variant<
+    boolean_t,
+    std::unique_ptr<WorkspaceSymbolOptions>
+  > ServerCapabilities_workspaceSymbolProvider;
+
+  enum class ServerCapabilities_documentFormattingProviderType {
+    BOOLEAN_TYPE,
     DOCUMENT_FORMATTING_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<DocumentFormattingOptions>
-  > DocumentFormattingProvider;
+  > ServerCapabilities_documentFormattingProvider;
 
-  enum class DocumentRangeFormattingProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_documentRangeFormattingProviderType {
+    BOOLEAN_TYPE,
     DOCUMENT_RANGE_FORMATTING_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<DocumentRangeFormattingOptions>
-  > DocumentRangeFormattingProvider;
+  > ServerCapabilities_documentRangeFormattingProvider;
 
-  enum class RenameProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_renameProviderType {
+    BOOLEAN_TYPE,
     RENAME_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<RenameOptions>
-  > RenameProvider;
+  > ServerCapabilities_renameProvider;
 
-  enum class FoldingRangeProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_foldingRangeProviderType {
+    BOOLEAN_TYPE,
     FOLDING_RANGE_OPTIONS,
     FOLDING_RANGE_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<FoldingRangeOptions>,
     std::unique_ptr<FoldingRangeRegistrationOptions>
-  > FoldingRangeProvider;
+  > ServerCapabilities_foldingRangeProvider;
 
-  enum class SelectionRangeProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_selectionRangeProviderType {
+    BOOLEAN_TYPE,
     SELECTION_RANGE_OPTIONS,
     SELECTION_RANGE_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<SelectionRangeOptions>,
     std::unique_ptr<SelectionRangeRegistrationOptions>
-  > SelectionRangeProvider;
+  > ServerCapabilities_selectionRangeProvider;
 
-  enum class LinkedEditingRangeProviderType {
-    BOOLEAN,
-    LINKED_EDITING_RANGE_OPTIONS,
-    LINKED_EDITING_RANGE_REGISTRATION_OPTIONS,
-  };
-
-  typedef std::variant<
-    boolean,
-    std::unique_ptr<LinkedEditingRangeOptions>,
-    std::unique_ptr<LinkedEditingRangeRegistrationOptions>
-  > LinkedEditingRangeProvider;
-
-  enum class CallHierarchyProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_callHierarchyProviderType {
+    BOOLEAN_TYPE,
     CALL_HIERARCHY_OPTIONS,
     CALL_HIERARCHY_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<CallHierarchyOptions>,
     std::unique_ptr<CallHierarchyRegistrationOptions>
-  > CallHierarchyProvider;
+  > ServerCapabilities_callHierarchyProvider;
 
-  enum class SemanticTokensProviderType {
+  enum class ServerCapabilities_linkedEditingRangeProviderType {
+    BOOLEAN_TYPE,
+    LINKED_EDITING_RANGE_OPTIONS,
+    LINKED_EDITING_RANGE_REGISTRATION_OPTIONS,
+  };
+
+  typedef std::variant<
+    boolean_t,
+    std::unique_ptr<LinkedEditingRangeOptions>,
+    std::unique_ptr<LinkedEditingRangeRegistrationOptions>
+  > ServerCapabilities_linkedEditingRangeProvider;
+
+  enum class ServerCapabilities_semanticTokensProviderType {
     SEMANTIC_TOKENS_OPTIONS,
     SEMANTIC_TOKENS_REGISTRATION_OPTIONS,
   };
@@ -14209,57 +8860,57 @@ namespace LCompilers::LanguageServerProtocol {
   typedef std::variant<
     std::unique_ptr<SemanticTokensOptions>,
     std::unique_ptr<SemanticTokensRegistrationOptions>
-  > SemanticTokensProvider;
+  > ServerCapabilities_semanticTokensProvider;
 
-  enum class MonikerProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_monikerProviderType {
+    BOOLEAN_TYPE,
     MONIKER_OPTIONS,
     MONIKER_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<MonikerOptions>,
     std::unique_ptr<MonikerRegistrationOptions>
-  > MonikerProvider;
+  > ServerCapabilities_monikerProvider;
 
-  enum class TypeHierarchyProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_typeHierarchyProviderType {
+    BOOLEAN_TYPE,
     TYPE_HIERARCHY_OPTIONS,
     TYPE_HIERARCHY_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<TypeHierarchyOptions>,
     std::unique_ptr<TypeHierarchyRegistrationOptions>
-  > TypeHierarchyProvider;
+  > ServerCapabilities_typeHierarchyProvider;
 
-  enum class InlineValueProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_inlineValueProviderType {
+    BOOLEAN_TYPE,
     INLINE_VALUE_OPTIONS,
     INLINE_VALUE_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<InlineValueOptions>,
     std::unique_ptr<InlineValueRegistrationOptions>
-  > InlineValueProvider;
+  > ServerCapabilities_inlineValueProvider;
 
-  enum class InlayHintProviderType {
-    BOOLEAN,
+  enum class ServerCapabilities_inlayHintProviderType {
+    BOOLEAN_TYPE,
     INLAY_HINT_OPTIONS,
     INLAY_HINT_REGISTRATION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
+    boolean_t,
     std::unique_ptr<InlayHintOptions>,
     std::unique_ptr<InlayHintRegistrationOptions>
-  > InlayHintProvider;
+  > ServerCapabilities_inlayHintProvider;
 
-  enum class DiagnosticProviderType {
+  enum class ServerCapabilities_diagnosticProviderType {
     DIAGNOSTIC_OPTIONS,
     DIAGNOSTIC_REGISTRATION_OPTIONS,
   };
@@ -14267,161 +8918,30 @@ namespace LCompilers::LanguageServerProtocol {
   typedef std::variant<
     std::unique_ptr<DiagnosticOptions>,
     std::unique_ptr<DiagnosticRegistrationOptions>
-  > DiagnosticProvider;
+  > ServerCapabilities_diagnosticProvider;
 
-  enum class WorkspaceSymbolProviderType {
-    BOOLEAN,
-    WORKSPACE_SYMBOL_OPTIONS,
+  enum class ServerCapabilities_inlineCompletionProviderType {
+    BOOLEAN_TYPE,
+    INLINE_COMPLETION_OPTIONS,
   };
 
   typedef std::variant<
-    boolean,
-    std::unique_ptr<WorkspaceSymbolOptions>
-  > WorkspaceSymbolProvider;
+    boolean_t,
+    std::unique_ptr<InlineCompletionOptions>
+  > ServerCapabilities_inlineCompletionProvider;
 
-  struct FileOperations {
-
-    /**
-     * The server is interested in receiving didCreateFiles
-     * notifications.
-     *
-     * didCreate?: FileOperationRegistrationOptions;
-     */
-    optional_ptr<FileOperationRegistrationOptions> didCreate;
-
-    /**
-     * The server is interested in receiving willCreateFiles requests.
-     *
-     * willCreate?: FileOperationRegistrationOptions;
-     */
-    optional_ptr<FileOperationRegistrationOptions> willCreate;
-
-    /**
-     * The server is interested in receiving didRenameFiles
-     * notifications.
-     *
-     * didRename?: FileOperationRegistrationOptions;
-     */
-    optional_ptr<FileOperationRegistrationOptions> didRename;
-
-    /**
-     * The server is interested in receiving willRenameFiles requests.
-     *
-     * willRename?: FileOperationRegistrationOptions;
-     */
-    optional_ptr<FileOperationRegistrationOptions> willRename;
-
-    /**
-     * The server is interested in receiving didDeleteFiles file
-     * notifications.
-     *
-     * didDelete?: FileOperationRegistrationOptions;
-     */
-    optional_ptr<FileOperationRegistrationOptions> didDelete;
-
-    /**
-     * The server is interested in receiving willDeleteFiles file
-     * requests.
-     *
-     * willDelete?: FileOperationRegistrationOptions;
-     */
-    optional_ptr<FileOperationRegistrationOptions> willDelete;
-  };
-
-  struct WorkspaceProvider {
-
-    /**
-     * The server supports workspace folder.
-     *
-     * workspaceFolders?: WorkspaceFoldersServerCapabilities;
-     *
-     * @since 3.6.0
-     */
-    optional_ptr<WorkspaceFoldersServerCapabilities> workspaceFolders;
-
-    /**
-     * The server is interested in file notifications/requests.
-     *
-     * fileOperations?: {
-     *   didCreate?: FileOperationRegistrationOptions;
-     *   willCreate?: FileOperationRegistrationOptions;
-     *   didRename?: FileOperationRegistrationOptions;
-     *   willRename?: FileOperationRegistrationOptions;
-     *   didDelete?: FileOperationRegistrationOptions;
-     *   willDelete?: FileOperationRegistrationOptions;
-     * };
-     *
-     * @since 3.16.0
-     */
-    optional_ptr<FileOperations> fileOperations;
+  struct ServerCapabilities_workspace
+  {
+    std::optional<std::unique_ptr<WorkspaceFoldersServerCapabilities>> workspaceFolders;
+    std::optional<std::unique_ptr<FileOperationOptions>> fileOperations;
   };
 
   /**
-   * The server can signal the following capabilities:
-   *
-   * interface ServerCapabilities {
-   *   positionEncoding?: PositionEncodingKind;
-   *   textDocumentSync?: TextDocumentSyncOptions | TextDocumentSyncKind;
-   *   notebookDocumentSync?: NotebookDocumentSyncOptions
-   *     | NotebookDocumentSyncRegistrationOptions;
-   *   completionProvider?: CompletionOptions;
-   *   hoverProvider?: boolean | HoverOptions;
-   *   signatureHelpProvider?: SignatureHelpOptions;
-   *   declarationProvider?: boolean | DeclarationOptions
-   *     | DeclarationRegistrationOptions;
-   *   definitionProvider?: boolean | DefinitionOptions;
-   *   typeDefinitionProvider?: boolean | TypeDefinitionOptions
-   *     | TypeDefinitionRegistrationOptions;
-   *   implementationProvider?: boolean | ImplementationOptions
-   *     | ImplementationRegistrationOptions;
-   *   referencesProvider?: boolean | ReferenceOptions;
-   *   documentHighlightProvider?: boolean | DocumentHighlightOptions;
-   *   documentSymbolProvider?: boolean | DocumentSymbolOptions;
-   *   codeActionProvider?: boolean | CodeActionOptions;
-   *   codeLensProvider?: CodeLensOptions;
-   *   documentLinkProvider?: DocumentLinkOptions;
-   *   colorProvider?: boolean | DocumentColorOptions
-   *     | DocumentColorRegistrationOptions;
-   *   documentFormattingProvider?: boolean | DocumentFormattingOptions;
-   *   documentRangeFormattingProvider?: boolean | DocumentRangeFormattingOptions;
-   *   documentOnTypeFormattingProvider?: DocumentOnTypeFormattingOptions;
-   *   renameProvider?: boolean | RenameOptions;
-   *   foldingRangeProvider?: boolean | FoldingRangeOptions
-   *     | FoldingRangeRegistrationOptions;
-   *   executeCommandProvider?: ExecuteCommandOptions;
-   *   selectionRangeProvider?: boolean | SelectionRangeOptions
-   *     | SelectionRangeRegistrationOptions;
-   *   linkedEditingRangeProvider?: boolean | LinkedEditingRangeOptions
-   *     | LinkedEditingRangeRegistrationOptions;
-   *   callHierarchyProvider?: boolean | CallHierarchyOptions
-   *     | CallHierarchyRegistrationOptions;
-   *   semanticTokensProvider?: SemanticTokensOptions
-   *     | SemanticTokensRegistrationOptions;
-   *   monikerProvider?: boolean | MonikerOptions | MonikerRegistrationOptions;
-   *   typeHierarchyProvider?: boolean | TypeHierarchyOptions
-   *     | TypeHierarchyRegistrationOptions;
-   *   inlineValueProvider?: boolean | InlineValueOptions
-   *     | InlineValueRegistrationOptions;
-   *   inlayHintProvider?: boolean | InlayHintOptions
-   *     | InlayHintRegistrationOptions;
-   *   diagnosticProvider?: DiagnosticOptions | DiagnosticRegistrationOptions;
-   *   workspaceSymbolProvider?: boolean | WorkspaceSymbolOptions;
-   *   workspace?: {
-   *     workspaceFolders?: WorkspaceFoldersServerCapabilities;
-   *     fileOperations?: {
-   *       didCreate?: FileOperationRegistrationOptions;
-   *       willCreate?: FileOperationRegistrationOptions;
-   *       didRename?: FileOperationRegistrationOptions;
-   *       willRename?: FileOperationRegistrationOptions;
-   *       didDelete?: FileOperationRegistrationOptions;
-   *       willDelete?: FileOperationRegistrationOptions;
-   *     };
-   *   };
-   *   experimental?: LSPAny;
-   * }
+   * Defines the capabilities provided by a language
+   * server.
    */
-  struct ServerCapabilities {
-
+  struct ServerCapabilities
+  {
     /**
      * The position encoding the server picked from the encodings offered
      * by the client via the client capability `general.positionEncodings`.
@@ -14431,1101 +8951,903 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * If omitted it defaults to 'utf-16'.
      *
-     * positionEncoding?: PositionEncodingKind;
-     *
      * @since 3.17.0
      */
-    optional_ptr<PositionEncodingKind> positionEncoding;
-
+    std::optional<PositionEncodingKind> positionEncoding;
     /**
      * Defines how text documents are synced. Is either a detailed structure
      * defining each notification or for backwards compatibility the
-     * TextDocumentSyncKind number. If omitted it defaults to
-     * `TextDocumentSyncKind.None`.
-     *
-     * textDocumentSync?: TextDocumentSyncOptions | TextDocumentSyncKind;
+     * TextDocumentSyncKind number.
      */
-    std::optional<TextDocumentSync> textDocumentSync;
-
+    std::optional<ServerCapabilities_textDocumentSync> textDocumentSync;
     /**
      * Defines how notebook documents are synced.
      *
-     * notebookDocumentSync?: NotebookDocumentSyncOptions
-     *   | NotebookDocumentSyncRegistrationOptions;
-     *
      * @since 3.17.0
      */
-    std::optional<NotebookDocumentSync> notebookDocumentSync;
-
+    std::optional<ServerCapabilities_notebookDocumentSync> notebookDocumentSync;
     /**
      * The server provides completion support.
-     *
-     * completionProvider?: CompletionOptions;
      */
-    optional_ptr<CompletionOptions> completionProvider;
-
+    std::optional<std::unique_ptr<CompletionOptions>> completionProvider;
     /**
      * The server provides hover support.
-     *
-     * hoverProvider?: boolean | HoverOptions;
      */
-    std::optional<HoverProvider> hoverProvider;
-
+    std::optional<ServerCapabilities_hoverProvider> hoverProvider;
     /**
      * The server provides signature help support.
-     *
-     * signatureHelpProvider?: SignatureHelpOptions;
      */
-    optional_ptr<SignatureHelpOptions> signatureHelpProvider;
-
+    std::optional<std::unique_ptr<SignatureHelpOptions>> signatureHelpProvider;
     /**
-     * The server provides go to declaration support.
-     *
-     * declarationProvider?: boolean | DeclarationOptions
-     *   | DeclarationRegistrationOptions;
-     *
-     * @since 3.14.0
+     * The server provides Goto Declaration support.
      */
-    std::optional<DeclarationProvider> declarationProvider;
-
+    std::optional<ServerCapabilities_declarationProvider> declarationProvider;
     /**
      * The server provides goto definition support.
-     *
-     * definitionProvider?: boolean | DefinitionOptions;
      */
-    std::optional<DefinitionProvider> definitionProvider;
-
+    std::optional<ServerCapabilities_definitionProvider> definitionProvider;
     /**
-     * The server provides goto type definition support.
-     *
-     * typeDefinitionProvider?: boolean | TypeDefinitionOptions
-     *   | TypeDefinitionRegistrationOptions;
-     *
-     * @since 3.6.0
+     * The server provides Goto Type Definition support.
      */
-    std::optional<TypeDefinitionProvider> typeDefinitionProvider;
-
+    std::optional<ServerCapabilities_typeDefinitionProvider> typeDefinitionProvider;
     /**
-     * The server provides goto implementation support.
-     *
-     * implementationProvider?: boolean | ImplementationOptions
-     *   | ImplementationRegistrationOptions;
-     *
-     * @since 3.6.0
+     * The server provides Goto Implementation support.
      */
-    std::optional<ImplementationProvider> implementationProvider;
-
+    std::optional<ServerCapabilities_implementationProvider> implementationProvider;
     /**
      * The server provides find references support.
-     *
-     * referencesProvider?: boolean | ReferenceOptions;
      */
-    std::optional<ReferencesProvider> referencesProvider;
-
+    std::optional<ServerCapabilities_referencesProvider> referencesProvider;
     /**
      * The server provides document highlight support.
-     *
-     * documentHighlightProvider?: boolean | DocumentHighlightOptions;
      */
-    std::optional<DocumentHighlightProvider> documentHighlightProvider;
-
+    std::optional<ServerCapabilities_documentHighlightProvider> documentHighlightProvider;
     /**
      * The server provides document symbol support.
-     *
-     * documentSymbolProvider?: boolean | DocumentSymbolOptions;
      */
-    std::optional<DocumentSymbolProvider> documentSymbolProvider;
-
+    std::optional<ServerCapabilities_documentSymbolProvider> documentSymbolProvider;
     /**
-     * The server provides code actions. The `CodeActionOptions` return type is
-     * only valid if the client signals code action literal support via the
-     * property `textDocument.codeAction.codeActionLiteralSupport`.
-     *
-     * codeActionProvider?: boolean | CodeActionOptions;
+     * The server provides code actions. CodeActionOptions may only be
+     * specified if the client states that it supports
+     * `codeActionLiteralSupport` in its initial `initialize` request.
      */
-    std::optional<CodeActionProvider> codeActionProvider;
-
+    std::optional<ServerCapabilities_codeActionProvider> codeActionProvider;
     /**
      * The server provides code lens.
-     *
-     * codeLensProvider?: CodeLensOptions;
      */
-    optional_ptr<CodeLensOptions> codeLensProvider;
-
+    std::optional<std::unique_ptr<CodeLensOptions>> codeLensProvider;
     /**
      * The server provides document link support.
-     *
-     * documentLinkProvider?: DocumentLinkOptions;
      */
-    optional_ptr<DocumentLinkOptions> documentLinkProvider;
-
+    std::optional<std::unique_ptr<DocumentLinkOptions>> documentLinkProvider;
     /**
      * The server provides color provider support.
-     *
-     * colorProvider?: boolean | DocumentColorOptions
-     *   | DocumentColorRegistrationOptions;
-     *
-     * @since 3.6.0
      */
-    std::optional<ColorProvider> colorProvider;
-
+    std::optional<ServerCapabilities_colorProvider> colorProvider;
+    /**
+     * The server provides workspace symbol support.
+     */
+    std::optional<ServerCapabilities_workspaceSymbolProvider> workspaceSymbolProvider;
     /**
      * The server provides document formatting.
-     *
-     * documentFormattingProvider?: boolean | DocumentFormattingOptions;
      */
-    std::optional<DocumentFormattingProvider> documentFormattingProvider;
-
+    std::optional<ServerCapabilities_documentFormattingProvider> documentFormattingProvider;
     /**
      * The server provides document range formatting.
-     *
-     * documentRangeFormattingProvider?: boolean | DocumentRangeFormattingOptions;
      */
-    std::optional<DocumentRangeFormattingProvider> documentRangeFormattingProvider;
-
+    std::optional<ServerCapabilities_documentRangeFormattingProvider> documentRangeFormattingProvider;
     /**
      * The server provides document formatting on typing.
-     *
-     * documentOnTypeFormattingProvider?: DocumentOnTypeFormattingOptions;
      */
-    optional_ptr<DocumentOnTypeFormattingOptions> documentOnTypeFormattingProvider;
-
+    std::optional<std::unique_ptr<DocumentOnTypeFormattingOptions>> documentOnTypeFormattingProvider;
     /**
-     * The server provides rename support. RenameOptions may only be specified
-     * if the client states that it supports `prepareSupport` in its initial
-     * `initialize` request.
-     *
-     * renameProvider?: boolean | RenameOptions;
+     * The server provides rename support. RenameOptions may only be
+     * specified if the client states that it supports
+     * `prepareSupport` in its initial `initialize` request.
      */
-    std::optional<RenameProvider> renameProvider;
-
+    std::optional<ServerCapabilities_renameProvider> renameProvider;
     /**
      * The server provides folding provider support.
-     *
-     * foldingRangeProvider?: boolean | FoldingRangeOptions
-     *   | FoldingRangeRegistrationOptions;
-     *
-     * @since 3.10.0
      */
-    std::optional<FoldingRangeProvider> foldingRangeProvider;
-
-    /**
-     * The server provides execute command support.
-     *
-     * executeCommandProvider?: ExecuteCommandOptions;
-     */
-    optional_ptr<ExecuteCommandOptions> executeCommandProvider;
-
+    std::optional<ServerCapabilities_foldingRangeProvider> foldingRangeProvider;
     /**
      * The server provides selection range support.
-     *
-     * selectionRangeProvider?: boolean | SelectionRangeOptions
-     *   | SelectionRangeRegistrationOptions;
-     *
-     * @since 3.15.0
      */
-    std::optional<SelectionRangeProvider> selectionRangeProvider;
-
+    std::optional<ServerCapabilities_selectionRangeProvider> selectionRangeProvider;
     /**
-     * The server provides linked editing range support.
-     *
-     * linkedEditingRangeProvider?: boolean | LinkedEditingRangeOptions
-     *   | LinkedEditingRangeRegistrationOptions;
-     *
-     * @since 3.16.0
+     * The server provides execute command support.
      */
-    std::optional<LinkedEditingRangeProvider> linkedEditingRangeProvider;
-
+    std::optional<std::unique_ptr<ExecuteCommandOptions>> executeCommandProvider;
     /**
      * The server provides call hierarchy support.
      *
-     * callHierarchyProvider?: boolean | CallHierarchyOptions
-     *   | CallHierarchyRegistrationOptions;
+     * @since 3.16.0
+     */
+    std::optional<ServerCapabilities_callHierarchyProvider> callHierarchyProvider;
+    /**
+     * The server provides linked editing range support.
      *
      * @since 3.16.0
      */
-    std::optional<CallHierarchyProvider> callHierarchyProvider;
-
+    std::optional<ServerCapabilities_linkedEditingRangeProvider> linkedEditingRangeProvider;
     /**
      * The server provides semantic tokens support.
      *
-     * semanticTokensProvider?: SemanticTokensOptions
-     *   | SemanticTokensRegistrationOptions;
-     *
      * @since 3.16.0
      */
-    std::optional<SemanticTokensProvider> semanticTokensProvider;
-
+    std::optional<ServerCapabilities_semanticTokensProvider> semanticTokensProvider;
     /**
-     * Whether server provides moniker support.
-     *
-     * monikerProvider?: boolean | MonikerOptions | MonikerRegistrationOptions;
+     * The server provides moniker support.
      *
      * @since 3.16.0
      */
-    std::optional<MonikerProvider> monikerProvider;
-
+    std::optional<ServerCapabilities_monikerProvider> monikerProvider;
     /**
      * The server provides type hierarchy support.
      *
-     * typeHierarchyProvider?: boolean | TypeHierarchyOptions
-     *   | TypeHierarchyRegistrationOptions;
-     *
      * @since 3.17.0
      */
-    std::optional<TypeHierarchyProvider> typeHierarchyProvider;
-
+    std::optional<ServerCapabilities_typeHierarchyProvider> typeHierarchyProvider;
     /**
      * The server provides inline values.
      *
-     * inlineValueProvider?: boolean | InlineValueOptions
-     *   | InlineValueRegistrationOptions;
-     *
      * @since 3.17.0
      */
-    std::optional<InlineValueProvider> inlineValueProvider;
-
+    std::optional<ServerCapabilities_inlineValueProvider> inlineValueProvider;
     /**
      * The server provides inlay hints.
      *
-     * inlayHintProvider?: boolean | InlayHintOptions
-     *   | InlayHintRegistrationOptions;
-     *
      * @since 3.17.0
      */
-    std::optional<InlayHintProvider> inlayHintProvider;
-
+    std::optional<ServerCapabilities_inlayHintProvider> inlayHintProvider;
     /**
      * The server has support for pull model diagnostics.
      *
-     * diagnosticProvider?: DiagnosticOptions | DiagnosticRegistrationOptions;
-     *
      * @since 3.17.0
      */
-    std::optional<DiagnosticProvider> diagnosticProvider;
-
+    std::optional<ServerCapabilities_diagnosticProvider> diagnosticProvider;
     /**
-     * The server provides workspace symbol support.
+     * Inline completion options used during static registration.
      *
-     * workspaceSymbolProvider?: boolean | WorkspaceSymbolOptions;
+     * @since 3.18.0
+     * @proposed
      */
-    std::optional<WorkspaceSymbolProvider> workspaceSymbolProvider;
-
+    std::optional<ServerCapabilities_inlineCompletionProvider> inlineCompletionProvider;
     /**
-     * Workspace specific server capabilities
-     *
-     * workspace?: {
-     *   workspaceFolders?: WorkspaceFoldersServerCapabilities;
-     *   fileOperations?: {
-     *     didCreate?: FileOperationRegistrationOptions;
-     *     willCreate?: FileOperationRegistrationOptions;
-     *     didRename?: FileOperationRegistrationOptions;
-     *     willRename?: FileOperationRegistrationOptions;
-     *     didDelete?: FileOperationRegistrationOptions;
-     *     willDelete?: FileOperationRegistrationOptions;
-     *   };
-     * };
+     * Workspace specific server capabilities.
      */
-    optional_ptr<WorkspaceProvider> workspace;
-
+    std::optional<std::unique_ptr<ServerCapabilities_workspace>> workspace;
     /**
      * Experimental server capabilities.
-     *
-     * experimental?: LSPAny;
      */
-    optional_ptr<LSPAny> experimental;
+    std::optional<std::unique_ptr<LSPAny>> experimental;
+  };
+
+  struct InitializeResult_serverInfo
+  {
+    string_t name;
+    std::optional<string_t> version;
   };
 
   /**
-   * The initialized notification is sent from the client to the server after
-   * the client received the result of the initialize request but before the
-   * client is sending any other request or notification to the server. The
-   * server can use the initialized notification, for example, to dynamically
-   * register capabilities. The initialized notification may only be sent once.
-   *
-   * Notification:
-   *   method: ‘initialized’
-   *   params: InitializedParams defined as follows:
-   *
-   * interface InitializedParams {
-   * }
+   * The result returned from an initialize request.
    */
-  struct InitializedParams {
-    // empty
-  };
-
-  /**
-   * The client/registerCapability request is sent from the server to the client
-   * to register for a new capability on the client side. Not all clients need
-   * to support dynamic capability registration. A client opts in via the
-   * dynamicRegistration property on the specific client capabilities. A client
-   * can even provide dynamic registration for capability A but not for
-   * capability B (see TextDocumentClientCapabilities as an example).
-   *
-   * Server must not register the same capability both statically through the
-   * initialize result and dynamically for the same document selector. If a
-   * server wants to support both static and dynamic registration it needs to
-   * check the client capability in the initialize request and only register the
-   * capability statically if the client doesn’t support dynamic registration
-   * for that capability.
-   *
-   * Request:
-   *   method: ‘client/registerCapability’
-   *   params: RegistrationParams
-   *
-   * Where RegistrationParams are defined as follows:
-   *
-   * export interface Registration {
-   *   id: string;
-   *   method: string;
-   *   registerOptions?: LSPAny;
-   * }
-   */
-  struct Registration {
-
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again.
-     *
-     * id: string;
-     */
-    string id;
-
-    /**
-     * The method / capability to register for.
-     *
-     * method: string;
-     */
-    string method;
-
-    /**
-     * Options necessary for the registration.
-     *
-     * registerOptions?: LSPAny;
-     */
-    optional_ptr<LSPAny> registerOptions;
-  };
-
-  /**
-   * export interface RegistrationParams {
-   *   registrations: Registration[];
-   * }
-   */
-  struct RegistrationParams {
-
-    /**
-     * registrations: Registration[];
-     */
-    ptr_vector<Registration> registrations;
-  };
-
-  /**
-   * The client/unregisterCapability request is sent from the server to the
-   * client to unregister a previously registered capability.
-   *
-   * Request:
-   *   method: ‘client/unregisterCapability’
-   *   params: UnregistrationParams
-   *
-   * Where UnregistrationParams are defined as follows:
-   *
-   * export interface Unregistration {
-   *   id: string;
-   *   method: string;
-   * }
-   */
-  struct Unregistration {
-
-    /**
-     * The id used to unregister the request or notification. Usually an id
-     * provided during the register request.
-     *
-     * id: string;
-     */
-    string id;
-
-    /**
-     * The method / capability to unregister for.
-     *
-     * method: string;
-     */
-    string method;
-  };
-
-  /**
-   * export interface UnregistrationParams {
-   *   unregisterations: Unregistration[];
-   * }
-   */
-  struct UnregistrationParams {
-
-    /**
-     * This should correctly be named `unregistrations`. However changing this
-     * is a breaking change and needs to wait until we deliver a 4.x version of
-     * the specification.
-     *
-     * unregisterations: Unregistration[];
-     */
-    ptr_vector<Unregistration> unregisterations;  //<- Typo is part of spec!
-  };
-
-  /**
-   * A notification that should be used by the client to modify the trace setting of the server.
-   *
-   * Notification:
-   *   method: ‘$/setTrace’
-   *   params: SetTraceParams defined as follows:
-   *
-   * interface SetTraceParams {
-   *   value: TraceValue;
-   * }
-   */
-  struct SetTraceParams {
-
-    /**
-     * The new value that should be assigned to the trace setting.
-     *
-     * value: TraceValue;
-     */
-    TraceValue value;
-  };
-
-  /**
-   * A notification to log the trace of the server’s execution. The amount and
-   * content of these notifications depends on the current trace configuration.
-   * If trace is 'off', the server should not send any logTrace notification. If
-   * trace is 'messages', the server should not add the 'verbose' field in the
-   * LogTraceParams.
-   *
-   * $/logTrace should be used for systematic trace reporting. For single
-   * debugging messages, the server should send window/logMessage notifications.
-   *
-   * Notification:
-   *   method: ‘$/logTrace’
-   *   params: LogTraceParams defined as follows:
-   *
-   * interface LogTraceParams {
-   *   message: string;
-   *   verbose?: string;
-   * }
-   */
-  struct LogTraceParams {
-
-    /**
-     * The message to be logged.
-     *
-     * message: string;
-     */
-    string message;
-
-    /**
-     * Additional information that can be computed if the `trace` configuration
-     * is set to `'verbose'`
-     *
-     * verbose?: string;
-     */
-    std::optional<string> verbose;
-  };
-
-  /**
-   * Response:
-   *   result: InitializeResult defined as follows:
-   *
-   * interface InitializeResult {
-   *   capabilities: ServerCapabilities;
-   *   serverInfo?: {
-   *     name: string;
-   *     version?: string;
-   *   };
-   * }
-   */
-  struct InitializeResult {
-
+  struct InitializeResult
+  {
     /**
      * The capabilities the language server provides.
-     *
-     * capabilities: ServerCapabilities;
      */
     std::unique_ptr<ServerCapabilities> capabilities;
-
     /**
      * Information about the server.
      *
-     * serverInfo?: {
-     *   name: string;
-     *   version?: string;
-     * };
-     *
      * @since 3.15.0
      */
-    optional_ptr<ServerInfo> serverInfo;
+    std::optional<std::unique_ptr<InitializeResult_serverInfo>> serverInfo;
   };
 
   /**
-   * error.code
-   *
-   * Known error codes for an `InitializeErrorCodes`;
-   *
-   * export namespace InitializeErrorCodes {
-   *   export const unknownProtocolVersion: 1 = 1;
-   * }
-   * export type InitializeErrorCodes = 1;
+   * Save registration options.
    */
-  enum class InitializeErrorCodes {
-
-    /**
-     * If the protocol version provided by the client can't be handled by
-     * the server.
-     *
-     * export const unknownProtocolVersion: 1 = 1;
-     *
-     * @deprecated This initialize error got replaced by client capabilities.
-     * There is no version handshake in version 3.0x
-     */
-    unknownProtocolVersion = 1,
-  };
-
-  extern std::map<InitializeErrorCodes, std::string> InitializeErrorCodesNames;
-
-  auto initializeErrorCodesByName(const std::string &name) -> InitializeErrorCodes;
-
-  /**
-   * error.data
-   *
-   * interface InitializeError {
-   *   retry: boolean;
-   * }
-   */
-  struct InitializeError {
-
-    /**
-     * Indicates whether the client execute the following retry logic:
-     * (1) show the message provided by the ResponseError to the user
-     * (2) user selects retry or cancel
-     * (3) if user selected retry the initialize method is sent again.
-     *
-     * retry: boolean;
-     */
-    boolean retry;
+  struct TextDocumentSaveRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public SaveOptions
+  {
   };
 
   /**
-   * The initialize request is sent as the first request from the client to the
-   * server. If the server receives a request or notification before the
-   * initialize request it should act as follows:
-   * - For a request the response should be an error with code: -32002. The
-   *   message can be picked by the server.
-   * - Notifications should be dropped, except for the exit notification. This
-   *   will allow the exit of a server without an initialize request.
-   *
-   * Until the server has responded to the initialize request with an
-   * InitializeResult, the client must not send any additional requests or
-   * notifications to the server. In addition the server is not allowed to send
-   * any requests or notifications to the client until it has responded with an
-   * InitializeResult, with the exception that during the initialize request the
-   * server is allowed to send the notifications window/showMessage,
-   * window/logMessage and telemetry/event as well as the
-   * window/showMessageRequest request to the client. In case the client sets up
-   * a progress token in the initialize params (e.g. property workDoneToken) the
-   * server is also allowed to use that token (and only that token) using the
-   * $/progress notification sent from the server to the client.
-   *
-   * The initialize request may only be sent once.
-   *
-   * Request:
-   *   method: ‘initialize’
-   *   params: InitializeParams defined as follows:
-   *
-   * interface InitializeParams extends WorkDoneProgressParams {
-   *   processId: integer | null;
-   *   clientInfo?: {
-   *     name: string;
-   *     version?: string;
-   *   };
-   *   locale?: string;
-   *   rootPath?: string | null;
-   *   rootUri: DocumentUri | null;
-   *   initializationOptions?: LSPAny;
-   *   capabilities: ClientCapabilities;
-   *   trace?: TraceValue;
-   *   workspaceFolders?: WorkspaceFolder[] | null;
-   * }
+   * Registration options for a {@link DocumentHighlightRequest}.
    */
-  struct InitializeParams : public WorkDoneProgressParams {
-
-    /**
-     * The process Id of the parent process that started the server. Is null if
-     * the process has not been started by another process. If the parent
-     * process is not alive then the server should exit (see exit notification)
-     * its process.
-     *
-     * processId: integer | null;
-     */
-    std::optional<integer> processId;
-
-    /**
-     * Information about the client
-     *
-     * clientInfo?: {
-     *   name: string;
-     *   version?: string;
-     * };
-     *
-     * @since 3.15.0
-     */
-    optional_ptr<ClientInfo> clientInfo;
-
-    /**
-     * The locale the client is currently showing the user interface
-     * in. This must not necessarily be the locale of the operating
-     * system.
-     *
-     * Uses IETF language tags as the value's syntax
-     * (See https://en.wikipedia.org/wiki/IETF_language_tag)
-     *
-     * locale?: string;
-     *
-     * @since 3.16.0
-     */
-    std::optional<string> locale;
-
-    /**
-     * The rootPath of the workspace. Is null
-     * if no folder is open.
-     *
-     * rootPath?: string | null;
-     *
-     * @deprecated in favour of `rootUri`.
-     */
-    std::optional<string> rootPath;
-
-    /**
-     * The rootUri of the workspace. Is null if no
-     * folder is open. If both `rootPath` and `rootUri` are set
-     * `rootUri` wins.
-     *
-     * rootUri: DocumentUri | null;
-     *
-     * @deprecated in favour of `workspaceFolders`
-     */
-    std::optional<DocumentUri> rootUri;
-
-    /**
-     * User provided initialization options.
-     *
-     * initializationOptions?: LSPAny;
-     */
-    optional_ptr<LSPAny> initializationOptions;
-
-    /**
-     * The capabilities provided by the client (editor or tool)
-     *
-     * capabilities: ClientCapabilities;
-     */
-    std::unique_ptr<ClientCapabilities> capabilities;
-
-    /**
-     * The initial trace setting. If omitted trace is disabled ('off').
-     *
-     * trace?: TraceValue;
-     */
-    std::optional<TraceValue> trace;
-
-    /**
-     * The workspace folders configured in the client when the server starts.
-     * This property is only available if the client supports workspace folders.
-     * It can be `null` if the client supports workspace folders but none are
-     * configured.
-     *
-     * workspaceFolders?: WorkspaceFolder[] | null;
-     *
-     * @since 3.6.0
-     */
-    optional_ptr_vector<WorkspaceFolder> workspaceFolders;
+  struct DocumentHighlightRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentHighlightOptions
+  {
   };
 
   /**
-   * The document open notification is sent from the client to the server to
-   * signal newly opened text documents. The document’s content is now managed
-   * by the client and the server must not try to read the document’s content
-   * using the document’s Uri. Open in this sense means it is managed by the
-   * client. It doesn’t necessarily mean that its content is presented in an
-   * editor. An open notification must not be sent more than once without a
-   * corresponding close notification send before. This means open and close
-   * notification must be balanced and the max open count for a particular
-   * textDocument is one. Note that a server’s ability to fulfill requests is
-   * independent of whether a text document is open or closed.
+   * The glob pattern to watch relative to the base path. Glob patterns can have the following syntax:
+   * - `*` to match one or more characters in a path segment
+   * - `?` to match on one character in a path segment
+   * - `**` to match any number of path segments, including none
+   * - `{}` to group conditions (e.g. `**​/​*.{ts,js}` matches all TypeScript and JavaScript files)
+   * - `[]` to declare a range of characters to match in a path segment (e.g., `example.[0-9]` to match on `example.0`, `example.1`, …)
+   * - `[!...]` to negate a range of characters to match in a path segment (e.g., `example.[!0-9]` to match on `example.a`, `example.b`, but not `example.0`)
    *
-   * The DidOpenTextDocumentParams contain the language id the document is
-   * associated with. If the language id of a document changes, the client needs
-   * to send a textDocument/didClose to the server followed by a
-   * textDocument/didOpen with the new language id if the server handles the new
-   * language id as well.
-   *
-   * Client Capability: See general synchronization client capabilities.
-   *
-   * Server Capability: See general synchronization server capabilities.
-   *
-   * Registration Options: TextDocumentRegistrationOptions
-   *
-   * Notification:
-   *   method: ‘textDocument/didOpen’
-   *   params: DidOpenTextDocumentParams defined as follows:
-   *
-   * interface DidOpenTextDocumentParams {
-   *   textDocument: TextDocumentItem;
-   * }
+   * @since 3.17.0
    */
-  struct DidOpenTextDocumentParams {
+  typedef string_t Pattern;
 
-    /**
-     * The document that was opened.
-     *
-     * textDocument: TextDocumentItem;
-     */
-    std::unique_ptr<TextDocumentItem> textDocument;
+  enum class RelativePattern_baseUriType {
+    WORKSPACE_FOLDER,
+    URI,
   };
 
-  /**
-   * Describe options to be used when registering for text document change
-   * events.
-   *
-   * The document change notification is sent from the client to the server to
-   * signal changes to a text document. Before a client can change a text
-   * document it must claim ownership of its content using the
-   * textDocument/didOpen notification. In 2.0 the shape of the params has
-   * changed to include proper version numbers.
-   *
-   * Client Capability: See general synchronization client capabilities.
-   *
-   * Server Capability: See general synchronization server capabilities.
-   *
-   * Registration Options: TextDocumentChangeRegistrationOptions defined as
-   * follows:
-   *
-   * export interface TextDocumentChangeRegistrationOptions
-   *     extends TextDocumentRegistrationOptions {
-   *   syncKind: TextDocumentSyncKind;
-   * }
-   */
-  struct TextDocumentChangeRegistrationOptions : public TextDocumentRegistrationOptions {
-
-    /**
-     * How documents are synced to the server. See TextDocumentSyncKind.Full and
-     * TextDocumentSyncKind.Incremental.
-     *
-     * syncKind: TextDocumentSyncKind;
-     */
-    TextDocumentSyncKind syncKind;
-  };
-
-  /**
-   * Notification:
-   *   method: textDocument/didChange
-   *   params: DidChangeTextDocumentParams defined as follows:
-   *
-   * interface DidChangeTextDocumentParams {
-   *   textDocument: VersionedTextDocumentIdentifier;
-   *   contentChanges: TextDocumentContentChangeEvent[];
-   * }
-   */
-  struct DidChangeTextDocumentParams {
-
-    /**
-     * The document that did change. The version number points
-     * to the version after all provided content changes have
-     * been applied.
-     *
-     * textDocument: VersionedTextDocumentIdentifier;
-     */
-    std::unique_ptr<VersionedTextDocumentIdentifier> textDocument;
-
-    /**
-     * The actual content changes. The content changes describe single state
-     * changes to the document. So if there are two content changes c1 (at array
-     * index 0) and c2 (at array index 1) for a document in state S then c1
-     * moves the document from S to S' and c2 from S' to S''. So c1 is computed
-     * on the state S and c2 is computed on the state S'.
-     *
-     * To mirror the content of a document using change events use the following
-     * approach:
-     * - start with the same initial content
-     * - apply the 'textDocument/didChange' notifications in the order you
-     *   receive them.
-     * - apply the `TextDocumentContentChangeEvent`s in a single notification in
-     *   the order you receive them.
-     *
-     * contentChanges: TextDocumentContentChangeEvent[];
-     */
-    std::vector<TextDocumentContentChangeEvent> contentChanges;
-  };
-
-  /**
-   * Represents reasons why a text document is saved.
-   *
-   * export namespace TextDocumentSaveReason {
-   *   export const Manual = 1;
-   *   export const AfterDelay = 2;
-   *   export const FocusOut = 3;
-   * }
-   * export type TextDocumentSaveReason = 1 | 2 | 3;
-   */
-  enum class TextDocumentSaveReason {
-
-    /**
-     * Manually triggered, e.g. by the user pressing save, by starting
-     * debugging, or by an API call.
-     *
-     * export const Manual = 1;
-     */
-    Manual = 1,
-
-    /**
-     * Automatic after a delay.
-     *
-     * export const AfterDelay = 2;
-     */
-    AfterDelay = 2,
-
-    /**
-     * When the editor lost focus.
-     *
-     * export const FocusOut = 3;
-     */
-    FocusOut = 3,
-  };
-
-  extern std::map<TextDocumentSaveReason, std::string> TextDocumentSaveReasonNames;
-
-  auto textDocumentSaveReasonByName(const std::string &name) -> TextDocumentSaveReason;
-
-  auto textDocumentSaveReasonByValue(int value) -> TextDocumentSaveReason;
-
-  /**
-   * The document will save notification is sent from the client to the server
-   * before the document is actually saved. If a server has registered for open
-   * / close events clients should ensure that the document is open before a
-   * willSave notification is sent since clients can’t change the content of a
-   * file without ownership transferal.
-   *
-   * Client Capability:
-   *   property name (optional): textDocument.synchronization.willSave
-   *   property type: boolean
-   *
-   * The capability indicates that the client supports textDocument/willSave
-   * notifications.
-   *
-   * Server Capability:
-   *   property name (optional): textDocumentSync.willSave
-   *   property type: boolean
-   *
-   * The capability indicates that the server is interested in
-   * textDocument/willSave notifications.
-   *
-   * Registration Options: TextDocumentRegistrationOptions
-   *
-   * Notification:
-   *   method: ‘textDocument/willSave’
-   *   params: WillSaveTextDocumentParams defined as follows:
-   *
-   * export interface WillSaveTextDocumentParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   reason: TextDocumentSaveReason;
-   * }
-   */
-  struct WillSaveTextDocumentParams {
-
-    /**
-     * The document that will be saved.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * The 'TextDocumentSaveReason'.
-     *
-     * reason: TextDocumentSaveReason;
-     */
-    TextDocumentSaveReason reason;
-  };
-
-  enum class WillSaveWaitUntilResultType {
-    TEXT_EDITS,
-    LSP_NULL,
-  };
-
-  /**
-   * The document will save request is sent from the client to the server before
-   * the document is actually saved. The request can return an array of
-   * TextEdits which will be applied to the text document before it is saved.
-   * Please note that clients might drop results if computing the text edits
-   * took too long or if a server constantly fails on this request. This is done
-   * to keep the save fast and reliable. If a server has registered for open /
-   * close events clients should ensure that the document is open before a
-   * willSaveWaitUntil notification is sent since clients can’t change the
-   * content of a file without ownership transferal.
-   *
-   * Client Capability:
-   * - property name (optional): textDocument.synchronization.willSaveWaitUntil
-   * - property type: boolean
-   *
-   * The capability indicates that the client supports
-   * textDocument/willSaveWaitUntil requests.
-   *
-   * Server Capability:
-   * - property name (optional): textDocumentSync.willSaveWaitUntil
-   * - property type: boolean
-   *
-   * The capability indicates that the server is interested in
-   * textDocument/willSaveWaitUntil requests.
-   *
-   * Registration Options: TextDocumentRegistrationOptions
-   *
-   * Request:
-   * - method: textDocument/willSaveWaitUntil
-   * - params: WillSaveTextDocumentParams
-   *
-   * Response:
-   * - result: TextEdit[] | null
-   * - error: code and message set in case an exception happens during the
-   *   textDocument/willSaveWaitUntil request.
-   */
   typedef std::variant<
-    ptr_vector<TextEdit>,
-    null
-  > WillSaveWaitUntilResult;
+    std::unique_ptr<WorkspaceFolder>,
+    URI
+  > RelativePattern_baseUri;
 
   /**
-   * The capability indicates that the server is interested in
-   * textDocument/didSave notifications.
+   * A relative pattern is a helper to construct glob patterns that are matched
+   * relatively to a base URI. The common value for a `baseUri` is a workspace
+   * folder root, but it can be another absolute URI as well.
    *
-   * Registration Options: TextDocumentSaveRegistrationOptions defined as
-   * follows:
-   *
-   * export interface TextDocumentSaveRegistrationOptions
-   *     extends TextDocumentRegistrationOptions {
-   *   includeText?: boolean;
-   * }
+   * @since 3.17.0
    */
-  struct TextDocumentSaveRegistrationOptions : public TextDocumentRegistrationOptions {
-
+  struct RelativePattern
+  {
     /**
-     * The client is supposed to include the content on save.
-     *
-     * includeText?: boolean;
+     * A workspace folder or a base URI to which this pattern will be matched
+     * against relatively.
      */
-    std::optional<boolean> includeText;
+    RelativePattern_baseUri baseUri;
+    /**
+     * The actual glob pattern;
+     */
+    Pattern pattern;
+  };
+
+  enum class GlobPatternType {
+    PATTERN,
+    RELATIVE_PATTERN,
+  };
+
+  typedef std::variant<
+    Pattern,
+    std::unique_ptr<RelativePattern>
+  > GlobPattern;
+
+  struct FileSystemWatcher
+  {
+    /**
+     * The glob pattern to watch. See {@link GlobPattern glob pattern} for more detail.
+     *
+     * @since 3.17.0 support for relative patterns.
+     */
+    GlobPattern globPattern;
+    /**
+     * The kind of events of interest. If omitted it defaults
+     * to WatchKind.Create | WatchKind.Change | WatchKind.Delete
+     * which is 7.
+     */
+    std::optional<WatchKind> kind;
   };
 
   /**
-   * Notification:
-   *   method: textDocument/didSave
-   *   params: DidSaveTextDocumentParams defined as follows:
-   *
-   * interface DidSaveTextDocumentParams {
-   *   textDocument: TextDocumentIdentifier;
-   *   text?: string;
-   * }
+   * Describe options to be used when registered for text document change events.
    */
-  struct DidSaveTextDocumentParams {
-
+  struct DidChangeWatchedFilesRegistrationOptions
+  {
     /**
-     * The document that was saved.
-     *
-     * textDocument: TextDocumentIdentifier;
+     * The watchers to register.
      */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-
-    /**
-     * Optional the content when saved. Depends on the includeText value when
-     * the save notification was requested.
-     *
-     * text?: string;
-     */
-    std::optional<string> text;
+    std::vector<std::unique_ptr<FileSystemWatcher>> watchers;
   };
 
-  /**
-   * The document close notification is sent from the client to the server when
-   * the document got closed in the client. The document’s master now exists
-   * where the document’s Uri points to (e.g. if the document’s Uri is a file
-   * Uri the master now exists on disk). As with the open notification the close
-   * notification is about managing the document’s content. Receiving a close
-   * notification doesn’t mean that the document was open in an editor before. A
-   * close notification requires a previous open notification to be sent. Note
-   * that a server’s ability to fulfill requests is independent of whether a
-   * text document is open or closed.
-   *
-   * Client Capability: See general synchronization client capabilities.
-   *
-   * Server Capability: See general synchronization server capabilities.
-   *
-   * Registration Options: TextDocumentRegistrationOptions
-   *
-   * Notification:
-   *   method: textDocument/didClose
-   *   params: DidCloseTextDocumentParams defined as follows:
-   *
-   * interface DidCloseTextDocumentParams {
-   *   textDocument: TextDocumentIdentifier;
-   * }
-   */
-  struct DidCloseTextDocumentParams {
-
-    /**
-     * The document that was closed.
-     *
-     * textDocument: TextDocumentIdentifier;
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  enum class TextDocumentImplementationResultType {
+    DEFINITION,
+    DEFINITION_LINK_ARRAY,
+    NULL_TYPE,
+    LOCATION_ARRAY,
   };
 
-  enum class RequestMethod {
+  typedef std::variant<
+    Definition,
+    std::vector<std::unique_ptr<DefinitionLink>>,
+    null_t,
+    std::vector<std::unique_ptr<Location>>
+  > TextDocumentImplementationResult;
+
+  enum class TextDocumentTypeDefinitionResultType {
+    DEFINITION,
+    DEFINITION_LINK_ARRAY,
+    NULL_TYPE,
+    LOCATION_ARRAY,
+  };
+
+  typedef std::variant<
+    Definition,
+    std::vector<std::unique_ptr<DefinitionLink>>,
+    null_t,
+    std::vector<std::unique_ptr<Location>>
+  > TextDocumentTypeDefinitionResult;
+
+  enum class WorkspaceWorkspaceFoldersResultType {
+    WORKSPACE_FOLDER_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<WorkspaceFolder>>,
+    null_t
+  > WorkspaceWorkspaceFoldersResult;
+
+  typedef std::vector<std::unique_ptr<LSPAny>> WorkspaceConfigurationResult;
+
+  typedef std::vector<std::unique_ptr<ColorInformation>> TextDocumentDocumentColorResult;
+
+  typedef std::vector<std::unique_ptr<ColorPresentation>> TextDocumentColorPresentationResult;
+
+  enum class TextDocumentFoldingRangeResultType {
+    FOLDING_RANGE_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<FoldingRange>>,
+    null_t
+  > TextDocumentFoldingRangeResult;
+
+  typedef null_t WorkspaceFoldingRangeRefreshResult;
+
+  enum class TextDocumentDeclarationResultType {
+    DECLARATION,
+    DECLARATION_LINK_ARRAY,
+    NULL_TYPE,
+    LOCATION_ARRAY,
+  };
+
+  typedef std::variant<
+    Declaration,
+    std::vector<std::unique_ptr<DeclarationLink>>,
+    null_t,
+    std::vector<std::unique_ptr<Location>>
+  > TextDocumentDeclarationResult;
+
+  typedef null_t WindowWorkDoneProgressCreateResult;
+
+  enum class TextDocumentPrepareCallHierarchyResultType {
+    CALL_HIERARCHY_ITEM_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<CallHierarchyItem>>,
+    null_t
+  > TextDocumentPrepareCallHierarchyResult;
+
+  enum class CallHierarchyIncomingCallsResultType {
+    CALL_HIERARCHY_INCOMING_CALL_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<CallHierarchyIncomingCall>>,
+    null_t
+  > CallHierarchyIncomingCallsResult;
+
+  enum class CallHierarchyOutgoingCallsResultType {
+    CALL_HIERARCHY_OUTGOING_CALL_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<CallHierarchyOutgoingCall>>,
+    null_t
+  > CallHierarchyOutgoingCallsResult;
+
+  enum class TextDocumentSemanticTokensFullResultType {
+    SEMANTIC_TOKENS,
+    NULL_TYPE,
+    SEMANTIC_TOKENS_PARTIAL_RESULT,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<SemanticTokens>,
+    null_t,
+    std::unique_ptr<SemanticTokensPartialResult>
+  > TextDocumentSemanticTokensFullResult;
+
+  enum class TextDocumentSemanticTokensFullDeltaResultType {
+    SEMANTIC_TOKENS,
+    SEMANTIC_TOKENS_DELTA,
+    NULL_TYPE,
+    SEMANTIC_TOKENS_PARTIAL_RESULT,
+    SEMANTIC_TOKENS_DELTA_PARTIAL_RESULT,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<SemanticTokens>,
+    std::unique_ptr<SemanticTokensDelta>,
+    null_t,
+    std::unique_ptr<SemanticTokensPartialResult>,
+    std::unique_ptr<SemanticTokensDeltaPartialResult>
+  > TextDocumentSemanticTokensFullDeltaResult;
+
+  enum class TextDocumentSemanticTokensRangeResultType {
+    SEMANTIC_TOKENS,
+    NULL_TYPE,
+    SEMANTIC_TOKENS_PARTIAL_RESULT,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<SemanticTokens>,
+    null_t,
+    std::unique_ptr<SemanticTokensPartialResult>
+  > TextDocumentSemanticTokensRangeResult;
+
+  typedef null_t WorkspaceSemanticTokensRefreshResult;
+
+  typedef ShowDocumentResult WindowShowDocumentResult;
+
+  enum class TextDocumentLinkedEditingRangeResultType {
+    LINKED_EDITING_RANGES,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<LinkedEditingRanges>,
+    null_t
+  > TextDocumentLinkedEditingRangeResult;
+
+  enum class WorkspaceWillCreateFilesResultType {
+    WORKSPACE_EDIT,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<WorkspaceEdit>,
+    null_t
+  > WorkspaceWillCreateFilesResult;
+
+  enum class WorkspaceWillRenameFilesResultType {
+    WORKSPACE_EDIT,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<WorkspaceEdit>,
+    null_t
+  > WorkspaceWillRenameFilesResult;
+
+  enum class WorkspaceWillDeleteFilesResultType {
+    WORKSPACE_EDIT,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<WorkspaceEdit>,
+    null_t
+  > WorkspaceWillDeleteFilesResult;
+
+  enum class TextDocumentMonikerResultType {
+    MONIKER_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<Moniker>>,
+    null_t
+  > TextDocumentMonikerResult;
+
+  enum class TextDocumentPrepareTypeHierarchyResultType {
+    TYPE_HIERARCHY_ITEM_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TypeHierarchyItem>>,
+    null_t
+  > TextDocumentPrepareTypeHierarchyResult;
+
+  enum class TypeHierarchySupertypesResultType {
+    TYPE_HIERARCHY_ITEM_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TypeHierarchyItem>>,
+    null_t
+  > TypeHierarchySupertypesResult;
+
+  enum class TypeHierarchySubtypesResultType {
+    TYPE_HIERARCHY_ITEM_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TypeHierarchyItem>>,
+    null_t
+  > TypeHierarchySubtypesResult;
+
+  enum class TextDocumentInlineValueResultType {
+    INLINE_VALUE_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<InlineValue>,
+    null_t
+  > TextDocumentInlineValueResult;
+
+  typedef null_t WorkspaceInlineValueRefreshResult;
+
+  enum class TextDocumentInlayHintResultType {
+    INLAY_HINT_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<InlayHint>>,
+    null_t
+  > TextDocumentInlayHintResult;
+
+  typedef InlayHint InlayHintResolveResult;
+
+  typedef null_t WorkspaceInlayHintRefreshResult;
+
+  enum class TextDocumentDiagnosticResultType {
+    DOCUMENT_DIAGNOSTIC_REPORT,
+    DOCUMENT_DIAGNOSTIC_REPORT_PARTIAL_RESULT,
+  };
+
+  typedef std::variant<
+    DocumentDiagnosticReport,
+    std::unique_ptr<DocumentDiagnosticReportPartialResult>
+  > TextDocumentDiagnosticResult;
+
+  enum class WorkspaceDiagnosticResultType {
+    WORKSPACE_DIAGNOSTIC_REPORT,
+    WORKSPACE_DIAGNOSTIC_REPORT_PARTIAL_RESULT,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<WorkspaceDiagnosticReport>,
+    std::unique_ptr<WorkspaceDiagnosticReportPartialResult>
+  > WorkspaceDiagnosticResult;
+
+  typedef null_t WorkspaceDiagnosticRefreshResult;
+
+  enum class TextDocumentInlineCompletionResultType {
+    INLINE_COMPLETION_LIST,
+    INLINE_COMPLETION_ITEM_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<InlineCompletionList>,
+    std::vector<std::unique_ptr<InlineCompletionItem>>,
+    null_t
+  > TextDocumentInlineCompletionResult;
+
+  typedef null_t ClientRegisterCapabilityResult;
+
+  typedef null_t ClientUnregisterCapabilityResult;
+
+  typedef null_t ShutdownResult;
+
+  enum class WindowShowMessageRequestResultType {
+    MESSAGE_ACTION_ITEM,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<MessageActionItem>,
+    null_t
+  > WindowShowMessageRequestResult;
+
+  enum class TextDocumentWillSaveWaitUntilResultType {
+    TEXT_EDIT_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TextEdit>>,
+    null_t
+  > TextDocumentWillSaveWaitUntilResult;
+
+  enum class TextDocumentCompletionResultType {
+    COMPLETION_ITEM_ARRAY,
+    COMPLETION_LIST,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<CompletionItem>>,
+    std::unique_ptr<CompletionList>,
+    null_t
+  > TextDocumentCompletionResult;
+
+  typedef CompletionItem CompletionItemResolveResult;
+
+  enum class TextDocumentHoverResultType {
+    HOVER,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<Hover>,
+    null_t
+  > TextDocumentHoverResult;
+
+  enum class TextDocumentSignatureHelpResultType {
+    SIGNATURE_HELP,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<SignatureHelp>,
+    null_t
+  > TextDocumentSignatureHelpResult;
+
+  enum class TextDocumentDefinitionResultType {
+    DEFINITION,
+    DEFINITION_LINK_ARRAY,
+    NULL_TYPE,
+    LOCATION_ARRAY,
+  };
+
+  typedef std::variant<
+    Definition,
+    std::vector<std::unique_ptr<DefinitionLink>>,
+    null_t,
+    std::vector<std::unique_ptr<Location>>
+  > TextDocumentDefinitionResult;
+
+  enum class TextDocumentReferencesResultType {
+    LOCATION_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<Location>>,
+    null_t
+  > TextDocumentReferencesResult;
+
+  enum class TextDocumentDocumentHighlightResultType {
+    DOCUMENT_HIGHLIGHT_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<DocumentHighlight>>,
+    null_t
+  > TextDocumentDocumentHighlightResult;
+
+  enum class TextDocumentCodeActionResult_0Type {
+    COMMAND,
+    CODE_ACTION,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<Command>,
+    std::unique_ptr<CodeAction>
+  > TextDocumentCodeActionResult_0;
+
+  enum class TextDocumentCodeActionResultType {
+    COMMAND_OR_CODE_ACTION_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<TextDocumentCodeActionResult_0>,
+    null_t
+  > TextDocumentCodeActionResult;
+
+  typedef CodeAction CodeActionResolveResult;
+
+  enum class WorkspaceSymbolResultType {
+    SYMBOL_INFORMATION_ARRAY,
+    WORKSPACE_SYMBOL_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<SymbolInformation>>,
+    std::vector<std::unique_ptr<WorkspaceSymbol>>,
+    null_t
+  > WorkspaceSymbolResult;
+
+  typedef WorkspaceSymbol WorkspaceSymbolResolveResult;
+
+  enum class TextDocumentCodeLensResultType {
+    CODE_LENS_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<CodeLens>>,
+    null_t
+  > TextDocumentCodeLensResult;
+
+  typedef CodeLens CodeLensResolveResult;
+
+  typedef null_t WorkspaceCodeLensRefreshResult;
+
+  enum class TextDocumentDocumentLinkResultType {
+    DOCUMENT_LINK_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<DocumentLink>>,
+    null_t
+  > TextDocumentDocumentLinkResult;
+
+  typedef DocumentLink DocumentLinkResolveResult;
+
+  enum class TextDocumentFormattingResultType {
+    TEXT_EDIT_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TextEdit>>,
+    null_t
+  > TextDocumentFormattingResult;
+
+  enum class TextDocumentRangeFormattingResultType {
+    TEXT_EDIT_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TextEdit>>,
+    null_t
+  > TextDocumentRangeFormattingResult;
+
+  enum class TextDocumentRangesFormattingResultType {
+    TEXT_EDIT_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TextEdit>>,
+    null_t
+  > TextDocumentRangesFormattingResult;
+
+  enum class TextDocumentOnTypeFormattingResultType {
+    TEXT_EDIT_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<TextEdit>>,
+    null_t
+  > TextDocumentOnTypeFormattingResult;
+
+  enum class TextDocumentRenameResultType {
+    WORKSPACE_EDIT,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<WorkspaceEdit>,
+    null_t
+  > TextDocumentRenameResult;
+
+  enum class TextDocumentPrepareRenameResultType {
+    PREPARE_RENAME_RESULT,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    PrepareRenameResult,
+    null_t
+  > TextDocumentPrepareRenameResult;
+
+  enum class WorkspaceExecuteCommandResultType {
+    ANY_TYPE,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::unique_ptr<LSPAny>,
+    null_t
+  > WorkspaceExecuteCommandResult;
+
+  typedef ApplyWorkspaceEditResult WorkspaceApplyEditResult;
+
+  enum class IncomingRequest
+  {
     CALL_HIERARCHY_INCOMING_CALLS,
     CALL_HIERARCHY_OUTGOING_CALLS,
+    CODE_ACTION_RESOLVE,
     CODE_LENS_RESOLVE,
+    COMPLETION_ITEM_RESOLVE,
     DOCUMENT_LINK_RESOLVE,
     INITIALIZE,
+    INLAY_HINT_RESOLVE,
     SHUTDOWN,
+    TEXT_DOCUMENT_CODE_ACTION,
     TEXT_DOCUMENT_CODE_LENS,
+    TEXT_DOCUMENT_COLOR_PRESENTATION,
+    TEXT_DOCUMENT_COMPLETION,
     TEXT_DOCUMENT_DECLARATION,
     TEXT_DOCUMENT_DEFINITION,
+    TEXT_DOCUMENT_DIAGNOSTIC,
+    TEXT_DOCUMENT_DOCUMENT_COLOR,
     TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT,
     TEXT_DOCUMENT_DOCUMENT_LINK,
     TEXT_DOCUMENT_DOCUMENT_SYMBOL,
     TEXT_DOCUMENT_FOLDING_RANGE,
+    TEXT_DOCUMENT_FORMATTING,
     TEXT_DOCUMENT_HOVER,
     TEXT_DOCUMENT_IMPLEMENTATION,
+    TEXT_DOCUMENT_INLAY_HINT,
+    TEXT_DOCUMENT_INLINE_COMPLETION,
+    TEXT_DOCUMENT_INLINE_VALUE,
+    TEXT_DOCUMENT_LINKED_EDITING_RANGE,
+    TEXT_DOCUMENT_MONIKER,
+    TEXT_DOCUMENT_ON_TYPE_FORMATTING,
     TEXT_DOCUMENT_PREPARE_CALL_HIERARCHY,
+    TEXT_DOCUMENT_PREPARE_RENAME,
     TEXT_DOCUMENT_PREPARE_TYPE_HIERARCHY,
+    TEXT_DOCUMENT_RANGES_FORMATTING,
+    TEXT_DOCUMENT_RANGE_FORMATTING,
     TEXT_DOCUMENT_REFERENCES,
+    TEXT_DOCUMENT_RENAME,
     TEXT_DOCUMENT_SELECTION_RANGE,
     TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL,
+    TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL_DELTA,
+    TEXT_DOCUMENT_SEMANTIC_TOKENS_RANGE,
+    TEXT_DOCUMENT_SIGNATURE_HELP,
     TEXT_DOCUMENT_TYPE_DEFINITION,
     TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL,
     TYPE_HIERARCHY_SUBTYPES,
     TYPE_HIERARCHY_SUPERTYPES,
-    WORKSPACE_CODE_LENS_REFRESH,
+    WORKSPACE_DIAGNOSTIC,
     WORKSPACE_EXECUTE_COMMAND,
     WORKSPACE_SYMBOL,
     WORKSPACE_SYMBOL_RESOLVE,
     WORKSPACE_WILL_CREATE_FILES,
+    WORKSPACE_WILL_DELETE_FILES,
     WORKSPACE_WILL_RENAME_FILES,
   };
 
-  extern std::map<RequestMethod, std::string> RequestMethodNames;
+  extern std::map<IncomingRequest, std::string> IncomingRequestNames;
+  extern std::map<IncomingRequest, std::string> IncomingRequestValues;
 
-  extern std::map<RequestMethod, std::string> RequestMethodValues;
+  auto incomingRequestByName(const std::string &name) -> IncomingRequest;
+  auto incomingRequestByValue(const std::string &value) -> IncomingRequest;
+  auto isIncomingRequest(const std::string &value) -> bool;
 
-  auto requestMethodByName(const std::string &name) -> RequestMethod;
+  enum class OutgoingRequest
+  {
+    CLIENT_REGISTER_CAPABILITY,
+    CLIENT_UNREGISTER_CAPABILITY,
+    WINDOW_SHOW_DOCUMENT,
+    WINDOW_SHOW_MESSAGE_REQUEST,
+    WINDOW_WORK_DONE_PROGRESS_CREATE,
+    WORKSPACE_APPLY_EDIT,
+    WORKSPACE_CODE_LENS_REFRESH,
+    WORKSPACE_CONFIGURATION,
+    WORKSPACE_DIAGNOSTIC_REFRESH,
+    WORKSPACE_FOLDING_RANGE_REFRESH,
+    WORKSPACE_INLAY_HINT_REFRESH,
+    WORKSPACE_INLINE_VALUE_REFRESH,
+    WORKSPACE_SEMANTIC_TOKENS_REFRESH,
+    WORKSPACE_WORKSPACE_FOLDERS,
+  };
 
-  auto requestMethodByValue(const std::string &value) -> RequestMethod;
+  extern std::map<OutgoingRequest, std::string> OutgoingRequestNames;
+  extern std::map<OutgoingRequest, std::string> OutgoingRequestValues;
 
-  auto isRequestMethod(const std::string &name) -> bool;
+  auto outgoingRequestByName(const std::string &name) -> OutgoingRequest;
+  auto outgoingRequestByValue(const std::string &value) -> OutgoingRequest;
 
-  enum class NotificationMethod {
-    CANCEL_REQUEST,
+  enum class IncomingNotification
+  {
     EXIT,
     INITIALIZED,
     NOTEBOOK_DOCUMENT_DID_CHANGE,
@@ -15537,6 +9859,7 @@ namespace LCompilers::LanguageServerProtocol {
     TEXT_DOCUMENT_DID_CLOSE,
     TEXT_DOCUMENT_DID_OPEN,
     TEXT_DOCUMENT_DID_SAVE,
+    TEXT_DOCUMENT_WILL_SAVE,
     WINDOW_WORK_DONE_PROGRESS_CANCEL,
     WORKSPACE_DID_CHANGE_CONFIGURATION,
     WORKSPACE_DID_CHANGE_WATCHED_FILES,
@@ -15546,110 +9869,118 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_DID_RENAME_FILES,
   };
 
-  extern std::map<NotificationMethod, std::string> NotificationMethodNames;
+  extern std::map<IncomingNotification, std::string> IncomingNotificationNames;
+  extern std::map<IncomingNotification, std::string> IncomingNotificationValues;
 
-  extern std::map<NotificationMethod, std::string> NotificationMethodValues;
+  auto incomingNotificationByName(const std::string &name) -> IncomingNotification;
+  auto incomingNotificationByValue(const std::string &value) -> IncomingNotification;
+  auto isIncomingNotification(const std::string &value) -> bool;
 
-  auto notificationMethodByName(const std::string &name) -> NotificationMethod;
-
-  auto notificationMethodByValue(const std::string &value) -> NotificationMethod;
-
-  auto isNotificationMethod(const std::string &name) -> bool;
-
-  // Requests from the server to the client
-  enum class ServerRequestMethod {
-    CLIENT_REGISTER_CAPABILITY,
-    CLIENT_UNREGISTER_CAPABILITY,
-    WINDOW_LOG_MESSAGE,
-    WINDOW_SHOW_DOCUMENT,
-    WINDOW_SHOW_MESSAGE_REQUEST,
-    WINDOW_WORK_DONE_PROGRESS_CREATE,
-    WORKSPACE_APPLY_EDIT,
-    WORKSPACE_CONFIGURATION,
-  };
-
-  extern std::map<ServerRequestMethod, std::string> ServerRequestMethodNames;
-
-  extern std::map<ServerRequestMethod, std::string> ServerRequestMethodValues;
-
-  auto serverRequestMethodByName(const std::string &name) -> ServerRequestMethod;
-
-  auto serverRequestMethodByValue(const std::string &value) -> ServerRequestMethod;
-
-  auto isServerRequestMethod(const std::string &name) -> bool;
-
-  // Notifications from the server to the client
-  enum class ServerNotificationMethod {
+  enum class OutgoingNotification
+  {
     LOG_TRACE,
-    PROGRESS,
     TELEMETRY_EVENT,
     TEXT_DOCUMENT_PUBLISH_DIAGNOSTICS,
+    WINDOW_LOG_MESSAGE,
     WINDOW_SHOW_MESSAGE,
   };
 
-  extern std::map<ServerNotificationMethod, std::string> ServerNotificationMethodNames;
+  extern std::map<OutgoingNotification, std::string> OutgoingNotificationNames;
+  extern std::map<OutgoingNotification, std::string> OutgoingNotificationValues;
 
-  extern std::map<ServerNotificationMethod, std::string> ServerNotificationMethodValues;
+  auto outgoingNotificationByName(const std::string &name) -> OutgoingNotification;
+  auto outgoingNotificationByValue(const std::string &value) -> OutgoingNotification;
 
-  auto serverNotificationMethodByName(const std::string &name) -> ServerNotificationMethod;
+  struct DocumentSymbol;  // forward declaration
 
-  auto serverNotificationMethodByValue(const std::string &value) -> ServerNotificationMethod;
+  enum class TextDocumentDocumentSymbolResultType {
+    SYMBOL_INFORMATION_ARRAY,
+    DOCUMENT_SYMBOL_ARRAY,
+    NULL_TYPE,
+  };
 
-  auto isServerNotificationMethod(const std::string &name) -> bool;
+  typedef std::variant<
+    std::vector<std::unique_ptr<SymbolInformation>>,
+    std::vector<std::unique_ptr<DocumentSymbol>>,
+    null_t
+  > TextDocumentDocumentSymbolResult;
 
-  // Implementation Considerations
-  // Language servers usually run in a separate process and clients communicate
-  // with them in an asynchronous fashion. Additionally clients usually allow
-  // users to interact with the source code even if request results are pending.
-  // We recommend the following implementation pattern to avoid that clients
-  // apply outdated response results:
-  // - if a client sends a request to the server and the client state changes in
-  //   a way that it invalidates the response it should do the following:
-  //   - cancel the server request and ignore the result if the result is not
-  //     useful for the client anymore. If necessary the client should resend
-  //     the request.
-  //   - keep the request running if the client can still make use of the result
-  //     by, for example, transforming it to a new result by applying the state
-  //     change to the result.
-  // - servers should therefore not decide by themselves to cancel requests
-  //   simply due to that fact that a state change notification is detected in
-  //   the queue. As said the result could still be useful for the client.
-  // - if a server detects an internal state change (for example, a project
-  //   context changed) that invalidates the result of a request in execution
-  //   the server can error these requests with ContentModified. If clients
-  //   receive a ContentModified error, it generally should not show it in the
-  //   UI for the end-user. Clients can resend the request if they know how to
-  //   do so. It should be noted that for all position based requests it might
-  //   be especially hard for clients to re-craft a request.
-  // - a client should not send resolve requests for out of date objects (for
-  //   example, code lenses, …). If a server receives a resolve request for an
-  //   out of date object the server can error these requests with
-  //   ContentModified.
-  // - if a client notices that a server exits unexpectedly, it should try to
-  //   restart the server. However clients should be careful not to restart a
-  //   crashing server endlessly. VS Code, for example, doesn’t restart a server
-  //   which has crashed 5 times in the last 180 seconds.
-  //
-  // Servers usually support different communication channels (e.g. stdio,
-  // pipes, …). To ease the usage of servers in different clients it is highly
-  // recommended that a server implementation supports the following command
-  // line arguments to pick the communication channel:
-  // - stdio: uses stdio as the communication channel.
-  // - pipe: use pipes (Windows) or socket files (Linux, Mac) as the
-  //   communication channel. The pipe / socket file name is passed as the next
-  //   arg or with --pipe=.
-  // - socket: uses a socket as the communication channel. The port is passed as
-  //   next arg or with --port=.
-  // - node-ipc: use node IPC communication between the client and the server.
-  //   This is only supported if both client and server run under node.
-  //
-  // To support the case that the editor starting a server crashes an editor
-  // should also pass its process id to the server. This allows the server to
-  // monitor the editor process and to shutdown itself if the editor process
-  // dies. The process id passed on the command line should be the same as the
-  // one passed in the initialize parameters. The command line argument to use
-  // is --clientProcessId.
+  /**
+   * Represents programming constructs like variables, classes, interfaces etc.
+   * that appear in a document. Document symbols can be hierarchical and they
+   * have two ranges: one that encloses its definition and one that points to
+   * its most interesting range, e.g. the range of an identifier.
+   */
+  struct DocumentSymbol
+  {
+    /**
+     * The name of this symbol. Will be displayed in the user interface and therefore must not be
+     * an empty string or a string only consisting of white spaces.
+     */
+    string_t name;
+    /**
+     * More detail for this symbol, e.g the signature of a function.
+     */
+    std::optional<string_t> detail;
+    /**
+     * The kind of this symbol.
+     */
+    SymbolKind kind;
+    /**
+     * Tags for this document symbol.
+     *
+     * @since 3.16.0
+     */
+    std::optional<std::vector<SymbolTag>> tags;
+    /**
+     * Indicates if this symbol is deprecated.
+     *
+     * @deprecated Use tags instead
+     */
+    std::optional<boolean_t> deprecated;
+    /**
+     * The range enclosing this symbol not including leading/trailing whitespace but everything else
+     * like comments. This information is typically used to determine if the clients cursor is
+     * inside the symbol to reveal in the symbol in the UI.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The range that should be selected and revealed when this symbol is being picked, e.g the name of a function.
+     * Must be contained by the `range`.
+     */
+    std::unique_ptr<Range> selectionRange;
+    /**
+     * Children of this symbol, e.g. properties of a class.
+     */
+    std::optional<std::vector<std::unique_ptr<DocumentSymbol>>> children;
+  };
+
+  struct SelectionRange;  // forward declaration
+
+  enum class TextDocumentSelectionRangeResultType {
+    SELECTION_RANGE_ARRAY,
+    NULL_TYPE,
+  };
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<SelectionRange>>,
+    null_t
+  > TextDocumentSelectionRangeResult;
+
+  /**
+   * A selection range represents a part of a selection hierarchy. A selection range
+   * may have a parent selection range that contains it.
+   */
+  struct SelectionRange
+  {
+    /**
+     * The {@link Range range} of this selection range.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The parent selection range containing this range. Therefore `parent.range` must contain `this.range`.
+     */
+    std::optional<std::unique_ptr<SelectionRange>> parent;
+  };
 
 } // namespace LCompilers::LanguageServerProtocol
-
-#endif // LCOMPILERS_LSP_SPECIFICATION_H
