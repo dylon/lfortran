@@ -16,8 +16,9 @@
 namespace LCompilers::LanguageServerProtocol {
 
   LspLanguageServer::LspLanguageServer(
-    ls::MessageQueue &outgoingMessages
-  ) : ls::LanguageServer(outgoingMessages)
+    ls::MessageQueue &outgoingMessages,
+    lsl::Logger &logger
+  ) : ls::LanguageServer(outgoingMessages, logger)
   {
     // empty
   }
@@ -105,7 +106,7 @@ namespace LCompilers::LanguageServerProtocol {
       }
     } catch (const LspException &e) {
       const std::source_location &where = e.where();
-      std::cerr
+      logger
         << "[" << where.file_name() << ":" << where.line() << ":" << where.column() << "] "
         << e.what()
         << std::endl;
@@ -126,7 +127,7 @@ namespace LCompilers::LanguageServerProtocol {
       error->message = e.what();
       response.error = std::move(error);
     } catch (const std::exception &e) {
-      std::cerr << "Caught unhandled exception: " << e.what() << std::endl;
+      logger << "Caught unhandled exception: " << e.what() << std::endl;
       std::unique_ptr<ResponseError> error =
         std::make_unique<ResponseError>();
       error->code = static_cast<int>(ErrorCodes::INTERNAL_ERROR);
@@ -1219,7 +1220,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::handleShutdown() -> ShutdownResult {
     bool shutdown = false;
     if (_shutdown.compare_exchange_strong(shutdown, true)) {
-      std::cerr << "Shutting down server." << std::endl;
+      logger << "Shutting down server." << std::endl;
     }
     return nullptr;
   }
@@ -1569,10 +1570,10 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::handleExit() -> void {
     bool exit = false;
     if (_exit.compare_exchange_strong(exit, true)) {
-      std::cerr << "Exiting server." << std::endl;
+      logger << "Exiting server." << std::endl;
       bool shutdown = false;
       if (_shutdown.compare_exchange_strong(shutdown, true)) {
-        std::cerr
+        logger
           << "Server exited before being notified to shutdown!"
           << std::endl;
       }
@@ -1601,7 +1602,7 @@ namespace LCompilers::LanguageServerProtocol {
       textDocuments.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(uri),
-        std::forward_as_tuple(uri, text)
+        std::forward_as_tuple(uri, text, logger)
       );
     }
   }

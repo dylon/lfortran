@@ -12,6 +12,7 @@
 #include <shared_mutex>
 
 #include <lsp/language_server.h>
+#include <lsp/logger.h>
 #include <lsp/lsp_serializer.h>
 #include <lsp/lsp_transformer.h>
 #include <lsp/specification.h>
@@ -19,12 +20,16 @@
 
 namespace LCompilers::LanguageServerProtocol {
   namespace ls = LCompilers::LanguageServer;
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   const std::string JSON_RPC_VERSION = "2.0";
 
   class LspLanguageServer : public ls::LanguageServer {
   public:
-    LspLanguageServer(ls::MessageQueue &outgoingMessages);
+    LspLanguageServer(
+      ls::MessageQueue &outgoingMessages,
+      lsl::Logger &logger
+    );
     std::string serve(const std::string &request) override;
     auto isInitialized() const -> bool;
     auto isShutdown() const -> bool;

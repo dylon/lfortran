@@ -7,11 +7,14 @@
 namespace LCompilers::LanguageServer::Threading {
   using namespace std::literals::chrono_literals;
 
-  ThreadPool::ThreadPool(std::size_t numThreads)
-    : numThreads(numThreads)
+  ThreadPool::ThreadPool(
+    std::size_t numThreads,
+    lsl::Logger &logger
+  ) : numThreads(numThreads)
+    , logger(logger)
   {
     for (std::size_t threadId = 0; threadId < numThreads; ++threadId) {
-      std::cerr << "Starting thread with id=" << threadId << std::endl;
+      logger << "Starting thread with id=" << threadId << std::endl;
       workers.emplace_back([this, threadId]() {
         run(threadId);
       });
@@ -49,7 +52,7 @@ namespace LCompilers::LanguageServer::Threading {
   auto ThreadPool::stop() -> void {
     {
       std::unique_lock<std::mutex> stderrLock(stderrMutex);
-      std::cerr
+      logger
         << "Thread pool will no longer accept new tasks and will shut down "
         << "once those pending have returned."
         << std::endl;
@@ -61,7 +64,7 @@ namespace LCompilers::LanguageServer::Threading {
   auto ThreadPool::stopNow() -> void {
     {
       std::unique_lock<std::mutex> stderrLock(stderrMutex);
-      std::cerr
+      logger
         << "Stopping thread pool as quickly as possible."
         << std::endl;
     }
@@ -92,7 +95,7 @@ namespace LCompilers::LanguageServer::Threading {
             task(threadId);
           } catch (std::exception &e) {
             std::unique_lock<std::mutex> stderrLock(stderrMutex);
-            std::cerr
+            logger
               << "[thread.id=" << threadId << "] "
               << "Failed to execute task: " << e.what()
               << std::endl;
@@ -101,14 +104,14 @@ namespace LCompilers::LanguageServer::Threading {
       }
       {
         std::unique_lock<std::mutex> stderrLock(stderrMutex);
-        std::cerr
+        logger
           << "[thread.id=" << threadId << "] "
           << "Shutting down thread."
           << std::endl;
       }
     } catch (std::exception &e) {
       std::unique_lock<std::mutex> stderrLock(stderrMutex);
-      std::cerr
+      logger
         << "[thread.id=" << threadId << "] "
         << "Unhandled exception caught: " << e.what()
         << std::endl;

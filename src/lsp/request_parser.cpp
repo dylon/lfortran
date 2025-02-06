@@ -2,6 +2,12 @@
 
 namespace LCompilers::LanguageServer {
 
+  RequestParser::RequestParser(lsl::Logger &logger)
+    : logger(logger)
+  {
+    // empty
+  }
+
   auto RequestParser::startLine() -> const std::string & {
     return _startLine;
   }
@@ -36,6 +42,12 @@ namespace LCompilers::LanguageServer {
       _error = "Finished prematurely.";
     }
     }
+  }
+
+  RequestParserFactory::RequestParserFactory(lsl::Logger &logger)
+    : logger(logger)
+  {
+    // empty
   }
 
 } // LCompilers::LanguageServer

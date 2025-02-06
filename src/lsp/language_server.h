@@ -5,13 +5,15 @@
 #include <string>
 #include <sstream>
 
+#include <lsp/logger.h>
 #include <lsp/message_queue.h>
 
 namespace LCompilers::LanguageServer {
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   class LanguageServer {
   public:
-    LanguageServer(MessageQueue &outgoingMessages);
+    LanguageServer(MessageQueue &outgoingMessages, lsl::Logger &logger);
     virtual std::string serve(const std::string &request) = 0;
     virtual bool isTerminated() const = 0;
     virtual void prepare(
@@ -24,6 +26,7 @@ namespace LCompilers::LanguageServer {
     ) const = 0;
   protected:
     MessageQueue &outgoingMessages;
+    lsl::Logger &logger;
   };
 
 } // namespace LCompilers::LanguageServer

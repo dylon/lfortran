@@ -7,8 +7,9 @@
 
 namespace LCompilers::LanguageServerProtocol {
 
-  LspRequestParser::LspRequestParser(bool interactive)
-    : interactive(interactive)
+  LspRequestParser::LspRequestParser(bool interactive, lsl::Logger &logger)
+    : RequestParser(logger)
+    , interactive(interactive)
   {
     // empty
   }
@@ -506,14 +507,17 @@ namespace LCompilers::LanguageServerProtocol {
     return true;
   }
 
-  LspRequestParserFactory::LspRequestParserFactory(bool interactive)
-    : interactive(interactive)
+  LspRequestParserFactory::LspRequestParserFactory(
+    bool interactive,
+    lsl::Logger &logger
+  ) : RequestParserFactory(logger)
+    , interactive(interactive)
   {
     // empty
   }
 
   std::unique_ptr<ls::RequestParser> LspRequestParserFactory::build() {
-    return std::make_unique<LspRequestParser>(interactive);
+    return std::make_unique<LspRequestParser>(interactive, logger);
   }
 
 } // namespace LCompilers::LanguageServerProtocol

@@ -4,15 +4,17 @@
 #include <cstddef>
 #include <sstream>
 
+#include <lsp/logger.h>
 #include <lsp/request_parser.h>
 
 namespace LCompilers::LanguageServerProtocol {
 
   namespace ls = LCompilers::LanguageServer;
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   class LspRequestParser : public ls::RequestParser {
   public:
-    LspRequestParser(bool interactive);
+    LspRequestParser(bool interactive, lsl::Logger &logger);
     bool parse(unsigned char c) override;
   private:
     bool interactive;
@@ -34,7 +36,7 @@ namespace LCompilers::LanguageServerProtocol {
 
   class LspRequestParserFactory : public ls::RequestParserFactory {
   public:
-    LspRequestParserFactory(bool interactive);
+    LspRequestParserFactory(bool interactive, lsl::Logger &logger);
     std::unique_ptr<ls::RequestParser> build() override;
   private:
     bool interactive;

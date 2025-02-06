@@ -5,7 +5,10 @@
 #include <memory>
 #include <string>
 
+#include <lsp/logger.h>
+
 namespace LCompilers::LanguageServer {
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   enum class RequestParserState {
     INITIAL = 0,
@@ -48,6 +51,7 @@ namespace LCompilers::LanguageServer {
 
   class RequestParser {
   public:
+    RequestParser(lsl::Logger &logger);
     auto startLine() -> const std::string &;
     auto headers() -> const std::map<std::string, std::string> &;
     auto body() -> const std::string &;
@@ -59,6 +63,7 @@ namespace LCompilers::LanguageServer {
     virtual bool parse(unsigned char c) = 0;
 
   protected:
+    lsl::Logger &logger;
     std::string _startLine = "";
     std::map<std::string, std::string> _headers;
     std::string _body = "";
@@ -72,7 +77,10 @@ namespace LCompilers::LanguageServer {
 
   class RequestParserFactory {
   public:
+    RequestParserFactory(lsl::Logger &logger);
     virtual std::unique_ptr<RequestParser> build() = 0;
+  protected:
+    lsl::Logger &logger;
   };
 
 } // namespace LCompilers::LanguageServer

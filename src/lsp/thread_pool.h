@@ -10,13 +10,16 @@
 #include <thread>
 #include <vector>
 
+#include <lsp/logger.h>
+
 namespace LCompilers::LanguageServer::Threading {
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   typedef std::function<void(const std::size_t threadId)> Task;
 
   class ThreadPool {
   public:
-    ThreadPool(std::size_t numThreads);
+    ThreadPool(std::size_t numThreads, lsl::Logger &logger);
     auto execute(Task task) -> bool;
     auto getNumThreads() -> std::size_t;
     auto isRunning() -> bool;
@@ -27,6 +30,7 @@ namespace LCompilers::LanguageServer::Threading {
     auto getStderrMutex() -> std::mutex &;
   protected:
     std::size_t numThreads;
+    lsl::Logger &logger;
     std::mutex stdoutMutex;
     std::mutex stderrMutex;
     std::vector<std::thread> workers;

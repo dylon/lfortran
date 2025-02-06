@@ -4,6 +4,12 @@
 
 namespace LCompilers::LanguageServer {
 
+  MessageQueue::MessageQueue(lsl::Logger &logger)
+    : logger(logger)
+  {
+    // empty
+  }
+
   auto MessageQueue::enqueue(const std::string &message) -> bool {
     std::unique_lock<std::mutex> lock(mutex);
     while ((_size == MESSAGE_QUEUE_CAPACITY) && running) {

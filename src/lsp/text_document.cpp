@@ -12,15 +12,17 @@ namespace LCompilers::LanguageServerProtocol {
 
   TextDocument::TextDocument(
     const DocumentUri &uri,
-    const std::string &text
-  ) : _uri(uri)
+    const std::string &text,
+    lsl::Logger &logger
+  ) : logger(logger)
+    , _uri(uri)
     , _text(text)
   {
     validateUriAndSetPath();
-    std::cerr  // DEBUG
-      << "================================================================================" << std::endl
-      << _text
-      << "================================================================================" << std::endl;
+    // logger  // DEBUG
+    //   << "================================================================================" << std::endl
+    //   << _text
+    //   << "================================================================================" << std::endl;
     indexLines();
   }
 
@@ -44,10 +46,10 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::setText(const std::string &text) -> void {
     std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
     _text = text;
-    std::cerr  // DEBUG
-      << "================================================================================" << std::endl
-      << _text
-      << "================================================================================" << std::endl;
+    // logger  // DEBUG
+    //   << "================================================================================" << std::endl
+    //   << _text
+    //   << "================================================================================" << std::endl;
     indexLines();
   }
 
@@ -73,21 +75,21 @@ namespace LCompilers::LanguageServerProtocol {
         std::string patch;
         decompose(change, j, k, patch);
         if (i < _text.length()) {
-          // std::cerr
+          // logger
           //   << "text[" << i << ":" << j << "] "
           //   << "= text.substr(" << i << ", " << (j - i) << ") "
           //   << "= \"" << _text.substr(i, (j - i)) << "\""
           //   << std::endl;
           ss << _text.substr(i, (j - i));
         }
-        // std::cerr
+        // logger
         //   << "text[" << j << ":" << k << "] = \"" << patch << "\""
         //   << std::endl;
         ss << patch;
         i = k;
       }
       if (i < _text.length()) {
-        // std::cerr
+        // logger
         //   << "text[" << i << ":" << _text.length() << "] "
         //   << "= text.substr(" << i << ", " << (_text.length() - i) << ") "
         //   << "= \"" << _text.substr(i, (_text.length() - i)) << "\""
@@ -102,7 +104,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::indexLines() -> void {
     lineIndices.clear();
     lineIndices.push_back(0);
-    // std::cerr << "lineIndices[0] = 0" << std::endl;
+    // logger << "lineIndices[0] = 0" << std::endl;
     for (std::size_t index = 0; index < _text.length(); ++index) {
       unsigned char c = _text[index];
       switch (c) {
@@ -112,7 +114,7 @@ namespace LCompilers::LanguageServerProtocol {
         }
       } // fallthrough
       case '\n': {
-        // std::cerr << "lineIndices[" << lineIndices.size() << "] = " << (index + 1) << std::endl;
+        // logger << "lineIndices[" << lineIndices.size() << "] = " << (index + 1) << std::endl;
         lineIndices.push_back(index + 1);
       }
       }

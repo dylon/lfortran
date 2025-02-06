@@ -155,6 +155,16 @@ def rename_type(old_name: str) -> str:
     new_name = f"{new_name}_t"
   return new_name
 
+@memoize
+def any_enum(type_name: str) -> str:
+  match type_name:
+    case "object" | "array" | "string" | "integer" | "uinteger" | "decimal" | "boolean" | "null":
+      return rename_enum(type_name)
+    case "URI" | "DocumentUri" | "RegExp":
+      return rename_enum("string")
+    case _:
+      return rename_enum("object")
+
 def as_enumeration_spec(type_name: str, enumeration: List[Tuple[str, str]]) -> Dict[str, Any]:
   return {
     "name": type_name,
@@ -1436,6 +1446,8 @@ namespace {self.namespace} {{
     NULL_TYPE = 7,
   }};
 
+  extern std::map<LSPAnyType, std::string> LSPAnyTypeNames;
+
   typedef std::variant<
     LSPObject,
     LSPArray,
@@ -1856,6 +1868,20 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
       as_enumeration_spec("OutgoingNotification", outgoing_notifications)
     )
 
+  def generate_lsp_any_type_names(self: Self) -> None:
+    self.write('std::map<LSPAnyType, std::string> LSPAnyTypeNames = {')
+    with self.indent():
+      self.write('{LSPAnyType::OBJECT_TYPE, "OBJECT_TYPE"},')
+      self.write('{LSPAnyType::ARRAY_TYPE, "ARRAY_TYPE"},')
+      self.write('{LSPAnyType::STRING_TYPE, "STRING_TYPE"},')
+      self.write('{LSPAnyType::INTEGER_TYPE, "INTEGER_TYPE"},')
+      self.write('{LSPAnyType::UINTEGER_TYPE, "UINTEGER_TYPE"},')
+      self.write('{LSPAnyType::DECIMAL_TYPE, "DECIMAL_TYPE"},')
+      self.write('{LSPAnyType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},')
+      self.write('{LSPAnyType::NULL_TYPE, "NULL_TYPE"},')
+    self.write('};')
+    self.newline()
+
   def generate_code(self: Self) -> None:
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
@@ -1868,6 +1894,7 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
     self.write('#include <lsp/specification.h>')
     self.write(f'namespace {self.namespace} {{')
     with self.indent():
+      self.generate_lsp_any_type_names()
       self.generate_enumerations()
       self.generate_structures()
       self.generate_type_aliases()
@@ -2137,6 +2164,7 @@ class CPlusPlusLspTransformerHeaderGenerator(CPlusPlusFileGenerator):
               self.write(f'auto anyTo{upper_first_char(alias_name)}(')
               with self.indent():
                 self.write('const LSPAny &any')
+              # self.write(f') const -> {rename_type(alias_name)};')
               self.inline(') const -> ', indent=True)
               self.generate_type_declaration(type_spec)
               self.inline(';', end='\n')
@@ -2226,28 +2254,62 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
         self.write('const LSPAny &any')
       self.write(f') const -> {enum_name} {{')
       with self.indent():
-        self.inline('if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::', indent=True)
-        self.inline(enumerator)
-        self.inline(') {', end='\n')
-        with self.indent():
-          self.write('throw LspException(')
-          with self.indent():
-            self.write('ErrorCodes::INVALID_PARAMS,')
-            self.write('std::format(')
-            with self.indent():
-              self.write(f'"LSPAnyType for a(n) {enum_name} must be of type {{}} but received type {{}}",')
-              self.write(f'static_cast<int>(LSPAnyType::{enumerator}),')
-              self.write('any.index()')
-            self.write(')')
-          self.write(');')
-        self.write('}')
-        if type_name == "string":
-          self.write(f'const {value_type} &value = std::get<std::string>(any);')
-        else:
-          self.write(f'{value_type} value = std::get<int>(any);')
         self.write('try {')
         with self.indent():
-          self.write(f'return {inst_name}ByValue(value);')
+          self.write('switch (static_cast<LSPAnyType>(any.index())) {')
+          match type_name:
+            case "string":
+              self.write(f'case LSPAnyType::{any_enum("string")}: {{')
+              with self.indent():
+                self.write(f'const {value_type} &value = std::get<std::string>(any);')
+                self.write(f'return {inst_name}ByValue(value);')
+                self.write('break;')
+              self.write('}')
+            case "integer":
+              self.write(f'case LSPAnyType::{any_enum("integer")}: {{')
+              with self.indent():
+                self.write(f'{value_type} value = std::get<{value_type}>(any);')
+                self.write(f'return {inst_name}ByValue(value);')
+                self.write('break;')
+              self.write('}')
+              self.write(f'case LSPAnyType::{any_enum("uinteger")}: {{')
+              with self.indent():
+                self.write(f'{value_type} value = static_cast<{value_type}>(')
+                with self.indent(): self.write(f'std::get<{rename_type("uinteger")}>(any)')
+                self.write(');')
+                self.write(f'return {inst_name}ByValue(value);')
+                self.write('break;')
+              self.write('}')
+            case "uinteger":
+              self.write(f'case LSPAnyType::{any_enum("uinteger")}: {{')
+              with self.indent():
+                self.write(f'{value_type} value = std::get<{value_type}>(any);')
+                self.write(f'return {inst_name}ByValue(value);')
+                self.write('break;')
+              self.write('}')
+              self.write(f'case LSPAnyType::{any_enum("integer")}: {{')
+              with self.indent():
+                self.write(f'{value_type} value = static_cast<{value_type}>(')
+                with self.indent(): self.write(f'std::get<{rename_type("integer")}>(any)')
+                self.write(');')
+                self.write(f'return {inst_name}ByValue(value);')
+                self.write('break;')
+              self.write('}')
+            case _:
+              raise ValueError(f'Unsupported enumeration type ({type_name}): {enum_spec}')
+          self.write('default: {')
+          with self.indent():
+            self.write('throw LspException(')
+            with self.indent():
+              self.write('ErrorCodes::INVALID_PARAMS,')
+              self.write('std::format(')
+              with self.indent():
+                self.write(f'"LSPAnyType for a(n) {enum_name} must be of type LSPAnyType::{enumerator} but received type {{}}",')
+                self.write('LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))')
+              self.write(')')
+            self.write(');')
+          self.write('}')
+          self.write('}')
         self.write('} catch (std::invalid_argument &e) {')
         with self.indent():
           self.write('throw LspException(')
@@ -3456,6 +3518,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
     self.write(f'auto LspTransformer::anyTo{upper_first_char(alias_name)}(')
     with self.indent():
       self.write('const LSPAny &any')
+    # self.write(f') const -> {rename_type(alias_name)} {{')
     self.inline(') const -> ', indent=True)
     self.generate_type_declaration(alias_spec["type"])
     self.inline(' {', end='\n')
@@ -3463,9 +3526,59 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       type_spec = alias_spec["type"]
       match type_spec["kind"]:
         case "base":
-          self.inline('return std::get<', indent=True)
-          self.inline(rename_type(type_spec["name"]))
-          self.inline('>(any);', end='\n')
+          type_name = type_spec["name"]
+          type_enum = any_enum(alias_name)
+          self.write('switch (static_cast<LSPAnyType>(any.index())) {')
+          self.write(f'case LSPAnyType::{type_enum}: {{')
+          with self.indent():
+            self.inline('return std::get<', indent=True)
+            self.inline(rename_type(alias_name))
+            self.inline('>(any);', end='\n')
+          self.write('}')
+          match alias_name:
+            case "integer":
+              integer_type = rename_type("integer")
+              self.write(f'case LSPAnyType::{rename_enum("uinteger")}: {{')
+              with self.indent():
+                uinteger_type = rename_type("uinteger")
+                self.write(f'{uinteger_type} value = std::get<{uinteger_type}>(any);')
+                self.write(f'return static_cast<{integer_type}>(value);')
+              self.write('}')
+            case "uinteger":
+              uinteger_type = rename_type("uinteger")
+              self.write(f'case LSPAnyType::{rename_enum("integer")}: {{')
+              with self.indent():
+                integer_type = rename_type("integer")
+                self.write(f'{integer_type} value = std::get<{integer_type}>(any);')
+                self.write(f'return static_cast<{uinteger_type}>(value);')
+              self.write('}')
+            case "decimal":
+              decimal_type = rename_type("decimal")
+              self.write(f'case LSPAnyType::{rename_enum("integer")}: {{')
+              with self.indent():
+                integer_type = rename_type("integer")
+                self.write(f'{integer_type} value = std::get<{integer_type}>(any);')
+                self.write(f'return static_cast<{decimal_type}>(value);')
+              self.write('}')
+              self.write(f'case LSPAnyType::{rename_enum("uinteger")}: {{')
+              with self.indent():
+                uinteger_type = rename_type("uinteger")
+                self.write(f'{uinteger_type} value = std::get<{uinteger_type}>(any);')
+                self.write(f'return static_cast<{decimal_type}>(value);')
+              self.write('}')
+          self.write('default: {')
+          with self.indent():
+            self.write('throw LspException(')
+            with self.indent():
+              self.write('ErrorCodes::INVALID_PARAMS,')
+              self.write('std::format(')
+              with self.indent():
+                self.write(f'"Cannot transform LSPAny of type LSPAnyType::{{}} to type {rename_type(alias_name)}",')
+                self.write('LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))')
+              self.write(')')
+            self.write(');')
+          self.write('}')
+          self.write('}')
         case "reference":
           self.inline('return anyTo', indent=True)
           self.generate_upper_type_name(type_spec)
@@ -4300,6 +4413,7 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     self.write('#include <shared_mutex>')
     self.newline()
     self.write('#include <lsp/language_server.h>')
+    self.write('#include <lsp/logger.h>')
     self.write('#include <lsp/lsp_serializer.h>')
     self.write('#include <lsp/lsp_transformer.h>')
     self.write('#include <lsp/specification.h>')
@@ -4308,13 +4422,18 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     self.write(f'namespace {self.namespace} {{')
     with self.indent():
       self.write('namespace ls = LCompilers::LanguageServer;')
+      self.write('namespace lsl = LCompilers::LanguageServer::Logging;')
       self.newline()
       self.write('const std::string JSON_RPC_VERSION = "2.0";')
       self.newline()
       self.write('class LspLanguageServer : public ls::LanguageServer {')
       self.write('public:')
       with self.indent():
-        self.write('LspLanguageServer(ls::MessageQueue &outgoingMessages);')
+        self.write('LspLanguageServer(')
+        with self.indent():
+          self.write('ls::MessageQueue &outgoingMessages,')
+          self.write('lsl::Logger &logger')
+        self.write(');')
         self.write('std::string serve(const std::string &request) override;')
         self.write('auto isInitialized() const -> bool;')
         self.write('auto isShutdown() const -> bool;')
@@ -4367,8 +4486,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
   def generate_constructor(self: Self) -> None:
     self.write('LspLanguageServer::LspLanguageServer(')
     with self.indent():
-      self.write('ls::MessageQueue &outgoingMessages')
-    self.write(') : ls::LanguageServer(outgoingMessages)')
+      self.write('ls::MessageQueue &outgoingMessages,')
+      self.write('lsl::Logger &logger')
+    self.write(') : ls::LanguageServer(outgoingMessages, logger)')
     self.write('{')
     with self.indent():
       self.write('// empty')
@@ -4488,7 +4608,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('} catch (const LspException &e) {')
       with self.indent():
         self.write('const std::source_location &where = e.where();')
-        self.write('std::cerr')
+        self.write('logger')
         with self.indent():
           self.write('<< "[" << where.file_name() << ":" << where.line() << ":" << where.column() << "] "')
           self.write('<< e.what()')
@@ -4514,7 +4634,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('response.error = std::move(error);')
       self.write('} catch (const std::exception &e) {')
       with self.indent():
-        self.write('std::cerr << "Caught unhandled exception: " << e.what() << std::endl;')
+        self.write('logger << "Caught unhandled exception: " << e.what() << std::endl;')
         self.write('std::unique_ptr<ResponseError> error =')
         with self.indent():
           self.write('std::make_unique<ResponseError>();')
@@ -4844,7 +4964,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               self.write('bool shutdown = false;')
               self.write('if (_shutdown.compare_exchange_strong(shutdown, true)) {')
               with self.indent():
-                self.write('std::cerr << "Shutting down server." << std::endl;')
+                self.write('logger << "Shutting down server." << std::endl;')
               self.write('}')
               self.write('return nullptr;')
             case _:
@@ -4879,11 +4999,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               self.write('bool exit = false;')
               self.write('if (_exit.compare_exchange_strong(exit, true)) {')
               with self.indent():
-                self.write('std::cerr << "Exiting server." << std::endl;')
+                self.write('logger << "Exiting server." << std::endl;')
                 self.write('bool shutdown = false;')
                 self.write('if (_shutdown.compare_exchange_strong(shutdown, true)) {')
                 with self.indent():
-                  self.write('std::cerr')
+                  self.write('logger')
                   with self.indent():
                     self.write('<< "Server exited before being notified to shutdown!"')
                     self.write('<< std::endl;')
@@ -4902,7 +5022,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                 with self.indent():
                   self.write('std::piecewise_construct,')
                   self.write('std::forward_as_tuple(uri),')
-                  self.write('std::forward_as_tuple(uri, text)')
+                  self.write('std::forward_as_tuple(uri, text, logger)')
                 self.write(');')
               self.write('}')
             case "textDocument/didChange":

@@ -2,8 +2,11 @@
 
 namespace LCompilers::LanguageServer {
 
-  LanguageServer::LanguageServer(MessageQueue &outgoingMessages)
-    : outgoingMessages(outgoingMessages)
+  LanguageServer::LanguageServer(
+    MessageQueue &outgoingMessages,
+    lsl::Logger &logger
+  ) : outgoingMessages(outgoingMessages)
+    , logger(logger)
   {
     // empty
   }

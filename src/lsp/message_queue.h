@@ -7,12 +7,16 @@
 #include <mutex>
 #include <string>
 
+#include <lsp/logger.h>
+
 namespace LCompilers::LanguageServer {
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   const std::size_t MESSAGE_QUEUE_CAPACITY = 64;
 
   class MessageQueue {
   public:
+    MessageQueue(lsl::Logger &logger);
     auto enqueue(const std::string &message) -> bool;
     auto dequeue() -> const std::string;
     auto size() const -> std::size_t;
@@ -20,6 +24,7 @@ namespace LCompilers::LanguageServer {
     auto isStopped() const -> bool;
     auto stop() -> void;
   private:
+    lsl::Logger &logger;
     std::string buffer[MESSAGE_QUEUE_CAPACITY];
     std::atomic_bool running = true;
     std::size_t head = 0;

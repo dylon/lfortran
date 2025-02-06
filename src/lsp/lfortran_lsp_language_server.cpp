@@ -5,8 +5,9 @@
 namespace LCompilers::LanguageServerProtocol {
 
   LFortranLspLanguageServer::LFortranLspLanguageServer(
-    ls::MessageQueue &outgoingMessages
-  ) : LspLanguageServer(outgoingMessages)
+    ls::MessageQueue &outgoingMessages,
+    lsl::Logger &logger
+  ) : LspLanguageServer(outgoingMessages, logger)
   {
     // empty
   }

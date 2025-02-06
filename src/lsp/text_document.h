@@ -9,10 +9,13 @@
 #include <string>
 #include <vector>
 
+#include <lsp/logger.h>
 #include <lsp/specification.h>
 
 namespace LCompilers::LanguageServerProtocol {
   namespace fs = std::filesystem;
+
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   const std::regex RE_FILE_URI(
     "^file:(?://)?",
@@ -21,7 +24,11 @@ namespace LCompilers::LanguageServerProtocol {
 
   class TextDocument {
   public:
-    TextDocument(const std::string &uri, const std::string &text);
+    TextDocument(
+      const std::string &uri,
+      const std::string &text,
+      lsl::Logger &logger
+    );
     auto uri() -> const DocumentUri &;
     auto path() -> const fs::path &;
     auto text() -> const std::string &;
@@ -30,6 +37,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::vector<TextDocumentContentChangeEvent> &changes
     ) -> void;
   private:
+    lsl::Logger &logger;
     DocumentUri _uri;
     fs::path _path;
     std::string _text;

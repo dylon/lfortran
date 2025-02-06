@@ -20,6 +20,7 @@
 #include <lsp/thread_pool.h>
 #include <lsp/message_queue.h>
 #include <lsp/language_server.h>
+#include <lsp/logger.h>
 #include <lsp/request_parser.h>
 
 namespace LCompilers::LanguageServer {
@@ -30,18 +31,21 @@ namespace LCompilers::LanguageServer {
   using asio::use_awaitable;
 
   namespace lst = LCompilers::LanguageServer::Threading;
+  namespace lsl = LCompilers::LanguageServer::Logging;
 
   class CommunicationProtocol {
   public:
     CommunicationProtocol(
       LanguageServer &languageServer,
       RequestParserFactory &parserFactory,
-      MessageQueue &incomingMessages);
+      MessageQueue &incomingMessages,
+      lsl::Logger &logger);
     virtual void serve() = 0;
   protected:
     LanguageServer &languageServer;
     RequestParserFactory &parserFactory;
     MessageQueue &incomingMessages;
+    lsl::Logger &logger;
   };
 
   class StdIOCommunicationProtocol : public CommunicationProtocol {
@@ -50,12 +54,14 @@ namespace LCompilers::LanguageServer {
       LanguageServer &languageServer,
       RequestParserFactory &parserFactory,
       std::unique_ptr<lst::ThreadPool> threadPool,
-      MessageQueue &incomingMessages);
+      MessageQueue &incomingMessages,
+      lsl::Logger &logger);
     void serve() override;
   private:
     std::unique_ptr<lst::ThreadPool> threadPool;
     std::thread messageListener;
     std::atomic_bool running = true;
+    std::stringstream ss;
 
     auto listen() -> void;
   };
@@ -64,13 +70,15 @@ namespace LCompilers::LanguageServer {
   public:
     TcpRequestMatchCondition(
       RequestParser &parser,
-      LanguageServer &languageServer
+      LanguageServer &languageServer,
+      lsl::Logger &logger
     );
     template <typename Iterator>
     auto operator()(Iterator begin, Iterator end) -> std::pair<Iterator, bool>;
   private:
     RequestParser &parser;
     LanguageServer &languageServer;
+    lsl::Logger &logger;
   };
 
   class TcpCommunicationProtocol : public CommunicationProtocol {
@@ -80,7 +88,8 @@ namespace LCompilers::LanguageServer {
       RequestParserFactory &parserFactory,
       short unsigned int port,
       std::size_t numThreads,
-      MessageQueue &incomingMessages
+      MessageQueue &incomingMessages,
+      lsl::Logger &logger
     );
     void serve() override;
   private:
@@ -105,7 +114,8 @@ namespace LCompilers::LanguageServer {
     WebSocketCommunicationProtocol(
       LanguageServer &languageServer,
       RequestParserFactory &parserFactory,
-      MessageQueue &incomingMessages
+      MessageQueue &incomingMessages,
+      lsl::Logger &logger
     );
     void serve() override;
   };

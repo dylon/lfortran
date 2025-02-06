@@ -27,10 +27,12 @@ namespace LCompilers::LanguageServer {
   CommunicationProtocol::CommunicationProtocol(
     LanguageServer &languageServer,
     RequestParserFactory &parserFactory,
-    MessageQueue &incomingMessages)
+    MessageQueue &incomingMessages,
+    lsl::Logger &logger)
     : languageServer(languageServer)
     , parserFactory(parserFactory)
     , incomingMessages(incomingMessages)
+    , logger(logger)
   {
     // empty
   }
@@ -39,8 +41,14 @@ namespace LCompilers::LanguageServer {
     LanguageServer &languageServer,
     RequestParserFactory &parserFactory,
     std::unique_ptr<lst::ThreadPool> threadPool,
-    MessageQueue &incomingMessages)
-    : CommunicationProtocol(languageServer, parserFactory, incomingMessages)
+    MessageQueue &incomingMessages,
+    lsl::Logger &logger)
+    : CommunicationProtocol(
+      languageServer,
+      parserFactory,
+      incomingMessages,
+      logger
+    )
     , threadPool(std::move(threadPool))
     , messageListener([this]() {
       listen();
@@ -56,18 +64,19 @@ namespace LCompilers::LanguageServer {
       const std::string message = incomingMessages.dequeue();
       std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
       std::unique_lock<std::mutex> stderrLock(stderrMutex);
-      languageServer.prepare(std::cout, message);
-      std::cout << std::flush;
-      std::cerr << std::endl;
+      ss.str("");
+      languageServer.prepare(ss, message);
+      std::cout << ss.str() << std::flush;
+      logger << ss.str() << std::endl;
     } while (running);
   }
 
   void StdIOCommunicationProtocol::serve() {
-    std::cerr
+    logger
       << "Serving stdio requests with " << threadPool->getNumThreads() << " threads."
       << std::endl;
     std::unique_ptr<RequestParser> parser = parserFactory.build();
-    std::string line;
+    // std::string line;
     std::mutex &stdoutMutex = threadPool->getStdoutMutex();
     std::mutex &stderrMutex = threadPool->getStderrMutex();
     std::mutex printMutex;
@@ -76,132 +85,128 @@ namespace LCompilers::LanguageServer {
     std::size_t pendingId = 0;
     try {
       bool pending = true;
-      while (!languageServer.isTerminated()
-             && std::getline(std::cin, line)
-             // NOTE: This double-check logic is intentional because of
-             // how conditionals are short-circuited.
-             && !languageServer.isTerminated()) {
-        for (std::size_t i = 0; (i < line.length()) && pending; i++) {
-          unsigned char c = line[i];
-          pending = !parser->parse(c);
-        }
-        if (!pending) {
-          if (parser->state() == RequestParserState::COMPLETE) {
-            for (auto const &[header, value] : parser->headers()) {
-              std::unique_lock<std::mutex> stderrLock(stderrMutex);
-              std::cerr
-                << "request.headers[\"" << header << "\"] = \"" << value << "\""
-                << std::endl;
-            }
-            const std::string &request = parser->body();
-            {
-              std::unique_lock<std::mutex> stderrLock(stderrMutex);
-              std::cerr << "request.body = '" << request << "'" << std::endl;
-            }
-            if (request.length() > 0) {
-              threadPool->execute([this,
-                                  request,
-                                  &stdoutMutex,
-                                  &stderrMutex,
-                                  &pendingId,
-                                  requestId,
-                                  &responsePrinted,
-                                  &printMutex](const std::size_t threadId) {
-                try {
-                  const std::string response = languageServer.serve(request);
-                  {
+      while (!languageServer.isTerminated()) {
+        char c;
+        std::cin.get(c);
+        if (!languageServer.isTerminated()) {
+          pending = !parser->parse(static_cast<unsigned char>(c));
+          if (!pending) {
+            if (parser->state() == RequestParserState::COMPLETE) {
+              for (auto const &[header, value] : parser->headers()) {
+                std::unique_lock<std::mutex> stderrLock(stderrMutex);
+                logger
+                  << "request.headers[\"" << header << "\"] = \"" << value << "\""
+                  << std::endl;
+              }
+              const std::string &request = parser->body();
+              {
+                std::unique_lock<std::mutex> stderrLock(stderrMutex);
+                logger << "request.body = '" << request << "'" << std::endl;
+              }
+              if (request.length() > 0) {
+                threadPool->execute([this,
+                                    request,
+                                    &stdoutMutex,
+                                    &stderrMutex,
+                                    &pendingId,
+                                    requestId,
+                                    &responsePrinted,
+                                    &printMutex](const std::size_t threadId) {
+                  try {
+                    const std::string response = languageServer.serve(request);
+                    {
+                      std::unique_lock<std::mutex> stderrLock(stderrMutex);
+                      logger
+                        << "[thread.id=" << threadId << "] "
+                        << "response = '" << response << "'"
+                        << std::endl;
+                    }
+                    // ----------------------------------------------------------------
+                    // NOTE: The LSP spec requires responses to be returned in roughly
+                    // the same order of receipt of their corresponding requests. Some
+                    // types of responses may be returned out-of-order, but in order to
+                    // support those we will need to implement a sort of dependency
+                    // graph. Without knowledge of their dependencies, we must respond
+                    // to all requests in order of receipt.
+                    // ----------------------------------------------------------------
+                    while (pendingId < requestId) {
+                      std::unique_lock<std::mutex> printLock(printMutex);
+                      responsePrinted.wait_for(
+                        printLock, 100ms, [&pendingId, &requestId]() {
+                          return pendingId == requestId;
+                        }
+                      );
+                    }
+                    if (pendingId == requestId) {
+                      {
+                        std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
+                        std::unique_lock<std::mutex> stderrLock(stderrMutex);
+                        ss.str("");
+                        languageServer.prepare(ss, response);
+                        std::cout << ss.str() << std::flush;
+                        logger << ss.str() << std::endl;
+                      }
+                      ++pendingId;
+                    }
+                  } catch (std::exception &e) {
                     std::unique_lock<std::mutex> stderrLock(stderrMutex);
-                    std::cerr
+                    logger
                       << "[thread.id=" << threadId << "] "
-                      << "response = '" << response << "'"
+                      << "Failed to serve request: " << request
+                      << std::endl;
+                    logger
+                      << "[thread.id=" << threadId << "] "
+                      << "Caught unhandled exception: " << e.what()
                       << std::endl;
                   }
-                  // ----------------------------------------------------------------
-                  // NOTE: The LSP spec requires responses to be returned in roughly
-                  // the same order of receipt of their corresponding requests. Some
-                  // types of responses may be returned out-of-order, but in order to
-                  // support those we will need to implement a sort of dependency
-                  // graph. Without knowledge of their dependencies, we must respond
-                  // to all requests in order of receipt.
-                  // ----------------------------------------------------------------
-                  while (pendingId < requestId) {
-                    std::unique_lock<std::mutex> printLock(printMutex);
-                    responsePrinted.wait_for(
-                      printLock, 100ms, [&pendingId, &requestId]() {
-                        return pendingId == requestId;
-                      }
-                    );
-                  }
-                  if (pendingId == requestId) {
-                    {
-                      std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
-                      std::unique_lock<std::mutex> stderrLock(stderrMutex);
-                      languageServer.prepare(std::cout, response);
-                      std::cout << std::flush;
-                      std::cerr << std::endl;
-                    }
-                    ++pendingId;
-                  }
-                } catch (std::exception &e) {
-                  std::unique_lock<std::mutex> stderrLock(stderrMutex);
-                  std::cerr
-                    << "[thread.id=" << threadId << "] "
-                    << "Failed to serve request: " << request
-                    << std::endl;
-                  std::cerr
-                    << "[thread.id=" << threadId << "] "
-                    << "Caught unhandled exception: " << e.what()
-                    << std::endl;
-                }
-              });
+                });
+              } else {
+                std::unique_lock<std::mutex> stderrLock(stderrMutex);
+                logger << "Cannot parse an empty request body." << std::endl;
+              }
+            } else if (parser->state() == RequestParserState::ERROR) {
+              const std::string &error = parser->error();
+              std::unique_lock<std::mutex> stderrLock(stderrMutex);
+              logger << "Failed to parse request: " << error << std::endl;
             } else {
               std::unique_lock<std::mutex> stderrLock(stderrMutex);
-              std::cerr << "Cannot parse an empty request body." << std::endl;
+              logger
+                << "Parser in unexpected state: " << static_cast<int>(parser->state())
+                << std::endl;
             }
-          } else if (parser->state() == RequestParserState::ERROR) {
-            const std::string &error = parser->error();
-            std::unique_lock<std::mutex> stderrLock(stderrMutex);
-            std::cerr << "Failed to parse request: " << error << std::endl;
-          } else {
-            std::unique_lock<std::mutex> stderrLock(stderrMutex);
-            std::cerr
-              << "Parser in unexpected state: " << static_cast<int>(parser->state())
-              << std::endl;
+            parser->reset();
+            ++requestId;
+            pending = true;
           }
-          parser->reset();
-          ++requestId;
-          pending = true;
-        } else {
-          parser->parse('\n');
         }
       }
       if (pending) {
         parser->finish();
         for (auto const &[header, value] : parser->headers()) {
           std::unique_lock<std::mutex> stderrLock(stderrMutex);
-          std::cerr
+          logger
             << "request.headers[\"" << header << "\"] = \"" << value << "\""
             << std::endl;
         }
         const std::string &request = parser->body();
         {
           std::unique_lock<std::mutex> stderrLock(stderrMutex);
-          std::cerr << "request.body = " << request << std::endl;
+          logger << "request.body = " << request << std::endl;
         }
         const std::string response = languageServer.serve(request);
         {
           std::unique_lock<std::mutex> stderrLock(stderrMutex);
-          std::cerr << "response = " << response << std::endl;
+          logger << "response = " << response << std::endl;
         }
         {
           std::unique_lock<std::mutex> stdoutLock(stdoutMutex);
           std::unique_lock<std::mutex> stderrLock(stderrMutex);
-          std::cout << response << std::flush;
-          std::cerr << std::endl;
+          logger << response << std::flush;
+          logger << std::endl;
         }
       }
     } catch (std::exception &e) {
-      std::cerr
+      logger
         << "Caught unhandled exception while serving requests: " << e.what()
         << std::endl;
     }
@@ -214,9 +219,11 @@ namespace LCompilers::LanguageServer {
 
   TcpRequestMatchCondition::TcpRequestMatchCondition(
     RequestParser &parser,
-    LanguageServer &languageServer
+    LanguageServer &languageServer,
+    lsl::Logger &logger
   ) : parser(parser)
     , languageServer(languageServer)
+    , logger(logger)
   {
     // empty
   }
@@ -241,8 +248,14 @@ namespace LCompilers::LanguageServer {
     RequestParserFactory &parserFactory,
     short unsigned int port,
     std::size_t numThreads,
-    MessageQueue &incomingMessages)
-    : CommunicationProtocol(languageServer, parserFactory, incomingMessages)
+    MessageQueue &incomingMessages,
+    lsl::Logger &logger)
+    : CommunicationProtocol(
+      languageServer,
+      parserFactory,
+      incomingMessages,
+      logger
+    )
     , io_context(numThreads)
     , port(port)
     , messageListener([this]() {
@@ -260,7 +273,7 @@ namespace LCompilers::LanguageServer {
         ss.str("");
         prepareResponse(ss, 200, "OK", message);
         const std::string output = ss.str();
-        std::cout << output << std::endl;
+        logger << output << std::endl;
       } while (running);
     } catch (std::runtime_error &e) {
       if (running) {
@@ -284,7 +297,7 @@ namespace LCompilers::LanguageServer {
   ) -> awaitable<void> {
     try {
       std::unique_ptr<RequestParser> parser = parserFactory.build();
-      TcpRequestMatchCondition matchCondition(*parser, languageServer);
+      TcpRequestMatchCondition matchCondition(*parser, languageServer, logger);
       std::stringstream ss;
       for (std::string buffer; !languageServer.isTerminated();) {
         std::size_t n =
@@ -302,22 +315,22 @@ namespace LCompilers::LanguageServer {
         const std::string message = buffer.substr(0, n);
         buffer.erase(0, n);
 
-        std::cout << "~~~~~~~~" << std::endl;
-        std::cout << "request:" << std::endl;
-        std::cout << "~~~~~~~~" << std::endl;
-        std::cout << message << std::endl;
+        logger << "~~~~~~~~" << std::endl;
+        logger << "request:" << std::endl;
+        logger << "~~~~~~~~" << std::endl;
+        logger << message << std::endl;
 
         ss.str("");
         if (parser->state() == RequestParserState::COMPLETE) {
           const std::string &startLine = parser->startLine();
-          std::cout << "request.startLine = '" << startLine << "'" << std::endl;
+          logger << "request.startLine = '" << startLine << "'" << std::endl;
           for (auto const &[header, value] : parser->headers()) {
-            std::cout
+            logger
               << "request.headers[\"" << header << "\"] = \"" << value << "\""
               << std::endl;
           }
           const std::string &body = parser->body();
-          std::cout << "request.body = '" << body << "'" << std::endl;
+          logger << "request.body = '" << body << "'" << std::endl;
 
           try {
             const std::string response = languageServer.serve(body);
@@ -353,22 +366,26 @@ namespace LCompilers::LanguageServer {
           prepareResponse(ss, 400, "Bad Request", response);
         }
 
-        std::cout << "~~~~~~~~~" << std::endl;
-        std::cout << "response:" << std::endl;
-        std::cout << "~~~~~~~~~" << std::endl;
-        std::cout << ss.str() << std::endl;
+        logger << "~~~~~~~~~" << std::endl;
+        logger << "response:" << std::endl;
+        logger << "~~~~~~~~~" << std::endl;
+        logger << ss.str() << std::endl;
 
         co_await async_write(socket, asio::buffer(ss.str()), use_awaitable);
         parser->reset();
       }
     } catch (std::system_error &e) {
       if (e.code() == asio::error::eof) {
-        std::cout << "Connection closed." << std::endl;
+        logger << "Connection closed." << std::endl;
       } else {
-        std::fprintf(stderr, "tcpDispatch failed with error: %s\n", e.what());
+        logger
+          << "tcpDispatch failed with error: " << e.what()
+          << std::endl;
       }
     } catch (std::exception &e) {
-      std::fprintf(stderr, "tcpDispatch failed with error: %s\n", e.what());
+      logger
+        << "tcpDispatch failed with error: " << e.what()
+        << std::endl;
     }
     if (languageServer.isTerminated()) {
       io_context.stop();
@@ -386,7 +403,7 @@ namespace LCompilers::LanguageServer {
 
   void TcpCommunicationProtocol::serve() {
     try {
-      std::cout
+      logger
         << "Starting TCP server; listening on port: "
         << port
         << std::endl;
@@ -402,19 +419,23 @@ namespace LCompilers::LanguageServer {
       incomingMessages.stop();
       messageListener.join();
     } catch (std::exception &e) {
-      std::fprintf(
-        stderr,
-        "TcpCommunicationProtocol::serve() failed with error: %s\n",
-        e.what()
-      );
+      logger
+        << "TcpCommunicationProtocol::serve() failed with error: " << e.what()
+        << std::endl;
     }
   }
 
   WebSocketCommunicationProtocol::WebSocketCommunicationProtocol(
     LanguageServer &languageServer,
     RequestParserFactory &parserFactory,
-    MessageQueue &incomingMessages)
-    : CommunicationProtocol(languageServer, parserFactory, incomingMessages)
+    MessageQueue &incomingMessages,
+    lsl::Logger &logger
+  ) : CommunicationProtocol(
+      languageServer,
+      parserFactory,
+      incomingMessages,
+      logger
+    )
   {
     // empty
   }

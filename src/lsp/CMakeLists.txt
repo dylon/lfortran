@@ -14,6 +14,7 @@ endif ()
 
 set(LFORTRAN_LSP_SRC
   specification.cpp
+  logger.cpp
   lsp_exception.cpp
   text_document.cpp
   message_queue.cpp

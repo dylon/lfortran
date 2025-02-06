@@ -75,19 +75,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToSemanticTokenTypes(
     const LSPAny &any
   ) const -> SemanticTokenTypes {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) SemanticTokenTypes must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return semanticTokenTypesByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return semanticTokenTypesByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) SemanticTokenTypes must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -107,19 +111,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToSemanticTokenModifiers(
     const LSPAny &any
   ) const -> SemanticTokenModifiers {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) SemanticTokenModifiers must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return semanticTokenModifiersByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return semanticTokenModifiersByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) SemanticTokenModifiers must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -139,19 +147,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToDocumentDiagnosticReportKind(
     const LSPAny &any
   ) const -> DocumentDiagnosticReportKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) DocumentDiagnosticReportKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return documentDiagnosticReportKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return documentDiagnosticReportKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) DocumentDiagnosticReportKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -171,19 +183,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToErrorCodes(
     const LSPAny &any
   ) const -> ErrorCodes {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::INTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) ErrorCodes must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::INTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    integer_t value = std::get<int>(any);
     try {
-      return errorCodesByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::INTEGER_TYPE: {
+        integer_t value = std::get<integer_t>(any);
+        return errorCodesByValue(value);
+        break;
+      }
+      case LSPAnyType::UINTEGER_TYPE: {
+        integer_t value = static_cast<integer_t>(
+          std::get<uinteger_t>(any)
+        );
+        return errorCodesByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) ErrorCodes must be of type LSPAnyType::INTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -203,19 +226,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToLSPErrorCodes(
     const LSPAny &any
   ) const -> LSPErrorCodes {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::INTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) LSPErrorCodes must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::INTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    integer_t value = std::get<int>(any);
     try {
-      return lspErrorCodesByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::INTEGER_TYPE: {
+        integer_t value = std::get<integer_t>(any);
+        return lspErrorCodesByValue(value);
+        break;
+      }
+      case LSPAnyType::UINTEGER_TYPE: {
+        integer_t value = static_cast<integer_t>(
+          std::get<uinteger_t>(any)
+        );
+        return lspErrorCodesByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) LSPErrorCodes must be of type LSPAnyType::INTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -235,19 +269,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToFoldingRangeKind(
     const LSPAny &any
   ) const -> FoldingRangeKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) FoldingRangeKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return foldingRangeKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return foldingRangeKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) FoldingRangeKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -267,19 +305,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToSymbolKind(
     const LSPAny &any
   ) const -> SymbolKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) SymbolKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return symbolKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return symbolKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return symbolKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) SymbolKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -299,19 +348,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToSymbolTag(
     const LSPAny &any
   ) const -> SymbolTag {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) SymbolTag must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return symbolTagByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return symbolTagByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return symbolTagByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) SymbolTag must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -331,19 +391,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToUniquenessLevel(
     const LSPAny &any
   ) const -> UniquenessLevel {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) UniquenessLevel must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return uniquenessLevelByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return uniquenessLevelByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) UniquenessLevel must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -363,19 +427,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToMonikerKind(
     const LSPAny &any
   ) const -> MonikerKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) MonikerKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return monikerKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return monikerKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) MonikerKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -395,19 +463,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToInlayHintKind(
     const LSPAny &any
   ) const -> InlayHintKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) InlayHintKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return inlayHintKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return inlayHintKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return inlayHintKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) InlayHintKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -427,19 +506,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToMessageType(
     const LSPAny &any
   ) const -> MessageType {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) MessageType must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return messageTypeByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return messageTypeByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return messageTypeByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) MessageType must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -459,19 +549,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToTextDocumentSyncKind(
     const LSPAny &any
   ) const -> TextDocumentSyncKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) TextDocumentSyncKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return textDocumentSyncKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return textDocumentSyncKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return textDocumentSyncKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) TextDocumentSyncKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -491,19 +592,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToTextDocumentSaveReason(
     const LSPAny &any
   ) const -> TextDocumentSaveReason {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) TextDocumentSaveReason must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return textDocumentSaveReasonByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return textDocumentSaveReasonByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return textDocumentSaveReasonByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) TextDocumentSaveReason must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -523,19 +635,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToCompletionItemKind(
     const LSPAny &any
   ) const -> CompletionItemKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) CompletionItemKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return completionItemKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return completionItemKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return completionItemKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) CompletionItemKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -555,19 +678,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToCompletionItemTag(
     const LSPAny &any
   ) const -> CompletionItemTag {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) CompletionItemTag must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return completionItemTagByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return completionItemTagByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return completionItemTagByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) CompletionItemTag must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -587,19 +721,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToInsertTextFormat(
     const LSPAny &any
   ) const -> InsertTextFormat {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) InsertTextFormat must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return insertTextFormatByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return insertTextFormatByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return insertTextFormatByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) InsertTextFormat must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -619,19 +764,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToInsertTextMode(
     const LSPAny &any
   ) const -> InsertTextMode {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) InsertTextMode must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return insertTextModeByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return insertTextModeByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return insertTextModeByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) InsertTextMode must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -651,19 +807,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToDocumentHighlightKind(
     const LSPAny &any
   ) const -> DocumentHighlightKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) DocumentHighlightKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return documentHighlightKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return documentHighlightKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return documentHighlightKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) DocumentHighlightKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -683,19 +850,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToCodeActionKind(
     const LSPAny &any
   ) const -> CodeActionKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) CodeActionKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return codeActionKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return codeActionKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) CodeActionKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -715,19 +886,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToTraceValues(
     const LSPAny &any
   ) const -> TraceValues {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) TraceValues must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return traceValuesByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return traceValuesByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) TraceValues must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -747,19 +922,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToMarkupKind(
     const LSPAny &any
   ) const -> MarkupKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) MarkupKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return markupKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return markupKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) MarkupKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -779,19 +958,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToInlineCompletionTriggerKind(
     const LSPAny &any
   ) const -> InlineCompletionTriggerKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) InlineCompletionTriggerKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return inlineCompletionTriggerKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return inlineCompletionTriggerKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return inlineCompletionTriggerKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) InlineCompletionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -811,19 +1001,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToPositionEncodingKind(
     const LSPAny &any
   ) const -> PositionEncodingKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) PositionEncodingKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return positionEncodingKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return positionEncodingKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) PositionEncodingKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -843,19 +1037,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToFileChangeType(
     const LSPAny &any
   ) const -> FileChangeType {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) FileChangeType must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return fileChangeTypeByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return fileChangeTypeByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return fileChangeTypeByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) FileChangeType must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -875,19 +1080,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToWatchKind(
     const LSPAny &any
   ) const -> WatchKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) WatchKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return watchKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return watchKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return watchKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) WatchKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -907,19 +1123,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToDiagnosticSeverity(
     const LSPAny &any
   ) const -> DiagnosticSeverity {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) DiagnosticSeverity must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return diagnosticSeverityByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return diagnosticSeverityByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return diagnosticSeverityByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) DiagnosticSeverity must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -939,19 +1166,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToDiagnosticTag(
     const LSPAny &any
   ) const -> DiagnosticTag {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) DiagnosticTag must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return diagnosticTagByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return diagnosticTagByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return diagnosticTagByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) DiagnosticTag must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -971,19 +1209,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToCompletionTriggerKind(
     const LSPAny &any
   ) const -> CompletionTriggerKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) CompletionTriggerKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return completionTriggerKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return completionTriggerKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return completionTriggerKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) CompletionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1003,19 +1252,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToSignatureHelpTriggerKind(
     const LSPAny &any
   ) const -> SignatureHelpTriggerKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) SignatureHelpTriggerKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return signatureHelpTriggerKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return signatureHelpTriggerKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return signatureHelpTriggerKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) SignatureHelpTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1035,19 +1295,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToCodeActionTriggerKind(
     const LSPAny &any
   ) const -> CodeActionTriggerKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) CodeActionTriggerKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return codeActionTriggerKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return codeActionTriggerKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return codeActionTriggerKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) CodeActionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1067,19 +1338,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToFileOperationPatternKind(
     const LSPAny &any
   ) const -> FileOperationPatternKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) FileOperationPatternKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return fileOperationPatternKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return fileOperationPatternKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) FileOperationPatternKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1099,19 +1374,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToNotebookCellKind(
     const LSPAny &any
   ) const -> NotebookCellKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) NotebookCellKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return notebookCellKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return notebookCellKindByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return notebookCellKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) NotebookCellKind must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1131,19 +1417,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToResourceOperationKind(
     const LSPAny &any
   ) const -> ResourceOperationKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) ResourceOperationKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return resourceOperationKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return resourceOperationKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) ResourceOperationKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1163,19 +1453,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToFailureHandlingKind(
     const LSPAny &any
   ) const -> FailureHandlingKind {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) FailureHandlingKind must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return failureHandlingKindByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return failureHandlingKindByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) FailureHandlingKind must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1195,19 +1489,30 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToPrepareSupportDefaultBehavior(
     const LSPAny &any
   ) const -> PrepareSupportDefaultBehavior {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::UINTEGER_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) PrepareSupportDefaultBehavior must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::UINTEGER_TYPE),
-          any.index()
-        )
-      );
-    }
-    uinteger_t value = std::get<int>(any);
     try {
-      return prepareSupportDefaultBehaviorByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::UINTEGER_TYPE: {
+        uinteger_t value = std::get<uinteger_t>(any);
+        return prepareSupportDefaultBehaviorByValue(value);
+        break;
+      }
+      case LSPAnyType::INTEGER_TYPE: {
+        uinteger_t value = static_cast<uinteger_t>(
+          std::get<integer_t>(any)
+        );
+        return prepareSupportDefaultBehaviorByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) PrepareSupportDefaultBehavior must be of type LSPAnyType::UINTEGER_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -1227,19 +1532,23 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToTokenFormat(
     const LSPAny &any
   ) const -> TokenFormat {
-    if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::STRING_TYPE) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "LSPAnyType for a(n) TokenFormat must be of type {} but received type {}",
-          static_cast<int>(LSPAnyType::STRING_TYPE),
-          any.index()
-        )
-      );
-    }
-    const string_t &value = std::get<std::string>(any);
     try {
-      return tokenFormatByValue(value);
+      switch (static_cast<LSPAnyType>(any.index())) {
+      case LSPAnyType::STRING_TYPE: {
+        const string_t &value = std::get<std::string>(any);
+        return tokenFormatByValue(value);
+        break;
+      }
+      default: {
+        throw LspException(
+          ErrorCodes::INVALID_PARAMS,
+          std::format(
+            "LSPAnyType for a(n) TokenFormat must be of type LSPAnyType::STRING_TYPE but received type {}",
+            LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+          )
+        );
+      }
+      }
     } catch (std::invalid_argument &e) {
       throw LspException(
         ErrorCodes::INVALID_PARAMS,
@@ -32865,7 +33174,24 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToInteger(
     const LSPAny &any
   ) const -> int {
-    return std::get<int>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::INTEGER_TYPE: {
+      return std::get<integer_t>(any);
+    }
+    case LSPAnyType::UINTEGER_TYPE: {
+      uinteger_t value = std::get<uinteger_t>(any);
+      return static_cast<integer_t>(value);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type integer_t",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::integerToAny(
@@ -32879,7 +33205,24 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToUInteger(
     const LSPAny &any
   ) const -> unsigned int {
-    return std::get<unsigned int>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::UINTEGER_TYPE: {
+      return std::get<uinteger_t>(any);
+    }
+    case LSPAnyType::INTEGER_TYPE: {
+      integer_t value = std::get<integer_t>(any);
+      return static_cast<uinteger_t>(value);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type uinteger_t",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::uintegerToAny(
@@ -32893,7 +33236,28 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToDecimal(
     const LSPAny &any
   ) const -> double {
-    return std::get<double>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::DECIMAL_TYPE: {
+      return std::get<decimal_t>(any);
+    }
+    case LSPAnyType::INTEGER_TYPE: {
+      integer_t value = std::get<integer_t>(any);
+      return static_cast<decimal_t>(value);
+    }
+    case LSPAnyType::UINTEGER_TYPE: {
+      uinteger_t value = std::get<uinteger_t>(any);
+      return static_cast<decimal_t>(value);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type decimal_t",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::decimalToAny(
@@ -32907,7 +33271,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToBoolean(
     const LSPAny &any
   ) const -> bool {
-    return std::get<bool>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::BOOLEAN_TYPE: {
+      return std::get<boolean_t>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type boolean_t",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::booleanToAny(
@@ -32921,7 +33298,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToNull(
     const LSPAny &any
   ) const -> std::nullptr_t {
-    return std::get<std::nullptr_t>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::NULL_TYPE: {
+      return std::get<null_t>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type null_t",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::nullToAny(
@@ -32935,7 +33325,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToString(
     const LSPAny &any
   ) const -> std::string {
-    return std::get<std::string>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::STRING_TYPE: {
+      return std::get<string_t>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type string_t",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::stringToAny(
@@ -32949,7 +33352,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToURI(
     const LSPAny &any
   ) const -> string_t {
-    return std::get<string_t>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::STRING_TYPE: {
+      return std::get<URI>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type URI",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::uriToAny(
@@ -32963,7 +33379,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToDocumentUri(
     const LSPAny &any
   ) const -> string_t {
-    return std::get<string_t>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::STRING_TYPE: {
+      return std::get<DocumentUri>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type DocumentUri",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::documentUriToAny(
@@ -32977,7 +33406,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToRegExp(
     const LSPAny &any
   ) const -> string_t {
-    return std::get<string_t>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::STRING_TYPE: {
+      return std::get<RegExp>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type RegExp",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::regExpToAny(
@@ -33757,7 +34199,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToChangeAnnotationIdentifier(
     const LSPAny &any
   ) const -> string_t {
-    return std::get<string_t>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::OBJECT_TYPE: {
+      return std::get<ChangeAnnotationIdentifier>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type ChangeAnnotationIdentifier",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::changeAnnotationIdentifierToAny(
@@ -34837,7 +35292,20 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspTransformer::anyToPattern(
     const LSPAny &any
   ) const -> string_t {
-    return std::get<string_t>(any);
+    switch (static_cast<LSPAnyType>(any.index())) {
+    case LSPAnyType::OBJECT_TYPE: {
+      return std::get<Pattern>(any);
+    }
+    default: {
+      throw LspException(
+        ErrorCodes::INVALID_PARAMS,
+        std::format(
+          "Cannot transform LSPAny of type LSPAnyType::{} to type Pattern",
+          LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
+        )
+      );
+    }
+    }
   }
 
   auto LspTransformer::patternToAny(

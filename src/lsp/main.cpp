@@ -1,7 +1,9 @@
-#include "lsp/message_queue.h"
 #include <cstddef>
+#include <filesystem>
 #include <format>
+#include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -9,17 +11,21 @@
 #define CLI11_HAS_FILESYSTEM 0
 #include <bin/CLI11.hpp>
 
+#include <lsp/communication_protocol.h>
 #include <lsp/language_server.h>
 #include <lsp/lfortran_lsp_language_server.h>
-#include <lsp/request_parser.h>
+#include <lsp/logger.h>
 #include <lsp/lsp_request_parser.h>
-#include <lsp/communication_protocol.h>
-#include <lsp/thread_pool.h>
 #include <lsp/message_queue.h>
+#include <lsp/request_parser.h>
+#include <lsp/thread_pool.h>
+
+namespace fs = std::filesystem;
 
 namespace ls = LCompilers::LanguageServer;
 namespace lsp = LCompilers::LanguageServerProtocol;
 namespace lst = LCompilers::LanguageServer::Threading;
+namespace lsl = LCompilers::LanguageServer::Logging;
 
 enum class ExitCode {
   SUCCESS = 0,
@@ -28,13 +34,58 @@ enum class ExitCode {
   UNHANDLED_EXCEPTION = 3,
 };
 
+std::map<ExitCode, std::string> ExitCodeNames = {
+  {ExitCode::SUCCESS, "SUCCESS"},
+  {ExitCode::INVALID_VALUE, "INVALID_VALUE"},
+  {ExitCode::BAD_ARG_COMBO, "BAD_ARG_COMBO"},
+  {ExitCode::UNHANDLED_EXCEPTION, "UNHANDLED_EXCEPTION"},
+};
+
 enum class Language {
   FORTRAN,
 };
 
+std::map<Language, std::string> LanguageNames = {
+  {Language::FORTRAN, "FORTRAN"},
+};
+
+std::map<Language, std::string> LanguageValues = {
+  {Language::FORTRAN, "fortran"},
+};
+
+auto languageByValue(const std::string &value) -> Language {
+  for (const auto &[lang_key, lang_value] : LanguageValues) {
+    if (lang_value == value) {
+      return lang_key;
+    }
+  }
+  throw std::invalid_argument(
+    std::format("Invalid Language value: \"{}\"", value)
+  );
+}
+
 enum class DataFormat {
   JSON_RPC,
 };
+
+std::map<DataFormat, std::string> DataFormatNames = {
+  {DataFormat::JSON_RPC, "JSON_RPC"},
+};
+
+std::map<DataFormat, std::string> DataFormatValues = {
+  {DataFormat::JSON_RPC, "json-rpc"},
+};
+
+auto dataFormatByValue(const std::string &value) -> DataFormat {
+  for (const auto &[fmt_key, fmt_value] : DataFormatValues) {
+    if (fmt_value == value) {
+      return fmt_key;
+    }
+  }
+  throw std::invalid_argument(
+    std::format("Invalid DataFormat value: \"{}\"", value)
+  );
+}
 
 enum class CommunicationProtocol {
   STDIO,
@@ -42,9 +93,51 @@ enum class CommunicationProtocol {
   WEBSOCKET,
 };
 
+std::map<CommunicationProtocol, std::string> CommunicationProtocolNames = {
+  {CommunicationProtocol::STDIO, "STDIO"},
+  {CommunicationProtocol::TCP, "TCP"},
+  {CommunicationProtocol::WEBSOCKET, "WEBSOCKET"},
+};
+
+std::map<CommunicationProtocol, std::string> CommunicationProtocolValues = {
+  {CommunicationProtocol::STDIO, "stdio"},
+  {CommunicationProtocol::TCP, "tcp"},
+  {CommunicationProtocol::WEBSOCKET, "websocket"},
+};
+
+auto communicationProtocolByValue(const std::string &value) -> CommunicationProtocol {
+  for (const auto &[protocol_key, protocol_value] : CommunicationProtocolValues) {
+    if (protocol_value == value) {
+      return protocol_key;
+    }
+  }
+  throw std::invalid_argument(
+    std::format("Invalid CommunicationProtocol value: \"{}\"", value)
+  );
+}
+
 enum class ServerProtocol {
   LSP,
 };
+
+std::map<ServerProtocol, std::string> ServerProtocolNames = {
+  {ServerProtocol::LSP, "LSP"},
+};
+
+std::map<ServerProtocol, std::string> ServerProtocolValues = {
+  {ServerProtocol::LSP, "lsp"},
+};
+
+auto serverProtocolByValue(const std::string &value) -> ServerProtocol {
+  for (const auto &[protocol_key, protocol_value] : ServerProtocolValues) {
+    if (protocol_value == value) {
+      return protocol_key;
+    }
+  }
+  throw std::invalid_argument(
+    std::format("Invalid ServerProtocol value: \"{}\"", value)
+  );
+}
 
 struct CommandLineOptions {
   Language language;
@@ -54,90 +147,148 @@ struct CommandLineOptions {
   short unsigned int tcpPort;
   bool interactive;
   std::size_t numThreads;
+  fs::path logPath;
 };
 
-ExitCode validateAndSetLanguage(
+auto validateAndSetLogPath(
+  CommandLineOptions &opts,
+  const std::string &logPathStr
+) -> ExitCode {
+  fs::path logPath = fs::absolute(logPathStr).lexically_normal();
+  fs::path logDir = logPath.parent_path();
+  if (!fs::exists(logDir) && !fs::create_directories(logDir)) {
+    std::cerr
+      << "Cannot create log directory: " << logDir
+      << std::endl;
+    return ExitCode::INVALID_VALUE;
+  }
+
+  std::ofstream ofs(logPath);
+  if (ofs.is_open()) {
+    ofs.close();
+    opts.logPath = logPath;
+    std::cerr
+      << "Logging to: " << logPath
+      << std::endl;
+    return ExitCode::SUCCESS;
+  }
+
+  std::cerr
+    << "Log path is not writable: " << logPath
+    << std::endl;
+  return ExitCode::INVALID_VALUE;
+}
+
+auto validateAndSetLanguage(
   CommandLineOptions &opts,
   const std::string &language
-) {
-  if (language == "fortran") {
-    opts.language = Language::FORTRAN;
+) -> ExitCode {
+  try {
+    opts.language = languageByValue(language);
     return ExitCode::SUCCESS;
+  } catch (std::invalid_argument &e) {
+    std::cerr
+      << "Unsupported value for --language (\""
+      << language
+      << "\"), it must be one of: ";
+    auto iter = LanguageValues.begin();
+    for (int index = 0; iter != LanguageValues.end(); ++index, ++iter) {
+      if (index > 0) {
+        std::cerr << "; ";
+      }
+      std::cerr << iter->second;
+    }
+    std::cerr << std::endl;
+    return ExitCode::INVALID_VALUE;
   }
-  std::cerr
-    << "Unsupported value for --language: "
-    << language
-    << ". Must be one of: fortran."
-    << std::endl;
-  return ExitCode::INVALID_VALUE;
 }
 
-ExitCode validateAndSetDataFormat(
+auto validateAndSetDataFormat(
   CommandLineOptions &opts,
   const std::string &dataFormat
-) {
-  if (dataFormat == "json-rpc") {
-    opts.dataFormat = DataFormat::JSON_RPC;
+) -> ExitCode {
+  try {
+    opts.dataFormat = dataFormatByValue(dataFormat);
     return ExitCode::SUCCESS;
+  } catch (std::invalid_argument &e) {
+    std::cerr
+      << "Unsupported value for --data-format: (\""
+      << dataFormat
+      << "\"), it must be one of: ";
+    auto iter = DataFormatValues.begin();
+    for (int index = 0; iter != DataFormatValues.end(); ++index, ++iter) {
+      if (index > 0) {
+        std::cerr << "; ";
+      }
+      std::cerr << iter->second;
+    }
+    std::cerr << std::endl;
+    return ExitCode::INVALID_VALUE;
   }
-  std::cerr
-    << "Unsupported value for --data-format: "
-    << dataFormat
-    << ". Must be one of: json-rpc."
-    << std::endl;
-  return ExitCode::INVALID_VALUE;
 }
 
-ExitCode validateAndSetCommunicationProtocol(
+auto validateAndSetCommunicationProtocol(
   CommandLineOptions &opts,
   const std::string &communicationProtocol
-) {
-  if (communicationProtocol == "stdio") {
-    opts.communicationProtocol = CommunicationProtocol::STDIO;
+) -> ExitCode {
+  try {
+    opts.communicationProtocol =
+      communicationProtocolByValue(communicationProtocol);
     return ExitCode::SUCCESS;
+  } catch (std::invalid_argument &e) {
+    std::cerr
+      << "Unsupported value for --communication-protocol: (\""
+      << communicationProtocol
+      << "\"), it must be one of: ";
+    auto iter = CommunicationProtocolValues.begin();
+    for (int index = 0; iter != CommunicationProtocolValues.end(); ++index, ++iter) {
+      if (index > 0) {
+        std::cerr << "; ";
+      }
+      std::cerr << iter->second;
+    }
+    std::cerr << std::endl;
+    return ExitCode::INVALID_VALUE;
   }
-  if (communicationProtocol == "tcp") {
-    opts.communicationProtocol = CommunicationProtocol::TCP;
-    return ExitCode::SUCCESS;
-  }
-  if (communicationProtocol == "websocket") {
-    opts.communicationProtocol = CommunicationProtocol::WEBSOCKET;
-    return ExitCode::SUCCESS;
-  }
-  std::cerr
-    << "Unsupported value for --communication-protocol: "
-    << communicationProtocol
-    << ". Must be one of: stdio; tcp; websocket."
-    << std::endl;
-  return ExitCode::INVALID_VALUE;
 }
 
-ExitCode validateAndSetServerProtocol(
+auto validateAndSetServerProtocol(
   CommandLineOptions &opts,
   const std::string &serverProtocol
-) {
-  if (serverProtocol == "lsp") {
+) -> ExitCode {
+  try {
+    opts.serverProtocol = serverProtocolByValue(serverProtocol);
+  } catch (std::invalid_argument &e) {
+    std::cerr
+      << "Unsupported value for --server-protocol: (\""
+      << serverProtocol
+      << "\"), it must be one of: "
+      << std::endl;
+    auto iter = ServerProtocolValues.begin();
+    for (int index = 0; iter != ServerProtocolValues.end(); ++index, ++iter) {
+      if (index > 0) {
+        std::cerr << "; ";
+      }
+      std::cerr << iter->second;
+    }
+    std::cerr << std::endl;
+    return ExitCode::INVALID_VALUE;
+  }
+  if (opts.serverProtocol == ServerProtocol::LSP) {
     if (opts.dataFormat != DataFormat::JSON_RPC) {
       std::cerr
         << "Only JSON-RPC is supported with LSP; must set --data-format=json-rpc."
         << std::endl;
       return ExitCode::BAD_ARG_COMBO;
     }
-    opts.serverProtocol = ServerProtocol::LSP;
-    return ExitCode::SUCCESS;
   }
-  std::cerr
-    << "Unsupported value for --server-protocol: "
-    << serverProtocol
-    << ". Must be one of: lsp."
-    << std::endl;
-  return ExitCode::INVALID_VALUE;
+  return ExitCode::SUCCESS;
 }
 
-ExitCode validateAndSetTcpPort(
+auto validateAndSetTcpPort(
   CommandLineOptions &opts,
   short unsigned int tcpPort
-) {
+) -> ExitCode {
   // NOTE: The following is always true due to the data type of tcpPort:
   // -------------------------------------------------------------------
   // if ((opts.communicationProtocol != CommunicationProtocol::TCP)
@@ -155,10 +306,10 @@ ExitCode validateAndSetTcpPort(
   return ExitCode::SUCCESS;
 }
 
-ExitCode validateAndSetInteractive(
+auto validateAndSetInteractive(
   CommandLineOptions &opts,
   bool interactive
-) {
+) -> ExitCode {
   if (!interactive ||
       (opts.communicationProtocol == CommunicationProtocol::STDIO)) {
     opts.interactive = interactive;
@@ -170,10 +321,10 @@ ExitCode validateAndSetInteractive(
   return ExitCode::BAD_ARG_COMBO;
 }
 
-ExitCode validateAndSetNumThreads(
+auto validateAndSetNumThreads(
   CommandLineOptions &opts,
   std::size_t numThreads
-) {
+) -> ExitCode {
   opts.numThreads = numThreads;
   return ExitCode::SUCCESS;
 }
@@ -184,7 +335,7 @@ ExitCode validateAndSetNumThreads(
  * @param argv Vector of command-line arguments.
  * @return How successful the parser was at parsing the command-line arguments.
  */
-int parse(CommandLineOptions &opts, int argc, char *argv[]) {
+auto parse(CommandLineOptions &opts, int argc, char *argv[]) -> int {
   std::string language;
   std::string dataFormat;
   std::string communicationProtocol = "stdio";
@@ -192,6 +343,7 @@ int parse(CommandLineOptions &opts, int argc, char *argv[]) {
   std::string serverProtocol = "lsp";
   bool interactive;
   std::size_t numThreads = 5;
+  std::string logPath = "llanguage-server.log";
 
   CLI::App app {
     "LCompilers Language Server: Serves requests from language extensions in supported editors."
@@ -232,6 +384,11 @@ int parse(CommandLineOptions &opts, int argc, char *argv[]) {
     "Number of pooled threads (for applicable communication protocols)."
   )->capture_default_str();
 
+  app.add_option(
+    "--log-path", logPath,
+    "Path to where logs should be written."
+  )->capture_default_str();
+
   CLI11_PARSE(app, argc, argv);
 
   ExitCode exitCode = validateAndSetLanguage(opts, language);
@@ -250,15 +407,22 @@ int parse(CommandLineOptions &opts, int argc, char *argv[]) {
   if (exitCode == ExitCode::SUCCESS) {
     exitCode = validateAndSetNumThreads(opts, numThreads);
   }
+  if (exitCode == ExitCode::SUCCESS) {
+    exitCode = validateAndSetLogPath(opts, logPath);
+  }
   return static_cast<int>(exitCode);
 }
 
 std::unique_ptr<ls::RequestParserFactory> buildRequestParserFactory(
-  CommandLineOptions &opts
+  CommandLineOptions &opts,
+  lsl::Logger &logger
 ) {
   switch (opts.serverProtocol) {
   case ServerProtocol::LSP: {
-    return std::make_unique<lsp::LspRequestParserFactory>(opts.interactive);
+    return std::make_unique<lsp::LspRequestParserFactory>(
+      opts.interactive,
+      logger
+    );
   }
   default: {
     throw std::runtime_error(
@@ -273,12 +437,16 @@ std::unique_ptr<ls::RequestParserFactory> buildRequestParserFactory(
 
 std::unique_ptr<ls::LanguageServer> buildLanguageServer(
   CommandLineOptions &opts,
-  ls::MessageQueue &outgoingMessages
+  ls::MessageQueue &outgoingMessages,
+  lsl::Logger &logger
 ) {
   if (opts.language == Language::FORTRAN) {
     if (opts.dataFormat == DataFormat::JSON_RPC) {
       if (opts.serverProtocol == ServerProtocol::LSP) {
-        return std::make_unique<lsp::LFortranLspLanguageServer>(outgoingMessages);
+        return std::make_unique<lsp::LFortranLspLanguageServer>(
+          outgoingMessages,
+          logger
+        );
       } else {
         throw std::runtime_error(
           std::format(
@@ -306,25 +474,28 @@ std::unique_ptr<ls::LanguageServer> buildLanguageServer(
 }
 
 auto buildThreadPool(
-  CommandLineOptions &opts
+  CommandLineOptions &opts,
+  lsl::Logger &logger
 ) -> std::unique_ptr<lst::ThreadPool> {
-  return std::make_unique<lst::ThreadPool>(opts.numThreads);
+  return std::make_unique<lst::ThreadPool>(opts.numThreads, logger);
 }
 
 auto buildCommunicationProtocol(
   CommandLineOptions &opts,
   ls::LanguageServer &languageServer,
   ls::RequestParserFactory &requestParserFactory,
-  ls::MessageQueue &incomingMessages
+  ls::MessageQueue &incomingMessages,
+  lsl::Logger &logger
 ) -> std::unique_ptr<ls::CommunicationProtocol> {
   switch (opts.communicationProtocol) {
   case CommunicationProtocol::STDIO: {
-    std::unique_ptr<lst::ThreadPool> threadPool = buildThreadPool(opts);
+    std::unique_ptr<lst::ThreadPool> threadPool = buildThreadPool(opts, logger);
     return std::make_unique<ls::StdIOCommunicationProtocol>(
       languageServer,
       requestParserFactory,
       std::move(threadPool),
-      incomingMessages
+      incomingMessages,
+      logger
     );
   }
   case CommunicationProtocol::TCP: {
@@ -333,7 +504,8 @@ auto buildCommunicationProtocol(
       requestParserFactory,
       opts.tcpPort,
       opts.numThreads,
-      incomingMessages
+      incomingMessages,
+      logger
     );
   }
   case CommunicationProtocol::WEBSOCKET: {
@@ -351,9 +523,10 @@ auto buildCommunicationProtocol(
 }
 
 auto buildMessageQueue(
-  CommandLineOptions &opts
+  CommandLineOptions &opts,
+  lsl::Logger &logger
 ) -> std::unique_ptr<ls::MessageQueue> {
-  return std::make_unique<ls::MessageQueue>();
+  return std::make_unique<ls::MessageQueue>(logger);
 }
 
 int main(int argc, char *argv[]) {
@@ -365,12 +538,21 @@ int main(int argc, char *argv[]) {
   }
 
   try {
+    lsl::Logger logger(opts.logPath);
     std::unique_ptr<ls::RequestParserFactory> requestParserFactory =
-      buildRequestParserFactory(opts);
-    std::unique_ptr<ls::MessageQueue> messageQueue = buildMessageQueue(opts);
-    std::unique_ptr<ls::LanguageServer> languageServer = buildLanguageServer(opts, *messageQueue);
+      buildRequestParserFactory(opts, logger);
+    std::unique_ptr<ls::MessageQueue> messageQueue =
+      buildMessageQueue(opts, logger);
+    std::unique_ptr<ls::LanguageServer> languageServer =
+      buildLanguageServer(opts, *messageQueue, logger);
     std::unique_ptr<ls::CommunicationProtocol> communicationProtocol =
-      buildCommunicationProtocol(opts, *languageServer, *requestParserFactory, *messageQueue);
+      buildCommunicationProtocol(
+        opts,
+        *languageServer,
+        *requestParserFactory,
+        *messageQueue,
+        logger
+      );
     communicationProtocol->serve();
   } catch (std::exception &e) {
     std::cerr

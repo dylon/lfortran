@@ -8,6 +8,17 @@
 
 #include <lsp/specification.h>
 namespace LCompilers::LanguageServerProtocol {
+  std::map<LSPAnyType, std::string> LSPAnyTypeNames = {
+    {LSPAnyType::OBJECT_TYPE, "OBJECT_TYPE"},
+    {LSPAnyType::ARRAY_TYPE, "ARRAY_TYPE"},
+    {LSPAnyType::STRING_TYPE, "STRING_TYPE"},
+    {LSPAnyType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {LSPAnyType::UINTEGER_TYPE, "UINTEGER_TYPE"},
+    {LSPAnyType::DECIMAL_TYPE, "DECIMAL_TYPE"},
+    {LSPAnyType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {LSPAnyType::NULL_TYPE, "NULL_TYPE"},
+  };
+
   std::map<
     SemanticTokenTypes,
     std::string
