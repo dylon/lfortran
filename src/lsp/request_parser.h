@@ -1,5 +1,4 @@
-#ifndef LCOMPILERS_LS_TCP_REQUEST_PARSER_H
-#define LCOMPILERS_LS_TCP_REQUEST_PARSER_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -84,5 +83,3 @@ namespace LCompilers::LanguageServer {
   };
 
 } // namespace LCompilers::LanguageServer
-
-#endif // LCOMPILERS_LS_TCP_REQUEST_PARSER_H

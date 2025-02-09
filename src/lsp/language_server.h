@@ -1,34 +1,53 @@
-#ifndef LCOMPILERS_LS_LANGUAGE_SERVER_H
-#define LCOMPILERS_LS_LANGUAGE_SERVER_H
+#pragma once
 
-#include <ostream>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
 #include <string>
 #include <sstream>
 
 #include <lsp/logger.h>
 #include <lsp/message_queue.h>
+#include <lsp/thread_pool.h>
 
 namespace LCompilers::LanguageServer {
   namespace lsl = LCompilers::LanguageServer::Logging;
+  namespace lst = LCompilers::LanguageServer::Threading;
 
   class LanguageServer {
   public:
-    LanguageServer(MessageQueue &outgoingMessages, lsl::Logger &logger);
-    virtual std::string serve(const std::string &request) = 0;
+    LanguageServer(
+      MessageQueue &incomingMessages,
+      MessageQueue &outgoingMessages,
+      std::size_t numRequestThreads,
+      std::size_t numWorkerThreads,
+      lsl::Logger &logger
+    );
     virtual bool isTerminated() const = 0;
-    virtual void prepare(
-      std::ostream &os,
-      const std::string &response
-    ) const = 0;
+  protected:
+    MessageQueue &incomingMessages;
+    MessageQueue &outgoingMessages;
+    std::thread listener;
+    lst::ThreadPool requestPool;
+    lst::ThreadPool workerPool;
+    lsl::Logger &logger;
+    std::stringstream ss;
+    std::atomic_size_t serialSendId = 0;
+    std::atomic_size_t pendingSendId = 0;
+    std::condition_variable sent;
+    std::mutex sentMutex;
+
+    auto listen() -> void;
+    virtual void handle(const std::string &message, std::size_t sendId) = 0;
+    auto nextSendId() -> std::size_t;
+    auto notifySent() -> void;
+    auto send(const std::string &request, std::size_t sendId) -> void;
+    auto send(const std::string &request) -> void;
+
     virtual void prepare(
       std::stringstream &ss,
-      const std::string &response
+      const std::string &message
     ) const = 0;
-  protected:
-    MessageQueue &outgoingMessages;
-    lsl::Logger &logger;
   };
 
 } // namespace LCompilers::LanguageServer
-
-#endif // LCOMPILERS_LS_LANGUAGE_SERVER_H

@@ -1,5 +1,4 @@
-#ifndef LCOMPILERS_LS_THREAD_POOL_H
-#define LCOMPILERS_LS_THREAD_POOL_H
+#pragma once
 
 #include <atomic>
 #include <condition_variable>
@@ -7,6 +6,7 @@
 #include <functional>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -15,24 +15,29 @@
 namespace LCompilers::LanguageServer::Threading {
   namespace lsl = LCompilers::LanguageServer::Logging;
 
-  typedef std::function<void(const std::size_t threadId)> Task;
+  typedef std::function<void(
+    const std::string &name,
+    const std::size_t threadId
+  )> Task;
 
   class ThreadPool {
   public:
-    ThreadPool(std::size_t numThreads, lsl::Logger &logger);
+    ThreadPool(
+      const std::string &name,
+      std::size_t numThreads,
+      lsl::Logger &logger
+    );
     auto execute(Task task) -> bool;
-    auto getNumThreads() -> std::size_t;
-    auto isRunning() -> bool;
+    auto name() const -> const std::string &;
+    auto numThreads() const -> std::size_t;
+    auto isRunning() const -> bool;
     auto stop() -> void;
     auto stopNow() -> void;
     auto join() -> void;
-    auto getStdoutMutex() -> std::mutex &;
-    auto getStderrMutex() -> std::mutex &;
   protected:
-    std::size_t numThreads;
+    const std::string _name;
+    std::size_t _numThreads;
     lsl::Logger &logger;
-    std::mutex stdoutMutex;
-    std::mutex stderrMutex;
     std::vector<std::thread> workers;
     std::atomic_bool running = true;
     std::atomic_bool stopRunning = false;
@@ -45,5 +50,3 @@ namespace LCompilers::LanguageServer::Threading {
   };
 
 } // namespace LCompilers::LanguageServer::Threading
-
-#endif // LCOMPILERS_LS_THREAD_POOL_H

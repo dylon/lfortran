@@ -1,6 +1,4 @@
-#include "lsp/lsp_language_server.h"
-#include <format>
-#include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <utility>
 
@@ -148,7 +146,7 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto JsonRpcLspSerializer::intToJson(
     int value,
-    rapidjson::Document::AllocatorType &allocator
+    rapidjson::Document::AllocatorType &/*allocator*/
   ) const -> rapidjson::Value {
     return rapidjson::Value(value);
   }
@@ -318,13 +316,10 @@ namespace LCompilers::LanguageServerProtocol {
       return jsonId.GetInt();
     }
     default: {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "Unsupported RequestId type: {}",
-          static_cast<int>(jsonId.GetType())
-        )
-      );
+      std::stringstream ss;
+      ss << "Unsupported RequestId type: "
+         << static_cast<int>(jsonId.GetType());
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
     }
     }
   }
@@ -364,13 +359,10 @@ namespace LCompilers::LanguageServerProtocol {
       return lspObject;
     }
     default: {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "Unsupported MessageParams type: {}",
-          static_cast<int>(jsonParams.GetType())
-        )
-      );
+      std::stringstream ss;
+      ss << "Unsupported MessageParams type: "
+         << static_cast<int>(jsonParams.GetType());
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
     }
     }
   }
@@ -421,13 +413,10 @@ namespace LCompilers::LanguageServerProtocol {
       } else if (json.IsUint()) {
         (*lspAny) = json.GetUint();
       } else {
-        throw LspException(
-          ErrorCodes::INVALID_PARAMS,
-          std::format(
-            "Unsupported JSON number type: {}",
-            static_cast<int>(json.GetType())
-          )
-        );
+        std::stringstream ss;
+        ss << "Unsupported JSON number type: "
+           << static_cast<int>(json.GetType());
+        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
       }
       break;
     }

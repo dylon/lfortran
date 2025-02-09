@@ -1,5 +1,4 @@
-#ifndef LCOMPILERS_LS_MESSAGE_QUEUE_H
-#define LCOMPILERS_LS_MESSAGE_QUEUE_H
+#pragma once
 
 #include <atomic>
 #include <condition_variable>
@@ -36,5 +35,3 @@ namespace LCompilers::LanguageServer {
   };
 
 } // namespace LCompilers::LanguageServer
-
-#endif // LCOMPILERS_LS_MESSAGE_QUEUE_H

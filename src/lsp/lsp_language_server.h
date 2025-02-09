@@ -6,53 +6,50 @@
 #pragma once
 
 #include <atomic>
-#include <cstddef>
 #include <map>
-#include <optional>
-#include <shared_mutex>
 
 #include <lsp/language_server.h>
 #include <lsp/logger.h>
 #include <lsp/lsp_serializer.h>
 #include <lsp/lsp_transformer.h>
 #include <lsp/specification.h>
-#include <lsp/text_document.h>
 
 namespace LCompilers::LanguageServerProtocol {
   namespace ls = LCompilers::LanguageServer;
   namespace lsl = LCompilers::LanguageServer::Logging;
 
-  const std::string JSON_RPC_VERSION = "2.0";
-
   class LspLanguageServer : public ls::LanguageServer {
   public:
     LspLanguageServer(
+      ls::MessageQueue &incomingMessages,
       ls::MessageQueue &outgoingMessages,
-      lsl::Logger &logger
+      std::size_t numRequestThreads,
+      std::size_t numWorkerThreads,
+      lsl::Logger &logger,
+      const std::string &configSection
     );
-    std::string serve(const std::string &request) override;
+    auto listen() -> void;
     auto isInitialized() const -> bool;
     auto isShutdown() const -> bool;
     bool isTerminated() const override;
     auto isRunning() const -> bool;
   protected:
+    const std::string configSection;
     JsonRpcLspSerializer serializer;
     JsonRpcLspDeserializer deserializer;
     LspTransformer transformer;
-    std::map<DocumentUri, TextDocument> textDocuments;
     std::unique_ptr<InitializeParams> _initializeParams;
-    std::shared_mutex readWriteMutex;
     std::atomic_bool _initialized = false;
     std::atomic_bool _shutdown = false;
     std::atomic_bool _exit = false;
     std::atomic_int serialId = 0;
+    std::map<int, std::string> callbacksById;
+    std::mutex callbackMutex;
 
-    auto nextId() -> RequestId;
-
+    void handle(const std::string &request, std::size_t sendId) override;
+    auto nextId() -> int;
     auto initializeParams() const -> const InitializeParams &;
-
     auto assertInitialized() -> void;
-
     auto assertRunning() -> void;
 
     auto dispatch(
@@ -65,10 +62,7 @@ namespace LCompilers::LanguageServerProtocol {
       NotificationMessage &notification
     ) -> void;
 
-    void prepare(
-      std::ostream &os,
-      const std::string &response
-    ) const override;
+    auto dispatch(ResponseMessage &response) -> void;
 
     void prepare(
       std::stringstream &ss,
@@ -92,7 +86,7 @@ namespace LCompilers::LanguageServerProtocol {
      * document position. The request's parameter is of type {@link TextDocumentPositionParams}
      * the response is of type {@link Definition} or a Thenable that resolves to such.
      */
-    auto handleTextDocumentImplementation(
+    virtual auto receiveTextDocument_implementation(
       ImplementationParams &params
     ) -> TextDocumentImplementationResult;
 
@@ -101,7 +95,7 @@ namespace LCompilers::LanguageServerProtocol {
      * document position. The request's parameter is of type {@link TextDocumentPositionParams}
      * the response is of type {@link Definition} or a Thenable that resolves to such.
      */
-    auto handleTextDocumentTypeDefinition(
+    virtual auto receiveTextDocument_typeDefinition(
       TypeDefinitionParams &params
     ) -> TextDocumentTypeDefinitionResult;
 
@@ -111,7 +105,7 @@ namespace LCompilers::LanguageServerProtocol {
      * response is of type {@link ColorInformation ColorInformation[]} or a Thenable
      * that resolves to such.
      */
-    auto handleTextDocumentDocumentColor(
+    virtual auto receiveTextDocument_documentColor(
       DocumentColorParams &params
     ) -> TextDocumentDocumentColorResult;
 
@@ -121,7 +115,7 @@ namespace LCompilers::LanguageServerProtocol {
      * response is of type {@link ColorInformation ColorInformation[]} or a Thenable
      * that resolves to such.
      */
-    auto handleTextDocumentColorPresentation(
+    virtual auto receiveTextDocument_colorPresentation(
       ColorPresentationParams &params
     ) -> TextDocumentColorPresentationResult;
 
@@ -131,7 +125,7 @@ namespace LCompilers::LanguageServerProtocol {
      * response is of type {@link FoldingRangeList} or a Thenable
      * that resolves to such.
      */
-    auto handleTextDocumentFoldingRange(
+    virtual auto receiveTextDocument_foldingRange(
       FoldingRangeParams &params
     ) -> TextDocumentFoldingRangeResult;
 
@@ -141,7 +135,7 @@ namespace LCompilers::LanguageServerProtocol {
      * the response is of type {@link Declaration} or a typed array of {@link DeclarationLink}
      * or a Thenable that resolves to such.
      */
-    auto handleTextDocumentDeclaration(
+    virtual auto receiveTextDocument_declaration(
       DeclarationParams &params
     ) -> TextDocumentDeclarationResult;
 
@@ -151,7 +145,7 @@ namespace LCompilers::LanguageServerProtocol {
      * response is of type {@link SelectionRange SelectionRange[]} or a Thenable
      * that resolves to such.
      */
-    auto handleTextDocumentSelectionRange(
+    virtual auto receiveTextDocument_selectionRange(
       SelectionRangeParams &params
     ) -> TextDocumentSelectionRangeResult;
 
@@ -161,7 +155,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleTextDocumentPrepareCallHierarchy(
+    virtual auto receiveTextDocument_prepareCallHierarchy(
       CallHierarchyPrepareParams &params
     ) -> TextDocumentPrepareCallHierarchyResult;
 
@@ -170,7 +164,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleCallHierarchyIncomingCalls(
+    virtual auto receiveCallHierarchy_incomingCalls(
       CallHierarchyIncomingCallsParams &params
     ) -> CallHierarchyIncomingCallsResult;
 
@@ -179,28 +173,28 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleCallHierarchyOutgoingCalls(
+    virtual auto receiveCallHierarchy_outgoingCalls(
       CallHierarchyOutgoingCallsParams &params
     ) -> CallHierarchyOutgoingCallsResult;
 
     /**
      * @since 3.16.0
      */
-    auto handleTextDocumentSemanticTokensFull(
+    virtual auto receiveTextDocument_semanticTokens_full(
       SemanticTokensParams &params
     ) -> TextDocumentSemanticTokensFullResult;
 
     /**
      * @since 3.16.0
      */
-    auto handleTextDocumentSemanticTokensFullDelta(
+    virtual auto receiveTextDocument_semanticTokens_full_delta(
       SemanticTokensDeltaParams &params
     ) -> TextDocumentSemanticTokensFullDeltaResult;
 
     /**
      * @since 3.16.0
      */
-    auto handleTextDocumentSemanticTokensRange(
+    virtual auto receiveTextDocument_semanticTokens_range(
       SemanticTokensRangeParams &params
     ) -> TextDocumentSemanticTokensRangeResult;
 
@@ -209,7 +203,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleTextDocumentLinkedEditingRange(
+    virtual auto receiveTextDocument_linkedEditingRange(
       LinkedEditingRangeParams &params
     ) -> TextDocumentLinkedEditingRangeResult;
 
@@ -223,7 +217,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleWorkspaceWillCreateFiles(
+    virtual auto receiveWorkspace_willCreateFiles(
       CreateFilesParams &params
     ) -> WorkspaceWillCreateFilesResult;
 
@@ -233,7 +227,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleWorkspaceWillRenameFiles(
+    virtual auto receiveWorkspace_willRenameFiles(
       RenameFilesParams &params
     ) -> WorkspaceWillRenameFilesResult;
 
@@ -243,7 +237,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleWorkspaceWillDeleteFiles(
+    virtual auto receiveWorkspace_willDeleteFiles(
       DeleteFilesParams &params
     ) -> WorkspaceWillDeleteFilesResult;
 
@@ -252,7 +246,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The request parameter is of type {@link TextDocumentPositionParams}.
      * The response is of type {@link Moniker Moniker[]} or `null`.
      */
-    auto handleTextDocumentMoniker(
+    virtual auto receiveTextDocument_moniker(
       MonikerParams &params
     ) -> TextDocumentMonikerResult;
 
@@ -262,7 +256,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleTextDocumentPrepareTypeHierarchy(
+    virtual auto receiveTextDocument_prepareTypeHierarchy(
       TypeHierarchyPrepareParams &params
     ) -> TextDocumentPrepareTypeHierarchyResult;
 
@@ -271,7 +265,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleTypeHierarchySupertypes(
+    virtual auto receiveTypeHierarchy_supertypes(
       TypeHierarchySupertypesParams &params
     ) -> TypeHierarchySupertypesResult;
 
@@ -280,7 +274,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleTypeHierarchySubtypes(
+    virtual auto receiveTypeHierarchy_subtypes(
       TypeHierarchySubtypesParams &params
     ) -> TypeHierarchySubtypesResult;
 
@@ -291,7 +285,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleTextDocumentInlineValue(
+    virtual auto receiveTextDocument_inlineValue(
       InlineValueParams &params
     ) -> TextDocumentInlineValueResult;
 
@@ -302,7 +296,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleTextDocumentInlayHint(
+    virtual auto receiveTextDocument_inlayHint(
       InlayHintParams &params
     ) -> TextDocumentInlayHintResult;
 
@@ -313,7 +307,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleInlayHintResolve(
+    virtual auto receiveInlayHint_resolve(
       InlayHint &params
     ) -> InlayHintResolveResult;
 
@@ -322,7 +316,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleTextDocumentDiagnostic(
+    virtual auto receiveTextDocument_diagnostic(
       DocumentDiagnosticParams &params
     ) -> TextDocumentDiagnosticResult;
 
@@ -331,7 +325,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleWorkspaceDiagnostic(
+    virtual auto receiveWorkspace_diagnostic(
       WorkspaceDiagnosticParams &params
     ) -> WorkspaceDiagnosticResult;
 
@@ -343,7 +337,7 @@ namespace LCompilers::LanguageServerProtocol {
      * @since 3.18.0
      * @proposed
      */
-    auto handleTextDocumentInlineCompletion(
+    virtual auto receiveTextDocument_inlineCompletion(
       InlineCompletionParams &params
     ) -> TextDocumentInlineCompletionResult;
 
@@ -354,7 +348,7 @@ namespace LCompilers::LanguageServerProtocol {
      * the response if of type {@link InitializeResult} of a Thenable that
      * resolves to such.
      */
-    auto handleInitialize(
+    virtual auto receiveInitialize(
       InitializeParams &params
     ) -> InitializeResult;
 
@@ -364,7 +358,7 @@ namespace LCompilers::LanguageServerProtocol {
      * server. The only notification that is sent after a shutdown request
      * is the exit event.
      */
-    auto handleShutdown() -> ShutdownResult;
+    virtual auto receiveShutdown() -> ShutdownResult;
 
     /**
      * A document will save request is sent from the client to the server before
@@ -374,7 +368,7 @@ namespace LCompilers::LanguageServerProtocol {
      * server constantly fails on this request. This is done to keep the save fast and
      * reliable.
      */
-    auto handleTextDocumentWillSaveWaitUntil(
+    virtual auto receiveTextDocument_willSaveWaitUntil(
       WillSaveTextDocumentParams &params
     ) -> TextDocumentWillSaveWaitUntilResult;
 
@@ -389,7 +383,7 @@ namespace LCompilers::LanguageServerProtocol {
      * request. However, properties that are needed for the initial sorting and filtering, like `sortText`,
      * `filterText`, `insertText`, and `textEdit`, must not be changed during resolve.
      */
-    auto handleTextDocumentCompletion(
+    virtual auto receiveTextDocument_completion(
       CompletionParams &params
     ) -> TextDocumentCompletionResult;
 
@@ -398,7 +392,7 @@ namespace LCompilers::LanguageServerProtocol {
      * parameter is of type {@link CompletionItem} the response
      * is of type {@link CompletionItem} or a Thenable that resolves to such.
      */
-    auto handleCompletionItemResolve(
+    virtual auto receiveCompletionItem_resolve(
       CompletionItem &params
     ) -> CompletionItemResolveResult;
 
@@ -407,11 +401,11 @@ namespace LCompilers::LanguageServerProtocol {
      * parameter is of type {@link TextDocumentPosition} the response is of
      * type {@link Hover} or a Thenable that resolves to such.
      */
-    auto handleTextDocumentHover(
+    virtual auto receiveTextDocument_hover(
       HoverParams &params
     ) -> TextDocumentHoverResult;
 
-    auto handleTextDocumentSignatureHelp(
+    virtual auto receiveTextDocument_signatureHelp(
       SignatureHelpParams &params
     ) -> TextDocumentSignatureHelpResult;
 
@@ -421,7 +415,7 @@ namespace LCompilers::LanguageServerProtocol {
      * the response is of either type {@link Definition} or a typed array of
      * {@link DefinitionLink} or a Thenable that resolves to such.
      */
-    auto handleTextDocumentDefinition(
+    virtual auto receiveTextDocument_definition(
       DefinitionParams &params
     ) -> TextDocumentDefinitionResult;
 
@@ -431,7 +425,7 @@ namespace LCompilers::LanguageServerProtocol {
      * type {@link ReferenceParams} the response is of type
      * {@link Location Location[]} or a Thenable that resolves to such.
      */
-    auto handleTextDocumentReferences(
+    virtual auto receiveTextDocument_references(
       ReferenceParams &params
     ) -> TextDocumentReferencesResult;
 
@@ -441,7 +435,7 @@ namespace LCompilers::LanguageServerProtocol {
      * the request response is an array of type {@link DocumentHighlight}
      * or a Thenable that resolves to such.
      */
-    auto handleTextDocumentDocumentHighlight(
+    virtual auto receiveTextDocument_documentHighlight(
       DocumentHighlightParams &params
     ) -> TextDocumentDocumentHighlightResult;
 
@@ -451,14 +445,14 @@ namespace LCompilers::LanguageServerProtocol {
      * response is of type {@link SymbolInformation SymbolInformation[]} or a Thenable
      * that resolves to such.
      */
-    auto handleTextDocumentDocumentSymbol(
+    virtual auto receiveTextDocument_documentSymbol(
       DocumentSymbolParams &params
     ) -> TextDocumentDocumentSymbolResult;
 
     /**
      * A request to provide commands for the given text document and range.
      */
-    auto handleTextDocumentCodeAction(
+    virtual auto receiveTextDocument_codeAction(
       CodeActionParams &params
     ) -> TextDocumentCodeActionResult;
 
@@ -467,7 +461,7 @@ namespace LCompilers::LanguageServerProtocol {
      * parameter is of type {@link CodeAction} the response
      * is of type {@link CodeAction} or a Thenable that resolves to such.
      */
-    auto handleCodeActionResolve(
+    virtual auto receiveCodeAction_resolve(
       CodeAction &params
     ) -> CodeActionResolveResult;
 
@@ -482,7 +476,7 @@ namespace LCompilers::LanguageServerProtocol {
      *  `workspace.symbol.resolveSupport`.
      *
      */
-    auto handleWorkspaceSymbol(
+    virtual auto receiveWorkspace_symbol(
       WorkspaceSymbolParams &params
     ) -> WorkspaceSymbolResult;
 
@@ -492,28 +486,28 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleWorkspaceSymbolResolve(
+    virtual auto receiveWorkspaceSymbol_resolve(
       WorkspaceSymbol &params
     ) -> WorkspaceSymbolResolveResult;
 
     /**
      * A request to provide code lens for the given text document.
      */
-    auto handleTextDocumentCodeLens(
+    virtual auto receiveTextDocument_codeLens(
       CodeLensParams &params
     ) -> TextDocumentCodeLensResult;
 
     /**
      * A request to resolve a command for a given code lens.
      */
-    auto handleCodeLensResolve(
+    virtual auto receiveCodeLens_resolve(
       CodeLens &params
     ) -> CodeLensResolveResult;
 
     /**
      * A request to provide document links
      */
-    auto handleTextDocumentDocumentLink(
+    virtual auto receiveTextDocument_documentLink(
       DocumentLinkParams &params
     ) -> TextDocumentDocumentLinkResult;
 
@@ -522,21 +516,21 @@ namespace LCompilers::LanguageServerProtocol {
      * parameter is of type {@link DocumentLink} the response
      * is of type {@link DocumentLink} or a Thenable that resolves to such.
      */
-    auto handleDocumentLinkResolve(
+    virtual auto receiveDocumentLink_resolve(
       DocumentLink &params
     ) -> DocumentLinkResolveResult;
 
     /**
      * A request to format a whole document.
      */
-    auto handleTextDocumentFormatting(
+    virtual auto receiveTextDocument_formatting(
       DocumentFormattingParams &params
     ) -> TextDocumentFormattingResult;
 
     /**
      * A request to format a range in a document.
      */
-    auto handleTextDocumentRangeFormatting(
+    virtual auto receiveTextDocument_rangeFormatting(
       DocumentRangeFormattingParams &params
     ) -> TextDocumentRangeFormattingResult;
 
@@ -546,21 +540,21 @@ namespace LCompilers::LanguageServerProtocol {
      * @since 3.18.0
      * @proposed
      */
-    auto handleTextDocumentRangesFormatting(
+    virtual auto receiveTextDocument_rangesFormatting(
       DocumentRangesFormattingParams &params
     ) -> TextDocumentRangesFormattingResult;
 
     /**
      * A request to format a document on type.
      */
-    auto handleTextDocumentOnTypeFormatting(
+    virtual auto receiveTextDocument_onTypeFormatting(
       DocumentOnTypeFormattingParams &params
     ) -> TextDocumentOnTypeFormattingResult;
 
     /**
      * A request to rename a symbol.
      */
-    auto handleTextDocumentRename(
+    virtual auto receiveTextDocument_rename(
       RenameParams &params
     ) -> TextDocumentRenameResult;
 
@@ -569,7 +563,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16 - support for default behavior
      */
-    auto handleTextDocumentPrepareRename(
+    virtual auto receiveTextDocument_prepareRename(
       PrepareRenameParams &params
     ) -> TextDocumentPrepareRenameResult;
 
@@ -577,7 +571,7 @@ namespace LCompilers::LanguageServerProtocol {
      * A request send from the client to the server to execute a command. The request might return
      * a workspace edit which the client will apply to the workspace.
      */
-    auto handleWorkspaceExecuteCommand(
+    virtual auto receiveWorkspace_executeCommand(
       ExecuteCommandParams &params
     ) -> WorkspaceExecuteCommandResult;
 
@@ -589,7 +583,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The `workspace/didChangeWorkspaceFolders` notification is sent from the client to the server when the workspace
      * folder configuration changes.
      */
-    auto handleWorkspaceDidChangeWorkspaceFolders(
+    virtual auto receiveWorkspace_didChangeWorkspaceFolders(
       DidChangeWorkspaceFoldersParams &params
     ) -> void;
 
@@ -597,7 +591,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The `window/workDoneProgress/cancel` notification is sent from  the client to the server to cancel a progress
      * initiated on the server side.
      */
-    auto handleWindowWorkDoneProgressCancel(
+    virtual auto receiveWindow_workDoneProgress_cancel(
       WorkDoneProgressCancelParams &params
     ) -> void;
 
@@ -607,7 +601,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleWorkspaceDidCreateFiles(
+    virtual auto receiveWorkspace_didCreateFiles(
       CreateFilesParams &params
     ) -> void;
 
@@ -617,7 +611,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleWorkspaceDidRenameFiles(
+    virtual auto receiveWorkspace_didRenameFiles(
       RenameFilesParams &params
     ) -> void;
 
@@ -627,7 +621,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto handleWorkspaceDidDeleteFiles(
+    virtual auto receiveWorkspace_didDeleteFiles(
       DeleteFilesParams &params
     ) -> void;
 
@@ -636,11 +630,11 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleNotebookDocumentDidOpen(
+    virtual auto receiveNotebookDocument_didOpen(
       DidOpenNotebookDocumentParams &params
     ) -> void;
 
-    auto handleNotebookDocumentDidChange(
+    virtual auto receiveNotebookDocument_didChange(
       DidChangeNotebookDocumentParams &params
     ) -> void;
 
@@ -649,7 +643,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleNotebookDocumentDidSave(
+    virtual auto receiveNotebookDocument_didSave(
       DidSaveNotebookDocumentParams &params
     ) -> void;
 
@@ -658,7 +652,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    auto handleNotebookDocumentDidClose(
+    virtual auto receiveNotebookDocument_didClose(
       DidCloseNotebookDocumentParams &params
     ) -> void;
 
@@ -667,7 +661,7 @@ namespace LCompilers::LanguageServerProtocol {
      * server after the client is fully initialized and the server
      * is allowed to send requests from the server to the client.
      */
-    auto handleInitialized(
+    virtual auto receiveInitialized(
       InitializedParams &params
     ) -> void;
 
@@ -675,14 +669,14 @@ namespace LCompilers::LanguageServerProtocol {
      * The exit event is sent from the client to the server to
      * ask the server to exit its process.
      */
-    auto handleExit() -> void;
+    virtual auto receiveExit() -> void;
 
     /**
      * The configuration change notification is sent from the client to the server
      * when the client's configuration has changed. The notification contains
      * the changed configuration as defined by the language client.
      */
-    auto handleWorkspaceDidChangeConfiguration(
+    virtual auto receiveWorkspace_didChangeConfiguration(
       DidChangeConfigurationParams &params
     ) -> void;
 
@@ -696,7 +690,7 @@ namespace LCompilers::LanguageServerProtocol {
      * This means open and close notification must be balanced and the max open count
      * is one.
      */
-    auto handleTextDocumentDidOpen(
+    virtual auto receiveTextDocument_didOpen(
       DidOpenTextDocumentParams &params
     ) -> void;
 
@@ -704,7 +698,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The document change notification is sent from the client to the server to signal
      * changes to a text document.
      */
-    auto handleTextDocumentDidChange(
+    virtual auto receiveTextDocument_didChange(
       DidChangeTextDocumentParams &params
     ) -> void;
 
@@ -717,7 +711,7 @@ namespace LCompilers::LanguageServerProtocol {
      * doesn't mean that the document was open in an editor before. A close
      * notification requires a previous open notification to be sent.
      */
-    auto handleTextDocumentDidClose(
+    virtual auto receiveTextDocument_didClose(
       DidCloseTextDocumentParams &params
     ) -> void;
 
@@ -725,7 +719,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The document save notification is sent from the client to the server when
      * the document got saved in the client.
      */
-    auto handleTextDocumentDidSave(
+    virtual auto receiveTextDocument_didSave(
       DidSaveTextDocumentParams &params
     ) -> void;
 
@@ -733,7 +727,7 @@ namespace LCompilers::LanguageServerProtocol {
      * A document will save notification is sent from the client to the server before
      * the document is actually saved.
      */
-    auto handleTextDocumentWillSave(
+    virtual auto receiveTextDocument_willSave(
       WillSaveTextDocumentParams &params
     ) -> void;
 
@@ -741,11 +735,11 @@ namespace LCompilers::LanguageServerProtocol {
      * The watched files notification is sent from the client to the server when
      * the client detects changes to file watched by the language client.
      */
-    auto handleWorkspaceDidChangeWatchedFiles(
+    virtual auto receiveWorkspace_didChangeWatchedFiles(
       DidChangeWatchedFilesParams &params
     ) -> void;
 
-    auto handleSetTrace(
+    virtual auto receiveSetTrace(
       SetTraceParams &params
     ) -> void;
 
@@ -756,7 +750,14 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * The `workspace/workspaceFolders` is sent from the server to the client to fetch the open workspace folders.
      */
-    auto requestWorkspaceWorkspaceFolders() -> void;
+    virtual auto sendWorkspace_workspaceFolders() -> void;
+
+    /**
+     * The `workspace/workspaceFolders` is sent from the server to the client to fetch the open workspace folders.
+     */
+    virtual auto receiveWorkspace_workspaceFolders(
+      WorkspaceWorkspaceFoldersResult &params
+    ) -> void;
 
     /**
      * The 'workspace/configuration' request is sent from the server to the client to fetch a certain
@@ -767,28 +768,64 @@ namespace LCompilers::LanguageServerProtocol {
      * result of `workspace/configuration` requests) the server should register for an empty configuration
      * change event and empty the cache if such an event is received.
      */
-    auto requestWorkspaceConfiguration(
+    virtual auto sendWorkspace_configuration(
       ConfigurationParams &params
+    ) -> void;
+
+    /**
+     * The 'workspace/configuration' request is sent from the server to the client to fetch a certain
+     * configuration setting.
+     *
+     * This pull model replaces the old push model where the client signaled configuration change via an
+     * event. If the server still needs to react to configuration changes (since the server caches the
+     * result of `workspace/configuration` requests) the server should register for an empty configuration
+     * change event and empty the cache if such an event is received.
+     */
+    virtual auto receiveWorkspace_configuration(
+      WorkspaceConfigurationResult &params
     ) -> void;
 
     /**
      * @since 3.18.0
      * @proposed
      */
-    auto requestWorkspaceFoldingRangeRefresh() -> void;
+    virtual auto sendWorkspace_foldingRange_refresh() -> void;
+
+    /**
+     * @since 3.18.0
+     * @proposed
+     */
+    virtual auto receiveWorkspace_foldingRange_refresh(
+      WorkspaceFoldingRangeRefreshResult params
+    ) -> void;
 
     /**
      * The `window/workDoneProgress/create` request is sent from the server to the client to initiate progress
      * reporting from the server.
      */
-    auto requestWindowWorkDoneProgressCreate(
+    virtual auto sendWindow_workDoneProgress_create(
       WorkDoneProgressCreateParams &params
+    ) -> void;
+
+    /**
+     * The `window/workDoneProgress/create` request is sent from the server to the client to initiate progress
+     * reporting from the server.
+     */
+    virtual auto receiveWindow_workDoneProgress_create(
+      WindowWorkDoneProgressCreateResult params
     ) -> void;
 
     /**
      * @since 3.16.0
      */
-    auto requestWorkspaceSemanticTokensRefresh() -> void;
+    virtual auto sendWorkspace_semanticTokens_refresh() -> void;
+
+    /**
+     * @since 3.16.0
+     */
+    virtual auto receiveWorkspace_semanticTokens_refresh(
+      WorkspaceSemanticTokensRefreshResult params
+    ) -> void;
 
     /**
      * A request to show a document. This request might open an
@@ -798,49 +835,108 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto requestWindowShowDocument(
+    virtual auto sendWindow_showDocument(
       ShowDocumentParams &params
+    ) -> void;
+
+    /**
+     * A request to show a document. This request might open an
+     * external program depending on the value of the URI to open.
+     * For example a request to open `https://code.visualstudio.com/`
+     * will very likely open the URI in a WEB browser.
+     *
+     * @since 3.16.0
+     */
+    virtual auto receiveWindow_showDocument(
+      WindowShowDocumentResult &params
     ) -> void;
 
     /**
      * @since 3.17.0
      */
-    auto requestWorkspaceInlineValueRefresh() -> void;
+    virtual auto sendWorkspace_inlineValue_refresh() -> void;
 
     /**
      * @since 3.17.0
      */
-    auto requestWorkspaceInlayHintRefresh() -> void;
+    virtual auto receiveWorkspace_inlineValue_refresh(
+      WorkspaceInlineValueRefreshResult params
+    ) -> void;
+
+    /**
+     * @since 3.17.0
+     */
+    virtual auto sendWorkspace_inlayHint_refresh() -> void;
+
+    /**
+     * @since 3.17.0
+     */
+    virtual auto receiveWorkspace_inlayHint_refresh(
+      WorkspaceInlayHintRefreshResult params
+    ) -> void;
 
     /**
      * The diagnostic refresh request definition.
      *
      * @since 3.17.0
      */
-    auto requestWorkspaceDiagnosticRefresh() -> void;
+    virtual auto sendWorkspace_diagnostic_refresh() -> void;
+
+    /**
+     * The diagnostic refresh request definition.
+     *
+     * @since 3.17.0
+     */
+    virtual auto receiveWorkspace_diagnostic_refresh(
+      WorkspaceDiagnosticRefreshResult params
+    ) -> void;
 
     /**
      * The `client/registerCapability` request is sent from the server to the client to register a new capability
      * handler on the client side.
      */
-    auto requestClientRegisterCapability(
+    virtual auto sendClient_registerCapability(
       RegistrationParams &params
+    ) -> void;
+
+    /**
+     * The `client/registerCapability` request is sent from the server to the client to register a new capability
+     * handler on the client side.
+     */
+    virtual auto receiveClient_registerCapability(
+      ClientRegisterCapabilityResult params
     ) -> void;
 
     /**
      * The `client/unregisterCapability` request is sent from the server to the client to unregister a previously registered capability
      * handler on the client side.
      */
-    auto requestClientUnregisterCapability(
+    virtual auto sendClient_unregisterCapability(
       UnregistrationParams &params
+    ) -> void;
+
+    /**
+     * The `client/unregisterCapability` request is sent from the server to the client to unregister a previously registered capability
+     * handler on the client side.
+     */
+    virtual auto receiveClient_unregisterCapability(
+      ClientUnregisterCapabilityResult params
     ) -> void;
 
     /**
      * The show message request is sent from the server to the client to show a message
      * and a set of options actions to the user.
      */
-    auto requestWindowShowMessageRequest(
+    virtual auto sendWindow_showMessageRequest(
       ShowMessageRequestParams &params
+    ) -> void;
+
+    /**
+     * The show message request is sent from the server to the client to show a message
+     * and a set of options actions to the user.
+     */
+    virtual auto receiveWindow_showMessageRequest(
+      WindowShowMessageRequestResult &params
     ) -> void;
 
     /**
@@ -848,13 +944,29 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    auto requestWorkspaceCodeLensRefresh() -> void;
+    virtual auto sendWorkspace_codeLens_refresh() -> void;
+
+    /**
+     * A request to refresh all code actions
+     *
+     * @since 3.16.0
+     */
+    virtual auto receiveWorkspace_codeLens_refresh(
+      WorkspaceCodeLensRefreshResult params
+    ) -> void;
 
     /**
      * A request sent from the server to the client to modified certain resources.
      */
-    auto requestWorkspaceApplyEdit(
+    virtual auto sendWorkspace_applyEdit(
       ApplyWorkspaceEditParams &params
+    ) -> void;
+
+    /**
+     * A request sent from the server to the client to modified certain resources.
+     */
+    virtual auto receiveWorkspace_applyEdit(
+      WorkspaceApplyEditResult &params
     ) -> void;
 
     // ====================== //
@@ -865,7 +977,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The show message notification is sent from a server to a client to ask
      * the client to display a particular message in the user interface.
      */
-    auto notifyWindowShowMessage(
+    virtual auto sendWindow_showMessage(
       ShowMessageParams &params
     ) -> void;
 
@@ -873,7 +985,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The log message notification is sent from the server to the client to ask
      * the client to log a particular message.
      */
-    auto notifyWindowLogMessage(
+    virtual auto sendWindow_logMessage(
       LogMessageParams &params
     ) -> void;
 
@@ -881,7 +993,7 @@ namespace LCompilers::LanguageServerProtocol {
      * The telemetry event notification is sent from the server to the client to ask
      * the client to log telemetry data.
      */
-    auto notifyTelemetryEvent(
+    virtual auto sendTelemetry_event(
       LSPAny &params
     ) -> void;
 
@@ -889,11 +1001,11 @@ namespace LCompilers::LanguageServerProtocol {
      * Diagnostics notification are sent from the server to the client to signal
      * results of validation runs.
      */
-    auto notifyTextDocumentPublishDiagnostics(
+    virtual auto sendTextDocument_publishDiagnostics(
       PublishDiagnosticsParams &params
     ) -> void;
 
-    auto notifyLogTrace(
+    virtual auto sendLogTrace(
       LogTraceParams &params
     ) -> void;
 

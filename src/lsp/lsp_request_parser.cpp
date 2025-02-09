@@ -1,8 +1,3 @@
-#include <format>
-#include <iostream>
-
-#include "lsp/request_parser.h"
-
 #include <lsp/lsp_request_parser.h>
 
 namespace LCompilers::LanguageServerProtocol {
@@ -216,10 +211,10 @@ namespace LCompilers::LanguageServerProtocol {
           }
           }
         }
-        _error = std::format(
-          "Reached non-newline character on line={}, column={} while parsing newline: {}",
-          line, column, c
-        );
+        ss.str("");
+        ss << "Reached non-newline character on line=" << line
+           << ", column=" << column << " while parsing newline: " << c;
+        _error = ss.str();
         goto error;
       }
       }
@@ -263,10 +258,11 @@ namespace LCompilers::LanguageServerProtocol {
           headerState = ls::RequestHeaderParserState::COMPLETE;
           break;
         }
-        _error = std::format(
-          "Reached newline character on line={}, column={}, while parsing header name: {}",
-          line, column, ((c == '\r') ? "\\r" : "\\n")
-        );
+        ss.str("");
+        ss << "Reached newline character on line=" << line
+           << ", column=" << column << ", while parsing header name: "
+           << ((c == '\r') ? "\\r" : "\\n");
+        _error = ss.str();
         goto error;
       }
       case ':': {
@@ -334,10 +330,11 @@ namespace LCompilers::LanguageServerProtocol {
       }
       case '\n': // fallthrough
       case '\r': {
-        _error = std::format(
-          "Reached newline character on line={}, column={} while parsing header separator: {}",
-          line, column, ((c == '\r') ? "\\r" : "\\n")
-        );
+        ss.str("");
+        ss << "Reached newline character on line=" << line
+           << ", column=" << column << " while parsing header separator: "
+           << ((c == '\r') ? "\\r" : "\\n");
+        _error = ss.str();
         goto error;
       }
       default: {
@@ -440,10 +437,10 @@ namespace LCompilers::LanguageServerProtocol {
           }
           }
         }
-        _error = std::format(
-          "Reached non-newline character on line={}, column={} while parsing newline: {}",
-          line, column, c
-        );
+        ss.str("");
+        ss << "Reached non-newline character on line=" << line
+           << ", column=" << column << " while parsing newline: " << c;
+        _error = ss.str();
         goto error;
       }
       }
@@ -480,10 +477,9 @@ namespace LCompilers::LanguageServerProtocol {
     } // fallthrough
     case ls::RequestBodyParserState::PARSING_BODY: {
       if (numBytes == 0) {
-        _error = std::format(
-          "line={}, column={}: No bytes to read.",
-          line, column
-        );
+        ss.str("");
+        ss << "line=" << line << ", column=" << column << ": No bytes to read.";
+        _error = ss.str();
         goto error;
       }
       if (readBytes < numBytes) {

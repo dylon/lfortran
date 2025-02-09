@@ -8,12 +8,17 @@
 #include <cstddef>
 #include <memory>
 
+#include <lsp/logger.h>
 #include <lsp/specification.h>
 
 namespace LCompilers::LanguageServerProtocol {
 
+  namespace lsl = LCompilers::LanguageServer::Logging;
+
   class LspTransformer {
   public:
+    LspTransformer(lsl::Logger &logger);
+
     // ============ //
     // Copy Methods //
     // ============ //
@@ -3513,27 +3518,69 @@ namespace LCompilers::LanguageServerProtocol {
     // Outgoing Requests //
     // ================= //
 
+    auto anyToWorkspaceWorkspaceFoldersResult(
+      const LSPAny &any
+    ) const -> WorkspaceWorkspaceFoldersResult;
     auto asMessageParams(
       const ConfigurationParams &requestParams
     ) const -> MessageParams;
+    auto anyToWorkspaceConfigurationResult(
+      const LSPAny &any
+    ) const -> WorkspaceConfigurationResult;
+    auto anyToWorkspaceFoldingRangeRefreshResult(
+      const LSPAny &any
+    ) const -> WorkspaceFoldingRangeRefreshResult;
     auto asMessageParams(
       const WorkDoneProgressCreateParams &requestParams
     ) const -> MessageParams;
+    auto anyToWindowWorkDoneProgressCreateResult(
+      const LSPAny &any
+    ) const -> WindowWorkDoneProgressCreateResult;
+    auto anyToWorkspaceSemanticTokensRefreshResult(
+      const LSPAny &any
+    ) const -> WorkspaceSemanticTokensRefreshResult;
     auto asMessageParams(
       const ShowDocumentParams &requestParams
     ) const -> MessageParams;
+    auto anyToWindowShowDocumentResult(
+      const LSPAny &any
+    ) const -> std::unique_ptr<WindowShowDocumentResult>;
+    auto anyToWorkspaceInlineValueRefreshResult(
+      const LSPAny &any
+    ) const -> WorkspaceInlineValueRefreshResult;
+    auto anyToWorkspaceInlayHintRefreshResult(
+      const LSPAny &any
+    ) const -> WorkspaceInlayHintRefreshResult;
+    auto anyToWorkspaceDiagnosticRefreshResult(
+      const LSPAny &any
+    ) const -> WorkspaceDiagnosticRefreshResult;
     auto asMessageParams(
       const RegistrationParams &requestParams
     ) const -> MessageParams;
+    auto anyToClientRegisterCapabilityResult(
+      const LSPAny &any
+    ) const -> ClientRegisterCapabilityResult;
     auto asMessageParams(
       const UnregistrationParams &requestParams
     ) const -> MessageParams;
+    auto anyToClientUnregisterCapabilityResult(
+      const LSPAny &any
+    ) const -> ClientUnregisterCapabilityResult;
     auto asMessageParams(
       const ShowMessageRequestParams &requestParams
     ) const -> MessageParams;
+    auto anyToWindowShowMessageRequestResult(
+      const LSPAny &any
+    ) const -> WindowShowMessageRequestResult;
+    auto anyToWorkspaceCodeLensRefreshResult(
+      const LSPAny &any
+    ) const -> WorkspaceCodeLensRefreshResult;
     auto asMessageParams(
       const ApplyWorkspaceEditParams &requestParams
     ) const -> MessageParams;
+    auto anyToWorkspaceApplyEditResult(
+      const LSPAny &any
+    ) const -> std::unique_ptr<WorkspaceApplyEditResult>;
 
     // ====================== //
     // Outgoing Notifications //
@@ -3555,6 +3602,8 @@ namespace LCompilers::LanguageServerProtocol {
       const LogTraceParams &notificationParams
     ) const -> MessageParams;
 
+  private:
+    lsl::Logger &logger;
   }; // class LspTransformer
 
 } // namespace LCompilers::LanguageServerProtocol

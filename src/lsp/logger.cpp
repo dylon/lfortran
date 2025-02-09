@@ -1,5 +1,5 @@
-#include <format>
 #include <stdexcept>
+#include <sstream>
 
 #include <lsp/logger.h>
 
@@ -10,9 +10,9 @@ namespace LCompilers::LanguageServer::Logging {
     , logFile(logPath, std::ios::out | std::ios::trunc)
   {
     if (!logFile.is_open()) {
-      throw std::invalid_argument(
-        std::format("Failed to open log file for writing: {}", logPath.string())
-      );
+      std::stringstream ss;
+      ss << "Failed to open log file for writing: " << logPath;
+      throw std::invalid_argument(ss.str());
     }
   }
 
@@ -37,6 +37,10 @@ namespace LCompilers::LanguageServer::Logging {
     } else {
       throw std::runtime_error("Logger has already been closed.");
     }
+  }
+
+  auto Logger::lock() -> std::unique_lock<std::mutex> {
+    return std::unique_lock<std::mutex>(mutex);
   }
 
   auto Logger::operator<<(unsigned char c) -> Logger & {

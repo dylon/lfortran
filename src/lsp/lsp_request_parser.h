@@ -1,5 +1,4 @@
-#ifndef LCOMPILERS_LSP_TCP_LSP_REQUEST_PARSER_H
-#define LCOMPILERS_LSP_TCP_LSP_REQUEST_PARSER_H
+#pragma once
 
 #include <cstddef>
 #include <sstream>
@@ -43,5 +42,3 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
 } // namespace LCompilers::LanguageServerProtocol
-
-#endif // LCOMPILERS_LSP_TCP_LSP_REQUEST_PARSER_H

@@ -20,6 +20,9 @@
  * See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification
  */
 namespace LCompilers::LanguageServerProtocol {
+  const std::string JSON_RPC_VERSION = "2.0";
+  const std::string LSP_VERSION = "3.17.0";
+
   typedef int integer_t;
   typedef unsigned int uinteger_t;
   typedef double decimal_t;
@@ -31,25 +34,29 @@ namespace LCompilers::LanguageServerProtocol {
   typedef string_t DocumentUri;
   typedef string_t RegExp;
 
-  // NOTE: This is a wrapper around std::variant because the types `LSPAny`,
-  // `LSPObject`, and `LSPArray` are mutually recursive and cannot be easily
-  // forward-declared otherwise.
   struct LSPAny;  // Forward declaration
 
-  typedef std::map<std::string, std::unique_ptr<LSPAny>> LSPObject;
+  /**
+   * LSP object definition.
+   * @since 3.17.0
+   */
+  typedef std::map<string_t, std::unique_ptr<LSPAny>> LSPObject;
 
+  /**
+   * LSP arrays.
+   * @since 3.17.0
+   */
   typedef std::vector<std::unique_ptr<LSPAny>> LSPArray;
 
-  enum class LSPAnyType
-  {
-    OBJECT_TYPE = 0,
-    ARRAY_TYPE = 1,
-    STRING_TYPE = 2,
-    INTEGER_TYPE = 3,
-    UINTEGER_TYPE = 4,
-    DECIMAL_TYPE = 5,
-    BOOLEAN_TYPE = 6,
-    NULL_TYPE = 7,
+  enum class LSPAnyType {
+    OBJECT_TYPE,
+    ARRAY_TYPE,
+    STRING_TYPE,
+    INTEGER_TYPE,
+    UINTEGER_TYPE,
+    DECIMAL_TYPE,
+    BOOLEAN_TYPE,
+    NULL_TYPE,
   };
 
   extern std::map<LSPAnyType, std::string> LSPAnyTypeNames;
@@ -69,141 +76,6 @@ namespace LCompilers::LanguageServerProtocol {
     : public LSPAnyBase
   {
     using LSPAnyBase::variant;
-  };
-
-  /**
-   * A general message as defined by JSON-RPC. The language server protocol
-   * always uses “2.0” as the jsonrpc version.
-   */
-  struct Message
-  {
-    string_t jsonrpc;
-  };
-
-  enum class RequestIdType {
-    INTEGER_TYPE,
-    STRING_TYPE,
-  };
-
-  typedef std::variant<
-    integer_t,
-    string_t
-  > RequestId;
-
-  enum class MessageParamsType
-  {
-    ARRAY_TYPE,
-    OBJECT_TYPE,
-  };
-
-  typedef std::variant<
-    LSPArray,
-    LSPObject
-  > MessageParams;
-
-  /**
-   * A request message to describe a request between the client and the server.
-   * Every processed request must send a response back to the sender of the
-   * request.
-   */
-  struct RequestMessage
-    : public Message
-  {
-
-    /**
-     * The request id.
-     */
-    RequestId id;
-
-    /**
-     * The method to be invoked.
-     */
-    string_t method;
-
-    /**
-     * The method's params.
-     */
-    std::optional<MessageParams> params;
-  };
-
-  struct ResponseError
-  {
-
-    /**
-     * A number indicating the error type that occurred.
-     */
-    integer_t code;
-
-    /**
-     * A string providing a short description of the error.
-     */
-    string_t message;
-
-    /**
-     * A primitive or structured value that contains additional information about
-     * the error. Can be omitted.
-     */
-    std::optional<std::unique_ptr<LSPAny>> data;
-  };
-
-  enum class ResponseIdType
-  {
-    INTEGER_TYPE,
-    STRING_TYPE,
-    NULL_TYPE,
-  };
-
-  typedef std::variant<
-    integer_t,
-    string_t,
-    null_t
-  > ResponseId;
-
-  /**
-   * A Response Message sent as a result of a request. If a request doesn’t
-   * provide a result value the receiver of a request still needs to return a
-   * response message to conform to the JSON-RPC specification. The result
-   * property of the ResponseMessage should be set to null in this case to signal
-   * a successful request.
-   */
-  struct ResponseMessage
-    : public Message
-  {
-
-    /**
-     * The request id.
-     */
-    ResponseId id;
-
-    /**
-     * The result of a request. This member is REQUIRED on success. This member
-     * MUST NOT exist if there was an error invoking the method.
-     */
-    std::optional<std::unique_ptr<LSPAny>> result;
-
-    /**
-     * The error object in case a request fails.
-     */
-    std::optional<std::unique_ptr<ResponseError>> error;
-  };
-
-  /**
-   * A notification message. A processed notification message must not send a
-   * response back. They work like events.
-   */
-  struct NotificationMessage
-    : public Message
-  {
-
-    /**
-     * The method to be invoked.
-     */
-    string_t method;
-
-    /**
-     * The notification's params.
-     */
-    std::optional<MessageParams> params;
   };
 
   /**
@@ -1565,6 +1437,32 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> TokenFormat;
 
   /**
+   * A general message as defined by JSON-RPC. The language server protocol
+   * always uses “2.0” as the jsonrpc version.
+   */
+  struct Message
+  {
+    string_t jsonrpc;
+  };
+
+  struct ResponseError
+  {
+    /**
+     * A number indicating the error type that occurred.
+     */
+    integer_t code;
+    /**
+     * A string providing a short description of the error.
+     */
+    string_t message;
+    /**
+     * A primitive or structured value that contains additional information about
+     * the error. Can be omitted.
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
+  };
+
+  /**
    * A workspace folder inside a client.
    */
   struct WorkspaceFolder
@@ -1734,6 +1632,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
     STRING_TYPE_ARRAY,
   };
+
+  extern std::map<DidChangeConfigurationRegistrationOptions_sectionType, std::string> DidChangeConfigurationRegistrationOptions_sectionTypeNames;
 
   typedef std::variant<
     string_t,
@@ -1937,6 +1837,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
   };
 
+  extern std::map<CancelParams_idType, std::string> CancelParams_idTypeNames;
+
   typedef std::variant<
     integer_t,
     string_t
@@ -2031,21 +1933,6 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * The parameters sent in a will save text document notification.
-   */
-  struct WillSaveTextDocumentParams
-  {
-    /**
-     * The document that will be saved.
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-    /**
-     * The 'TextDocumentSaveReason'.
-     */
-    TextDocumentSaveReason reason;
-  };
-
-  /**
    * The parameters sent in a save text document notification
    */
   struct DidSaveTextDocumentParams
@@ -2070,6 +1957,21 @@ namespace LCompilers::LanguageServerProtocol {
      * The document that was closed.
      */
     std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * The parameters sent in a will save text document notification.
+   */
+  struct WillSaveTextDocumentParams
+  {
+    /**
+     * The document that will be saved.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The 'TextDocumentSaveReason'.
+     */
+    TextDocumentSaveReason reason;
   };
 
   /**
@@ -2202,88 +2104,36 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * A document link is a range in a text document that links to an internal or external resource, like another
-   * text document or a web site.
-   */
-  struct DocumentLink
-  {
-    /**
-     * The range this link applies to.
-     */
-    std::unique_ptr<Range> range;
-    /**
-     * The uri this link points to. If missing a resolve request is sent later.
-     */
-    std::optional<URI> target;
-    /**
-     * The tooltip text when you hover over this link.
-     *
-     * If a tooltip is provided, is will be displayed in a string that includes instructions on how to
-     * trigger the link, such as `{0} (ctrl + click)`. The specific instructions vary depending on OS,
-     * user settings, and localization.
-     *
-     * @since 3.15.0
-     */
-    std::optional<string_t> tooltip;
-    /**
-     * A data entry field that is preserved on a document link between a
-     * DocumentLinkRequest and a DocumentLinkResolveRequest.
-     */
-    std::optional<std::unique_ptr<LSPAny>> data;
-  };
-
-  /**
-   * Represents a location inside a resource, such as a line
-   * inside a text file.
-   */
-  struct Location
-  {
-    DocumentUri uri;
-    std::unique_ptr<Range> range;
-  };
-
-  /**
-   * Represents programming constructs like functions or constructors in the context
-   * of call hierarchy.
+   * Params to show a resource in the UI.
    *
    * @since 3.16.0
    */
-  struct CallHierarchyItem
+  struct ShowDocumentParams
   {
     /**
-     * The name of this item.
+     * The uri to show.
      */
-    string_t name;
+    URI uri;
     /**
-     * The kind of this item.
+     * Indicates to show the resource in an external program.
+     * To show, for example, `https://code.visualstudio.com/`
+     * in the default WEB browser set `external` to `true`.
      */
-    SymbolKind kind;
+    std::optional<boolean_t> external;
     /**
-     * Tags for this item.
+     * An optional property to indicate whether the editor
+     * showing the document should take focus or not.
+     * Clients might ignore this property if an external
+     * program is started.
      */
-    std::optional<std::vector<SymbolTag>> tags;
+    std::optional<boolean_t> takeFocus;
     /**
-     * More detail for this item, e.g. the signature of a function.
+     * An optional selection range if the document is a text
+     * document. Clients might ignore the property if an
+     * external program is started or the file is not a text
+     * file.
      */
-    std::optional<string_t> detail;
-    /**
-     * The resource identifier of this item.
-     */
-    DocumentUri uri;
-    /**
-     * The range enclosing this symbol not including leading/trailing whitespace but everything else, e.g. comments and code.
-     */
-    std::unique_ptr<Range> range;
-    /**
-     * The range that should be selected and revealed when this symbol is being picked, e.g. the name of a function.
-     * Must be contained by the {@link CallHierarchyItem.range `range`}.
-     */
-    std::unique_ptr<Range> selectionRange;
-    /**
-     * A data entry field that is preserved between a call hierarchy prepare and
-     * incoming calls or outgoing calls requests.
-     */
-    std::optional<std::unique_ptr<LSPAny>> data;
+    std::optional<std::unique_ptr<Range>> selection;
   };
 
   /**
@@ -2342,6 +2192,45 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
+   * Represents a color range from a document.
+   */
+  struct ColorInformation
+  {
+    /**
+     * The range in the document where this color appears.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The actual color value for this color range.
+     */
+    std::unique_ptr<Color> color;
+  };
+
+  /**
+   * A code lens represents a {@link Command command} that should be shown along with
+   * source text, like the number of references, a way to run tests, etc.
+   *
+   * A code lens is _unresolved_ when no command is associated to it. For performance
+   * reasons the creation of a code lens and resolving should be done in two stages.
+   */
+  struct CodeLens
+  {
+    /**
+     * The range in which this code lens is valid. Should only span a single line.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The command this code lens represents.
+     */
+    std::optional<std::unique_ptr<Command>> command;
+    /**
+     * A data entry field that is preserved on a code lens item between
+     * a {@link CodeLensRequest} and a {@link CodeLensResolveRequest}
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
+  };
+
+  /**
    * The result of a linked editing range request.
    *
    * @since 3.16.0
@@ -2359,6 +2248,37 @@ namespace LCompilers::LanguageServerProtocol {
      * pattern will be used.
      */
     std::optional<string_t> wordPattern;
+  };
+
+  /**
+   * A document link is a range in a text document that links to an internal or external resource, like another
+   * text document or a web site.
+   */
+  struct DocumentLink
+  {
+    /**
+     * The range this link applies to.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The uri this link points to. If missing a resolve request is sent later.
+     */
+    std::optional<URI> target;
+    /**
+     * The tooltip text when you hover over this link.
+     *
+     * If a tooltip is provided, is will be displayed in a string that includes instructions on how to
+     * trigger the link, such as `{0} (ctrl + click)`. The specific instructions vary depending on OS,
+     * user settings, and localization.
+     *
+     * @since 3.15.0
+     */
+    std::optional<string_t> tooltip;
+    /**
+     * A data entry field that is preserved on a document link between a
+     * DocumentLinkRequest and a DocumentLinkResolveRequest.
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
   };
 
   /**
@@ -2392,6 +2312,60 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
+   * Represents a location inside a resource, such as a line
+   * inside a text file.
+   */
+  struct Location
+  {
+    DocumentUri uri;
+    std::unique_ptr<Range> range;
+  };
+
+  /**
+   * Represents programming constructs like functions or constructors in the context
+   * of call hierarchy.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyItem
+  {
+    /**
+     * The name of this item.
+     */
+    string_t name;
+    /**
+     * The kind of this item.
+     */
+    SymbolKind kind;
+    /**
+     * Tags for this item.
+     */
+    std::optional<std::vector<SymbolTag>> tags;
+    /**
+     * More detail for this item, e.g. the signature of a function.
+     */
+    std::optional<string_t> detail;
+    /**
+     * The resource identifier of this item.
+     */
+    DocumentUri uri;
+    /**
+     * The range enclosing this symbol not including leading/trailing whitespace but everything else, e.g. comments and code.
+     */
+    std::unique_ptr<Range> range;
+    /**
+     * The range that should be selected and revealed when this symbol is being picked, e.g. the name of a function.
+     * Must be contained by the {@link CallHierarchyItem.range `range`}.
+     */
+    std::unique_ptr<Range> selectionRange;
+    /**
+     * A data entry field that is preserved between a call hierarchy prepare and
+     * incoming calls or outgoing calls requests.
+     */
+    std::optional<std::unique_ptr<LSPAny>> data;
+  };
+
+  /**
    * Represents an outgoing call, e.g. calling a getter from a method or a method from a constructor etc.
    *
    * @since 3.16.0
@@ -2406,6 +2380,24 @@ namespace LCompilers::LanguageServerProtocol {
      * The range at which this item is called. This is the range relative to the caller, e.g the item
      * passed to {@link CallHierarchyItemProvider.provideCallHierarchyOutgoingCalls `provideCallHierarchyOutgoingCalls`}
      * and not {@link CallHierarchyOutgoingCall.to `this.to`}.
+     */
+    std::vector<std::unique_ptr<Range>> fromRanges;
+  };
+
+  /**
+   * Represents an incoming call, e.g. a caller of a method or constructor.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyIncomingCall
+  {
+    /**
+     * The item that makes the call.
+     */
+    std::unique_ptr<CallHierarchyItem> from;
+    /**
+     * The ranges at which the calls appear. This is relative to the caller
+     * denoted by {@link CallHierarchyIncomingCall.from `this.from`}.
      */
     std::vector<std::unique_ptr<Range>> fromRanges;
   };
@@ -2455,96 +2447,6 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<std::unique_ptr<LSPAny>> data;
   };
 
-  /**
-   * Params to show a resource in the UI.
-   *
-   * @since 3.16.0
-   */
-  struct ShowDocumentParams
-  {
-    /**
-     * The uri to show.
-     */
-    URI uri;
-    /**
-     * Indicates to show the resource in an external program.
-     * To show, for example, `https://code.visualstudio.com/`
-     * in the default WEB browser set `external` to `true`.
-     */
-    std::optional<boolean_t> external;
-    /**
-     * An optional property to indicate whether the editor
-     * showing the document should take focus or not.
-     * Clients might ignore this property if an external
-     * program is started.
-     */
-    std::optional<boolean_t> takeFocus;
-    /**
-     * An optional selection range if the document is a text
-     * document. Clients might ignore the property if an
-     * external program is started or the file is not a text
-     * file.
-     */
-    std::optional<std::unique_ptr<Range>> selection;
-  };
-
-  /**
-   * Represents an incoming call, e.g. a caller of a method or constructor.
-   *
-   * @since 3.16.0
-   */
-  struct CallHierarchyIncomingCall
-  {
-    /**
-     * The item that makes the call.
-     */
-    std::unique_ptr<CallHierarchyItem> from;
-    /**
-     * The ranges at which the calls appear. This is relative to the caller
-     * denoted by {@link CallHierarchyIncomingCall.from `this.from`}.
-     */
-    std::vector<std::unique_ptr<Range>> fromRanges;
-  };
-
-  /**
-   * A code lens represents a {@link Command command} that should be shown along with
-   * source text, like the number of references, a way to run tests, etc.
-   *
-   * A code lens is _unresolved_ when no command is associated to it. For performance
-   * reasons the creation of a code lens and resolving should be done in two stages.
-   */
-  struct CodeLens
-  {
-    /**
-     * The range in which this code lens is valid. Should only span a single line.
-     */
-    std::unique_ptr<Range> range;
-    /**
-     * The command this code lens represents.
-     */
-    std::optional<std::unique_ptr<Command>> command;
-    /**
-     * A data entry field that is preserved on a code lens item between
-     * a {@link CodeLensRequest} and a {@link CodeLensResolveRequest}
-     */
-    std::optional<std::unique_ptr<LSPAny>> data;
-  };
-
-  /**
-   * Represents a color range from a document.
-   */
-  struct ColorInformation
-  {
-    /**
-     * The range in the document where this color appears.
-     */
-    std::unique_ptr<Range> range;
-    /**
-     * The actual color value for this color range.
-     */
-    std::unique_ptr<Color> color;
-  };
-
   struct SelectionRangeOptions
   {
     std::optional<boolean_t> workDoneProgress;
@@ -2582,20 +2484,20 @@ namespace LCompilers::LanguageServerProtocol {
   /**
    * @since 3.16.0
    */
-  struct SemanticTokensDeltaPartialResult
-  {
-    std::vector<std::unique_ptr<SemanticTokensEdit>> edits;
-  };
-
-  /**
-   * @since 3.16.0
-   */
   struct SemanticTokensDelta
   {
     std::optional<string_t> resultId;
     /**
      * The semantic token edits to transform a previous result into a new result.
      */
+    std::vector<std::unique_ptr<SemanticTokensEdit>> edits;
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensDeltaPartialResult
+  {
     std::vector<std::unique_ptr<SemanticTokensEdit>> edits;
   };
 
@@ -2857,6 +2759,8 @@ namespace LCompilers::LanguageServerProtocol {
     MARKUP_CONTENT,
   };
 
+  extern std::map<InlayHintLabelPart_tooltipType, std::string> InlayHintLabelPart_tooltipTypeNames;
+
   typedef std::variant<
     string_t,
     std::unique_ptr<MarkupContent>
@@ -2908,6 +2812,8 @@ namespace LCompilers::LanguageServerProtocol {
     INLAY_HINT_LABEL_PART_ARRAY,
   };
 
+  extern std::map<InlayHint_labelType, std::string> InlayHint_labelTypeNames;
+
   typedef std::variant<
     string_t,
     std::vector<std::unique_ptr<InlayHintLabelPart>>
@@ -2917,6 +2823,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
     MARKUP_CONTENT,
   };
+
+  extern std::map<InlayHint_tooltipType, std::string> InlayHint_tooltipTypeNames;
 
   typedef std::variant<
     string_t,
@@ -3191,6 +3099,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_VALUE,
   };
 
+  extern std::map<InlineCompletionItem_insertTextType, std::string> InlineCompletionItem_insertTextTypeNames;
+
   typedef std::variant<
     string_t,
     std::unique_ptr<StringValue>
@@ -3297,6 +3207,8 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_FOLDER_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<WorkspaceFoldersInitializeParams_workspaceFoldersType, std::string> WorkspaceFoldersInitializeParams_workspaceFoldersTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<WorkspaceFolder>>,
@@ -3427,6 +3339,8 @@ namespace LCompilers::LanguageServerProtocol {
     MARKUP_CONTENT,
   };
 
+  extern std::map<CompletionItem_documentationType, std::string> CompletionItem_documentationTypeNames;
+
   typedef std::variant<
     string_t,
     std::unique_ptr<MarkupContent>
@@ -3436,6 +3350,8 @@ namespace LCompilers::LanguageServerProtocol {
     TEXT_EDIT,
     INSERT_REPLACE_EDIT,
   };
+
+  extern std::map<CompletionItem_textEditType, std::string> CompletionItem_textEditTypeNames;
 
   typedef std::variant<
     std::unique_ptr<TextEdit>,
@@ -3615,6 +3531,8 @@ namespace LCompilers::LanguageServerProtocol {
     RANGE,
     COMPLETION_LIST_ITEM_DEFAULTS_EDIT_RANGE_1,
   };
+
+  extern std::map<CompletionList_itemDefaults_editRangeType, std::string> CompletionList_itemDefaults_editRangeTypeNames;
 
   typedef std::variant<
     std::unique_ptr<Range>,
@@ -3805,6 +3723,33 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<string_t> containerName;
   };
 
+  /**
+   * Represents information about programming constructs like variables, classes,
+   * interfaces etc.
+   */
+  struct SymbolInformation
+    : public BaseSymbolInformation
+  {
+    /**
+     * Indicates if this symbol is deprecated.
+     *
+     * @deprecated Use tags instead
+     */
+    std::optional<boolean_t> deprecated;
+    /**
+     * The location of this symbol. The location's range is used by a tool
+     * to reveal the location in the editor. If the symbol is selected in the
+     * tool the range's start information is used to position the cursor. So
+     * the range usually spans more than the actual symbol's name and does
+     * normally include things like visibility modifiers.
+     *
+     * The range doesn't have to denote a node range in the sense of an abstract
+     * syntax tree. It can therefore not be used to re-construct a hierarchy of
+     * the symbols.
+     */
+    std::unique_ptr<Location> location;
+  };
+
   struct WorkspaceSymbol_location_1
   {
     DocumentUri uri;
@@ -3814,6 +3759,8 @@ namespace LCompilers::LanguageServerProtocol {
     LOCATION,
     WORKSPACE_SYMBOL_LOCATION_1,
   };
+
+  extern std::map<WorkspaceSymbol_locationType, std::string> WorkspaceSymbol_locationTypeNames;
 
   typedef std::variant<
     std::unique_ptr<Location>,
@@ -3843,33 +3790,6 @@ namespace LCompilers::LanguageServerProtocol {
      * workspace symbol request and a workspace symbol resolve request.
      */
     std::optional<std::unique_ptr<LSPAny>> data;
-  };
-
-  /**
-   * Represents information about programming constructs like variables, classes,
-   * interfaces etc.
-   */
-  struct SymbolInformation
-    : public BaseSymbolInformation
-  {
-    /**
-     * Indicates if this symbol is deprecated.
-     *
-     * @deprecated Use tags instead
-     */
-    std::optional<boolean_t> deprecated;
-    /**
-     * The location of this symbol. The location's range is used by a tool
-     * to reveal the location in the editor. If the symbol is selected in the
-     * tool the range's start information is used to position the cursor. So
-     * the range usually spans more than the actual symbol's name and does
-     * normally include things like visibility modifiers.
-     *
-     * The range doesn't have to denote a node range in the sense of an abstract
-     * syntax tree. It can therefore not be used to re-construct a hierarchy of
-     * the symbols.
-     */
-    std::unique_ptr<Location> location;
   };
 
   /**
@@ -4113,6 +4033,8 @@ namespace LCompilers::LanguageServerProtocol {
     SEMANTIC_TOKENS_OPTIONS_RANGE_1,
   };
 
+  extern std::map<SemanticTokensOptions_rangeType, std::string> SemanticTokensOptions_rangeTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<SemanticTokensOptions_range_1>
@@ -4127,6 +4049,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     SEMANTIC_TOKENS_OPTIONS_FULL_1,
   };
+
+  extern std::map<SemanticTokensOptions_fullType, std::string> SemanticTokensOptions_fullTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -4158,6 +4082,8 @@ namespace LCompilers::LanguageServerProtocol {
     INTEGER_TYPE,
     NULL_TYPE,
   };
+
+  extern std::map<OptionalVersionedTextDocumentIdentifier_versionType, std::string> OptionalVersionedTextDocumentIdentifier_versionTypeNames;
 
   typedef std::variant<
     integer_t,
@@ -4230,6 +4156,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<WorkspaceUnchangedDocumentDiagnosticReport_versionType, std::string> WorkspaceUnchangedDocumentDiagnosticReport_versionTypeNames;
+
   typedef std::variant<
     integer_t,
     null_t
@@ -4295,6 +4223,8 @@ namespace LCompilers::LanguageServerProtocol {
     SAVE_OPTIONS,
   };
 
+  extern std::map<TextDocumentSyncOptions_saveType, std::string> TextDocumentSyncOptions_saveTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<SaveOptions>
@@ -4333,6 +4263,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
     BOOLEAN_TYPE,
   };
+
+  extern std::map<WorkspaceFoldersServerCapabilities_changeNotificationsType, std::string> WorkspaceFoldersServerCapabilities_changeNotificationsTypeNames;
 
   typedef std::variant<
     string_t,
@@ -4391,6 +4323,8 @@ namespace LCompilers::LanguageServerProtocol {
     INTEGER_TYPE,
     STRING_TYPE,
   };
+
+  extern std::map<Diagnostic_codeType, std::string> Diagnostic_codeTypeNames;
 
   typedef std::variant<
     integer_t,
@@ -4454,6 +4388,146 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
+   * A diagnostic report with a full set of problems.
+   *
+   * @since 3.17.0
+   */
+  struct FullDocumentDiagnosticReport
+  {
+    /**
+     * A full document diagnostic report.
+     */
+    string_t kind;
+    /**
+     * An optional result id. If provided it will
+     * be sent on the next diagnostic request for the
+     * same document.
+     */
+    std::optional<string_t> resultId;
+    /**
+     * The actual items.
+     */
+    std::vector<std::unique_ptr<Diagnostic>> items;
+  };
+
+  enum class WorkspaceFullDocumentDiagnosticReport_versionType {
+    INTEGER_TYPE,
+    NULL_TYPE,
+  };
+
+  extern std::map<WorkspaceFullDocumentDiagnosticReport_versionType, std::string> WorkspaceFullDocumentDiagnosticReport_versionTypeNames;
+
+  typedef std::variant<
+    integer_t,
+    null_t
+  > WorkspaceFullDocumentDiagnosticReport_version;
+
+  /**
+   * A full document diagnostic report for a workspace diagnostic result.
+   *
+   * @since 3.17.0
+   */
+  struct WorkspaceFullDocumentDiagnosticReport
+    : public FullDocumentDiagnosticReport
+  {
+    /**
+     * The URI for which diagnostic information is reported.
+     */
+    DocumentUri uri;
+    /**
+     * The version number for which the diagnostics are reported.
+     * If the document is not marked as open `null` can be provided.
+     */
+    WorkspaceFullDocumentDiagnosticReport_version version;
+  };
+
+  enum class DocumentDiagnosticReportPartialResult_relatedDocumentsType {
+    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
+    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
+  };
+
+  extern std::map<DocumentDiagnosticReportPartialResult_relatedDocumentsType, std::string> DocumentDiagnosticReportPartialResult_relatedDocumentsTypeNames;
+
+  typedef std::variant<
+    std::unique_ptr<FullDocumentDiagnosticReport>,
+    std::unique_ptr<UnchangedDocumentDiagnosticReport>
+  > DocumentDiagnosticReportPartialResult_relatedDocuments;
+
+  /**
+   * A partial result for a document diagnostic report.
+   *
+   * @since 3.17.0
+   */
+  struct DocumentDiagnosticReportPartialResult
+  {
+    std::map<DocumentUri, DocumentDiagnosticReportPartialResult_relatedDocuments> relatedDocuments;
+  };
+
+  enum class RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType {
+    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
+    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
+  };
+
+  extern std::map<RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType, std::string> RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsTypeNames;
+
+  typedef std::variant<
+    std::unique_ptr<FullDocumentDiagnosticReport>,
+    std::unique_ptr<UnchangedDocumentDiagnosticReport>
+  > RelatedUnchangedDocumentDiagnosticReport_relatedDocuments;
+
+  /**
+   * An unchanged diagnostic report with a set of related documents.
+   *
+   * @since 3.17.0
+   */
+  struct RelatedUnchangedDocumentDiagnosticReport
+    : public UnchangedDocumentDiagnosticReport
+  {
+    /**
+     * Diagnostics of related documents. This information is useful
+     * in programming languages where code in a file A can generate
+     * diagnostics in a file B which A depends on. An example of
+     * such a language is C/C++ where marco definitions in a file
+     * a.cpp and result in errors in a header file b.hpp.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::map<DocumentUri, RelatedUnchangedDocumentDiagnosticReport_relatedDocuments>> relatedDocuments;
+  };
+
+  enum class RelatedFullDocumentDiagnosticReport_relatedDocumentsType {
+    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
+    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
+  };
+
+  extern std::map<RelatedFullDocumentDiagnosticReport_relatedDocumentsType, std::string> RelatedFullDocumentDiagnosticReport_relatedDocumentsTypeNames;
+
+  typedef std::variant<
+    std::unique_ptr<FullDocumentDiagnosticReport>,
+    std::unique_ptr<UnchangedDocumentDiagnosticReport>
+  > RelatedFullDocumentDiagnosticReport_relatedDocuments;
+
+  /**
+   * A full diagnostic report with a set of related documents.
+   *
+   * @since 3.17.0
+   */
+  struct RelatedFullDocumentDiagnosticReport
+    : public FullDocumentDiagnosticReport
+  {
+    /**
+     * Diagnostics of related documents. This information is useful
+     * in programming languages where code in a file A can generate
+     * diagnostics in a file B which A depends on. An example of
+     * such a language is C/C++ where marco definitions in a file
+     * a.cpp and result in errors in a header file b.hpp.
+     *
+     * @since 3.17.0
+     */
+    std::optional<std::map<DocumentUri, RelatedFullDocumentDiagnosticReport_relatedDocuments>> relatedDocuments;
+  };
+
+  /**
    * Contains additional diagnostic information about the context in which
    * a {@link CodeActionProvider.provideCodeActions code action} is run.
    */
@@ -4483,138 +4557,6 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * A diagnostic report with a full set of problems.
-   *
-   * @since 3.17.0
-   */
-  struct FullDocumentDiagnosticReport
-  {
-    /**
-     * A full document diagnostic report.
-     */
-    string_t kind;
-    /**
-     * An optional result id. If provided it will
-     * be sent on the next diagnostic request for the
-     * same document.
-     */
-    std::optional<string_t> resultId;
-    /**
-     * The actual items.
-     */
-    std::vector<std::unique_ptr<Diagnostic>> items;
-  };
-
-  enum class RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType {
-    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
-    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<FullDocumentDiagnosticReport>,
-    std::unique_ptr<UnchangedDocumentDiagnosticReport>
-  > RelatedUnchangedDocumentDiagnosticReport_relatedDocuments;
-
-  /**
-   * An unchanged diagnostic report with a set of related documents.
-   *
-   * @since 3.17.0
-   */
-  struct RelatedUnchangedDocumentDiagnosticReport
-    : public UnchangedDocumentDiagnosticReport
-  {
-    /**
-     * Diagnostics of related documents. This information is useful
-     * in programming languages where code in a file A can generate
-     * diagnostics in a file B which A depends on. An example of
-     * such a language is C/C++ where marco definitions in a file
-     * a.cpp and result in errors in a header file b.hpp.
-     *
-     * @since 3.17.0
-     */
-    std::optional<std::map<DocumentUri, RelatedUnchangedDocumentDiagnosticReport_relatedDocuments>> relatedDocuments;
-  };
-
-  enum class DocumentDiagnosticReportPartialResult_relatedDocumentsType {
-    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
-    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<FullDocumentDiagnosticReport>,
-    std::unique_ptr<UnchangedDocumentDiagnosticReport>
-  > DocumentDiagnosticReportPartialResult_relatedDocuments;
-
-  /**
-   * A partial result for a document diagnostic report.
-   *
-   * @since 3.17.0
-   */
-  struct DocumentDiagnosticReportPartialResult
-  {
-    std::map<DocumentUri, DocumentDiagnosticReportPartialResult_relatedDocuments> relatedDocuments;
-  };
-
-  enum class WorkspaceFullDocumentDiagnosticReport_versionType {
-    INTEGER_TYPE,
-    NULL_TYPE,
-  };
-
-  typedef std::variant<
-    integer_t,
-    null_t
-  > WorkspaceFullDocumentDiagnosticReport_version;
-
-  /**
-   * A full document diagnostic report for a workspace diagnostic result.
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceFullDocumentDiagnosticReport
-    : public FullDocumentDiagnosticReport
-  {
-    /**
-     * The URI for which diagnostic information is reported.
-     */
-    DocumentUri uri;
-    /**
-     * The version number for which the diagnostics are reported.
-     * If the document is not marked as open `null` can be provided.
-     */
-    WorkspaceFullDocumentDiagnosticReport_version version;
-  };
-
-  enum class RelatedFullDocumentDiagnosticReport_relatedDocumentsType {
-    FULL_DOCUMENT_DIAGNOSTIC_REPORT,
-    UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<FullDocumentDiagnosticReport>,
-    std::unique_ptr<UnchangedDocumentDiagnosticReport>
-  > RelatedFullDocumentDiagnosticReport_relatedDocuments;
-
-  /**
-   * A full diagnostic report with a set of related documents.
-   *
-   * @since 3.17.0
-   */
-  struct RelatedFullDocumentDiagnosticReport
-    : public FullDocumentDiagnosticReport
-  {
-    /**
-     * Diagnostics of related documents. This information is useful
-     * in programming languages where code in a file A can generate
-     * diagnostics in a file B which A depends on. An example of
-     * such a language is C/C++ where marco definitions in a file
-     * a.cpp and result in errors in a header file b.hpp.
-     *
-     * @since 3.17.0
-     */
-    std::optional<std::map<DocumentUri, RelatedFullDocumentDiagnosticReport_relatedDocuments>> relatedDocuments;
-  };
-
-  /**
    * The publish diagnostic notification's parameters.
    */
   struct PublishDiagnosticsParams
@@ -4640,6 +4582,8 @@ namespace LCompilers::LanguageServerProtocol {
     PAIR_OF_UINTEGER_TYPE_AND_UINTEGER_TYPE,
   };
 
+  extern std::map<ParameterInformation_labelType, std::string> ParameterInformation_labelTypeNames;
+
   typedef std::variant<
     string_t,
     std::pair<uinteger_t, uinteger_t>
@@ -4649,6 +4593,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
     MARKUP_CONTENT,
   };
+
+  extern std::map<ParameterInformation_documentationType, std::string> ParameterInformation_documentationTypeNames;
 
   typedef std::variant<
     string_t,
@@ -4683,6 +4629,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
     MARKUP_CONTENT,
   };
+
+  extern std::map<SignatureInformation_documentationType, std::string> SignatureInformation_documentationTypeNames;
 
   typedef std::variant<
     string_t,
@@ -5980,6 +5928,8 @@ namespace LCompilers::LanguageServerProtocol {
     SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_FULL_1,
   };
 
+  extern std::map<SemanticTokensClientCapabilities_requests_fullType, std::string> SemanticTokensClientCapabilities_requests_fullTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<SemanticTokensClientCapabilities_requests_full_1>
@@ -5993,6 +5943,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_RANGE_1,
   };
+
+  extern std::map<SemanticTokensClientCapabilities_requests_rangeType, std::string> SemanticTokensClientCapabilities_requests_rangeTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -6572,10 +6524,110 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<std::unique_ptr<LSPAny>> experimental;
   };
 
+  enum class RequestIdType {
+    INTEGER_TYPE,
+    STRING_TYPE,
+  };
+
+  extern std::map<RequestIdType, std::string> RequestIdTypeNames;
+
+  typedef std::variant<
+    integer_t,
+    string_t
+  > RequestId;
+
+  enum class MessageParamsType {
+    ARRAY_TYPE,
+    OBJECT_TYPE,
+  };
+
+  extern std::map<MessageParamsType, std::string> MessageParamsTypeNames;
+
+  typedef std::variant<
+    LSPArray,
+    LSPObject
+  > MessageParams;
+
+  /**
+   * A request message to describe a request between the client and the server.
+   * Every processed request must send a response back to the sender of the
+   * request.
+   */
+  struct RequestMessage
+    : public Message
+  {
+    /**
+     * The request id.
+     */
+    RequestId id;
+    /**
+     * The method to be invoked.
+     */
+    string_t method;
+    /**
+     * The method's params.
+     */
+    std::optional<MessageParams> params;
+  };
+
+  struct NotificationMessage
+    : public Message
+  {
+    /**
+     * The method to be invoked.
+     */
+    string_t method;
+    /**
+     * The notification's params.
+     */
+    std::optional<MessageParams> params;
+  };
+
+  enum class ResponseIdType {
+    INTEGER_TYPE,
+    STRING_TYPE,
+    NULL_TYPE,
+  };
+
+  extern std::map<ResponseIdType, std::string> ResponseIdTypeNames;
+
+  typedef std::variant<
+    integer_t,
+    string_t,
+    null_t
+  > ResponseId;
+
+  /**
+   * A Response Message sent as a result of a request. If a request doesn’t
+   * provide a result value the receiver of a request still needs to return a
+   * response message to conform to the JSON-RPC specification. The result
+   * property of the ResponseMessage should be set to null in this case to signal
+   * a successful request.
+   */
+  struct ResponseMessage
+    : public Message
+  {
+    /**
+     * The request id.
+     */
+    ResponseId id;
+    /**
+     * The result of a request. This member is REQUIRED on success. This member
+     * MUST NOT exist if there was an error invoking the method.
+     */
+    std::optional<std::unique_ptr<LSPAny>> result;
+    /**
+     * The error object in case a request fails.
+     */
+    std::optional<std::unique_ptr<ResponseError>> error;
+  };
+
   enum class DefinitionType {
     LOCATION,
     LOCATION_ARRAY,
   };
+
+  extern std::map<DefinitionType, std::string> DefinitionTypeNames;
 
   typedef std::variant<
     std::unique_ptr<Location>,
@@ -6594,6 +6646,8 @@ namespace LCompilers::LanguageServerProtocol {
     LOCATION,
     LOCATION_ARRAY,
   };
+
+  extern std::map<DeclarationType, std::string> DeclarationTypeNames;
 
   typedef std::variant<
     std::unique_ptr<Location>,
@@ -6617,6 +6671,8 @@ namespace LCompilers::LanguageServerProtocol {
     INLINE_VALUE_EVALUATABLE_EXPRESSION,
   };
 
+  extern std::map<InlineValueType, std::string> InlineValueTypeNames;
+
   typedef std::variant<
     std::unique_ptr<InlineValueText>,
     std::unique_ptr<InlineValueVariableLookup>,
@@ -6627,6 +6683,8 @@ namespace LCompilers::LanguageServerProtocol {
     RELATED_FULL_DOCUMENT_DIAGNOSTIC_REPORT,
     RELATED_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
   };
+
+  extern std::map<DocumentDiagnosticReportType, std::string> DocumentDiagnosticReportTypeNames;
 
   typedef std::variant<
     std::unique_ptr<RelatedFullDocumentDiagnosticReport>,
@@ -6650,6 +6708,8 @@ namespace LCompilers::LanguageServerProtocol {
     PREPARE_RENAME_RESULT_2,
   };
 
+  extern std::map<PrepareRenameResultType, std::string> PrepareRenameResultTypeNames;
+
   typedef std::variant<
     std::unique_ptr<Range>,
     std::unique_ptr<PrepareRenameResult_1>,
@@ -6661,18 +6721,12 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
   };
 
+  extern std::map<ProgressTokenType, std::string> ProgressTokenTypeNames;
+
   typedef std::variant<
     integer_t,
     string_t
   > ProgressToken;
-
-  struct WorkDoneProgressCancelParams
-  {
-    /**
-     * The token to be used to report progress.
-     */
-    ProgressToken token;
-  };
 
   struct WorkDoneProgressParams
   {
@@ -6683,29 +6737,23 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * The parameters of a {@link DocumentRangesFormattingRequest}.
+   * A parameter literal used in inline completion requests.
    *
    * @since 3.18.0
    * @proposed
    */
-  struct DocumentRangesFormattingParams
+  struct InlineCompletionParams
+    : public TextDocumentPositionParams
   {
     /**
      * An optional token that a server can use to report work done progress.
      */
     std::optional<ProgressToken> workDoneToken;
     /**
-     * The document to format.
+     * Additional information about the context in which inline completions were
+     * requested.
      */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-    /**
-     * The ranges to format
-     */
-    std::vector<std::unique_ptr<Range>> ranges;
-    /**
-     * The format options
-     */
-    std::unique_ptr<FormattingOptions> options;
+    std::unique_ptr<InlineCompletionContext> context;
   };
 
   /**
@@ -6727,62 +6775,6 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<std::vector<std::unique_ptr<LSPAny>>> arguments;
   };
 
-  struct PrepareRenameParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-  };
-
-  /**
-   * Parameters for a {@link SignatureHelpRequest}.
-   */
-  struct SignatureHelpParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * The signature help context. This is only available if the client specifies
-     * to send this using the client capability `textDocument.signatureHelp.contextSupport === true`
-     *
-     * @since 3.15.0
-     */
-    std::optional<std::unique_ptr<SignatureHelpContext>> context;
-  };
-
-  struct LinkedEditingRangeParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-  };
-
-  /**
-   * The parameters of a {@link DocumentFormattingRequest}.
-   */
-  struct DocumentFormattingParams
-  {
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * The document to format.
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-    /**
-     * The format options.
-     */
-    std::unique_ptr<FormattingOptions> options;
-  };
-
   /**
    * The parameter of a `textDocument/prepareTypeHierarchy` request.
    *
@@ -6795,6 +6787,41 @@ namespace LCompilers::LanguageServerProtocol {
      * An optional token that a server can use to report work done progress.
      */
     std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * The parameter of a `textDocument/prepareCallHierarchy` request.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyPrepareParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * A parameter literal used in inlay hint requests.
+   *
+   * @since 3.17.0
+   */
+  struct InlayHintParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The document range for which inlay hints should be computed.
+     */
+    std::unique_ptr<Range> range;
   };
 
   /**
@@ -6824,46 +6851,30 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * Parameters for a {@link HoverRequest}.
+   * The parameters of a {@link DocumentFormattingRequest}.
    */
-  struct HoverParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-  };
-
-  /**
-   * The parameters of a {@link RenameRequest}.
-   */
-  struct RenameParams
+  struct DocumentFormattingParams
   {
     /**
      * An optional token that a server can use to report work done progress.
      */
     std::optional<ProgressToken> workDoneToken;
     /**
-     * The document to rename.
+     * The document to format.
      */
     std::unique_ptr<TextDocumentIdentifier> textDocument;
     /**
-     * The position at which this request was sent.
+     * The format options.
      */
-    std::unique_ptr<Position> position;
-    /**
-     * The new name of the symbol. If the given name is not valid the
-     * request must return a {@link ResponseError} with an
-     * appropriate message set.
-     */
-    string_t newName;
+    std::unique_ptr<FormattingOptions> options;
   };
 
   enum class _InitializeParams_processIdType {
     INTEGER_TYPE,
     NULL_TYPE,
   };
+
+  extern std::map<_InitializeParams_processIdType, std::string> _InitializeParams_processIdTypeNames;
 
   typedef std::variant<
     integer_t,
@@ -6881,6 +6892,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<_InitializeParams_rootPathType, std::string> _InitializeParams_rootPathTypeNames;
+
   typedef std::variant<
     string_t,
     null_t
@@ -6890,6 +6903,8 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_URI,
     NULL_TYPE,
   };
+
+  extern std::map<_InitializeParams_rootUriType, std::string> _InitializeParams_rootUriTypeNames;
 
   typedef std::variant<
     DocumentUri,
@@ -6966,38 +6981,28 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * A parameter literal used in inlay hint requests.
-   *
-   * @since 3.17.0
+   * The parameters of a {@link RenameRequest}.
    */
-  struct InlayHintParams
+  struct RenameParams
   {
     /**
      * An optional token that a server can use to report work done progress.
      */
     std::optional<ProgressToken> workDoneToken;
     /**
-     * The text document.
+     * The document to rename.
      */
     std::unique_ptr<TextDocumentIdentifier> textDocument;
     /**
-     * The document range for which inlay hints should be computed.
+     * The position at which this request was sent.
      */
-    std::unique_ptr<Range> range;
-  };
-
-  /**
-   * The parameter of a `textDocument/prepareCallHierarchy` request.
-   *
-   * @since 3.16.0
-   */
-  struct CallHierarchyPrepareParams
-    : public TextDocumentPositionParams
-  {
+    std::unique_ptr<Position> position;
     /**
-     * An optional token that a server can use to report work done progress.
+     * The new name of the symbol. If the given name is not valid the
+     * request must return a {@link ResponseError} with an
+     * appropriate message set.
      */
-    std::optional<ProgressToken> workDoneToken;
+    string_t newName;
   };
 
   /**
@@ -7024,12 +7029,65 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * A parameter literal used in inline completion requests.
+   * The parameters of a {@link DocumentRangesFormattingRequest}.
    *
    * @since 3.18.0
    * @proposed
    */
-  struct InlineCompletionParams
+  struct DocumentRangesFormattingParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The document to format.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The ranges to format
+     */
+    std::vector<std::unique_ptr<Range>> ranges;
+    /**
+     * The format options
+     */
+    std::unique_ptr<FormattingOptions> options;
+  };
+
+  struct LinkedEditingRangeParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  struct PrepareRenameParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * Parameters for a {@link HoverRequest}.
+   */
+  struct HoverParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * Parameters for a {@link SignatureHelpRequest}.
+   */
+  struct SignatureHelpParams
     : public TextDocumentPositionParams
   {
     /**
@@ -7037,22 +7095,12 @@ namespace LCompilers::LanguageServerProtocol {
      */
     std::optional<ProgressToken> workDoneToken;
     /**
-     * Additional information about the context in which inline completions were
-     * requested.
+     * The signature help context. This is only available if the client specifies
+     * to send this using the client capability `textDocument.signatureHelp.contextSupport === true`
+     *
+     * @since 3.15.0
      */
-    std::unique_ptr<InlineCompletionContext> context;
-  };
-
-  struct ProgressParams
-  {
-    /**
-     * The progress token provided by the client or server.
-     */
-    ProgressToken token;
-    /**
-     * The progress data.
-     */
-    std::unique_ptr<LSPAny> value;
+    std::optional<std::unique_ptr<SignatureHelpContext>> context;
   };
 
   struct PartialResultParams
@@ -7062,6 +7110,200 @@ namespace LCompilers::LanguageServerProtocol {
      * the client.
      */
     std::optional<ProgressToken> partialResultToken;
+  };
+
+  /**
+   * The parameter of a `typeHierarchy/supertypes` request.
+   *
+   * @since 3.17.0
+   */
+  struct TypeHierarchySupertypesParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<TypeHierarchyItem> item;
+  };
+
+  /**
+   * Parameters of the workspace diagnostic request.
+   *
+   * @since 3.17.0
+   */
+  struct WorkspaceDiagnosticParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The additional identifier provided during registration.
+     */
+    std::optional<string_t> identifier;
+    /**
+     * The currently known diagnostic reports with their
+     * previous result ids.
+     */
+    std::vector<std::unique_ptr<PreviousResultId>> previousResultIds;
+  };
+
+  /**
+   * Parameters for a {@link DocumentColorRequest}.
+   */
+  struct DocumentColorParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * Parameters for a {@link DefinitionRequest}.
+   */
+  struct DefinitionParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * Parameters for a {@link DocumentHighlightRequest}.
+   */
+  struct DocumentHighlightParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * Parameters for a {@link FoldingRangeRequest}.
+   */
+  struct FoldingRangeParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * The parameter of a `callHierarchy/incomingCalls` request.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyIncomingCallsParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<CallHierarchyItem> item;
+  };
+
+  struct ImplementationParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+  };
+
+  /**
+   * The parameter of a `callHierarchy/outgoingCalls` request.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyOutgoingCallsParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<CallHierarchyItem> item;
+  };
+
+  /**
+   * Completion parameters
+   */
+  struct CompletionParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The completion context. This is only available if the client specifies
+     * to send this using the client capability `textDocument.completion.contextSupport === true`
+     */
+    std::optional<std::unique_ptr<CompletionContext>> context;
   };
 
   /**
@@ -7112,10 +7354,7 @@ namespace LCompilers::LanguageServerProtocol {
     std::unique_ptr<CodeActionContext> context;
   };
 
-  /**
-   * Parameters for a {@link DefinitionRequest}.
-   */
-  struct DefinitionParams
+  struct MonikerParams
     : public TextDocumentPositionParams
   {
     /**
@@ -7130,10 +7369,9 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * Completion parameters
+   * The parameters of a {@link CodeLensRequest}.
    */
-  struct CompletionParams
-    : public TextDocumentPositionParams
+  struct CodeLensParams
   {
     /**
      * An optional token that a server can use to report partial results (e.g. streaming) to
@@ -7145,10 +7383,74 @@ namespace LCompilers::LanguageServerProtocol {
      */
     std::optional<ProgressToken> workDoneToken;
     /**
-     * The completion context. This is only available if the client specifies
-     * to send this using the client capability `textDocument.completion.contextSupport === true`
+     * The document to request code lens for.
      */
-    std::optional<std::unique_ptr<CompletionContext>> context;
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+  };
+
+  /**
+   * The parameter of a `typeHierarchy/subtypes` request.
+   *
+   * @since 3.17.0
+   */
+  struct TypeHierarchySubtypesParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<TypeHierarchyItem> item;
+  };
+
+  /**
+   * Parameters for a {@link ColorPresentationRequest}.
+   */
+  struct ColorPresentationParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    /**
+     * The color to request presentations for.
+     */
+    std::unique_ptr<Color> color;
+    /**
+     * The range where the color would be inserted. Serves as a context.
+     */
+    std::unique_ptr<Range> range;
+  };
+
+  /**
+   * Parameters for a {@link ReferencesRequest}.
+   */
+  struct ReferenceParams
+    : public TextDocumentPositionParams
+  {
+    /**
+     * An optional token that a server can use to report partial results (e.g. streaming) to
+     * the client.
+     */
+    std::optional<ProgressToken> partialResultToken;
+    /**
+     * An optional token that a server can use to report work done progress.
+     */
+    std::optional<ProgressToken> workDoneToken;
+    std::unique_ptr<ReferenceContext> context;
   };
 
   /**
@@ -7190,11 +7492,9 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * The parameter of a `callHierarchy/incomingCalls` request.
-   *
-   * @since 3.16.0
+   * Parameters for a {@link DocumentSymbolRequest}.
    */
-  struct CallHierarchyIncomingCallsParams
+  struct DocumentSymbolParams
   {
     /**
      * An optional token that a server can use to report partial results (e.g. streaming) to
@@ -7205,15 +7505,16 @@ namespace LCompilers::LanguageServerProtocol {
      * An optional token that a server can use to report work done progress.
      */
     std::optional<ProgressToken> workDoneToken;
-    std::unique_ptr<CallHierarchyItem> item;
+    /**
+     * The text document.
+     */
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
   };
 
   /**
-   * The parameter of a `typeHierarchy/subtypes` request.
-   *
-   * @since 3.17.0
+   * @since 3.16.0
    */
-  struct TypeHierarchySubtypesParams
+  struct SemanticTokensDeltaParams
   {
     /**
      * An optional token that a server can use to report partial results (e.g. streaming) to
@@ -7224,21 +7525,15 @@ namespace LCompilers::LanguageServerProtocol {
      * An optional token that a server can use to report work done progress.
      */
     std::optional<ProgressToken> workDoneToken;
-    std::unique_ptr<TypeHierarchyItem> item;
-  };
-
-  struct ImplementationParams
-    : public TextDocumentPositionParams
-  {
     /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
+     * The text document.
      */
-    std::optional<ProgressToken> partialResultToken;
+    std::unique_ptr<TextDocumentIdentifier> textDocument;
     /**
-     * An optional token that a server can use to report work done progress.
+     * The result id of a previous response. The result Id can either point to a full response
+     * or a delta response depending on what was received last.
      */
-    std::optional<ProgressToken> workDoneToken;
+    string_t previousResultId;
   };
 
   /**
@@ -7263,184 +7558,6 @@ namespace LCompilers::LanguageServerProtocol {
      * The range the semantic tokens are requested for.
      */
     std::unique_ptr<Range> range;
-  };
-
-  /**
-   * The parameters of a {@link WorkspaceSymbolRequest}.
-   */
-  struct WorkspaceSymbolParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * A query string to filter symbols by. Clients may send an empty
-     * string here to request all symbols.
-     */
-    string_t query;
-  };
-
-  /**
-   * Parameters for a {@link ReferencesRequest}.
-   */
-  struct ReferenceParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    std::unique_ptr<ReferenceContext> context;
-  };
-
-  /**
-   * Parameters for a {@link DocumentHighlightRequest}.
-   */
-  struct DocumentHighlightParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-  };
-
-  /**
-   * Parameters of the workspace diagnostic request.
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceDiagnosticParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * The additional identifier provided during registration.
-     */
-    std::optional<string_t> identifier;
-    /**
-     * The currently known diagnostic reports with their
-     * previous result ids.
-     */
-    std::vector<std::unique_ptr<PreviousResultId>> previousResultIds;
-  };
-
-  /**
-   * The parameters of a {@link CodeLensRequest}.
-   */
-  struct CodeLensParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * The document to request code lens for.
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * Parameters for a {@link ColorPresentationRequest}.
-   */
-  struct ColorPresentationParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * The text document.
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-    /**
-     * The color to request presentations for.
-     */
-    std::unique_ptr<Color> color;
-    /**
-     * The range where the color would be inserted. Serves as a context.
-     */
-    std::unique_ptr<Range> range;
-  };
-
-  struct TypeDefinitionParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-  };
-
-  struct MonikerParams
-    : public TextDocumentPositionParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-  };
-
-  /**
-   * The parameter of a `typeHierarchy/supertypes` request.
-   *
-   * @since 3.17.0
-   */
-  struct TypeHierarchySupertypesParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    std::unique_ptr<TypeHierarchyItem> item;
   };
 
   /**
@@ -7474,25 +7591,6 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * The parameter of a `callHierarchy/outgoingCalls` request.
-   *
-   * @since 3.16.0
-   */
-  struct CallHierarchyOutgoingCallsParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    std::unique_ptr<CallHierarchyItem> item;
-  };
-
-  /**
    * The parameters of a {@link DocumentLinkRequest}.
    */
   struct DocumentLinkParams
@@ -7512,10 +7610,8 @@ namespace LCompilers::LanguageServerProtocol {
     std::unique_ptr<TextDocumentIdentifier> textDocument;
   };
 
-  /**
-   * @since 3.16.0
-   */
-  struct SemanticTokensDeltaParams
+  struct TypeDefinitionParams
+    : public TextDocumentPositionParams
   {
     /**
      * An optional token that a server can use to report partial results (e.g. streaming) to
@@ -7526,21 +7622,12 @@ namespace LCompilers::LanguageServerProtocol {
      * An optional token that a server can use to report work done progress.
      */
     std::optional<ProgressToken> workDoneToken;
-    /**
-     * The text document.
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-    /**
-     * The result id of a previous response. The result Id can either point to a full response
-     * or a delta response depending on what was received last.
-     */
-    string_t previousResultId;
   };
 
   /**
-   * Parameters for a {@link DocumentSymbolRequest}.
+   * The parameters of a {@link WorkspaceSymbolRequest}.
    */
-  struct DocumentSymbolParams
+  struct WorkspaceSymbolParams
   {
     /**
      * An optional token that a server can use to report partial results (e.g. streaming) to
@@ -7552,52 +7639,33 @@ namespace LCompilers::LanguageServerProtocol {
      */
     std::optional<ProgressToken> workDoneToken;
     /**
-     * The text document.
+     * A query string to filter symbols by. Clients may send an empty
+     * string here to request all symbols.
      */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * Parameters for a {@link DocumentColorRequest}.
-   */
-  struct DocumentColorParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * The text document.
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
-  };
-
-  /**
-   * Parameters for a {@link FoldingRangeRequest}.
-   */
-  struct FoldingRangeParams
-  {
-    /**
-     * An optional token that a server can use to report partial results (e.g. streaming) to
-     * the client.
-     */
-    std::optional<ProgressToken> partialResultToken;
-    /**
-     * An optional token that a server can use to report work done progress.
-     */
-    std::optional<ProgressToken> workDoneToken;
-    /**
-     * The text document.
-     */
-    std::unique_ptr<TextDocumentIdentifier> textDocument;
+    string_t query;
   };
 
   struct WorkDoneProgressCreateParams
+  {
+    /**
+     * The token to be used to report progress.
+     */
+    ProgressToken token;
+  };
+
+  struct ProgressParams
+  {
+    /**
+     * The progress token provided by the client or server.
+     */
+    ProgressToken token;
+    /**
+     * The progress data.
+     */
+    std::unique_ptr<LSPAny> value;
+  };
+
+  struct WorkDoneProgressCancelParams
   {
     /**
      * The token to be used to report progress.
@@ -7609,6 +7677,53 @@ namespace LCompilers::LanguageServerProtocol {
    * An identifier to refer to a change annotation stored with a workspace edit.
    */
   typedef string_t ChangeAnnotationIdentifier;
+
+  /**
+   * A special text edit with an additional change annotation.
+   *
+   * @since 3.16.0.
+   */
+  struct AnnotatedTextEdit
+    : public TextEdit
+  {
+    /**
+     * The actual identifier of the change annotation
+     */
+    ChangeAnnotationIdentifier annotationId;
+  };
+
+  enum class TextDocumentEdit_editsType {
+    TEXT_EDIT,
+    ANNOTATED_TEXT_EDIT,
+  };
+
+  extern std::map<TextDocumentEdit_editsType, std::string> TextDocumentEdit_editsTypeNames;
+
+  typedef std::variant<
+    std::unique_ptr<TextEdit>,
+    std::unique_ptr<AnnotatedTextEdit>
+  > TextDocumentEdit_edits;
+
+  /**
+   * Describes textual changes on a text document. A TextDocumentEdit describes all changes
+   * on a document version Si and after they are applied move the document to version Si+1.
+   * So the creator of a TextDocumentEdit doesn't need to sort the array of edits or do any
+   * kind of ordering. However the edits must be non overlapping.
+   */
+  struct TextDocumentEdit
+  {
+    /**
+     * The text document to change.
+     */
+    std::unique_ptr<OptionalVersionedTextDocumentIdentifier> textDocument;
+    /**
+     * The edits to be applied.
+     *
+     * @since 3.16.0 - support for AnnotatedTextEdit. This is guarded using a
+     * client capability.
+     */
+    std::vector<TextDocumentEdit_edits> edits;
+  };
 
   /**
    * A generic resource operation.
@@ -7648,26 +7763,6 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * Create file operation.
-   */
-  struct CreateFile
-    : public ResourceOperation
-  {
-    /**
-     * A create
-     */
-    string_t kind;
-    /**
-     * The resource to create.
-     */
-    DocumentUri uri;
-    /**
-     * Additional options
-     */
-    std::optional<std::unique_ptr<CreateFileOptions>> options;
-  };
-
-  /**
    * Rename file operation
    */
   struct RenameFile
@@ -7692,48 +7787,23 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
-   * A special text edit with an additional change annotation.
-   *
-   * @since 3.16.0.
+   * Create file operation.
    */
-  struct AnnotatedTextEdit
-    : public TextEdit
+  struct CreateFile
+    : public ResourceOperation
   {
     /**
-     * The actual identifier of the change annotation
+     * A create
      */
-    ChangeAnnotationIdentifier annotationId;
-  };
-
-  enum class TextDocumentEdit_editsType {
-    TEXT_EDIT,
-    ANNOTATED_TEXT_EDIT,
-  };
-
-  typedef std::variant<
-    std::unique_ptr<TextEdit>,
-    std::unique_ptr<AnnotatedTextEdit>
-  > TextDocumentEdit_edits;
-
-  /**
-   * Describes textual changes on a text document. A TextDocumentEdit describes all changes
-   * on a document version Si and after they are applied move the document to version Si+1.
-   * So the creator of a TextDocumentEdit doesn't need to sort the array of edits or do any
-   * kind of ordering. However the edits must be non overlapping.
-   */
-  struct TextDocumentEdit
-  {
+    string_t kind;
     /**
-     * The text document to change.
+     * The resource to create.
      */
-    std::unique_ptr<OptionalVersionedTextDocumentIdentifier> textDocument;
+    DocumentUri uri;
     /**
-     * The edits to be applied.
-     *
-     * @since 3.16.0 - support for AnnotatedTextEdit. This is guarded using a
-     * client capability.
+     * Additional options
      */
-    std::vector<TextDocumentEdit_edits> edits;
+    std::optional<std::unique_ptr<CreateFileOptions>> options;
   };
 
   enum class WorkspaceEdit_documentChangesType {
@@ -7742,6 +7812,8 @@ namespace LCompilers::LanguageServerProtocol {
     RENAME_FILE,
     DELETE_FILE,
   };
+
+  extern std::map<WorkspaceEdit_documentChangesType, std::string> WorkspaceEdit_documentChangesTypeNames;
 
   typedef std::variant<
     std::unique_ptr<TextDocumentEdit>,
@@ -7792,23 +7864,6 @@ namespace LCompilers::LanguageServerProtocol {
      * @since 3.16.0
      */
     std::optional<std::map<ChangeAnnotationIdentifier, std::unique_ptr<ChangeAnnotation>>> changeAnnotations;
-  };
-
-  /**
-   * The parameters passed via an apply workspace edit request.
-   */
-  struct ApplyWorkspaceEditParams
-  {
-    /**
-     * An optional label of the workspace edit. This label is
-     * presented in the user interface for example on an undo
-     * stack to undo the workspace edit.
-     */
-    std::optional<string_t> label;
-    /**
-     * The edits to apply.
-     */
-    std::unique_ptr<WorkspaceEdit> edit;
   };
 
   struct CodeAction_disabled
@@ -7885,10 +7940,29 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<std::unique_ptr<LSPAny>> data;
   };
 
+  /**
+   * The parameters passed via an apply workspace edit request.
+   */
+  struct ApplyWorkspaceEditParams
+  {
+    /**
+     * An optional label of the workspace edit. This label is
+     * presented in the user interface for example on an undo
+     * stack to undo the workspace edit.
+     */
+    std::optional<string_t> label;
+    /**
+     * The edits to apply.
+     */
+    std::unique_ptr<WorkspaceEdit> edit;
+  };
+
   enum class WorkspaceDocumentDiagnosticReportType {
     WORKSPACE_FULL_DOCUMENT_DIAGNOSTIC_REPORT,
     WORKSPACE_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT,
   };
+
+  extern std::map<WorkspaceDocumentDiagnosticReportType, std::string> WorkspaceDocumentDiagnosticReportTypeNames;
 
   typedef std::variant<
     std::unique_ptr<WorkspaceFullDocumentDiagnosticReport>,
@@ -7896,21 +7970,21 @@ namespace LCompilers::LanguageServerProtocol {
   > WorkspaceDocumentDiagnosticReport;
 
   /**
-   * A workspace diagnostic report.
-   *
-   * @since 3.17.0
-   */
-  struct WorkspaceDiagnosticReport
-  {
-    std::vector<WorkspaceDocumentDiagnosticReport> items;
-  };
-
-  /**
    * A partial result for a workspace diagnostic report.
    *
    * @since 3.17.0
    */
   struct WorkspaceDiagnosticReportPartialResult
+  {
+    std::vector<WorkspaceDocumentDiagnosticReport> items;
+  };
+
+  /**
+   * A workspace diagnostic report.
+   *
+   * @since 3.17.0
+   */
+  struct WorkspaceDiagnosticReport
   {
     std::vector<WorkspaceDocumentDiagnosticReport> items;
   };
@@ -7931,6 +8005,8 @@ namespace LCompilers::LanguageServerProtocol {
     TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_0,
     TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_1,
   };
+
+  extern std::map<TextDocumentContentChangeEventType, std::string> TextDocumentContentChangeEventTypeNames;
 
   typedef std::variant<
     std::unique_ptr<TextDocumentContentChangeEvent_0>,
@@ -8046,6 +8122,8 @@ namespace LCompilers::LanguageServerProtocol {
     MARKED_STRING_1,
   };
 
+  extern std::map<MarkedStringType, std::string> MarkedStringTypeNames;
+
   typedef std::variant<
     string_t,
     std::unique_ptr<MarkedString_1>
@@ -8056,6 +8134,8 @@ namespace LCompilers::LanguageServerProtocol {
     MARKED_STRING,
     MARKED_STRING_ARRAY,
   };
+
+  extern std::map<Hover_contentsType, std::string> Hover_contentsTypeNames;
 
   typedef std::variant<
     std::unique_ptr<MarkupContent>,
@@ -8106,6 +8186,8 @@ namespace LCompilers::LanguageServerProtocol {
     TEXT_DOCUMENT_FILTER_2,
   };
 
+  extern std::map<TextDocumentFilterType, std::string> TextDocumentFilterTypeNames;
+
   typedef std::variant<
     std::unique_ptr<TextDocumentFilter_0>,
     std::unique_ptr<TextDocumentFilter_1>,
@@ -8139,427 +8221,13 @@ namespace LCompilers::LanguageServerProtocol {
     NOTEBOOK_DOCUMENT_FILTER_2,
   };
 
+  extern std::map<NotebookDocumentFilterType, std::string> NotebookDocumentFilterTypeNames;
+
   typedef std::variant<
     std::unique_ptr<NotebookDocumentFilter_0>,
     std::unique_ptr<NotebookDocumentFilter_1>,
     std::unique_ptr<NotebookDocumentFilter_2>
   > NotebookDocumentFilter;
-
-  enum class NotebookCellTextDocumentFilter_notebookType {
-    STRING_TYPE,
-    NOTEBOOK_DOCUMENT_FILTER,
-  };
-
-  typedef std::variant<
-    string_t,
-    NotebookDocumentFilter
-  > NotebookCellTextDocumentFilter_notebook;
-
-  /**
-   * A notebook cell text document filter denotes a cell text
-   * document by different properties.
-   *
-   * @since 3.17.0
-   */
-  struct NotebookCellTextDocumentFilter
-  {
-    /**
-     * A filter that matches against the notebook
-     * containing the notebook cell. If a string
-     * value is provided it matches against the
-     * notebook type. '*' matches every notebook.
-     */
-    NotebookCellTextDocumentFilter_notebook notebook;
-    /**
-     * A language id like `python`.
-     *
-     * Will be matched against the language id of the
-     * notebook cell document. '*' matches every language.
-     */
-    std::optional<string_t> language;
-  };
-
-  enum class DocumentFilterType {
-    TEXT_DOCUMENT_FILTER,
-    NOTEBOOK_CELL_TEXT_DOCUMENT_FILTER,
-  };
-
-  typedef std::variant<
-    TextDocumentFilter,
-    std::unique_ptr<NotebookCellTextDocumentFilter>
-  > DocumentFilter;
-
-  /**
-   * A document selector is the combination of one or many document filters.
-   *
-   * @sample `let sel:DocumentSelector = [{ language: 'typescript' }, { language: 'json', pattern: '**∕tsconfig.json' }]`;
-   *
-   * The use of a string as a document filter is deprecated @since 3.16.0.
-   */
-  typedef std::vector<DocumentFilter> DocumentSelector;
-
-  enum class TextDocumentRegistrationOptions_documentSelectorType {
-    DOCUMENT_SELECTOR,
-    NULL_TYPE,
-  };
-
-  typedef std::variant<
-    DocumentSelector,
-    null_t
-  > TextDocumentRegistrationOptions_documentSelector;
-
-  /**
-   * General text document registration options.
-   */
-  struct TextDocumentRegistrationOptions
-  {
-    /**
-     * A document selector to identify the scope of the registration. If set to null
-     * the document selector provided on the client side will be used.
-     */
-    TextDocumentRegistrationOptions_documentSelector documentSelector;
-  };
-
-  /**
-   * Registration options for a {@link DocumentOnTypeFormattingRequest}.
-   */
-  struct DocumentOnTypeFormattingRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentOnTypeFormattingOptions
-  {
-  };
-
-  /**
-   * Registration options for a {@link HoverRequest}.
-   */
-  struct HoverRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public HoverOptions
-  {
-  };
-
-  /**
-   * Save registration options.
-   */
-  struct TextDocumentSaveRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public SaveOptions
-  {
-  };
-
-  struct DeclarationRegistrationOptions
-    : public DeclarationOptions
-    , public TextDocumentRegistrationOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * @since 3.16.0
-   */
-  struct SemanticTokensRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public SemanticTokensOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  struct SelectionRangeRegistrationOptions
-    : public SelectionRangeOptions
-    , public TextDocumentRegistrationOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Registration options for a {@link DefinitionRequest}.
-   */
-  struct DefinitionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DefinitionOptions
-  {
-  };
-
-  /**
-   * Registration options for a {@link CodeLensRequest}.
-   */
-  struct CodeLensRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CodeLensOptions
-  {
-  };
-
-  /**
-   * Registration options for a {@link CompletionRequest}.
-   */
-  struct CompletionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CompletionOptions
-  {
-  };
-
-  /**
-   * Registration options for a {@link CodeActionRequest}.
-   */
-  struct CodeActionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CodeActionOptions
-  {
-  };
-
-  /**
-   * Call hierarchy options used during static or dynamic registration.
-   *
-   * @since 3.16.0
-   */
-  struct CallHierarchyRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public CallHierarchyOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Registration options for a {@link ReferencesRequest}.
-   */
-  struct ReferenceRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public ReferenceOptions
-  {
-  };
-
-  /**
-   * Registration options for a {@link DocumentLinkRequest}.
-   */
-  struct DocumentLinkRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentLinkOptions
-  {
-  };
-
-  /**
-   * Registration options for a {@link RenameRequest}.
-   */
-  struct RenameRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public RenameOptions
-  {
-  };
-
-  struct DocumentColorRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentColorOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Registration options for a {@link DocumentSymbolRequest}.
-   */
-  struct DocumentSymbolRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentSymbolOptions
-  {
-  };
-
-  struct ImplementationRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public ImplementationOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Registration options for a {@link SignatureHelpRequest}.
-   */
-  struct SignatureHelpRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public SignatureHelpOptions
-  {
-  };
-
-  struct LinkedEditingRangeRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public LinkedEditingRangeOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Inline completion options used during static or dynamic registration.
-   *
-   * @since 3.18.0
-   * @proposed
-   */
-  struct InlineCompletionRegistrationOptions
-    : public InlineCompletionOptions
-    , public TextDocumentRegistrationOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Registration options for a {@link DocumentRangeFormattingRequest}.
-   */
-  struct DocumentRangeFormattingRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentRangeFormattingOptions
-  {
-  };
-
-  /**
-   * Inlay hint options used during static or dynamic registration.
-   *
-   * @since 3.17.0
-   */
-  struct InlayHintRegistrationOptions
-    : public InlayHintOptions
-    , public TextDocumentRegistrationOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  struct MonikerRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public MonikerOptions
-  {
-  };
-
-  /**
-   * Type hierarchy options used during static or dynamic registration.
-   *
-   * @since 3.17.0
-   */
-  struct TypeHierarchyRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public TypeHierarchyOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Diagnostic registration options.
-   *
-   * @since 3.17.0
-   */
-  struct DiagnosticRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DiagnosticOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Inline value options used during static or dynamic registration.
-   *
-   * @since 3.17.0
-   */
-  struct InlineValueRegistrationOptions
-    : public InlineValueOptions
-    , public TextDocumentRegistrationOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  struct FoldingRangeRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public FoldingRangeOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Describe options to be used when registered for text document change events.
-   */
-  struct TextDocumentChangeRegistrationOptions
-    : public TextDocumentRegistrationOptions
-  {
-    /**
-     * How documents are synced to the server.
-     */
-    TextDocumentSyncKind syncKind;
-  };
-
-  struct TypeDefinitionRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public TypeDefinitionOptions
-  {
-    /**
-     * The id used to register the request. The id can be used to deregister
-     * the request again. See also Registration#id.
-     */
-    std::optional<string_t> id;
-  };
-
-  /**
-   * Registration options for a {@link DocumentHighlightRequest}.
-   */
-  struct DocumentHighlightRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentHighlightOptions
-  {
-  };
-
-  /**
-   * Registration options for a {@link DocumentFormattingRequest}.
-   */
-  struct DocumentFormattingRegistrationOptions
-    : public TextDocumentRegistrationOptions
-    , public DocumentFormattingOptions
-  {
-  };
 
   struct NotebookDocumentSyncOptions_notebookSelector_1_cells
   {
@@ -8570,6 +8238,8 @@ namespace LCompilers::LanguageServerProtocol {
     STRING_TYPE,
     NOTEBOOK_DOCUMENT_FILTER,
   };
+
+  extern std::map<NotebookDocumentSyncOptions_notebookSelector_1_notebookType, std::string> NotebookDocumentSyncOptions_notebookSelector_1_notebookTypeNames;
 
   typedef std::variant<
     string_t,
@@ -8592,6 +8262,8 @@ namespace LCompilers::LanguageServerProtocol {
     NOTEBOOK_DOCUMENT_FILTER,
   };
 
+  extern std::map<NotebookDocumentSyncOptions_notebookSelector_0_notebookType, std::string> NotebookDocumentSyncOptions_notebookSelector_0_notebookTypeNames;
+
   typedef std::variant<
     string_t,
     NotebookDocumentFilter
@@ -8607,6 +8279,8 @@ namespace LCompilers::LanguageServerProtocol {
     NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_0,
     NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_1,
   };
+
+  extern std::map<NotebookDocumentSyncOptions_notebookSelectorType, std::string> NotebookDocumentSyncOptions_notebookSelectorTypeNames;
 
   typedef std::variant<
     std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_0>,
@@ -8656,10 +8330,395 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<string_t> id;
   };
 
+  enum class NotebookCellTextDocumentFilter_notebookType {
+    STRING_TYPE,
+    NOTEBOOK_DOCUMENT_FILTER,
+  };
+
+  extern std::map<NotebookCellTextDocumentFilter_notebookType, std::string> NotebookCellTextDocumentFilter_notebookTypeNames;
+
+  typedef std::variant<
+    string_t,
+    NotebookDocumentFilter
+  > NotebookCellTextDocumentFilter_notebook;
+
+  /**
+   * A notebook cell text document filter denotes a cell text
+   * document by different properties.
+   *
+   * @since 3.17.0
+   */
+  struct NotebookCellTextDocumentFilter
+  {
+    /**
+     * A filter that matches against the notebook
+     * containing the notebook cell. If a string
+     * value is provided it matches against the
+     * notebook type. '*' matches every notebook.
+     */
+    NotebookCellTextDocumentFilter_notebook notebook;
+    /**
+     * A language id like `python`.
+     *
+     * Will be matched against the language id of the
+     * notebook cell document. '*' matches every language.
+     */
+    std::optional<string_t> language;
+  };
+
+  enum class DocumentFilterType {
+    TEXT_DOCUMENT_FILTER,
+    NOTEBOOK_CELL_TEXT_DOCUMENT_FILTER,
+  };
+
+  extern std::map<DocumentFilterType, std::string> DocumentFilterTypeNames;
+
+  typedef std::variant<
+    TextDocumentFilter,
+    std::unique_ptr<NotebookCellTextDocumentFilter>
+  > DocumentFilter;
+
+  /**
+   * A document selector is the combination of one or many document filters.
+   *
+   * @sample `let sel:DocumentSelector = [{ language: 'typescript' }, { language: 'json', pattern: '**∕tsconfig.json' }]`;
+   *
+   * The use of a string as a document filter is deprecated @since 3.16.0.
+   */
+  typedef std::vector<DocumentFilter> DocumentSelector;
+
+  enum class TextDocumentRegistrationOptions_documentSelectorType {
+    DOCUMENT_SELECTOR,
+    NULL_TYPE,
+  };
+
+  extern std::map<TextDocumentRegistrationOptions_documentSelectorType, std::string> TextDocumentRegistrationOptions_documentSelectorTypeNames;
+
+  typedef std::variant<
+    DocumentSelector,
+    null_t
+  > TextDocumentRegistrationOptions_documentSelector;
+
+  /**
+   * General text document registration options.
+   */
+  struct TextDocumentRegistrationOptions
+  {
+    /**
+     * A document selector to identify the scope of the registration. If set to null
+     * the document selector provided on the client side will be used.
+     */
+    TextDocumentRegistrationOptions_documentSelector documentSelector;
+  };
+
+  /**
+   * Diagnostic registration options.
+   *
+   * @since 3.17.0
+   */
+  struct DiagnosticRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DiagnosticOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct DocumentColorRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentColorOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Inline value options used during static or dynamic registration.
+   *
+   * @since 3.17.0
+   */
+  struct InlineValueRegistrationOptions
+    : public InlineValueOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link DocumentRangeFormattingRequest}.
+   */
+  struct DocumentRangeFormattingRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentRangeFormattingOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link DocumentFormattingRequest}.
+   */
+  struct DocumentFormattingRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentFormattingOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link CodeLensRequest}.
+   */
+  struct CodeLensRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CodeLensOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link HoverRequest}.
+   */
+  struct HoverRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public HoverOptions
+  {
+  };
+
+  /**
+   * Inline completion options used during static or dynamic registration.
+   *
+   * @since 3.18.0
+   * @proposed
+   */
+  struct InlineCompletionRegistrationOptions
+    : public InlineCompletionOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link CodeActionRequest}.
+   */
+  struct CodeActionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CodeActionOptions
+  {
+  };
+
+  struct LinkedEditingRangeRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public LinkedEditingRangeOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct TypeDefinitionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public TypeDefinitionOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct MonikerRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public MonikerOptions
+  {
+  };
+
+  /**
+   * Type hierarchy options used during static or dynamic registration.
+   *
+   * @since 3.17.0
+   */
+  struct TypeHierarchyRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public TypeHierarchyOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link ReferencesRequest}.
+   */
+  struct ReferenceRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public ReferenceOptions
+  {
+  };
+
+  /**
+   * Save registration options.
+   */
+  struct TextDocumentSaveRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public SaveOptions
+  {
+  };
+
+  /**
+   * Call hierarchy options used during static or dynamic registration.
+   *
+   * @since 3.16.0
+   */
+  struct CallHierarchyRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CallHierarchyOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link DocumentLinkRequest}.
+   */
+  struct DocumentLinkRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentLinkOptions
+  {
+  };
+
+  struct SelectionRangeRegistrationOptions
+    : public SelectionRangeOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link DocumentHighlightRequest}.
+   */
+  struct DocumentHighlightRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentHighlightOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link SignatureHelpRequest}.
+   */
+  struct SignatureHelpRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public SignatureHelpOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link RenameRequest}.
+   */
+  struct RenameRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public RenameOptions
+  {
+  };
+
+  /**
+   * Inlay hint options used during static or dynamic registration.
+   *
+   * @since 3.17.0
+   */
+  struct InlayHintRegistrationOptions
+    : public InlayHintOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct ImplementationRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public ImplementationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct DeclarationRegistrationOptions
+    : public DeclarationOptions
+    , public TextDocumentRegistrationOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  struct FoldingRangeRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public FoldingRangeOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
+  /**
+   * Registration options for a {@link DefinitionRequest}.
+   */
+  struct DefinitionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DefinitionOptions
+  {
+  };
+
+  /**
+   * @since 3.16.0
+   */
+  struct SemanticTokensRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public SemanticTokensOptions
+  {
+    /**
+     * The id used to register the request. The id can be used to deregister
+     * the request again. See also Registration#id.
+     */
+    std::optional<string_t> id;
+  };
+
   enum class ServerCapabilities_textDocumentSyncType {
     TEXT_DOCUMENT_SYNC_OPTIONS,
     TEXT_DOCUMENT_SYNC_KIND,
   };
+
+  extern std::map<ServerCapabilities_textDocumentSyncType, std::string> ServerCapabilities_textDocumentSyncTypeNames;
 
   typedef std::variant<
     std::unique_ptr<TextDocumentSyncOptions>,
@@ -8671,6 +8730,8 @@ namespace LCompilers::LanguageServerProtocol {
     NOTEBOOK_DOCUMENT_SYNC_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_notebookDocumentSyncType, std::string> ServerCapabilities_notebookDocumentSyncTypeNames;
+
   typedef std::variant<
     std::unique_ptr<NotebookDocumentSyncOptions>,
     std::unique_ptr<NotebookDocumentSyncRegistrationOptions>
@@ -8680,6 +8741,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     HOVER_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_hoverProviderType, std::string> ServerCapabilities_hoverProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8692,6 +8755,8 @@ namespace LCompilers::LanguageServerProtocol {
     DECLARATION_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_declarationProviderType, std::string> ServerCapabilities_declarationProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<DeclarationOptions>,
@@ -8703,6 +8768,8 @@ namespace LCompilers::LanguageServerProtocol {
     DEFINITION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_definitionProviderType, std::string> ServerCapabilities_definitionProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<DefinitionOptions>
@@ -8713,6 +8780,8 @@ namespace LCompilers::LanguageServerProtocol {
     TYPE_DEFINITION_OPTIONS,
     TYPE_DEFINITION_REGISTRATION_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_typeDefinitionProviderType, std::string> ServerCapabilities_typeDefinitionProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8726,6 +8795,8 @@ namespace LCompilers::LanguageServerProtocol {
     IMPLEMENTATION_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_implementationProviderType, std::string> ServerCapabilities_implementationProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<ImplementationOptions>,
@@ -8737,6 +8808,8 @@ namespace LCompilers::LanguageServerProtocol {
     REFERENCE_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_referencesProviderType, std::string> ServerCapabilities_referencesProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<ReferenceOptions>
@@ -8746,6 +8819,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     DOCUMENT_HIGHLIGHT_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_documentHighlightProviderType, std::string> ServerCapabilities_documentHighlightProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8757,6 +8832,8 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_SYMBOL_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_documentSymbolProviderType, std::string> ServerCapabilities_documentSymbolProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<DocumentSymbolOptions>
@@ -8766,6 +8843,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     CODE_ACTION_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_codeActionProviderType, std::string> ServerCapabilities_codeActionProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8778,6 +8857,8 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_COLOR_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_colorProviderType, std::string> ServerCapabilities_colorProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<DocumentColorOptions>,
@@ -8789,6 +8870,8 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_SYMBOL_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_workspaceSymbolProviderType, std::string> ServerCapabilities_workspaceSymbolProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<WorkspaceSymbolOptions>
@@ -8798,6 +8881,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     DOCUMENT_FORMATTING_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_documentFormattingProviderType, std::string> ServerCapabilities_documentFormattingProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8809,6 +8894,8 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_RANGE_FORMATTING_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_documentRangeFormattingProviderType, std::string> ServerCapabilities_documentRangeFormattingProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<DocumentRangeFormattingOptions>
@@ -8818,6 +8905,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     RENAME_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_renameProviderType, std::string> ServerCapabilities_renameProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8829,6 +8918,8 @@ namespace LCompilers::LanguageServerProtocol {
     FOLDING_RANGE_OPTIONS,
     FOLDING_RANGE_REGISTRATION_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_foldingRangeProviderType, std::string> ServerCapabilities_foldingRangeProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8842,6 +8933,8 @@ namespace LCompilers::LanguageServerProtocol {
     SELECTION_RANGE_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_selectionRangeProviderType, std::string> ServerCapabilities_selectionRangeProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<SelectionRangeOptions>,
@@ -8853,6 +8946,8 @@ namespace LCompilers::LanguageServerProtocol {
     CALL_HIERARCHY_OPTIONS,
     CALL_HIERARCHY_REGISTRATION_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_callHierarchyProviderType, std::string> ServerCapabilities_callHierarchyProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8866,6 +8961,8 @@ namespace LCompilers::LanguageServerProtocol {
     LINKED_EDITING_RANGE_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_linkedEditingRangeProviderType, std::string> ServerCapabilities_linkedEditingRangeProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<LinkedEditingRangeOptions>,
@@ -8877,6 +8974,8 @@ namespace LCompilers::LanguageServerProtocol {
     SEMANTIC_TOKENS_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_semanticTokensProviderType, std::string> ServerCapabilities_semanticTokensProviderTypeNames;
+
   typedef std::variant<
     std::unique_ptr<SemanticTokensOptions>,
     std::unique_ptr<SemanticTokensRegistrationOptions>
@@ -8887,6 +8986,8 @@ namespace LCompilers::LanguageServerProtocol {
     MONIKER_OPTIONS,
     MONIKER_REGISTRATION_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_monikerProviderType, std::string> ServerCapabilities_monikerProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8900,6 +9001,8 @@ namespace LCompilers::LanguageServerProtocol {
     TYPE_HIERARCHY_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_typeHierarchyProviderType, std::string> ServerCapabilities_typeHierarchyProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<TypeHierarchyOptions>,
@@ -8911,6 +9014,8 @@ namespace LCompilers::LanguageServerProtocol {
     INLINE_VALUE_OPTIONS,
     INLINE_VALUE_REGISTRATION_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_inlineValueProviderType, std::string> ServerCapabilities_inlineValueProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -8924,6 +9029,8 @@ namespace LCompilers::LanguageServerProtocol {
     INLAY_HINT_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_inlayHintProviderType, std::string> ServerCapabilities_inlayHintProviderTypeNames;
+
   typedef std::variant<
     boolean_t,
     std::unique_ptr<InlayHintOptions>,
@@ -8935,6 +9042,8 @@ namespace LCompilers::LanguageServerProtocol {
     DIAGNOSTIC_REGISTRATION_OPTIONS,
   };
 
+  extern std::map<ServerCapabilities_diagnosticProviderType, std::string> ServerCapabilities_diagnosticProviderTypeNames;
+
   typedef std::variant<
     std::unique_ptr<DiagnosticOptions>,
     std::unique_ptr<DiagnosticRegistrationOptions>
@@ -8944,6 +9053,8 @@ namespace LCompilers::LanguageServerProtocol {
     BOOLEAN_TYPE,
     INLINE_COMPLETION_OPTIONS,
   };
+
+  extern std::map<ServerCapabilities_inlineCompletionProviderType, std::string> ServerCapabilities_inlineCompletionProviderTypeNames;
 
   typedef std::variant<
     boolean_t,
@@ -9167,6 +9278,45 @@ namespace LCompilers::LanguageServerProtocol {
   };
 
   /**
+   * Describe options to be used when registered for text document change events.
+   */
+  struct TextDocumentChangeRegistrationOptions
+    : public TextDocumentRegistrationOptions
+  {
+    /**
+     * How documents are synced to the server.
+     */
+    TextDocumentSyncKind syncKind;
+  };
+
+  /**
+   * Registration options for a {@link CompletionRequest}.
+   */
+  struct CompletionRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public CompletionOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link DocumentOnTypeFormattingRequest}.
+   */
+  struct DocumentOnTypeFormattingRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentOnTypeFormattingOptions
+  {
+  };
+
+  /**
+   * Registration options for a {@link DocumentSymbolRequest}.
+   */
+  struct DocumentSymbolRegistrationOptions
+    : public TextDocumentRegistrationOptions
+    , public DocumentSymbolOptions
+  {
+  };
+
+  /**
    * The glob pattern to watch relative to the base path. Glob patterns can have the following syntax:
    * - `*` to match one or more characters in a path segment
    * - `?` to match on one character in a path segment
@@ -9183,6 +9333,8 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_FOLDER,
     URI,
   };
+
+  extern std::map<RelativePattern_baseUriType, std::string> RelativePattern_baseUriTypeNames;
 
   typedef std::variant<
     std::unique_ptr<WorkspaceFolder>,
@@ -9213,6 +9365,8 @@ namespace LCompilers::LanguageServerProtocol {
     PATTERN,
     RELATIVE_PATTERN,
   };
+
+  extern std::map<GlobPatternType, std::string> GlobPatternTypeNames;
 
   typedef std::variant<
     Pattern,
@@ -9253,6 +9407,8 @@ namespace LCompilers::LanguageServerProtocol {
     LOCATION_ARRAY,
   };
 
+  extern std::map<TextDocumentImplementationResultType, std::string> TextDocumentImplementationResultTypeNames;
+
   typedef std::variant<
     Definition,
     std::vector<std::unique_ptr<DefinitionLink>>,
@@ -9267,6 +9423,8 @@ namespace LCompilers::LanguageServerProtocol {
     LOCATION_ARRAY,
   };
 
+  extern std::map<TextDocumentTypeDefinitionResultType, std::string> TextDocumentTypeDefinitionResultTypeNames;
+
   typedef std::variant<
     Definition,
     std::vector<std::unique_ptr<DefinitionLink>>,
@@ -9278,6 +9436,8 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_FOLDER_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<WorkspaceWorkspaceFoldersResultType, std::string> WorkspaceWorkspaceFoldersResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<WorkspaceFolder>>,
@@ -9295,6 +9455,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentFoldingRangeResultType, std::string> TextDocumentFoldingRangeResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<FoldingRange>>,
     null_t
@@ -9308,6 +9470,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
     LOCATION_ARRAY,
   };
+
+  extern std::map<TextDocumentDeclarationResultType, std::string> TextDocumentDeclarationResultTypeNames;
 
   typedef std::variant<
     Declaration,
@@ -9323,6 +9487,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentPrepareCallHierarchyResultType, std::string> TextDocumentPrepareCallHierarchyResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<CallHierarchyItem>>,
     null_t
@@ -9332,6 +9498,8 @@ namespace LCompilers::LanguageServerProtocol {
     CALL_HIERARCHY_INCOMING_CALL_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<CallHierarchyIncomingCallsResultType, std::string> CallHierarchyIncomingCallsResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<CallHierarchyIncomingCall>>,
@@ -9343,6 +9511,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<CallHierarchyOutgoingCallsResultType, std::string> CallHierarchyOutgoingCallsResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<CallHierarchyOutgoingCall>>,
     null_t
@@ -9353,6 +9523,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
     SEMANTIC_TOKENS_PARTIAL_RESULT,
   };
+
+  extern std::map<TextDocumentSemanticTokensFullResultType, std::string> TextDocumentSemanticTokensFullResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<SemanticTokens>,
@@ -9368,6 +9540,8 @@ namespace LCompilers::LanguageServerProtocol {
     SEMANTIC_TOKENS_DELTA_PARTIAL_RESULT,
   };
 
+  extern std::map<TextDocumentSemanticTokensFullDeltaResultType, std::string> TextDocumentSemanticTokensFullDeltaResultTypeNames;
+
   typedef std::variant<
     std::unique_ptr<SemanticTokens>,
     std::unique_ptr<SemanticTokensDelta>,
@@ -9381,6 +9555,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
     SEMANTIC_TOKENS_PARTIAL_RESULT,
   };
+
+  extern std::map<TextDocumentSemanticTokensRangeResultType, std::string> TextDocumentSemanticTokensRangeResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<SemanticTokens>,
@@ -9397,6 +9573,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentLinkedEditingRangeResultType, std::string> TextDocumentLinkedEditingRangeResultTypeNames;
+
   typedef std::variant<
     std::unique_ptr<LinkedEditingRanges>,
     null_t
@@ -9406,6 +9584,8 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_EDIT,
     NULL_TYPE,
   };
+
+  extern std::map<WorkspaceWillCreateFilesResultType, std::string> WorkspaceWillCreateFilesResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<WorkspaceEdit>,
@@ -9417,6 +9597,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<WorkspaceWillRenameFilesResultType, std::string> WorkspaceWillRenameFilesResultTypeNames;
+
   typedef std::variant<
     std::unique_ptr<WorkspaceEdit>,
     null_t
@@ -9426,6 +9608,8 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_EDIT,
     NULL_TYPE,
   };
+
+  extern std::map<WorkspaceWillDeleteFilesResultType, std::string> WorkspaceWillDeleteFilesResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<WorkspaceEdit>,
@@ -9437,6 +9621,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentMonikerResultType, std::string> TextDocumentMonikerResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<Moniker>>,
     null_t
@@ -9446,6 +9632,8 @@ namespace LCompilers::LanguageServerProtocol {
     TYPE_HIERARCHY_ITEM_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentPrepareTypeHierarchyResultType, std::string> TextDocumentPrepareTypeHierarchyResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<TypeHierarchyItem>>,
@@ -9457,6 +9645,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TypeHierarchySupertypesResultType, std::string> TypeHierarchySupertypesResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<TypeHierarchyItem>>,
     null_t
@@ -9467,6 +9657,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TypeHierarchySubtypesResultType, std::string> TypeHierarchySubtypesResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<TypeHierarchyItem>>,
     null_t
@@ -9476,6 +9668,8 @@ namespace LCompilers::LanguageServerProtocol {
     INLINE_VALUE_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentInlineValueResultType, std::string> TextDocumentInlineValueResultTypeNames;
 
   typedef std::variant<
     std::vector<InlineValue>,
@@ -9488,6 +9682,8 @@ namespace LCompilers::LanguageServerProtocol {
     INLAY_HINT_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentInlayHintResultType, std::string> TextDocumentInlayHintResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<InlayHint>>,
@@ -9503,6 +9699,8 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_DIAGNOSTIC_REPORT_PARTIAL_RESULT,
   };
 
+  extern std::map<TextDocumentDiagnosticResultType, std::string> TextDocumentDiagnosticResultTypeNames;
+
   typedef std::variant<
     DocumentDiagnosticReport,
     std::unique_ptr<DocumentDiagnosticReportPartialResult>
@@ -9512,6 +9710,8 @@ namespace LCompilers::LanguageServerProtocol {
     WORKSPACE_DIAGNOSTIC_REPORT,
     WORKSPACE_DIAGNOSTIC_REPORT_PARTIAL_RESULT,
   };
+
+  extern std::map<WorkspaceDiagnosticResultType, std::string> WorkspaceDiagnosticResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<WorkspaceDiagnosticReport>,
@@ -9525,6 +9725,8 @@ namespace LCompilers::LanguageServerProtocol {
     INLINE_COMPLETION_ITEM_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentInlineCompletionResultType, std::string> TextDocumentInlineCompletionResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<InlineCompletionList>,
@@ -9543,6 +9745,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<WindowShowMessageRequestResultType, std::string> WindowShowMessageRequestResultTypeNames;
+
   typedef std::variant<
     std::unique_ptr<MessageActionItem>,
     null_t
@@ -9552,6 +9756,8 @@ namespace LCompilers::LanguageServerProtocol {
     TEXT_EDIT_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentWillSaveWaitUntilResultType, std::string> TextDocumentWillSaveWaitUntilResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<TextEdit>>,
@@ -9563,6 +9769,8 @@ namespace LCompilers::LanguageServerProtocol {
     COMPLETION_LIST,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentCompletionResultType, std::string> TextDocumentCompletionResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<CompletionItem>>,
@@ -9577,6 +9785,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentHoverResultType, std::string> TextDocumentHoverResultTypeNames;
+
   typedef std::variant<
     std::unique_ptr<Hover>,
     null_t
@@ -9586,6 +9796,8 @@ namespace LCompilers::LanguageServerProtocol {
     SIGNATURE_HELP,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentSignatureHelpResultType, std::string> TextDocumentSignatureHelpResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<SignatureHelp>,
@@ -9599,6 +9811,8 @@ namespace LCompilers::LanguageServerProtocol {
     LOCATION_ARRAY,
   };
 
+  extern std::map<TextDocumentDefinitionResultType, std::string> TextDocumentDefinitionResultTypeNames;
+
   typedef std::variant<
     Definition,
     std::vector<std::unique_ptr<DefinitionLink>>,
@@ -9611,6 +9825,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentReferencesResultType, std::string> TextDocumentReferencesResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<Location>>,
     null_t
@@ -9620,6 +9836,8 @@ namespace LCompilers::LanguageServerProtocol {
     DOCUMENT_HIGHLIGHT_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentDocumentHighlightResultType, std::string> TextDocumentDocumentHighlightResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<DocumentHighlight>>,
@@ -9631,6 +9849,8 @@ namespace LCompilers::LanguageServerProtocol {
     CODE_ACTION,
   };
 
+  extern std::map<TextDocumentCodeActionResult_0Type, std::string> TextDocumentCodeActionResult_0TypeNames;
+
   typedef std::variant<
     std::unique_ptr<Command>,
     std::unique_ptr<CodeAction>
@@ -9640,6 +9860,8 @@ namespace LCompilers::LanguageServerProtocol {
     COMMAND_OR_CODE_ACTION_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentCodeActionResultType, std::string> TextDocumentCodeActionResultTypeNames;
 
   typedef std::variant<
     std::vector<TextDocumentCodeActionResult_0>,
@@ -9654,6 +9876,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<WorkspaceSymbolResultType, std::string> WorkspaceSymbolResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<SymbolInformation>>,
     std::vector<std::unique_ptr<WorkspaceSymbol>>,
@@ -9666,6 +9890,8 @@ namespace LCompilers::LanguageServerProtocol {
     CODE_LENS_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentCodeLensResultType, std::string> TextDocumentCodeLensResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<CodeLens>>,
@@ -9681,6 +9907,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentDocumentLinkResultType, std::string> TextDocumentDocumentLinkResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<DocumentLink>>,
     null_t
@@ -9693,6 +9921,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentFormattingResultType, std::string> TextDocumentFormattingResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<TextEdit>>,
     null_t
@@ -9702,6 +9932,8 @@ namespace LCompilers::LanguageServerProtocol {
     TEXT_EDIT_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentRangeFormattingResultType, std::string> TextDocumentRangeFormattingResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<TextEdit>>,
@@ -9713,6 +9945,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentRangesFormattingResultType, std::string> TextDocumentRangesFormattingResultTypeNames;
+
   typedef std::variant<
     std::vector<std::unique_ptr<TextEdit>>,
     null_t
@@ -9722,6 +9956,8 @@ namespace LCompilers::LanguageServerProtocol {
     TEXT_EDIT_ARRAY,
     NULL_TYPE,
   };
+
+  extern std::map<TextDocumentOnTypeFormattingResultType, std::string> TextDocumentOnTypeFormattingResultTypeNames;
 
   typedef std::variant<
     std::vector<std::unique_ptr<TextEdit>>,
@@ -9733,6 +9969,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentRenameResultType, std::string> TextDocumentRenameResultTypeNames;
+
   typedef std::variant<
     std::unique_ptr<WorkspaceEdit>,
     null_t
@@ -9743,6 +9981,8 @@ namespace LCompilers::LanguageServerProtocol {
     NULL_TYPE,
   };
 
+  extern std::map<TextDocumentPrepareRenameResultType, std::string> TextDocumentPrepareRenameResultTypeNames;
+
   typedef std::variant<
     PrepareRenameResult,
     null_t
@@ -9752,6 +9992,8 @@ namespace LCompilers::LanguageServerProtocol {
     ANY_TYPE,
     NULL_TYPE,
   };
+
+  extern std::map<WorkspaceExecuteCommandResultType, std::string> WorkspaceExecuteCommandResultTypeNames;
 
   typedef std::variant<
     std::unique_ptr<LSPAny>,
@@ -9895,6 +10137,20 @@ namespace LCompilers::LanguageServerProtocol {
 
   struct DocumentSymbol;  // forward declaration
 
+  enum class TextDocumentDocumentSymbolResultType {
+    SYMBOL_INFORMATION_ARRAY,
+    DOCUMENT_SYMBOL_ARRAY,
+    NULL_TYPE,
+  };
+
+  extern std::map<TextDocumentDocumentSymbolResultType, std::string> TextDocumentDocumentSymbolResultTypeNames;
+
+  typedef std::variant<
+    std::vector<std::unique_ptr<SymbolInformation>>,
+    std::vector<std::unique_ptr<DocumentSymbol>>,
+    null_t
+  > TextDocumentDocumentSymbolResult;
+
   /**
    * Represents programming constructs like variables, classes, interfaces etc.
    * that appear in a document. Document symbols can be hierarchical and they
@@ -9945,19 +10201,19 @@ namespace LCompilers::LanguageServerProtocol {
     std::optional<std::vector<std::unique_ptr<DocumentSymbol>>> children;
   };
 
-  enum class TextDocumentDocumentSymbolResultType {
-    SYMBOL_INFORMATION_ARRAY,
-    DOCUMENT_SYMBOL_ARRAY,
+  struct SelectionRange;  // forward declaration
+
+  enum class TextDocumentSelectionRangeResultType {
+    SELECTION_RANGE_ARRAY,
     NULL_TYPE,
   };
 
-  typedef std::variant<
-    std::vector<std::unique_ptr<SymbolInformation>>,
-    std::vector<std::unique_ptr<DocumentSymbol>>,
-    null_t
-  > TextDocumentDocumentSymbolResult;
+  extern std::map<TextDocumentSelectionRangeResultType, std::string> TextDocumentSelectionRangeResultTypeNames;
 
-  struct SelectionRange;  // forward declaration
+  typedef std::variant<
+    std::vector<std::unique_ptr<SelectionRange>>,
+    null_t
+  > TextDocumentSelectionRangeResult;
 
   /**
    * A selection range represents a part of a selection hierarchy. A selection range
@@ -9974,15 +10230,5 @@ namespace LCompilers::LanguageServerProtocol {
      */
     std::optional<std::unique_ptr<SelectionRange>> parent;
   };
-
-  enum class TextDocumentSelectionRangeResultType {
-    SELECTION_RANGE_ARRAY,
-    NULL_TYPE,
-  };
-
-  typedef std::variant<
-    std::vector<std::unique_ptr<SelectionRange>>,
-    null_t
-  > TextDocumentSelectionRangeResult;
 
 } // namespace LCompilers::LanguageServerProtocol

@@ -1,6 +1,31 @@
-add_executable(lfortran lfortran.cpp)
+set(LFORTRAN_SRC
+  lfortran.cpp
+)
+set(LFORTRAN_LINK_LIBRARIES
+  lfortran_lib
+)
+
+if (WITH_LSP)
+  add_compile_definitions(WITH_LSP)
+  set(LFORTRAN_SRC
+    lsp/utils.cpp
+    lsp/lfortran_accessor.cpp
+    lsp/cli.cpp
+    lsp/lfortran_lsp_language_server.cpp
+    lsp/interface.cpp
+    ${LFORTRAN_SRC}
+  )
+  set(LFORTRAN_LINK_LIBRARIES
+    ${LFORTRAN_LINK_LIBRARIES}
+    asr
+    p::rapidjson
+    lcompilers_lsp
+  )
+endif()
+
+add_executable(lfortran ${LFORTRAN_SRC})
 target_include_directories(lfortran PRIVATE "tpl")
-target_link_libraries(lfortran lfortran_lib)
+target_link_libraries(lfortran ${LFORTRAN_LINK_LIBRARIES})
 if (LFORTRAN_STATIC_BIN)
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux"
         OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD"

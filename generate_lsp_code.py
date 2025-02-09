@@ -165,6 +165,22 @@ def any_enum(type_name: str) -> str:
     case _:
       return rename_enum("object")
 
+@memoize
+def send_fn(method: str) -> str:
+  if method.startswith("$/"):
+    method = method[2:]
+  fn_nym = method.replace(r'/', '_')
+  fn_nym = upper_first_char(fn_nym)
+  return f"send{fn_nym}"
+
+@memoize
+def receive_fn(method: str) -> str:
+  if method.startswith("$/"):
+    method = method[2:]
+  fn_nym = method.replace(r'/', '_')
+  fn_nym = upper_first_char(fn_nym)
+  return f"receive{fn_nym}"
+
 def as_enumeration_spec(type_name: str, enumeration: List[Tuple[str, str]]) -> Dict[str, Any]:
   return {
     "name": type_name,
@@ -379,21 +395,21 @@ DEFAULT_SCHEMA: Dict[str, Any] = {
       "name": "URI",
       "type": {
         "kind": "base",
-        "name": rename_type("string"),
+        "name": "string",
       },
     },
     {
       "name": "DocumentUri",
       "type": {
         "kind": "base",
-        "name": rename_type("string"),
+        "name": "string",
       },
     },
     {
       "name": "RegExp",
       "type": {
         "kind": "base",
-        "name": rename_type("string"),
+        "name": "string",
       },
     },
     {
@@ -464,11 +480,15 @@ class LspCodeGenerator(ABC):
     self.args = args
 
   def generate_code(self: Self) -> None:
+    print('Creating parent directories ...')
     self.args.output_dir.mkdir(parents=True, exist_ok=True)
+    print('Loading schema ...')
     self.schema = json.loads(self.args.schema.read())
+    print('Generating files ...')
     self.generate_specification()
     self.generate_transformer()
     self.generate_server()
+    print('Done.')
 
   @abstractmethod
   def generate_specification(self: Self) -> None:
@@ -916,7 +936,8 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
     for name, closure in closures.items():
       while len(closure) > 0:
         dependency_name = closure.popleft()
-        if dependency_name not in self.generated and dependency_name not in declared:
+        if dependency_name not in self.generated \
+           and dependency_name not in declared:
           self.write(f'struct {dependency_name};  // forward declaration')
           self.newline()
           declared.add(dependency_name)
@@ -966,10 +987,14 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
       self.write(f') -> {enum_name};')
 
   def generate_enumerations(self: Self) -> None:
-    for enum in self.schema["enumerations"]:
-      enum_name = enum["name"]
-      self.symbols[enum_name] = ("enumeration", enum)
-      self.generate_enumeration(enum)
+    enum_specs = chain(
+      DEFAULT_SCHEMA["enumerations"],
+      self.schema["enumerations"],
+    )
+    for enum_spec in enum_specs:
+      enum_name = enum_spec["name"]
+      self.symbols[enum_name] = ("enumeration", enum_spec)
+      self.generate_enumeration(enum_spec)
       self.newline()
       self.generated.add(enum_name)
 
@@ -1059,6 +1084,8 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
             self.inline(',', end='\n')
       self.write('};')
       self.newline()
+      self.write(f'extern std::map<{nested_name}Type, std::string> {nested_name}TypeNames;')
+      self.newline()
       if spec is not None:
         spec_docs = spec.get("documentation", None)
         if spec_docs is None and nested_name in self.symbols:
@@ -1081,7 +1108,17 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
                 self.inline(indent=True)
                 self.generate_type_declaration(item_spec)
       self.newline()
-      self.write(f'> {nested_name};')
+      if nested_name != "LSPAny":
+        self.write(f'> {nested_name};')
+      else:
+        self.write(f'> {nested_name}Base;')
+        self.newline()
+        self.write('struct LSPAny')
+        with self.indent(): self.write(': public LSPAnyBase')
+        self.write('{')
+        with self.indent():
+          self.write('using LSPAnyBase::variant;')
+        self.write('};')
       self.newline()
 
   def generate_nested_structure(
@@ -1144,7 +1181,11 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
       self.newline()
 
   def generate_structures(self: Self) -> None:
-    for struct_spec in self.schema["structures"]:
+    struct_specs = chain(
+      DEFAULT_SCHEMA["structures"],
+      self.schema["structures"],
+    )
+    for struct_spec in struct_specs:
       struct_name = struct_spec["name"]
       self.symbols[struct_name] = ("structure", struct_spec)
       dependencies = set()
@@ -1167,48 +1208,49 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
 
   def generate_type_alias(self: Self, alias_spec: Dict[str, Any]) -> None:
     alias_name = alias_spec["name"]
-    match alias_name:
-      case "LSPAny" | "LSPObject" | "LSPArray":
-        pass
-      case _:
-        with self.nested_names_as(deque([alias_name])):
-          type_spec = alias_spec["type"]
-          nested_dependencies = deque()
-          self.extract_nested_dependencies(nested_dependencies, type_spec)
-          while len(nested_dependencies) > 0:
-            nested_names, generate_fn, nested_spec = nested_dependencies.pop()
-            generate_fn(nested_names, nested_spec)
-            self.add_generated(self.nested_name(nested_names))
-          if alias_name not in self.generated:
-            self.generate_docstring(alias_spec.get("documentation", None))
-            match type_spec["kind"]:
-              case "base" | "array":
-                self.inline('typedef ', indent=True)
-                self.generate_type_declaration(type_spec)
-                self.inline(f' {alias_name};', end='\n')
-                self.newline()
-              case "reference":
-                self.inline('typedef ', indent=True)
-                self.inline(type_spec["name"])
-                self.inline(f' {alias_name};', end='\n')
-                self.newline()
-              case "or":
-                self.generate_nested_variant(self.nested_names, type_spec)
-              case _:
-                raise ValueError(f'Unsupported alias type ({type_spec["kind"]}): {type_spec}')
+    with self.nested_names_as(deque([alias_name])):
+      type_spec = alias_spec["type"]
+      nested_dependencies = deque()
+      self.extract_nested_dependencies(nested_dependencies, type_spec)
+      while len(nested_dependencies) > 0:
+        nested_names, generate_fn, nested_spec = nested_dependencies.pop()
+        generate_fn(nested_names, nested_spec)
+        self.add_generated(self.nested_name(nested_names))
+      if alias_name not in self.generated:
+        self.generate_docstring(alias_spec.get("documentation", None))
+        match type_spec["kind"]:
+          case "base" | "array" | "map":
+            self.inline('typedef ', indent=True)
+            self.generate_type_declaration(type_spec)
+            self.inline(f' {alias_name};', end='\n')
+            self.newline()
+          case "reference":
+            self.inline('typedef ', indent=True)
+            self.inline(type_spec["name"])
+            self.inline(f' {alias_name};', end='\n')
+            self.newline()
+          case "or":
+            self.generate_nested_variant(self.nested_names, type_spec)
+          case _:
+            raise ValueError(f'Unsupported alias type ({type_spec["kind"]}): {type_spec}')
 
   def generate_type_aliases(self: Self) -> None:
-    for alias_spec in self.schema["typeAliases"]:
+    alias_specs = chain(
+      DEFAULT_SCHEMA["typeAliases"],
+      self.schema["typeAliases"],
+    )
+    for alias_spec in alias_specs:
       alias_name = alias_spec["name"]
-      self.symbols[alias_name] = ("alias", alias_spec)
-      dependencies = set()
-      self.extract_type_dependencies(dependencies, alias_spec["type"])
-      self.generate_or_add_to_pending(
-        alias_name,
-        alias_spec,
-        dependencies,
-        self.generate_type_alias
-      )
+      if alias_name not in self.generated:
+        self.symbols[alias_name] = ("alias", alias_spec)
+        dependencies = set()
+        self.extract_type_dependencies(dependencies, alias_spec["type"])
+        self.generate_or_add_to_pending(
+          alias_name,
+          alias_spec,
+          dependencies,
+          self.generate_type_alias
+        )
 
   def generate_request(self: Self, request_spec: Dict[str, Any]) -> None:
     request_method = request_spec["method"]
@@ -1266,9 +1308,13 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
           self.newline()
 
   def generate_requests(self: Self) -> None:
+    request_specs = chain(
+      DEFAULT_SCHEMA["requests"],
+      self.schema["requests"],
+    )
     incoming_requests = []
     outgoing_requests = []
-    for request_spec in self.schema["requests"]:
+    for request_spec in request_specs:
       request_method = request_spec["method"]
       enumeration = (method_to_underscore(request_method), request_method)
       match request_spec["messageDirection"]:
@@ -1325,9 +1371,13 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
     pass
 
   def generate_notifications(self: Self) -> None:
+    notification_specs = chain(
+      DEFAULT_SCHEMA["notifications"],
+      self.schema["notifications"],
+    )
     incoming_notifications = []
     outgoing_notifications = []
-    for notification_spec in self.schema["notifications"]:
+    for notification_spec in notification_specs:
       notification_method = notification_spec["method"]
       enumeration = (method_to_underscore(notification_method), notification_method)
       match notification_spec["messageDirection"]:
@@ -1376,7 +1426,55 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
     self.write(f'auto outgoingNotificationByValue(const std::string &value) -> OutgoingNotification;')
     self.newline()
 
+  def generate_lsp_any(self: Self) -> None:
+    for alias_spec in self.schema["typeAliases"]:
+      alias_name = alias_spec["name"]
+      if alias_name == "LSPAny":
+        self.symbols[alias_name] = ("alias", alias_spec)
+        dependencies = set()
+        self.extract_type_dependencies(dependencies, alias_spec["type"])
+        self.generate_or_add_to_pending(
+          alias_name,
+          alias_spec,
+          dependencies,
+          self.generate_type_alias
+        )
+        break
+
+  def generate_lsp_object(self: Self) -> None:
+    for alias_spec in self.schema["typeAliases"]:
+      alias_name = alias_spec["name"]
+      if alias_name == "LSPObject":
+        self.symbols[alias_name] = ("alias", alias_spec)
+        dependencies = set()
+        self.extract_type_dependencies(dependencies, alias_spec["type"])
+        dependencies.remove("LSPAny")
+        self.generate_or_add_to_pending(
+          alias_name,
+          alias_spec,
+          dependencies,
+          self.generate_type_alias
+        )
+        break
+
+  def generate_lsp_array(self: Self) -> None:
+    for alias_spec in self.schema["typeAliases"]:
+      alias_name = alias_spec["name"]
+      if alias_name == "LSPArray":
+        self.symbols[alias_name] = ("alias", alias_spec)
+        dependencies = set()
+        self.extract_type_dependencies(dependencies, alias_spec["type"])
+        dependencies.remove("LSPAny")
+        self.generate_or_add_to_pending(
+          alias_name,
+          alias_spec,
+          dependencies,
+          self.generate_type_alias
+        )
+        break
+
   def generate_code(self: Self) -> None:
+    print(f'Generating: {self.file_path} ...')
     version: str = self.schema["metaData"]["version"]
 
     lower_index = 0
@@ -1391,255 +1489,67 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
     upper_index = len(version)
     micro_version: str = version[lower_index:upper_index]
 
-    self.write(f"""
-// -----------------------------------------------------------------------------
-// NOTE: This file was generated from Microsoft's Language Server Protocol (LSP)
-// specification. Please do not edit it by hand.
-// -----------------------------------------------------------------------------
-
-#pragma once
-
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <optional>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <variant>
-#include <vector>
-
-/**
- * Interface definitions from the LSP {version} specification.
- * See: https://microsoft.github.io/language-server-protocol/specifications/lsp/{major_version}.{minor_version}/specification
- */
-namespace {self.namespace} {{
-  typedef int integer_t;
-  typedef unsigned int uinteger_t;
-  typedef double decimal_t;
-  typedef bool boolean_t;
-  typedef std::nullptr_t null_t;
-  typedef std::string string_t;
-
-  typedef string_t URI;
-  typedef string_t DocumentUri;
-  typedef string_t RegExp;
-
-  // NOTE: This is a wrapper around std::variant because the types `LSPAny`,
-  // `LSPObject`, and `LSPArray` are mutually recursive and cannot be easily
-  // forward-declared otherwise.
-  struct LSPAny;  // Forward declaration
-
-  typedef std::map<std::string, std::unique_ptr<LSPAny>> LSPObject;
-
-  typedef std::vector<std::unique_ptr<LSPAny>> LSPArray;
-
-  enum class LSPAnyType
-  {{
-    OBJECT_TYPE = 0,
-    ARRAY_TYPE = 1,
-    STRING_TYPE = 2,
-    INTEGER_TYPE = 3,
-    UINTEGER_TYPE = 4,
-    DECIMAL_TYPE = 5,
-    BOOLEAN_TYPE = 6,
-    NULL_TYPE = 7,
-  }};
-
-  extern std::map<LSPAnyType, std::string> LSPAnyTypeNames;
-
-  typedef std::variant<
-    LSPObject,
-    LSPArray,
-    string_t,
-    integer_t,
-    uinteger_t,
-    decimal_t,
-    boolean_t,
-    null_t
-  > LSPAnyBase;
-
-  struct LSPAny
-    : public LSPAnyBase
-  {{
-    using LSPAnyBase::variant;
-  }};
-
-  /**
-   * A general message as defined by JSON-RPC. The language server protocol
-   * always uses “2.0” as the jsonrpc version.
-   */
-  struct Message
-  {{
-    string_t jsonrpc;
-  }};
-
-  enum class RequestIdType {{
-    INTEGER_TYPE,
-    STRING_TYPE,
-  }};
-
-  typedef std::variant<
-    integer_t,
-    string_t
-  > RequestId;
-
-  enum class MessageParamsType
-  {{
-    ARRAY_TYPE,
-    OBJECT_TYPE,
-  }};
-
-  typedef std::variant<
-    LSPArray,
-    LSPObject
-  > MessageParams;
-
-  /**
-   * A request message to describe a request between the client and the server.
-   * Every processed request must send a response back to the sender of the
-   * request.
-   */
-  struct RequestMessage
-    : public Message
-  {{
-
-    /**
-     * The request id.
-     */
-    RequestId id;
-
-    /**
-     * The method to be invoked.
-     */
-    string_t method;
-
-    /**
-     * The method's params.
-     */
-    std::optional<MessageParams> params;
-  }};
-
-  struct ResponseError
-  {{
-
-    /**
-     * A number indicating the error type that occurred.
-     */
-    integer_t code;
-
-    /**
-     * A string providing a short description of the error.
-     */
-    string_t message;
-
-    /**
-     * A primitive or structured value that contains additional information about
-     * the error. Can be omitted.
-     */
-    std::optional<std::unique_ptr<LSPAny>> data;
-  }};
-
-  enum class ResponseIdType
-  {{
-    INTEGER_TYPE,
-    STRING_TYPE,
-    NULL_TYPE,
-  }};
-
-  typedef std::variant<
-    integer_t,
-    string_t,
-    null_t
-  > ResponseId;
-
-  /**
-   * A Response Message sent as a result of a request. If a request doesn’t
-   * provide a result value the receiver of a request still needs to return a
-   * response message to conform to the JSON-RPC specification. The result
-   * property of the ResponseMessage should be set to null in this case to signal
-   * a successful request.
-   */
-  struct ResponseMessage
-    : public Message
-  {{
-
-    /**
-     * The request id.
-     */
-    ResponseId id;
-
-    /**
-     * The result of a request. This member is REQUIRED on success. This member
-     * MUST NOT exist if there was an error invoking the method.
-     */
-    std::optional<std::unique_ptr<LSPAny>> result;
-
-    /**
-     * The error object in case a request fails.
-     */
-    std::optional<std::unique_ptr<ResponseError>> error;
-  }};
-
-  /**
-   * A notification message. A processed notification message must not send a
-   * response back. They work like events.
-   */
-  struct NotificationMessage
-    : public Message
-  {{
-
-    /**
-     * The method to be invoked.
-     */
-    string_t method;
-
-    /**
-     * The notification's params.
-     */
-    std::optional<MessageParams> params;
-  }};
-""".strip())
+    self.write('// -----------------------------------------------------------------------------')
+    self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
+    self.write('// specification. Please do not edit it by hand.')
+    self.write('// -----------------------------------------------------------------------------')
     self.newline()
-
-    self.generated.update([
-      "boolean",
-      "decimal",
-      "DocumentUri",
-      "integer",
-      "LSPAny",
-      "LSPArray",
-      "LSPObject",
-      "null",
-      "RegExp",
-      "string",
-      "uinteger",
-      "URI",
-    ])
-
-    pending_symbols = {"LSPAny", "LSPArray", "LSPObject"}
-    for alias in self.schema["typeAliases"]:
-      alias_name = alias["name"]
-      if alias_name in pending_symbols:
-        self.symbols[alias_name] = ("alias", alias)
-        pending_symbols.remove(alias_name)
-        if len(pending_symbols) == 0:
-          break;
-
-    for enum_spec in DEFAULT_SCHEMA["enumerations"]:
-      enum_name = enum_spec["name"]
-      self.symbols[enum_name] = ("enumeration", enum_spec)
-      self.generated.add(enum_name)
-    for struct_spec in DEFAULT_SCHEMA["structures"]:
-      struct_name = struct_spec["name"]
-      self.symbols[struct_name] = ("structure", struct_spec)
-      self.generated.add(struct_name)
-    for alias_spec in DEFAULT_SCHEMA["typeAliases"]:
-      alias_name = alias_spec["name"]
-      self.symbols[alias_name] = ("alias", alias_spec)
-      self.generated.add(alias_name)
-
+    self.write('#pragma once')
+    self.newline()
+    self.write('#include <cstddef>')
+    self.write('#include <map>')
+    self.write('#include <memory>')
+    self.write('#include <optional>')
+    self.write('#include <string>')
+    self.write('#include <tuple>')
+    self.write('#include <utility>')
+    self.write('#include <variant>')
+    self.write('#include <vector>')
+    self.newline()
+    self.write('/**')
+    self.write(f' * Interface definitions from the LSP {version} specification.')
+    self.write(f' * See: https://microsoft.github.io/language-server-protocol/specifications/lsp/{major_version}.{minor_version}/specification')
+    self.write(' */')
+    self.write(f'namespace {self.namespace} {{')
     with self.indent():
+      self.write('const std::string JSON_RPC_VERSION = "2.0";')
+      self.write(f'const std::string LSP_VERSION = "{version}";')
+      self.newline()
+      self.write(f'typedef int {rename_type("integer")};')
+      self.write(f'typedef unsigned int {rename_type("uinteger")};')
+      self.write(f'typedef double {rename_type("decimal")};')
+      self.write(f'typedef bool {rename_type("boolean")};')
+      self.write(f'typedef std::nullptr_t {rename_type("null")};')
+      self.write(f'typedef std::string {rename_type("string")};')
+      self.newline()
+      self.write(f'typedef {rename_type("string")} URI;')
+      self.write(f'typedef {rename_type("string")} DocumentUri;')
+      self.write(f'typedef {rename_type("string")} RegExp;')
+
+      self.generated.update([
+        "bool",
+        "boolean",
+        "decimal",
+        "DocumentUri",
+        "double",
+        "int",
+        "integer",
+        "null",
+        "RegExp",
+        "std::nullptr_t",
+        "std::string",
+        "string",
+        "uinteger",
+        "unsigned int",
+        "URI",
+      ])
+
+      self.newline()
+      self.write('struct LSPAny;  // Forward declaration')
+      self.newline()
+      self.generate_lsp_object()
+      self.generate_lsp_array()
+      self.generate_lsp_any()
       self.generate_enumerations()
       self.generate_structures()
       self.generate_type_aliases()
@@ -1652,6 +1562,7 @@ namespace {self.namespace} {{
     self.write(f'}} // namespace {self.namespace}')
 
 class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
+  generated: Set[str]
 
   def __init__(
       self: Self,
@@ -1662,6 +1573,7 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
   ) -> None:
     specification_source = output_dir / "specification.cpp"
     super().__init__(specification_source, schema, namespace, symbols)
+    self.generated = set()
 
   def generate_enumeration(self: Self, enum_spec: Dict[str, Any]) -> None:
     enum_name = enum_spec["name"]
@@ -1705,13 +1617,9 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
         with self.indent(): self.write('return enum_name;')
         self.write('}')
       self.write('}')
-      self.write(f'throw std::invalid_argument(')
-      with self.indent():
-        self.write('std::format(')
-        with self.indent(): self.write(f'"Invalid {enum_name} name: {{}}",')
-        with self.indent(): self.write('name')
-        self.write(')')
-      self.write(');')
+      self.write('std::stringstream ss;')
+      self.write(f'ss << "Invalid {enum_name} name: " << name;')
+      self.write(f'throw std::invalid_argument(ss.str());')
     self.write('}')
     self.newline()
     if value_type == rename_type("string"):
@@ -1726,13 +1634,9 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
           with self.indent(): self.write('return enum_name;')
           self.write('}')
         self.write('}')
-        self.write(f'throw std::invalid_argument(')
-        with self.indent():
-          self.write('std::format(')
-          with self.indent(): self.write(f'"Invalid {enum_name} value: {{}}",')
-          with self.indent(): self.write('value')
-          self.write(')')
-        self.write(');')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "Invalid {enum_name} value: " << value;')
+        self.write(f'throw std::invalid_argument(ss.str());')
       self.write('}')
     else:
       self.write(f'auto {lower_name}ByValue(')
@@ -1746,13 +1650,9 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
           with self.indent(): self.write('return field_name;')
           self.write('}')
         self.write('}')
-        self.write(f'throw std::invalid_argument(')
-        with self.indent():
-          self.write('std::format(')
-          with self.indent(): self.write(f'"Invalid {enum_name} value: {{}}",')
-          with self.indent(): self.write('value')
-          self.write(')')
-        self.write(');')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "Invalid {enum_name} value: " << value;')
+        self.write(f'throw std::invalid_argument(ss.str());')
       self.write('}')
     self.newline()
 
@@ -1765,7 +1665,24 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
       self.generate_enumeration(enum_spec)
 
   def generate_structure(self: Self, struct_spec: Dict[str, Any]) -> None:
-    pass
+    with self.nested_names_as(deque([struct_spec["name"]])) as struct_name:
+      nested_dependencies = deque()
+      pending = deque([struct_spec])
+      while len(pending) > 0:
+        spec = pending.popleft()
+        for prop_spec in reversed(spec["properties"]):
+          with self.nest_name(prop_spec["name"]):
+            self.extract_nested_dependencies(nested_dependencies, prop_spec["type"])
+        spec_mixins = spec.get("mixins", None)
+        if spec_mixins is not None:
+          for type_spec in spec_mixins:
+            mixin_name = type_spec["name"]
+            _, mixin_spec = self.symbols[mixin_name]
+            pending.append(mixin_spec)
+      while len(nested_dependencies) > 0:
+        nested_names, generate_fn, nested_spec = nested_dependencies.pop()
+        generate_fn(nested_names, nested_spec)
+        self.generated.add(self.nested_name(nested_names))
 
   def generate_structures(self: Self) -> None:
     struct_specs = chain(
@@ -1775,8 +1692,110 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
     for struct_spec in struct_specs:
       self.generate_structure(struct_spec)
 
+  def generate_nested_variant(
+      self: Self,
+      nested_names: Deque[str],
+      spec_or_items: Union[Dict[str, Any], List[Dict[str, Any]]]
+  ) -> None:
+    with self.nested_names_as(nested_names) as nested_name:
+      if isinstance(spec_or_items, dict):
+        spec = spec_or_items
+        item_specs = spec["items"]
+        self.symbols[nested_name] = ("union", spec)
+      else:
+        spec = None
+        item_specs = spec_or_items
+      self.write(f'std::map<{nested_name}Type, std::string> {nested_name}TypeNames = {{')
+      with self.indent():
+        for index, item_spec in enumerate(item_specs):
+          with self.nest_name(str(index)):
+            self.inline(f'{{{nested_name}Type::', indent=True)
+            self.generate_variant_enumeration(item_spec)
+            self.inline(', "')
+            self.generate_variant_enumeration(item_spec)
+            self.inline('"},', end='\n')
+      self.write('};')
+      self.newline()
+
+  def generate_nested_structure(
+      self: Self,
+      nested_names: Deque[str],
+      spec: Dict[str, Any]
+  ) -> None:
+    with self.nested_names_as(nested_names) as nested_name:
+      pass
+
+  def extract_nested_dependencies(
+      self: Self,
+      nested_dependencies: Deque[
+        Tuple[
+          Deque[str],
+          Callable[
+            [
+              Deque[str],
+              Dict[str, Any]
+            ],
+            None
+          ],
+          Dict[str, Any]
+        ]
+      ],
+      spec: Dict[str, Any]
+  ) -> None:
+    match spec["kind"]:
+      case "base" | "stringLiteral" | "integerLiteral" | "booleanLiteral" | "reference":
+        pass
+      case "array":
+        self.extract_nested_dependencies(nested_dependencies, spec["element"])
+      case "map":
+        self.extract_nested_dependencies(nested_dependencies, spec["key"])
+        self.extract_nested_dependencies(nested_dependencies, spec["value"])
+      case "and":
+        raise ValueError(
+          f'AND types are not supported for type declarations: {spec}'
+        )
+      case "or":
+        nested_dependencies.append((
+          deque(self.nested_names),
+          self.generate_nested_variant,
+          spec
+        ))
+        for index, item_spec in enumerate(spec["items"]):
+          with self.nest_name(str(index)):
+            self.extract_nested_dependencies(nested_dependencies, item_spec)
+      case "tuple":
+        for item_spec in spec["items"]:
+          self.extract_nested_dependencies(nested_dependencies, item_spec)
+      case "literal":
+        nested_dependencies.append((
+          deque(self.nested_names),
+          self.generate_nested_structure,
+          spec
+        ))
+        for prop_spec in spec["value"]["properties"]:
+          with self.nest_name(prop_spec["name"]):
+            self.extract_nested_dependencies(nested_dependencies, prop_spec["type"])
+      case _:
+        raise ValueError(f'Unsupported Type kind: {spec}')
+
   def generate_type_alias(self: Self, alias_spec: Dict[str, Any]) -> None:
-    pass
+    alias_name = alias_spec["name"]
+    with self.nested_names_as(deque([alias_name])):
+      type_spec = alias_spec["type"]
+      nested_dependencies = deque()
+      self.extract_nested_dependencies(nested_dependencies, type_spec)
+      while len(nested_dependencies) > 0:
+        nested_names, generate_fn, nested_spec = nested_dependencies.pop()
+        generate_fn(nested_names, nested_spec)
+        self.generated.add(self.nested_name(nested_names))
+      if alias_name not in self.generated:
+        match type_spec["kind"]:
+          case "base" | "array" | "map" | "reference":
+            pass
+          case "or":
+            self.generate_nested_variant(self.nested_names, type_spec)
+          case _:
+            raise ValueError(f'Unsupported alias type ({type_spec["kind"]}): {type_spec}')
 
   def generate_type_aliases(self: Self) -> None:
     alias_specs = chain(
@@ -1868,33 +1887,19 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
       as_enumeration_spec("OutgoingNotification", outgoing_notifications)
     )
 
-  def generate_lsp_any_type_names(self: Self) -> None:
-    self.write('std::map<LSPAnyType, std::string> LSPAnyTypeNames = {')
-    with self.indent():
-      self.write('{LSPAnyType::OBJECT_TYPE, "OBJECT_TYPE"},')
-      self.write('{LSPAnyType::ARRAY_TYPE, "ARRAY_TYPE"},')
-      self.write('{LSPAnyType::STRING_TYPE, "STRING_TYPE"},')
-      self.write('{LSPAnyType::INTEGER_TYPE, "INTEGER_TYPE"},')
-      self.write('{LSPAnyType::UINTEGER_TYPE, "UINTEGER_TYPE"},')
-      self.write('{LSPAnyType::DECIMAL_TYPE, "DECIMAL_TYPE"},')
-      self.write('{LSPAnyType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},')
-      self.write('{LSPAnyType::NULL_TYPE, "NULL_TYPE"},')
-    self.write('};')
-    self.newline()
-
   def generate_code(self: Self) -> None:
+    print(f'Generating: {self.file_path} ...')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
     self.write('// -----------------------------------------------------------------------------')
     self.newline()
-    self.write('#include <format>')
+    self.write('#include <sstream>')
     self.write('#include <stdexcept>')
     self.newline()
     self.write('#include <lsp/specification.h>')
     self.write(f'namespace {self.namespace} {{')
     with self.indent():
-      self.generate_lsp_any_type_names()
       self.generate_enumerations()
       self.generate_structures()
       self.generate_type_aliases()
@@ -1991,6 +1996,24 @@ class CPlusPlusLspTransformerHeaderGenerator(CPlusPlusFileGenerator):
     for request_spec in self.schema["requests"]:
       if request_spec["messageDirection"] == "serverToClient":
         self.generate_as_outgoing_params("requestParams", request_spec)
+        result_spec = request_spec.get("result", None)
+        if result_spec is not None:
+          request_method = request_spec["method"]
+          request_name = method_to_camel_case(request_method)
+          result_name = f'{request_name}Result'
+          symbol_name = result_name
+          symbol_spec = result_spec
+          symbol_kind = symbol_spec["kind"]
+          while (symbol_kind == "reference") and (symbol_name in self.symbols):
+            symbol_kind, symbol_spec = self.symbols[symbol_name]
+            symbol_name = symbol_spec["name"]
+          self.write(f'auto anyTo{upper_first_char(result_name)}(')
+          with self.indent():
+            self.write(f'const LSPAny &any')
+          if symbol_kind == "structure":
+            self.write(f') const -> std::unique_ptr<{result_name}>;')
+          else:
+            self.write(f') const -> {result_name};')
 
   def generate_outgoing_notification(self: Self) -> None:
     self.write('// ====================== //')
@@ -2185,6 +2208,7 @@ class CPlusPlusLspTransformerHeaderGenerator(CPlusPlusFileGenerator):
     self.write('auto copy(const LSPArray &array) const -> LSPArray;')
 
   def generate_code(self: Self) -> None:
+    print(f'Generating: {self.file_path} ...')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
@@ -2195,14 +2219,19 @@ class CPlusPlusLspTransformerHeaderGenerator(CPlusPlusFileGenerator):
     self.write('#include <cstddef>')
     self.write('#include <memory>')
     self.newline()
+    self.write('#include <lsp/logger.h>')
     self.write('#include <lsp/specification.h>')
     self.newline()
     self.write(f'namespace {self.namespace} {{')
     self.newline()
     with self.indent():
+      self.write('namespace lsl = LCompilers::LanguageServer::Logging;')
+      self.newline()
       self.write('class LspTransformer {')
       self.write('public:')
       with self.indent():
+        self.write('LspTransformer(lsl::Logger &logger);')
+        self.newline()
         self.generate_copy_methods()
         self.newline()
         self.generate_enumeration_transforms()
@@ -2219,6 +2248,9 @@ class CPlusPlusLspTransformerHeaderGenerator(CPlusPlusFileGenerator):
         self.newline()
         self.generate_outgoing_notification()
         self.newline()
+      self.write('private:')
+      with self.indent():
+        self.write('lsl::Logger &logger;')
       self.write('}; // class LspTransformer')
       self.newline()
     self.write(f'}} // namespace {self.namespace}')
@@ -2299,20 +2331,15 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
               raise ValueError(f'Unsupported enumeration type ({type_name}): {enum_spec}')
           self.write('default: {')
           with self.indent():
-            self.write('throw LspException(')
-            with self.indent():
-              self.write('ErrorCodes::INVALID_PARAMS,')
-              self.write('std::format(')
-              with self.indent():
-                self.write(f'"LSPAnyType for a(n) {enum_name} must be of type LSPAnyType::{enumerator} but received type {{}}",')
-                self.write('LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))')
-              self.write(')')
-            self.write(');')
+            self.write('std::stringstream ss;')
+            self.write(f'ss << "LSPAnyType for a(n) {enum_name} must be of type LSPAnyType::{enumerator} but received type "')
+            self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));')
+            self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
           self.write('}')
           self.write('}')
         self.write('} catch (std::invalid_argument &e) {')
         with self.indent():
-          self.write('throw LspException(')
+          self.write('throw LSP_EXCEPTION(')
           with self.indent():
             self.write('ErrorCodes::INVALID_PARAMS,')
             self.write('e.what()')
@@ -2577,7 +2604,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       else:
         raise ValueError(f'Redundant uinteger specs detected')
     else:
-      self.write('throw LspException(')
+      self.write('throw LSP_EXCEPTION(')
       with self.indent():
         self.write('ErrorCodes::INVALID_PARAMS,')
         self.write(f'"Failed to transform LSPAny to {type_name}"')
@@ -2607,7 +2634,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       else:
         raise ValueError(f'Redundant integer specs detected')
     else:
-      self.write('throw LspException(')
+      self.write('throw LSP_EXCEPTION(')
       with self.indent():
         self.write('ErrorCodes::INVALID_PARAMS,')
         self.write(f'"Failed to transform LSPAny to {type_name}"')
@@ -2637,7 +2664,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       else:
         raise ValueError(f'Redundant string specs detected')
     else:
-      self.write('throw LspException(')
+      self.write('throw LSP_EXCEPTION(')
       with self.indent():
         self.write('ErrorCodes::INVALID_PARAMS,')
         self.write(f'"Failed to transform LSPAny to {type_name}"')
@@ -2723,7 +2750,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
     elif map_specs is not None and len(map_specs) > 0:
       raise ValueError(f'Unsupported spec type (map) for {type_name}: {map_specs}')
     else:
-      self.write('throw LspException(')
+      self.write('throw LSP_EXCEPTION(')
       with self.indent():
         self.write('ErrorCodes::INVALID_PARAMS,')
         self.write(f'"Failed to transform LSPAny to {type_name}"')
@@ -2757,9 +2784,17 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
             self.write('for (const std::unique_ptr<LSPAny> &elem')
             with self.indent(2): self.write(': std::get<LSPArray>(any)) {')
             with self.indent():
-              self.inline('values.push_back(anyTo', indent=True)
-              self.generate_upper_type_name(elem_spec)
-              self.inline('(*elem));', end='\n')
+              match elem_spec["name"]:
+                case "LSPAny":
+                  self.write('values.push_back(copy(elem));')
+                case "LSPObject":
+                  self.write('values.push_back(copy(std::get<LSPObject>(*elem)));')
+                case "LSPArray":
+                  self.write('values.push_back(copy(std::get<LSPArray>(*elem)));')
+                case _:
+                  self.inline('values.push_back(anyTo', indent=True)
+                  self.generate_upper_type_name(elem_spec)
+                  self.inline('(*elem));', end='\n')
             self.write('}')
             self.write(f'value = std::move(values);')
       self.write('} catch (LspException &e) {')
@@ -2767,7 +2802,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
         self.generate_any_to_array(type_name, array_specs[1:])
       self.write('}')
     else:
-      self.write('throw LspException(')
+      self.write('throw LSP_EXCEPTION(')
       with self.indent():
         self.write('ErrorCodes::INVALID_PARAMS,')
         self.write(f'"Failed to transform LSPAny to array"')
@@ -2789,10 +2824,20 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
     self.write(f'auto LspTransformer::anyTo{upper_first_char(nested_name)}(')
     with self.indent():
       self.write('const LSPAny &any')
-    # self.write(f') const -> std::unique_ptr<{nested_name}> {{')
-    self.write(f') const -> {nested_name} {{')
+    symbol_name = nested_name
+    symbol_kind = spec["kind"]
+    while symbol_kind == "reference":
+      symbol_kind, symbol_spec = self.symbols[symbol_name]
+      symbol_name = symbol_spec["name"]
+    if symbol_kind == "structure":
+      self.write(f') const -> std::unique_ptr<{nested_name}> {{')
+      with self.indent():
+        self.write(f'std::unique_ptr<{nested_name}> value;')
+    else:
+      self.write(f') const -> {nested_name} {{')
+      with self.indent():
+        self.write(f'{nested_name} value;')
     with self.indent():
-      self.write(f'{nested_name} value;')
       self.newline()
       self.write('switch (static_cast<LSPAnyType>(any.index())) {')
       if has_object_type:
@@ -2859,15 +2904,10 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
         self.write('}')
       self.write('default: {')
       with self.indent():
-        self.write('throw LspException(')
-        with self.indent():
-          self.write('ErrorCodes::INVALID_PARAMS,')
-          self.write('std::format(')
-          with self.indent():
-            self.write(f'"Invalid LSPAnyType for a(n) {nested_name}: {{}}",')
-            self.write('any.index()')
-          self.write(')')
-        self.write(');')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "Invalid LSPAnyType for a(n) {nested_name}: "')
+        self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));')
+        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
       self.write('}')
       self.write('}')
       self.newline()
@@ -2999,15 +3039,10 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
           self.write('}')
       self.write('default: {')
       with self.indent():
-        self.write('throw LspException(')
-        with self.indent():
-          self.write('ErrorCodes::INVALID_PARAMS,')
-          self.write('std::format(')
-          with self.indent():
-            self.write(f'"Unsupported {nested_name}Type: {{}}",')
-            self.write('variant.index()')
-          self.write(')')
-        self.write(');')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "Unsupported {nested_name}Type: "')
+        self.write(f'   << {nested_name}TypeNames.at(static_cast<{nested_name}Type>(variant.index()));')
+        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
       self.write('}')
       self.write('}')
     self.write('}')
@@ -3040,16 +3075,10 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       self.inline(rename_enum("object"))
       self.inline(') {', end='\n')
       with self.indent():
-        self.write('throw LspException(')
-        with self.indent():
-          self.write('ErrorCodes::INVALID_PARAMS,')
-          self.write('std::format(')
-          with self.indent():
-            self.write(f'"LSPAnyType for a(n) {type_name} must be of type {{}} but received type {{}}",')
-            self.write(f'static_cast<int>(LSPAnyType::{rename_enum("object")}),')
-            self.write('any.index()')
-          self.write(')')
-        self.write(');')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "LSPAnyType for a(n) {type_name} must be of type LSPAnyType::{rename_enum("object")} but received type "')
+        self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));')
+        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
       self.write('}')
       self.newline()
       self.write(f'std::unique_ptr<{type_name}> value =')
@@ -3062,15 +3091,10 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       self.newline()
       self.write(f'if (object.size() > {len(type_names_and_prop_specs)}) {{')
       with self.indent():
-        self.write('throw LspException(')
-        with self.indent():
-          self.write('ErrorCodes::INVALID_PARAMS,')
-          self.write('std::format(')
-          with self.indent():
-            self.write(f'"Too many attributes to transform to a(n) {type_name}: {{}}",')
-            self.write('object.size()')
-          self.write(')')
-        self.write(');')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "Too many attributes to transform to a(n) {type_name}: "')
+        self.write('   << object.size();')
+        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
       self.write('}')
       for prop_type_name, prop_spec in type_names_and_prop_specs:
         prop_name = prop_spec["name"]
@@ -3189,7 +3213,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
                     with self.indent():
                       self.inline('array.push_back(anyTo', indent=True)
                       self.generate_upper_type_name(elem_spec)
-                      self.inline('(*map_value));', end='\n')
+                      self.inline('(*elem));', end='\n')
                     self.write('}')
                     self.write('map.emplace(map_key, std::move(array));')
                   case "or":
@@ -3204,15 +3228,9 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
               self.write(f'const {rename_type("string")} &stringValue = anyToString(*iter->second);')
               self.write(f'if (stringValue != "{expected_value}") {{')
               with self.indent():
-                self.write('throw LspException(')
-                with self.indent():
-                  self.write('ErrorCodes::INVALID_PARAMS,')
-                  self.write('std::format(')
-                  with self.indent():
-                    self.write(f'"String value for {type_name}.{prop_name} must be \\"{expected_value}\\" but was: \\"{{}}\\"",')
-                    self.write('stringValue')
-                  self.write(')')
-                self.write(');')
+                self.write('std::stringstream ss;')
+                self.write(f'ss << "String value for {type_name}.{prop_name} must be \\"{expected_value}\\" but was: \\"" << stringValue << "\\"";')
+                self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
               self.write('}')
               self.write(f'value->{prop_name} = stringValue;')
             case _:
@@ -3220,7 +3238,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
         if not prop_spec.get("optional", False):
           self.write('} else {')
           with self.indent():
-            self.write('throw LspException(')
+            self.write('throw LSP_EXCEPTION(')
             with self.indent():
               self.write('ErrorCodes::INVALID_PARAMS,')
               self.write(f'"Missing required {type_name} attribute: {prop_name}"')
@@ -3236,16 +3254,20 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       spec: Dict[str, Any]
   ) -> None:
     type_name = self.nested_name()
+    symbol_kind = spec.get("kind", "structure")
+    field_types_and_specs = list(self.expand_fields(symbol_kind, spec))
     fn_nym = f'{lower_first(type_name)}ToAny'
     self.write(f'auto LspTransformer::{fn_nym}(')
     with self.indent():
-      self.write(f'const {type_name} &structure')
+      if len(field_types_and_specs) > 0:
+        self.write(f'const {type_name} &structure')
+      else:
+        self.write(f'const {type_name} &/*structure*/')
     self.write(') const -> std::unique_ptr<LSPAny> {')
     with self.indent():
       self.write('LSPObject object;')
       self.newline()
-      symbol_kind = spec.get("kind", "structure")
-      for prop_type_name, prop_spec in self.expand_fields(symbol_kind, spec):
+      for prop_type_name, prop_spec in field_types_and_specs:
         prop_name = prop_spec["name"]
         prop_type = prop_spec["type"]
         is_optional = prop_spec.get("optional", False)
@@ -3464,6 +3486,8 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
             raise ValueError(f'Unsupported type ({prop_type["kind"]}): {prop_spec}')
         if is_optional:
           self.write('}')
+      if len(field_types_and_specs) == 0:
+        self.write('// empty')
       self.newline()
       self.write('std::unique_ptr<LSPAny> any = std::make_unique<LSPAny>();')
       self.write('(*any) = std::move(object);')
@@ -3568,15 +3592,11 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
               self.write('}')
           self.write('default: {')
           with self.indent():
-            self.write('throw LspException(')
-            with self.indent():
-              self.write('ErrorCodes::INVALID_PARAMS,')
-              self.write('std::format(')
-              with self.indent():
-                self.write(f'"Cannot transform LSPAny of type LSPAnyType::{{}} to type {rename_type(alias_name)}",')
-                self.write('LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))')
-              self.write(')')
-            self.write(');')
+            self.write('std::stringstream ss;')
+            self.write(f'ss << "Cannot transform LSPAny of type LSPAnyType::"')
+            self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))')
+            self.write(f'   << " to type {rename_type(alias_name)}";')
+            self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
           self.write('}')
           self.write('}')
         case "reference":
@@ -3586,20 +3606,24 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
         case "array":
           elem_spec = type_spec["element"]
           self.write('const LSPArray &array = std::get<LSPArray>(any);')
-          self.inline('std::vector<', indent=True)
-          self.generate_upper_type_name(elem_spec)
-          self.inline('> values;', end='\n')
-          self.write('for (const std::unique_ptr<LSPAny> &elem : array) {')
-          with self.indent():
-            match elem_spec["kind"]:
-              case "base" | "reference":
-                self.inline('values.push_back(anyTo', indent=True)
-                self.generate_upper_type_name(elem_spec)
-                self.inline('(*elem));', end='\n')
-              case _:
-                raise ValueError(f'Unsupported array type ({elem_spec["kind"]}): {elem_spec}')
-          self.write('}')
-          self.write('return values;')
+          if (elem_spec["kind"] == "reference") \
+             and (elem_spec["name"] == "LSPAny"):
+            self.write('return copy(array);')
+          else:
+            self.inline('std::vector<', indent=True)
+            self.generate_upper_type_name(elem_spec)
+            self.inline('> values;', end='\n')
+            self.write('for (const std::unique_ptr<LSPAny> &elem : array) {')
+            with self.indent():
+              match elem_spec["kind"]:
+                case "base" | "reference":
+                  self.inline('values.push_back(anyTo', indent=True)
+                  self.generate_upper_type_name(elem_spec)
+                  self.inline('(*elem));', end='\n')
+                case _:
+                  raise ValueError(f'Unsupported array type ({elem_spec["kind"]}): {elem_spec}')
+            self.write('}')
+            self.write('return values;')
         case _:
           raise ValueError(f'Unsupported alias type ({type_spec["kind"]}): {type_spec}')
     self.write('}')
@@ -3799,31 +3823,29 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
             raise ValueError(f'Unsupported message parameter type ({params_spec["name"]}): {params_spec}')
         self.inline(') {', end='\n')
         with self.indent():
-          self.write('throw LspException(')
-          with self.indent():
-            self.write('ErrorCodes::INVALID_PARAMS,')
-            self.write('std::format(')
-            with self.indent():
-              self.write('"MessageParamsType must be {} for method=\\"{}\\" but received type {}",')
-              self.inline('static_cast<int>(MessageParamsType::', indent=True)
-              match params_spec["kind"]:
-                case "reference":
-                  self.inline(rename_enum("object"))
-                case _:
-                  raise ValueError(f'Unsupported message parameter type ({params_spec["name"]}): {params_spec}')
-              self.inline('),', end='\n')
-              self.inline(f'"{message_spec["method"]}"', indent=True)
-              self.inline(',', end='\n')
-              self.write(f'{message_params_name}.index()')
-            self.write(')')
-          self.write(');')
+          self.write('std::stringstream ss;')
+          self.write(f'ss << "Message parameter type must be MessageParamsType::"')
+          self.inline('   << MessageParamsTypeNames.at(MessageParamsType::', indent=True)
+          match params_spec["kind"]:
+            case "reference":
+              self.inline(rename_enum("object"))
+            case _:
+              raise ValueError(f'Unsupported message parameter type ({params_spec["name"]}): {params_spec}')
+          self.inline(')', end='\n')
+          self.write(f'   << " for method=\\"{message_spec["method"]}\\" but received type "')
+          self.write(f'   << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>({message_params_name}.index()));')
+          self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
         self.write('}')
         self.newline()
         match params_spec["kind"]:
           case "reference":
-            self.write(f'const LSPObject &object = std::get<LSPObject>({message_params_name});')
-            self.write('LSPObject::const_iterator iter;')
-            self.newline()
+            symbol_name = params_spec["name"]
+            symbol_kind, symbol_spec = self.symbols[symbol_name]
+            field_types_and_specs = list(self.expand_fields(symbol_kind, symbol_spec))
+            if len(field_types_and_specs) > 0:
+              self.write(f'const LSPObject &object = std::get<LSPObject>({message_params_name});')
+              self.write('LSPObject::const_iterator iter;')
+              self.newline()
             self.inline(indent=True)
             self.generate_as_message_params_type(params_spec)
             self.inline(f' {incoming_params_name} =', end='\n')
@@ -3836,9 +3858,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
                   raise ValueError(f'Unsupported parameter type ({params_spec["kind"]}): {params_spec}')
               self.inline('>();', end='\n')
             self.newline()
-            symbol_name = params_spec["name"]
-            symbol_kind, symbol_spec = self.symbols[symbol_name]
-            for prop_type_name, prop_spec in self.expand_fields(symbol_kind, symbol_spec):
+            for prop_type_name, prop_spec in field_types_and_specs:
               prop_name = prop_spec["name"]
               prop_type = prop_spec["type"]
               self.write(f'iter = object.find("{prop_name}");')
@@ -3894,7 +3914,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
               if not prop_spec.get("optional", False):
                 self.write('} else {')
                 with self.indent():
-                  self.write('throw LspException(')
+                  self.write('throw LSP_EXCEPTION(')
                   with self.indent():
                     self.write('ErrorCodes::INVALID_PARAMS,')
                     self.write(f'"Missing required {params_spec["name"]} attribute: {prop_name}"')
@@ -4043,6 +4063,11 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
                     raise ValueError(f'Unsupported union type ({item_spec["kind"]}): {item_spec}')
               self.write('}')
             self.write('}')
+            self.write('throw LSP_EXCEPTION(')
+            with self.indent():
+              self.write('ErrorCodes::INTERNAL_ERROR,')
+              self.write('"Should be unreachable."')
+            self.write(');')
           else:
             match symbol_spec["kind"]:
               case "base" | "reference":
@@ -4136,15 +4161,10 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
                 self.write('}')
                 self.write('default: {')
                 with self.indent():
-                  self.write('throw LspException(')
-                  with self.indent():
-                    self.write('ErrorCodes::INVALID_PARAMS,')
-                    self.write('std::format(')
-                    with self.indent():
-                      self.write(f'"Invalid LSPAny type for {params_spec["name"]}: {{}}",')
-                      self.write(f'{params_name}.index()')
-                    self.write(')')
-                  self.write(');')
+                  self.write('std::stringstream ss;')
+                  self.write(f'ss << "Invalid LSPAny type for {params_spec["name"]}: "')
+                  self.write(f'   << LSPAnyTypeNames.at(static_cast<LSPAnyType>({params_name}.index()));')
+                  self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
                 self.write('}')
                 self.write('}')
                 self.newline()
@@ -4232,6 +4252,13 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
     for request_spec in self.schema["requests"]:
       if request_spec["messageDirection"] == "serverToClient":
         self.generate_as_outgoing_params("requestParams", request_spec)
+        result_spec = request_spec.get("result", None)
+        if result_spec is not None:
+          request_method = request_spec["method"]
+          request_name = method_to_camel_case(request_method)
+          result_name = f'{request_name}Result'
+          with self.nested_names_as(deque([result_name])):
+            self.generate_any_to_nested_variant(result_spec)
 
   def generate_outgoing_notification(self: Self) -> None:
     self.write('// ====================== //')
@@ -4242,14 +4269,25 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       if notification_spec["messageDirection"] == "serverToClient":
         self.generate_as_outgoing_params("notificationParams", notification_spec)
 
+  def generate_constructor(self: Self) -> None:
+    self.write('LspTransformer::LspTransformer(lsl::Logger &logger)')
+    with self.indent():
+      self.write(': logger(logger)')
+    self.write('{')
+    with self.indent():
+      self.write('// empty')
+    self.write('}')
+    self.newline()
+
   def generate_code(self: Self) -> None:
+    print(f'Generating: {self.file_path} ...')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
     self.write('// -----------------------------------------------------------------------------')
     self.newline()
     self.write('#include <cmath>')
-    self.write('#include <format>')
+    self.write('#include <sstream>')
     self.write('#include <stdexcept>')
     self.newline()
     self.write('#include <lsp/specification.h>')
@@ -4259,6 +4297,7 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
     self.write(f'namespace {self.namespace} {{')
     self.newline()
     with self.indent():
+      self.generate_constructor()
       self.generate_copy_methods()
       self.generate_enumeration_transforms()
       self.generate_structure_transforms()
@@ -4294,11 +4333,11 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
         self.generate_docstring(request_spec.get("documentation", None))
         params_spec = request_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto handle{request_name}(')
+          self.write(f'virtual auto {receive_fn(request_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
           self.write(f') -> {result_name};')
         else:
-          self.write(f'auto handle{request_name}() -> {result_name};')
+          self.write(f'virtual auto {receive_fn(request_method)}() -> {result_name};')
         self.newline()
 
   def generate_incoming_notification_handlers(self: Self) -> None:
@@ -4313,11 +4352,11 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
         self.generate_docstring(notification_spec.get("documentation", None))
         params_spec = notification_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto handle{notification_name}(')
+          self.write(f'virtual auto {receive_fn(notification_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
           self.write(f') -> void;')
         else:
-          self.write(f'auto handle{notification_name}() -> void;')
+          self.write(f'virtual auto {receive_fn(notification_method)}() -> void;')
         self.newline()
 
   def generate_outgoing_request_handlers(self: Self) -> None:
@@ -4332,11 +4371,25 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
         self.generate_docstring(request_spec.get("documentation", None))
         params_spec = request_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto request{request_name}(')
+          self.write(f'virtual auto {send_fn(request_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
           self.write(f') -> void;')
         else:
-          self.write(f'auto request{request_name}() -> void;')
+          self.write(f'virtual auto {send_fn(request_method)}() -> void;')
+        self.newline()
+        self.generate_docstring(request_spec.get("documentation", None))
+        result_spec = request_spec.get("result", None)
+        if result_spec is not None:
+          result_name = f'{request_name}Result'
+          self.write(f'virtual auto {receive_fn(request_method)}(')
+          with self.indent():
+            if result_spec["kind"] == "base":
+              self.write(f'{result_name} params')
+            else:
+              self.write(f'{result_name} &params')
+          self.write(f') -> void;')
+        else:
+          self.write(f'virtual auto {receive_fn(request_method)}() -> void;')
         self.newline()
 
   def generate_outgoing_notification_handlers(self: Self) -> None:
@@ -4351,11 +4404,11 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
         self.generate_docstring(notification_spec.get("documentation", None))
         params_spec = notification_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto notify{notification_name}(')
+          self.write(f'virtual auto {send_fn(notification_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
           self.write(f') -> void;')
         else:
-          self.write(f'auto notify{notification_name}() -> void;')
+          self.write(f'virtual auto {send_fn(notification_method)}() -> void;')
         self.newline()
 
   def generate_dispatch_methods(self: Self) -> None:
@@ -4371,14 +4424,10 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
       self.write('NotificationMessage &notification')
     self.write(') -> void;')
     self.newline()
-
-  def generate_prepare_methods(self: Self) -> None:
-    self.write('void prepare(')
-    with self.indent():
-      self.write('std::ostream &os,')
-      self.write('const std::string &response')
-    self.write(') const override;')
+    self.write('auto dispatch(ResponseMessage &response) -> void;')
     self.newline()
+
+  def generate_prepare(self: Self) -> None:
     self.write('void prepare(')
     with self.indent():
       self.write('std::stringstream &ss,')
@@ -4399,6 +4448,7 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     self.newline()
 
   def generate_code(self: Self) -> None:
+    print(f'Generating: {self.file_path} ...')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
@@ -4407,61 +4457,58 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     self.write('#pragma once')
     self.newline()
     self.write('#include <atomic>')
-    self.write('#include <cstddef>')
     self.write('#include <map>')
-    self.write('#include <optional>')
-    self.write('#include <shared_mutex>')
     self.newline()
     self.write('#include <lsp/language_server.h>')
     self.write('#include <lsp/logger.h>')
     self.write('#include <lsp/lsp_serializer.h>')
     self.write('#include <lsp/lsp_transformer.h>')
     self.write('#include <lsp/specification.h>')
-    self.write('#include <lsp/text_document.h>')
     self.newline()
     self.write(f'namespace {self.namespace} {{')
     with self.indent():
       self.write('namespace ls = LCompilers::LanguageServer;')
       self.write('namespace lsl = LCompilers::LanguageServer::Logging;')
       self.newline()
-      self.write('const std::string JSON_RPC_VERSION = "2.0";')
-      self.newline()
       self.write('class LspLanguageServer : public ls::LanguageServer {')
       self.write('public:')
       with self.indent():
         self.write('LspLanguageServer(')
         with self.indent():
+          self.write('ls::MessageQueue &incomingMessages,')
           self.write('ls::MessageQueue &outgoingMessages,')
-          self.write('lsl::Logger &logger')
+          self.write('std::size_t numRequestThreads,')
+          self.write('std::size_t numWorkerThreads,')
+          self.write('lsl::Logger &logger,')
+          self.write('const std::string &configSection')
         self.write(');')
-        self.write('std::string serve(const std::string &request) override;')
+        self.write('auto listen() -> void;')
         self.write('auto isInitialized() const -> bool;')
         self.write('auto isShutdown() const -> bool;')
         self.write('bool isTerminated() const override;')
         self.write('auto isRunning() const -> bool;')
       self.write('protected:')
       with self.indent():
+        self.write('const std::string configSection;')
         self.write('JsonRpcLspSerializer serializer;')
         self.write('JsonRpcLspDeserializer deserializer;')
         self.write('LspTransformer transformer;')
-        self.write('std::map<DocumentUri, TextDocument> textDocuments;')
         self.write('std::unique_ptr<InitializeParams> _initializeParams;')
-        self.write('std::shared_mutex readWriteMutex;')
         self.write('std::atomic_bool _initialized = false;')
         self.write('std::atomic_bool _shutdown = false;')
         self.write('std::atomic_bool _exit = false;')
         self.write('std::atomic_int serialId = 0;')
+        self.write('std::map<int, std::string> callbacksById;')
+        self.write('std::mutex callbackMutex;')
         self.newline()
-        self.write('auto nextId() -> RequestId;')
-        self.newline()
+        self.write('void handle(const std::string &request, std::size_t sendId) override;')
+        self.write('auto nextId() -> int;')
         self.write('auto initializeParams() const -> const InitializeParams &;')
-        self.newline()
         self.write('auto assertInitialized() -> void;')
-        self.newline()
         self.write('auto assertRunning() -> void;')
         self.newline()
         self.generate_dispatch_methods()
-        self.generate_prepare_methods()
+        self.generate_prepare()
         self.generate_require_message_params()
         self.generate_incoming_request_handlers()
         self.generate_incoming_notification_handlers()
@@ -4486,9 +4533,21 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
   def generate_constructor(self: Self) -> None:
     self.write('LspLanguageServer::LspLanguageServer(')
     with self.indent():
+      self.write('ls::MessageQueue &incomingMessages,')
       self.write('ls::MessageQueue &outgoingMessages,')
-      self.write('lsl::Logger &logger')
-    self.write(') : ls::LanguageServer(outgoingMessages, logger)')
+      self.write('std::size_t numRequestThreads,')
+      self.write('std::size_t numWorkerThreads,')
+      self.write('lsl::Logger &logger,')
+      self.write('const std::string &configSection')
+    self.write(') : ls::LanguageServer(')
+    self.write('    incomingMessages,')
+    self.write('    outgoingMessages,')
+    self.write('    numRequestThreads,')
+    self.write('    numWorkerThreads,')
+    self.write('    logger')
+    self.write('  )')
+    self.write('  , configSection(configSection)')
+    self.write('  , transformer(logger)')
     self.write('{')
     with self.indent():
       self.write('// empty')
@@ -4496,14 +4555,19 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     self.newline()
 
   def generate_next_id(self: Self) -> None:
-    self.write('auto LspLanguageServer::nextId() -> RequestId {')
+    self.write('auto LspLanguageServer::nextId() -> int {')
     with self.indent():
       self.write('return serialId++;')
     self.write('}')
     self.newline()
 
-  def generate_serve(self: Self) -> None:
-    self.write('std::string LspLanguageServer::serve(const std::string &request) {')
+  def generate_handle(self: Self) -> None:
+    self.write('auto LspLanguageServer::handle(')
+    with self.indent():
+      self.write('// TODO: Add support for batched messages, i.e. multiple messages within an array.')
+      self.write('const std::string &request,')
+      self.write('std::size_t sendId')
+    self.write(') -> void {')
     with self.indent():
       self.write('ResponseMessage response;')
       self.write('try {')
@@ -4515,16 +4579,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('rapidjson::Document document = deserializer.deserialize(request);')
         self.write('if (document.HasParseError()) {')
         with self.indent():
-          self.write('throw LspException(')
-          with self.indent():
-            self.write('ErrorCodes::PARSE_ERROR,')
-            self.write('std::format(')
-            with self.indent():
-              self.write('"Invalid JSON request (error={}): {}",')
-              self.write('static_cast<int>(document.GetParseError()),')
-              self.write('request')
-            self.write(')')
-          self.write(');')
+          self.write('std::stringstream ss;')
+          self.write('ss << "Invalid JSON request (error="')
+          self.write('   << static_cast<int>(document.GetParseError())')
+          self.write('   << "): " << request;')
+          self.write('throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, ss.str());')
         self.write('}')
         self.newline()
         self.write('if (document.HasMember("id")) {')
@@ -4538,15 +4597,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             self.write('response.id = idValue.GetInt();')
           self.write('} else if (!idValue.IsNull()) { // null => notification')
           with self.indent():
-            self.write('throw LspException(')
-            with self.indent():
-              self.write('ErrorCodes::INVALID_PARAMS,')
-              self.write('std::format(')
-              with self.indent():
-                self.write('"Unsupported type for id attribute: {}",')
-                self.write('static_cast<int>(idValue.GetType())')
-              self.write(')')
-            self.write(');')
+            self.write('std::stringstream ss;')
+            self.write('ss << "Unsupported type for id attribute: "')
+            self.write('   << static_cast<int>(idValue.GetType());')
+            self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
           self.write('}')
         self.write('}')
         self.newline()
@@ -4557,15 +4611,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           with self.indent():
             self.write('if (static_cast<ResponseIdType>(response.id.index()) == ResponseIdType::NULL_TYPE) {')
             with self.indent():
-              self.write('throw LspException(')
-              with self.indent():
-                self.write('ErrorCodes::INVALID_PARAMS,')
-                self.write('std::format(')
-                with self.indent():
-                  self.write('"Missing request method=\\"{}\\" attribute: id",')
-                  self.write('method')
-                self.write(')')
-              self.write(');')
+              self.write('std::stringstream ss;')
+              self.write(f'ss << "Missing request method=\\"" << method << "\\" attribute: id";')
+              self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
             self.write('}')
             self.write('RequestMessage request = deserializer.deserializeRequest(document);')
             self.write('response.jsonrpc = request.jsonrpc;')
@@ -4574,15 +4622,8 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           with self.indent():
             self.write('if (static_cast<ResponseIdType>(response.id.index()) != ResponseIdType::NULL_TYPE) {')
             with self.indent():
-              self.write('throw LspException(')
-              with self.indent():
-                self.write('ErrorCodes::INVALID_PARAMS,')
-                self.write('std::format(')
-                with self.indent():
-                  self.write('"Notification method=\\"{}\\" must not contain the attribute: id",')
-                  self.write('method')
-                self.write(')')
-              self.write(');')
+              self.write('std::stringstream ss;')
+              self.write(f'ss << "Notification method=\\"" << method << "\\" must not contain the attribute: id";')
             self.write('}')
             self.write('NotificationMessage notification =')
             with self.indent():
@@ -4591,15 +4632,29 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             self.write('dispatch(response, notification);')
           self.write('} else {')
           with self.indent():
-            self.write('throw LspException(')
-            with self.indent():
-              self.write('ErrorCodes::INVALID_REQUEST,')
-              self.write('std::format("Unsupported method: \\"{}\\"", method)')
-            self.write(');')
+            self.write('std::stringstream ss;')
+            self.write(f'ss << "Unsupported method: \\"" << method << "\\"";')
+            self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_REQUEST, ss.str());')
           self.write('}')
+        self.write('} else if (document.HasMember("result") || document.HasMember("error")) {')
+        with self.indent():
+          self.write('notifySent();')
+          self.write('if (document.HasMember("result")) {')
+          with self.indent():
+            self.write('const rapidjson::Value &result = document["result"];')
+            self.write('response.result = deserializer.jsonToLsp(result);')
+          self.write('} else if (document.HasMember("error")) {')
+          with self.indent():
+            self.write('std::unique_ptr<LSPAny> error =')
+            with self.indent():
+              self.write('deserializer.jsonToLsp(document["error"]);')
+            self.write('response.error = transformer.anyToResponseError(*error);')
+          self.write('}')
+          self.write('dispatch(response);')
+          self.write('return;')
         self.write('} else {')
         with self.indent():
-          self.write('throw LspException(')
+          self.write('throw LSP_EXCEPTION(')
           with self.indent():
             self.write('ErrorCodes::INVALID_REQUEST,')
             self.write('"Missing required attribute: method"')
@@ -4607,10 +4662,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('}')
       self.write('} catch (const LspException &e) {')
       with self.indent():
-        self.write('const std::source_location &where = e.where();')
         self.write('logger')
         with self.indent():
-          self.write('<< "[" << where.file_name() << ":" << where.line() << ":" << where.column() << "] "')
+          self.write('<< "[" << e.file() << ":" << e.line() << "] "')
           self.write('<< e.what()')
           self.write('<< std::endl;')
         self.write('std::unique_ptr<ResponseError> error =')
@@ -4644,7 +4698,8 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           self.write('"An unexpected exception occurred. If it continues, please file a ticket.";')
         self.write('response.error = std::move(error);')
       self.write('}')
-      self.write('return serializer.serializeResponse(response);')
+      self.write('const std::string message = serializer.serializeResponse(response);')
+      self.write('send(message, sendId);')
     self.write('}')
     self.newline()
 
@@ -4695,7 +4750,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     with self.indent():
       self.write('if (!_initialized) {')
       with self.indent():
-        self.write('throw LspException(')
+        self.write('throw LSP_EXCEPTION(')
         with self.indent():
           self.write('ErrorCodes::SERVER_NOT_INITIALIZED,')
           self.write('"Method \\"initialize\\" must be called first."')
@@ -4709,7 +4764,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     with self.indent():
       self.write('if (_shutdown) {')
       with self.indent():
-        self.write('throw LspException(')
+        self.write('throw LSP_EXCEPTION(')
         with self.indent():
           self.write('LSPErrorCodes::REQUEST_FAILED,')
           self.write('"Server has shutdown and cannot accept new requests."')
@@ -4742,7 +4797,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('bool expected = false;  // a reference is required ...')
         self.write('if (!_initialized.compare_exchange_strong(expected, true)) {')
         with self.indent():
-          self.write('throw LspException(')
+          self.write('throw LSP_EXCEPTION(')
           with self.indent():
             self.write('ErrorCodes::INVALID_REQUEST,')
             self.write('"Server may be initialized only once."')
@@ -4768,7 +4823,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                 self.write(f'std::unique_ptr<{params_spec["name"]}> requestParams =')
                 with self.indent(): self.write(f'transformer.as{request_name}Params(messageParams);')
                 self.write(f'{result_name} result =')
-                with self.indent(): self.write(f'handle{request_name}(*requestParams);')
+                with self.indent(): self.write(f'{receive_fn(request_method)}(*requestParams);')
                 self.write(f'response.result = transformer.{lower_first(result_name)}ToAny(result);')
                 if is_initialize:
                   self.write('_initializeParams = std::move(requestParams);')
@@ -4778,7 +4833,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                   self.write('bool expected = true;')
                   self.write('if (!_initialized.compare_exchange_strong(expected, false)) {')
                   with self.indent():
-                    self.write('throw LspException(')
+                    self.write('throw LSP_EXCEPTION(')
                     with self.indent():
                       self.write('ErrorCodes::INVALID_REQUEST,')
                       self.write('"Server initialization out of sync."')
@@ -4787,22 +4842,16 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                   self.write('throw e;')
                 self.write('}')
             else:
-              self.write(f'{result_name} result = handle{request_name}();')
+              self.write(f'{result_name} result = {receive_fn(request_method)}();')
               self.write(f'response.result = transformer.{lower_first(result_name)}ToAny(result);')
             self.write('break;')
           self.write('}')
       self.write('default: {')
       self.write('invalidMethod:')
       with self.indent():
-        self.write('throw LspException(')
-        with self.indent():
-          self.write('ErrorCodes::METHOD_NOT_FOUND,')
-          self.write('std::format(')
-          with self.indent():
-            self.write('"Unsupported request method: \\"{}\\"",')
-            self.write('request.method')
-          self.write(')')
-        self.write(');')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "Unsupported request method: \\"" << request.method << "\\"";')
+        self.write('throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());')
       self.write('}')
       self.write('}')
     self.write('}')
@@ -4811,7 +4860,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
   def generate_dispatch_notification(self: Self) -> None:
     self.write('auto LspLanguageServer::dispatch(')
     with self.indent():
-      self.write('ResponseMessage &response,')
+      self.write('ResponseMessage &/*response*/,')
       self.write('NotificationMessage &notification')
     self.write(') -> void {')
     with self.indent():
@@ -4845,23 +4894,105 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               self.write('MessageParams &messageParams = requireMessageParams(notification);')
               self.write(f'std::unique_ptr<{params_spec["name"]}> notificationParams =')
               with self.indent(): self.write(f'transformer.as{notification_name}Params(messageParams);')
-              self.write(f'handle{notification_name}(*notificationParams);')
+              self.write(f'{receive_fn(notification_method)}(*notificationParams);')
             else:
-              self.write(f'handle{notification_name}();')
+              self.write(f'{receive_fn(notification_method)}();')
             self.write('break;')
           self.write('}')
       self.write('default: {')
       self.write('invalidMethod:')
       with self.indent():
-        self.write('throw LspException(')
+        self.write('std::stringstream ss;')
+        self.write(f'ss << "Unsupported notification method: \\"" << notification.method << "\\"";')
+        self.write('throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());')
+      self.write('}')
+      self.write('}')
+    self.write('}')
+
+  def generate_dispatch_response(self: Self) -> None:
+    self.write('auto LspLanguageServer::dispatch(ResponseMessage &response) -> void {')
+    with self.indent():
+      self.write('ResponseIdType responseIdType =')
+      with self.indent():
+        self.write('static_cast<ResponseIdType>(response.id.index());')
+      self.write(f'if (responseIdType != ResponseIdType::{rename_enum("integer")}) {{')
+      with self.indent():
+        self.write('auto loggerLock = logger.lock();')
+        self.write('logger')
         with self.indent():
-          self.write('ErrorCodes::METHOD_NOT_FOUND,')
-          self.write('std::format(')
+          self.write('<< "Cannot dispatch response with id of type ResponseIdType::"')
+          self.write('<< ResponseIdTypeNames.at(responseIdType)')
+          self.write('<< std::endl;')
+      self.write('}')
+      self.write('int responseId = std::get<int>(response.id);')
+      self.write('std::string method;')
+      self.write('{')
+      with self.indent():
+        self.write('std::unique_lock<std::mutex> callbackLock(callbackMutex);')
+        self.write('auto iter = callbacksById.find(responseId);')
+        self.write('if (iter != callbacksById.end()) {')
+        with self.indent():
+          self.write('method = iter->second;')
+          self.write('callbacksById.erase(iter);')
+        self.write('} else {')
+        with self.indent():
+          self.write('auto loggerLock = logger.lock();')
+          self.write('logger << "Cannot locate request with id: " << responseId << std::endl;')
+          self.write('return;')
+        self.write('}')
+      self.write('}')
+      self.newline()
+      self.write('OutgoingRequest request;')
+      self.write('try {')
+      with self.indent():
+        self.write('request = outgoingRequestByValue(method);')
+      self.write('} catch (std::invalid_argument &e) {')
+      with self.indent():
+        self.write('goto invalidMethod;')
+      self.write('}')
+      self.newline()
+      self.write('switch (request) {')
+      for request_spec in self.schema["requests"]:
+        if request_spec["messageDirection"] == "serverToClient":
+          request_method = request_spec["method"]
+          request_name = method_to_camel_case(request_method)
+          result_name = f'{request_name}Result'
+          self.write(f'case OutgoingRequest::{method_to_underscore(request_method)}: {{')
           with self.indent():
-            self.write('"Unsupported notification method: \\"{}\\"",')
-            self.write('notification.method')
-          self.write(')')
-        self.write(');')
+            result_spec = request_spec.get("result", None)
+            if result_spec is not None:
+              self.write('if (!response.result.has_value()) {')
+              with self.indent():
+                self.write('auto loggerLock = logger.lock();')
+                self.write(f'logger << "Missing required attribute for method \\"{request_method}\\": result" << std::endl;')
+                self.write('return;')
+              self.write('}')
+              self.write('std::unique_ptr<LSPAny> &result = response.result.value();')
+              symbol_name = result_name
+              symbol_spec = result_spec
+              symbol_kind = symbol_spec["kind"]
+              while (symbol_kind == "reference") and (symbol_name in self.symbols):
+                symbol_kind, symbol_spec = self.symbols[symbol_name]
+                symbol_name = symbol_spec["name"]
+              if symbol_kind == "structure":
+                self.write(f'std::unique_ptr<{result_name}> params =')
+              else:
+                self.write(f'{result_name} params =')
+              with self.indent():
+                self.write(f'transformer.anyTo{upper_first_char(result_name)}(*result);')
+              if symbol_kind == "structure":
+                self.write(f'{receive_fn(request_method)}(*params);')
+              else:
+                self.write(f'{receive_fn(request_method)}(params);')
+            else:
+              self.write(f'{receive_fn(request_method)}()')
+            self.write('break;')
+          self.write('}')
+      self.write('default: {')
+      self.write('invalidMethod:')
+      with self.indent():
+        self.write('auto loggerLock = logger.lock();')
+        self.write(f'logger << "Unsupported request method: \\"" << method << "\\"";')
       self.write('}')
       self.write('}')
     self.write('}')
@@ -4876,15 +5007,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       with self.indent():
         self.write('return request.params.value();')
       self.write('}')
-      self.write('throw LspException(')
-      with self.indent():
-        self.write('ErrorCodes::INVALID_PARAMS,')
-        self.write('std::format(')
-        with self.indent():
-          self.write('"RequestMessage.params must be defined for method=\\"{}\\"",')
-          self.write('request.method')
-        self.write(')')
-      self.write(');')
+      self.write('std::stringstream ss;')
+      self.write(f'ss << "RequestMessage.params must be defined for method=\\"" << request.method << "\\"";')
+      self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
     self.write('}')
     self.newline()
 
@@ -4898,15 +5023,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       with self.indent():
         self.write('return notification.params.value();')
       self.write('}')
-      self.write('throw LspException(')
-      with self.indent():
-        self.write('ErrorCodes::INVALID_PARAMS,')
-        self.write('std::format(')
-        with self.indent():
-          self.write('"NotificationMessage.params must be defined for method=\\"{}\\"",')
-          self.write('notification.method')
-        self.write(')')
-      self.write(');')
+      self.write('std::stringstream ss;')
+      self.write(f'ss << "NotificationMessage.params must be defined for method=\\""')
+      self.write(f'   << notification.method << "\\"";')
+      self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
     self.write('}')
     self.newline()
 
@@ -4927,11 +5047,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write(f'// request: "{request_method}"')
         params_spec = request_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto LspLanguageServer::handle{request_name}(')
-          with self.indent(): self.write(f'{params_spec["name"]} &params')
+          self.write(f'auto LspLanguageServer::{receive_fn(request_method)}(')
+          with self.indent(): self.write(f'{params_spec["name"]} &/*params*/')
           self.write(f') -> {result_name} {{')
         else:
-          self.write(f'auto LspLanguageServer::handle{request_name}() -> {result_name} {{')
+          self.write(f'auto LspLanguageServer::{receive_fn(request_method)}() -> {result_name} {{')
         with self.indent():
           match request_method:
             case "initialize":
@@ -4940,24 +5060,6 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               self.write('std::unique_ptr<ServerCapabilities> capabilities =')
               with self.indent():
                 self.write('std::make_unique<ServerCapabilities>();')
-              self.newline()
-              self.write('// ------------------------- //')
-              self.write('// TextDocument Sync Options //')
-              self.write('// ------------------------- //')
-              self.write('ServerCapabilities_textDocumentSync textDocumentSync;')
-              self.write('std::unique_ptr<TextDocumentSyncOptions> textDocumentSyncOptions =')
-              with self.indent():
-                self.write('std::make_unique<TextDocumentSyncOptions>();')
-              self.write('textDocumentSyncOptions->openClose = true;')
-              self.write('textDocumentSyncOptions->change = TextDocumentSyncKind::INCREMENTAL;')
-              self.write('TextDocumentSyncOptions_save save;')
-              self.write('std::unique_ptr<SaveOptions> saveOptions = std::make_unique<SaveOptions>();')
-              self.write('saveOptions->includeText = true;')
-              self.write('save = std::move(saveOptions);')
-              self.write('textDocumentSyncOptions->save = std::move(save);')
-              self.write('textDocumentSync = std::move(textDocumentSyncOptions);')
-              self.write('capabilities->textDocumentSync = std::move(textDocumentSync);')
-              self.write('result.capabilities = std::move(capabilities);')
               self.newline()
               self.write('return result;')
             case "shutdown":
@@ -4968,7 +5070,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               self.write('}')
               self.write('return nullptr;')
             case _:
-              self.write('throw LspException(')
+              self.write('throw LSP_EXCEPTION(')
               with self.indent():
                 self.write('ErrorCodes::METHOD_NOT_FOUND,')
                 self.write(f'"No handler exists for method: \\"{request_method}\\""')
@@ -4988,11 +5090,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write(f'// notification: "{notification_method}"')
         params_spec = notification_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto LspLanguageServer::handle{notification_name}(')
-          with self.indent(): self.write(f'{params_spec["name"]} &params')
+          self.write(f'auto LspLanguageServer::{receive_fn(notification_method)}(')
+          with self.indent(): self.write(f'{params_spec["name"]} &/*params*/')
           self.write(f') -> void {{')
         else:
-          self.write(f'auto LspLanguageServer::handle{notification_name}() -> void {{')
+          self.write(f'auto LspLanguageServer::{receive_fn(notification_method)}() -> void {{')
         with self.indent():
           match notification_method:
             case "exit":
@@ -5003,69 +5105,23 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                 self.write('bool shutdown = false;')
                 self.write('if (_shutdown.compare_exchange_strong(shutdown, true)) {')
                 with self.indent():
+                  self.write('auto loggerLock = logger.lock();')
                   self.write('logger')
                   with self.indent():
                     self.write('<< "Server exited before being notified to shutdown!"')
                     self.write('<< std::endl;')
                 self.write('}')
+                self.write('incomingMessages.stop();')
+                self.write('requestPool.stop();')
+                self.write('workerPool.stop();')
+                self.write('requestPool.join();')
+                self.write('workerPool.join();')
+                self.write('listener.join();')
               self.write('}')
             case "initialized":
               self.write('// empty')
-            case "textDocument/didOpen":
-              self.write('const TextDocumentItem &textDocumentItem = *params.textDocument;')
-              self.write('const DocumentUri &uri = textDocumentItem.uri;')
-              self.write('const std::string &text = textDocumentItem.text;')
-              self.write('{')
-              with self.indent():
-                self.write('std::unique_lock<std::shared_mutex> writeLock(readWriteMutex);')
-                self.write('textDocuments.emplace(')
-                with self.indent():
-                  self.write('std::piecewise_construct,')
-                  self.write('std::forward_as_tuple(uri),')
-                  self.write('std::forward_as_tuple(uri, text, logger)')
-                self.write(');')
-              self.write('}')
-            case "textDocument/didChange":
-              self.write('const DocumentUri &uri = params.textDocument->uri;')
-              self.write('{')
-              with self.indent():
-                self.write('std::shared_lock<std::shared_mutex> readLock(readWriteMutex);')
-                self.write('TextDocument &textDocument = textDocuments.at(uri);')
-                self.write('readLock.unlock();')
-                self.write('textDocument.apply(params.contentChanges);')
-              self.write('}')
-            case "textDocument/didSave":
-              self.write('if (params.text.has_value()) {')
-              with self.indent():
-                self.write('const std::string &text = params.text.value();')
-                self.write('const DocumentUri &uri = params.textDocument->uri;')
-                self.write('{')
-                with self.indent():
-                  self.write('std::shared_lock<std::shared_mutex> readLock(readWriteMutex);')
-                  self.write('TextDocument &textDocument = textDocuments.at(uri);')
-                  self.write('readLock.unlock();')
-                  self.write('textDocument.setText(text);')
-                self.write('}')
-              self.write('}')
-            case "textDocument/didClose":
-              self.write('const DocumentUri &uri = params.textDocument->uri;')
-              self.write('{')
-              with self.indent():
-                self.write('std::shared_lock<std::shared_mutex> readLock(readWriteMutex);')
-                self.write('auto pos = textDocuments.find(uri);')
-                self.write('readLock.unlock();')
-                self.write('if (pos != textDocuments.end()) {')
-                with self.indent():
-                  self.write('std::unique_lock<std::shared_mutex> writeLock(readWriteMutex);')
-                  self.write('pos = textDocuments.find(uri);')
-                  self.write('if (pos != textDocuments.end()) {')
-                  with self.indent():
-                    self.write('textDocuments.erase(pos);')
-                  self.write('}')
-                self.write('}')
-              self.write('}')
             case _:
-              self.write('throw LspException(')
+              self.write('throw LSP_EXCEPTION(')
               with self.indent():
                 self.write('ErrorCodes::METHOD_NOT_FOUND,')
                 self.write(f'"No handler exists for method: \\"{notification_method}\\""')
@@ -5085,20 +5141,46 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write(f'// request: "{request_method}"')
         params_spec = request_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto LspLanguageServer::request{request_name}(')
+          self.write(f'auto LspLanguageServer::{send_fn(request_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
           self.write(f') -> void {{')
         else:
-          self.write(f'auto LspLanguageServer::request{request_name}() -> void {{')
+          self.write(f'auto LspLanguageServer::{send_fn(request_method)}() -> void {{')
         with self.indent():
           self.write('RequestMessage request;')
           self.write('request.jsonrpc = JSON_RPC_VERSION;')
-          self.write('request.id = nextId();')
+          self.write('int requestId = nextId();')
+          self.write('request.id = requestId;')
+          self.write('{')
+          with self.indent():
+            self.write('std::unique_lock<std::mutex> callbackLock(callbackMutex);')
+            self.write(f'callbacksById.emplace(requestId, "{request_method}");')
+          self.write('}')
           self.write(f'request.method = "{request_method}";')
           if params_spec is not None:
             self.write('request.params = transformer.asMessageParams(params);')
-          self.write('const std::string message = serializer.serializeRequest(request);')
-          self.write('outgoingMessages.enqueue(message);')
+          self.write('const std::string message =')
+          with self.indent():
+            self.write('serializer.serializeRequest(request);')
+          self.write('send(message);')
+        self.write('}')
+        self.newline()
+        result_spec = request_spec.get("result", None)
+        if result_spec is not None:
+          result_name = f'{request_name}Result'
+          self.write(f'auto LspLanguageServer::{receive_fn(request_method)}(')
+          with self.indent():
+            self.inline(result_name, indent=True)
+            if result_spec["kind"] == "base":
+              self.inline(' /*params*/', end='\n')
+            else:
+              self.inline(' &/*params*/', end='\n')
+          self.write(') -> void {')
+        else:
+          self.write(f'auto LspLanguageServer::{receive_fn(request_method)}() -> void {{')
+        with self.indent():
+          self.write('auto loggerLock = logger.lock();')
+          self.write(f'logger << "No handler exists for method: \\"{request_method}\\"" << std::endl;')
         self.write('}')
         self.newline()
 
@@ -5114,37 +5196,25 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write(f'// notification: "{notification_method}"')
         params_spec = notification_spec.get("params", None)
         if params_spec is not None:
-          self.write(f'auto LspLanguageServer::notify{notification_name}(')
+          self.write(f'auto LspLanguageServer::{send_fn(notification_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
           self.write(f') -> void {{')
         else:
-          self.write(f'auto LspLanguageServer::notify{notification_name}() -> void {{')
+          self.write(f'auto LspLanguageServer::{send_fn(notification_method)}() -> void {{')
         with self.indent():
           self.write('NotificationMessage notification;')
           self.write('notification.jsonrpc = JSON_RPC_VERSION;')
           self.write(f'notification.method = "{notification_method}";')
           if params_spec is not None:
             self.write('notification.params = transformer.asMessageParams(params);')
-          self.write('const std::string message = serializer.serializeNotification(notification);')
-          self.write('outgoingMessages.enqueue(message);')
+          self.write('const std::string message =')
+          with self.indent():
+            self.write('serializer.serializeNotification(notification);')
+          self.write('send(message);')
         self.write('}')
         self.newline()
 
-  def generate_prepare_ostream(self: Self) -> None:
-    self.write('auto LspLanguageServer::prepare(')
-    with self.indent():
-      self.write('std::ostream &os,')
-      self.write('const std::string &response')
-    self.write(') const -> void {')
-    with self.indent():
-      self.write('os << "Content-Type: application/vscode-jsonrpc; charset=utf-8\\r\\n"')
-      self.write('   << "Content-Length: " << response.length() << "\\r\\n"')
-      self.write('   << "\\r\\n"')
-      self.write('   << response;')
-    self.write('}')
-    self.newline()
-
-  def generate_prepare_stringstream(self: Self) -> None:
+  def generate_prepare(self: Self) -> None:
     self.write('auto LspLanguageServer::prepare(')
     with self.indent():
       self.write('std::stringstream &ss,')
@@ -5158,20 +5228,15 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     self.write('}')
     self.newline()
 
-  def generate_prepare_methods(self: Self) -> None:
-    self.generate_prepare_ostream()
-    self.generate_prepare_stringstream()
-
   def generate_code(self: Self) -> None:
+    print(f'Generating: {self.file_path} ...')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
     self.write('// -----------------------------------------------------------------------------')
     self.newline()
     self.write('#include <cctype>')
-    self.write('#include <format>')
     self.write('#include <iostream>')
-    self.write('#include <mutex>')
     self.write('#include <stdexcept>')
     self.newline()
     self.write('#include <lsp/specification.h>')
@@ -5183,7 +5248,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     with self.indent():
       self.generate_constructor()
       self.generate_next_id()
-      self.generate_serve()
+      self.generate_handle()
       self.generate_is_initialized()
       self.generate_is_shutdown()
       self.generate_is_terminated()
@@ -5191,9 +5256,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.generate_initialize_params()
       self.generate_assert_initialized()
       self.generate_assert_running();
-      self.generate_prepare_methods()
+      self.generate_prepare()
       self.generate_dispatch_request()
       self.generate_dispatch_notification()
+      self.generate_dispatch_response()
       self.generate_require_message_params()
       self.generate_incoming_request_handlers()
       self.generate_incoming_notification_handlers()

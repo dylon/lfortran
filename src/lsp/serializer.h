@@ -1,5 +1,4 @@
-#ifndef LCOMPILERS_LS_SERIALIZER_H
-#define LCOMPILERS_LS_SERIALIZER_H
+#pragma once
 
 #include <string>
 
@@ -30,5 +29,3 @@ namespace LCompilers::LanguageServer {
   };
 
 } // namespace LCompilers::LanguageServer
-
-#endif // LCOMPILERS_LS_SERIALIZER_H

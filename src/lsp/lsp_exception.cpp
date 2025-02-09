@@ -1,5 +1,3 @@
-#include <format>
-
 #include <lsp/lsp_exception.h>
 
 namespace LCompilers::LanguageServerProtocol {
@@ -7,10 +5,12 @@ namespace LCompilers::LanguageServerProtocol {
   LspException::LspException(
     ErrorCode code,
     const std::string &message,
-    const std::source_location location
+    const char *file,
+    int line
   ) : std::logic_error(message)
     , _code(code)
-    , _location(location)
+    , _file(file)
+    , _line(line)
   {
     // empty
   }
@@ -19,8 +19,12 @@ namespace LCompilers::LanguageServerProtocol {
     return _code;
   }
 
-  auto LspException::where() const -> const std::source_location & {
-    return _location;
+  auto LspException::file() const -> const char * {
+    return _file;
+  }
+
+  auto LspException::line() const -> int {
+    return _line;
   }
 
 } // namespace LCompilers::LanguageServerProtocol

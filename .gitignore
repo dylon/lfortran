@@ -28,6 +28,12 @@ src/lfortran/tests/cmp32
 src/lfortran/tests/x
 src/lfortran/tests/ref_pickle.txt.new
 src/lsp/llanguage_server
+src/lsp/specification.h
+src/lsp/specification.cpp
+src/lsp/lsp_transformer.h
+src/lsp/lsp_transformer.cpp
+src/lsp/lsp_language_server.h
+src/lsp/lsp_language_server.cpp
 
 # fortran_parser
 

@@ -23,5 +23,8 @@ python src/libasr/intrinsic_func_registry_util_gen.py
 (cd src/lfortran && ${RE2C} -W -b parser/preprocessor.re -o parser/preprocessor.cpp)
 (cd src/lfortran/parser && ${BISON} -Wall -d -r all parser.yy)
 
+# Generate the LSP sources
+python generate_lsp_code.py --schema src/lsp/metaModel.json --target-language c++ --output-dir src/lsp
+
 grep -n "'" src/lfortran/parser/parser.yy && echo "Single quote not allowed" && exit 1
 echo "OK"

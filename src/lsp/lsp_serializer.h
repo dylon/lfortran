@@ -1,5 +1,4 @@
-#ifndef LCOMPILERS_LSP_SERIALIZER_H
-#define LCOMPILERS_LSP_SERIALIZER_H
+#pragma once
 
 #include <memory>
 
@@ -75,6 +74,9 @@ namespace LCompilers::LanguageServerProtocol {
     auto deserializeNotification(
       const rapidjson::Document &document
     ) const -> NotificationMessage;
+    auto jsonToLsp(
+      const rapidjson::Value &json
+    ) const -> std::unique_ptr<LSPAny>;
   private:
     auto buildRequestId(
       const rapidjson::Value &jsonId
@@ -82,11 +84,6 @@ namespace LCompilers::LanguageServerProtocol {
     auto buildMessageParams(
       const rapidjson::Value &jsonParams
     ) const -> MessageParams;
-    auto jsonToLsp(
-      const rapidjson::Value &json
-    ) const -> std::unique_ptr<LSPAny>;
   };
 
 } // namespace LCompilers::LanguageServerProtocol
-
-#endif // LCOMPILERS_LSP_SERIALIZER_H

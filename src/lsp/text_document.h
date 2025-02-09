@@ -1,5 +1,4 @@
-#ifndef LCOMPILERS_LSP_TEXT_DOCUMENT_H
-#define LCOMPILERS_LSP_TEXT_DOCUMENT_H
+#pragma once
 
 #include <cstddef>
 #include <filesystem>
@@ -26,21 +25,29 @@ namespace LCompilers::LanguageServerProtocol {
   public:
     TextDocument(
       const std::string &uri,
+      const std::string &languageId,
+      int version,
       const std::string &text,
       lsl::Logger &logger
     );
-    auto uri() -> const DocumentUri &;
-    auto path() -> const fs::path &;
-    auto text() -> const std::string &;
+    TextDocument(TextDocument &&other) noexcept;  // move constructor
+    auto uri() const -> const DocumentUri &;
+    auto path() const -> const fs::path &;
+    auto languageId() const -> const std::string &;
+    auto version() const -> int;
+    auto text() const -> const std::string &;
     auto setText(const std::string &text) -> void;
     auto apply(
-      std::vector<TextDocumentContentChangeEvent> &changes
+      std::vector<TextDocumentContentChangeEvent> &changes,
+      int version
     ) -> void;
   private:
-    lsl::Logger &logger;
     DocumentUri _uri;
-    fs::path _path;
+    std::string _languageId;
+    int _version;
     std::string _text;
+    lsl::Logger &logger;
+    fs::path _path;
     std::stringstream ss;
     std::vector<std::size_t> lineIndices;
     std::recursive_mutex reentrantMutex;
@@ -63,21 +70,19 @@ namespace LCompilers::LanguageServerProtocol {
       std::size_t &j,
       std::size_t &k,
       std::string &patch
-    ) const -> void;
+    ) -> void;
     auto decompose(
       const TextDocumentContentChangeEvent_0 &event,
       std::size_t &j,
       std::size_t &k,
       std::string &patch
-    ) const -> void;
+    ) -> void;
     auto decompose(
       const TextDocumentContentChangeEvent_1 &event,
       std::size_t &j,
       std::size_t &k,
       std::string &patch
-    ) const -> void;
+    ) -> void;
   };
 
 } // namespace LCompilers::LanguageServerProtocol
-
-#endif // LCOMPILERS_LSP_TEXT_DOCUMENT_H

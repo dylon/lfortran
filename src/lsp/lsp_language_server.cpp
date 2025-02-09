@@ -4,9 +4,7 @@
 // -----------------------------------------------------------------------------
 
 #include <cctype>
-#include <format>
 #include <iostream>
-#include <mutex>
 #include <stdexcept>
 
 #include <lsp/specification.h>
@@ -16,18 +14,34 @@
 namespace LCompilers::LanguageServerProtocol {
 
   LspLanguageServer::LspLanguageServer(
+    ls::MessageQueue &incomingMessages,
     ls::MessageQueue &outgoingMessages,
-    lsl::Logger &logger
-  ) : ls::LanguageServer(outgoingMessages, logger)
+    std::size_t numRequestThreads,
+    std::size_t numWorkerThreads,
+    lsl::Logger &logger,
+    const std::string &configSection
+  ) : ls::LanguageServer(
+      incomingMessages,
+      outgoingMessages,
+      numRequestThreads,
+      numWorkerThreads,
+      logger
+    )
+    , configSection(configSection)
+    , transformer(logger)
   {
     // empty
   }
 
-  auto LspLanguageServer::nextId() -> RequestId {
+  auto LspLanguageServer::nextId() -> int {
     return serialId++;
   }
 
-  std::string LspLanguageServer::serve(const std::string &request) {
+  auto LspLanguageServer::handle(
+    // TODO: Add support for batched messages, i.e. multiple messages within an array.
+    const std::string &request,
+    std::size_t sendId
+  ) -> void {
     ResponseMessage response;
     try {
       // The language server protocol always uses “2.0” as the jsonrpc version.
@@ -36,14 +50,11 @@ namespace LCompilers::LanguageServerProtocol {
 
       rapidjson::Document document = deserializer.deserialize(request);
       if (document.HasParseError()) {
-        throw LspException(
-          ErrorCodes::PARSE_ERROR,
-          std::format(
-            "Invalid JSON request (error={}): {}",
-            static_cast<int>(document.GetParseError()),
-            request
-          )
-        );
+        std::stringstream ss;
+        ss << "Invalid JSON request (error="
+           << static_cast<int>(document.GetParseError())
+           << "): " << request;
+        throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, ss.str());
       }
 
       if (document.HasMember("id")) {
@@ -53,13 +64,10 @@ namespace LCompilers::LanguageServerProtocol {
         } else if (idValue.IsInt()) {
           response.id = idValue.GetInt();
         } else if (!idValue.IsNull()) { // null => notification
-          throw LspException(
-            ErrorCodes::INVALID_PARAMS,
-            std::format(
-              "Unsupported type for id attribute: {}",
-              static_cast<int>(idValue.GetType())
-            )
-          );
+          std::stringstream ss;
+          ss << "Unsupported type for id attribute: "
+             << static_cast<int>(idValue.GetType());
+          throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
         }
       }
 
@@ -67,47 +75,48 @@ namespace LCompilers::LanguageServerProtocol {
         const std::string &method = document["method"].GetString();
         if (isIncomingRequest(method)) {
           if (static_cast<ResponseIdType>(response.id.index()) == ResponseIdType::NULL_TYPE) {
-            throw LspException(
-              ErrorCodes::INVALID_PARAMS,
-              std::format(
-                "Missing request method=\"{}\" attribute: id",
-                method
-              )
-            );
+            std::stringstream ss;
+            ss << "Missing request method=\"" << method << "\" attribute: id";
+            throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
           }
           RequestMessage request = deserializer.deserializeRequest(document);
           response.jsonrpc = request.jsonrpc;
           dispatch(response, request);
         } else if (isIncomingNotification(method)) {
           if (static_cast<ResponseIdType>(response.id.index()) != ResponseIdType::NULL_TYPE) {
-            throw LspException(
-              ErrorCodes::INVALID_PARAMS,
-              std::format(
-                "Notification method=\"{}\" must not contain the attribute: id",
-                method
-              )
-            );
+            std::stringstream ss;
+            ss << "Notification method=\"" << method << "\" must not contain the attribute: id";
           }
           NotificationMessage notification =
             deserializer.deserializeNotification(document);
           response.jsonrpc = notification.jsonrpc;
           dispatch(response, notification);
         } else {
-          throw LspException(
-            ErrorCodes::INVALID_REQUEST,
-            std::format("Unsupported method: \"{}\"", method)
-          );
+          std::stringstream ss;
+          ss << "Unsupported method: \"" << method << "\"";
+          throw LSP_EXCEPTION(ErrorCodes::INVALID_REQUEST, ss.str());
         }
+      } else if (document.HasMember("result") || document.HasMember("error")) {
+        notifySent();
+        if (document.HasMember("result")) {
+          const rapidjson::Value &result = document["result"];
+          response.result = deserializer.jsonToLsp(result);
+        } else if (document.HasMember("error")) {
+          std::unique_ptr<LSPAny> error =
+            deserializer.jsonToLsp(document["error"]);
+          response.error = transformer.anyToResponseError(*error);
+        }
+        dispatch(response);
+        return;
       } else {
-        throw LspException(
+        throw LSP_EXCEPTION(
           ErrorCodes::INVALID_REQUEST,
           "Missing required attribute: method"
         );
       }
     } catch (const LspException &e) {
-      const std::source_location &where = e.where();
       logger
-        << "[" << where.file_name() << ":" << where.line() << ":" << where.column() << "] "
+        << "[" << e.file() << ":" << e.line() << "] "
         << e.what()
         << std::endl;
       std::unique_ptr<ResponseError> error =
@@ -135,7 +144,8 @@ namespace LCompilers::LanguageServerProtocol {
         "An unexpected exception occurred. If it continues, please file a ticket.";
       response.error = std::move(error);
     }
-    return serializer.serializeResponse(response);
+    const std::string message = serializer.serializeResponse(response);
+    send(message, sendId);
   }
 
   auto LspLanguageServer::isInitialized() const -> bool {
@@ -165,7 +175,7 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspLanguageServer::assertInitialized() -> void{
     if (!_initialized) {
-      throw LspException(
+      throw LSP_EXCEPTION(
         ErrorCodes::SERVER_NOT_INITIALIZED,
         "Method \"initialize\" must be called first."
       );
@@ -174,21 +184,11 @@ namespace LCompilers::LanguageServerProtocol {
 
   auto LspLanguageServer::assertRunning() -> void {
     if (_shutdown) {
-      throw LspException(
+      throw LSP_EXCEPTION(
         LSPErrorCodes::REQUEST_FAILED,
         "Server has shutdown and cannot accept new requests."
       );
     }
-  }
-
-  auto LspLanguageServer::prepare(
-    std::ostream &os,
-    const std::string &response
-  ) const -> void {
-    os << "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
-       << "Content-Length: " << response.length() << "\r\n"
-       << "\r\n"
-       << response;
   }
 
   auto LspLanguageServer::prepare(
@@ -217,7 +217,7 @@ namespace LCompilers::LanguageServerProtocol {
     } else {
       bool expected = false;  // a reference is required ...
       if (!_initialized.compare_exchange_strong(expected, true)) {
-        throw LspException(
+        throw LSP_EXCEPTION(
           ErrorCodes::INVALID_REQUEST,
           "Server may be initialized only once."
         );
@@ -229,7 +229,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<ImplementationParams> requestParams =
         transformer.asTextDocumentImplementationParams(messageParams);
       TextDocumentImplementationResult result =
-        handleTextDocumentImplementation(*requestParams);
+        receiveTextDocument_implementation(*requestParams);
       response.result = transformer.textDocumentImplementationResultToAny(result);
       break;
     }
@@ -238,7 +238,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<TypeDefinitionParams> requestParams =
         transformer.asTextDocumentTypeDefinitionParams(messageParams);
       TextDocumentTypeDefinitionResult result =
-        handleTextDocumentTypeDefinition(*requestParams);
+        receiveTextDocument_typeDefinition(*requestParams);
       response.result = transformer.textDocumentTypeDefinitionResultToAny(result);
       break;
     }
@@ -247,7 +247,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentColorParams> requestParams =
         transformer.asTextDocumentDocumentColorParams(messageParams);
       TextDocumentDocumentColorResult result =
-        handleTextDocumentDocumentColor(*requestParams);
+        receiveTextDocument_documentColor(*requestParams);
       response.result = transformer.textDocumentDocumentColorResultToAny(result);
       break;
     }
@@ -256,7 +256,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<ColorPresentationParams> requestParams =
         transformer.asTextDocumentColorPresentationParams(messageParams);
       TextDocumentColorPresentationResult result =
-        handleTextDocumentColorPresentation(*requestParams);
+        receiveTextDocument_colorPresentation(*requestParams);
       response.result = transformer.textDocumentColorPresentationResultToAny(result);
       break;
     }
@@ -265,7 +265,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<FoldingRangeParams> requestParams =
         transformer.asTextDocumentFoldingRangeParams(messageParams);
       TextDocumentFoldingRangeResult result =
-        handleTextDocumentFoldingRange(*requestParams);
+        receiveTextDocument_foldingRange(*requestParams);
       response.result = transformer.textDocumentFoldingRangeResultToAny(result);
       break;
     }
@@ -274,7 +274,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DeclarationParams> requestParams =
         transformer.asTextDocumentDeclarationParams(messageParams);
       TextDocumentDeclarationResult result =
-        handleTextDocumentDeclaration(*requestParams);
+        receiveTextDocument_declaration(*requestParams);
       response.result = transformer.textDocumentDeclarationResultToAny(result);
       break;
     }
@@ -283,7 +283,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<SelectionRangeParams> requestParams =
         transformer.asTextDocumentSelectionRangeParams(messageParams);
       TextDocumentSelectionRangeResult result =
-        handleTextDocumentSelectionRange(*requestParams);
+        receiveTextDocument_selectionRange(*requestParams);
       response.result = transformer.textDocumentSelectionRangeResultToAny(result);
       break;
     }
@@ -292,7 +292,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CallHierarchyPrepareParams> requestParams =
         transformer.asTextDocumentPrepareCallHierarchyParams(messageParams);
       TextDocumentPrepareCallHierarchyResult result =
-        handleTextDocumentPrepareCallHierarchy(*requestParams);
+        receiveTextDocument_prepareCallHierarchy(*requestParams);
       response.result = transformer.textDocumentPrepareCallHierarchyResultToAny(result);
       break;
     }
@@ -301,7 +301,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CallHierarchyIncomingCallsParams> requestParams =
         transformer.asCallHierarchyIncomingCallsParams(messageParams);
       CallHierarchyIncomingCallsResult result =
-        handleCallHierarchyIncomingCalls(*requestParams);
+        receiveCallHierarchy_incomingCalls(*requestParams);
       response.result = transformer.callHierarchyIncomingCallsResultToAny(result);
       break;
     }
@@ -310,7 +310,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CallHierarchyOutgoingCallsParams> requestParams =
         transformer.asCallHierarchyOutgoingCallsParams(messageParams);
       CallHierarchyOutgoingCallsResult result =
-        handleCallHierarchyOutgoingCalls(*requestParams);
+        receiveCallHierarchy_outgoingCalls(*requestParams);
       response.result = transformer.callHierarchyOutgoingCallsResultToAny(result);
       break;
     }
@@ -319,7 +319,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<SemanticTokensParams> requestParams =
         transformer.asTextDocumentSemanticTokensFullParams(messageParams);
       TextDocumentSemanticTokensFullResult result =
-        handleTextDocumentSemanticTokensFull(*requestParams);
+        receiveTextDocument_semanticTokens_full(*requestParams);
       response.result = transformer.textDocumentSemanticTokensFullResultToAny(result);
       break;
     }
@@ -328,7 +328,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<SemanticTokensDeltaParams> requestParams =
         transformer.asTextDocumentSemanticTokensFullDeltaParams(messageParams);
       TextDocumentSemanticTokensFullDeltaResult result =
-        handleTextDocumentSemanticTokensFullDelta(*requestParams);
+        receiveTextDocument_semanticTokens_full_delta(*requestParams);
       response.result = transformer.textDocumentSemanticTokensFullDeltaResultToAny(result);
       break;
     }
@@ -337,7 +337,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<SemanticTokensRangeParams> requestParams =
         transformer.asTextDocumentSemanticTokensRangeParams(messageParams);
       TextDocumentSemanticTokensRangeResult result =
-        handleTextDocumentSemanticTokensRange(*requestParams);
+        receiveTextDocument_semanticTokens_range(*requestParams);
       response.result = transformer.textDocumentSemanticTokensRangeResultToAny(result);
       break;
     }
@@ -346,7 +346,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<LinkedEditingRangeParams> requestParams =
         transformer.asTextDocumentLinkedEditingRangeParams(messageParams);
       TextDocumentLinkedEditingRangeResult result =
-        handleTextDocumentLinkedEditingRange(*requestParams);
+        receiveTextDocument_linkedEditingRange(*requestParams);
       response.result = transformer.textDocumentLinkedEditingRangeResultToAny(result);
       break;
     }
@@ -355,7 +355,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CreateFilesParams> requestParams =
         transformer.asWorkspaceWillCreateFilesParams(messageParams);
       WorkspaceWillCreateFilesResult result =
-        handleWorkspaceWillCreateFiles(*requestParams);
+        receiveWorkspace_willCreateFiles(*requestParams);
       response.result = transformer.workspaceWillCreateFilesResultToAny(result);
       break;
     }
@@ -364,7 +364,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<RenameFilesParams> requestParams =
         transformer.asWorkspaceWillRenameFilesParams(messageParams);
       WorkspaceWillRenameFilesResult result =
-        handleWorkspaceWillRenameFiles(*requestParams);
+        receiveWorkspace_willRenameFiles(*requestParams);
       response.result = transformer.workspaceWillRenameFilesResultToAny(result);
       break;
     }
@@ -373,7 +373,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DeleteFilesParams> requestParams =
         transformer.asWorkspaceWillDeleteFilesParams(messageParams);
       WorkspaceWillDeleteFilesResult result =
-        handleWorkspaceWillDeleteFiles(*requestParams);
+        receiveWorkspace_willDeleteFiles(*requestParams);
       response.result = transformer.workspaceWillDeleteFilesResultToAny(result);
       break;
     }
@@ -382,7 +382,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<MonikerParams> requestParams =
         transformer.asTextDocumentMonikerParams(messageParams);
       TextDocumentMonikerResult result =
-        handleTextDocumentMoniker(*requestParams);
+        receiveTextDocument_moniker(*requestParams);
       response.result = transformer.textDocumentMonikerResultToAny(result);
       break;
     }
@@ -391,7 +391,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<TypeHierarchyPrepareParams> requestParams =
         transformer.asTextDocumentPrepareTypeHierarchyParams(messageParams);
       TextDocumentPrepareTypeHierarchyResult result =
-        handleTextDocumentPrepareTypeHierarchy(*requestParams);
+        receiveTextDocument_prepareTypeHierarchy(*requestParams);
       response.result = transformer.textDocumentPrepareTypeHierarchyResultToAny(result);
       break;
     }
@@ -400,7 +400,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<TypeHierarchySupertypesParams> requestParams =
         transformer.asTypeHierarchySupertypesParams(messageParams);
       TypeHierarchySupertypesResult result =
-        handleTypeHierarchySupertypes(*requestParams);
+        receiveTypeHierarchy_supertypes(*requestParams);
       response.result = transformer.typeHierarchySupertypesResultToAny(result);
       break;
     }
@@ -409,7 +409,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<TypeHierarchySubtypesParams> requestParams =
         transformer.asTypeHierarchySubtypesParams(messageParams);
       TypeHierarchySubtypesResult result =
-        handleTypeHierarchySubtypes(*requestParams);
+        receiveTypeHierarchy_subtypes(*requestParams);
       response.result = transformer.typeHierarchySubtypesResultToAny(result);
       break;
     }
@@ -418,7 +418,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<InlineValueParams> requestParams =
         transformer.asTextDocumentInlineValueParams(messageParams);
       TextDocumentInlineValueResult result =
-        handleTextDocumentInlineValue(*requestParams);
+        receiveTextDocument_inlineValue(*requestParams);
       response.result = transformer.textDocumentInlineValueResultToAny(result);
       break;
     }
@@ -427,7 +427,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<InlayHintParams> requestParams =
         transformer.asTextDocumentInlayHintParams(messageParams);
       TextDocumentInlayHintResult result =
-        handleTextDocumentInlayHint(*requestParams);
+        receiveTextDocument_inlayHint(*requestParams);
       response.result = transformer.textDocumentInlayHintResultToAny(result);
       break;
     }
@@ -436,7 +436,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<InlayHint> requestParams =
         transformer.asInlayHintResolveParams(messageParams);
       InlayHintResolveResult result =
-        handleInlayHintResolve(*requestParams);
+        receiveInlayHint_resolve(*requestParams);
       response.result = transformer.inlayHintResolveResultToAny(result);
       break;
     }
@@ -445,7 +445,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentDiagnosticParams> requestParams =
         transformer.asTextDocumentDiagnosticParams(messageParams);
       TextDocumentDiagnosticResult result =
-        handleTextDocumentDiagnostic(*requestParams);
+        receiveTextDocument_diagnostic(*requestParams);
       response.result = transformer.textDocumentDiagnosticResultToAny(result);
       break;
     }
@@ -454,7 +454,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<WorkspaceDiagnosticParams> requestParams =
         transformer.asWorkspaceDiagnosticParams(messageParams);
       WorkspaceDiagnosticResult result =
-        handleWorkspaceDiagnostic(*requestParams);
+        receiveWorkspace_diagnostic(*requestParams);
       response.result = transformer.workspaceDiagnosticResultToAny(result);
       break;
     }
@@ -463,7 +463,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<InlineCompletionParams> requestParams =
         transformer.asTextDocumentInlineCompletionParams(messageParams);
       TextDocumentInlineCompletionResult result =
-        handleTextDocumentInlineCompletion(*requestParams);
+        receiveTextDocument_inlineCompletion(*requestParams);
       response.result = transformer.textDocumentInlineCompletionResultToAny(result);
       break;
     }
@@ -473,13 +473,13 @@ namespace LCompilers::LanguageServerProtocol {
         std::unique_ptr<InitializeParams> requestParams =
           transformer.asInitializeParams(messageParams);
         InitializeResult result =
-          handleInitialize(*requestParams);
+          receiveInitialize(*requestParams);
         response.result = transformer.initializeResultToAny(result);
         _initializeParams = std::move(requestParams);
       } catch (LspException &e) {
         bool expected = true;
         if (!_initialized.compare_exchange_strong(expected, false)) {
-          throw LspException(
+          throw LSP_EXCEPTION(
             ErrorCodes::INVALID_REQUEST,
             "Server initialization out of sync."
           );
@@ -489,7 +489,7 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     case IncomingRequest::SHUTDOWN: {
-      ShutdownResult result = handleShutdown();
+      ShutdownResult result = receiveShutdown();
       response.result = transformer.shutdownResultToAny(result);
       break;
     }
@@ -498,7 +498,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<WillSaveTextDocumentParams> requestParams =
         transformer.asTextDocumentWillSaveWaitUntilParams(messageParams);
       TextDocumentWillSaveWaitUntilResult result =
-        handleTextDocumentWillSaveWaitUntil(*requestParams);
+        receiveTextDocument_willSaveWaitUntil(*requestParams);
       response.result = transformer.textDocumentWillSaveWaitUntilResultToAny(result);
       break;
     }
@@ -507,7 +507,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CompletionParams> requestParams =
         transformer.asTextDocumentCompletionParams(messageParams);
       TextDocumentCompletionResult result =
-        handleTextDocumentCompletion(*requestParams);
+        receiveTextDocument_completion(*requestParams);
       response.result = transformer.textDocumentCompletionResultToAny(result);
       break;
     }
@@ -516,7 +516,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CompletionItem> requestParams =
         transformer.asCompletionItemResolveParams(messageParams);
       CompletionItemResolveResult result =
-        handleCompletionItemResolve(*requestParams);
+        receiveCompletionItem_resolve(*requestParams);
       response.result = transformer.completionItemResolveResultToAny(result);
       break;
     }
@@ -525,7 +525,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<HoverParams> requestParams =
         transformer.asTextDocumentHoverParams(messageParams);
       TextDocumentHoverResult result =
-        handleTextDocumentHover(*requestParams);
+        receiveTextDocument_hover(*requestParams);
       response.result = transformer.textDocumentHoverResultToAny(result);
       break;
     }
@@ -534,7 +534,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<SignatureHelpParams> requestParams =
         transformer.asTextDocumentSignatureHelpParams(messageParams);
       TextDocumentSignatureHelpResult result =
-        handleTextDocumentSignatureHelp(*requestParams);
+        receiveTextDocument_signatureHelp(*requestParams);
       response.result = transformer.textDocumentSignatureHelpResultToAny(result);
       break;
     }
@@ -543,7 +543,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DefinitionParams> requestParams =
         transformer.asTextDocumentDefinitionParams(messageParams);
       TextDocumentDefinitionResult result =
-        handleTextDocumentDefinition(*requestParams);
+        receiveTextDocument_definition(*requestParams);
       response.result = transformer.textDocumentDefinitionResultToAny(result);
       break;
     }
@@ -552,7 +552,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<ReferenceParams> requestParams =
         transformer.asTextDocumentReferencesParams(messageParams);
       TextDocumentReferencesResult result =
-        handleTextDocumentReferences(*requestParams);
+        receiveTextDocument_references(*requestParams);
       response.result = transformer.textDocumentReferencesResultToAny(result);
       break;
     }
@@ -561,7 +561,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentHighlightParams> requestParams =
         transformer.asTextDocumentDocumentHighlightParams(messageParams);
       TextDocumentDocumentHighlightResult result =
-        handleTextDocumentDocumentHighlight(*requestParams);
+        receiveTextDocument_documentHighlight(*requestParams);
       response.result = transformer.textDocumentDocumentHighlightResultToAny(result);
       break;
     }
@@ -570,7 +570,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentSymbolParams> requestParams =
         transformer.asTextDocumentDocumentSymbolParams(messageParams);
       TextDocumentDocumentSymbolResult result =
-        handleTextDocumentDocumentSymbol(*requestParams);
+        receiveTextDocument_documentSymbol(*requestParams);
       response.result = transformer.textDocumentDocumentSymbolResultToAny(result);
       break;
     }
@@ -579,7 +579,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CodeActionParams> requestParams =
         transformer.asTextDocumentCodeActionParams(messageParams);
       TextDocumentCodeActionResult result =
-        handleTextDocumentCodeAction(*requestParams);
+        receiveTextDocument_codeAction(*requestParams);
       response.result = transformer.textDocumentCodeActionResultToAny(result);
       break;
     }
@@ -588,7 +588,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CodeAction> requestParams =
         transformer.asCodeActionResolveParams(messageParams);
       CodeActionResolveResult result =
-        handleCodeActionResolve(*requestParams);
+        receiveCodeAction_resolve(*requestParams);
       response.result = transformer.codeActionResolveResultToAny(result);
       break;
     }
@@ -597,7 +597,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<WorkspaceSymbolParams> requestParams =
         transformer.asWorkspaceSymbolParams(messageParams);
       WorkspaceSymbolResult result =
-        handleWorkspaceSymbol(*requestParams);
+        receiveWorkspace_symbol(*requestParams);
       response.result = transformer.workspaceSymbolResultToAny(result);
       break;
     }
@@ -606,7 +606,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<WorkspaceSymbol> requestParams =
         transformer.asWorkspaceSymbolResolveParams(messageParams);
       WorkspaceSymbolResolveResult result =
-        handleWorkspaceSymbolResolve(*requestParams);
+        receiveWorkspaceSymbol_resolve(*requestParams);
       response.result = transformer.workspaceSymbolResolveResultToAny(result);
       break;
     }
@@ -615,7 +615,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CodeLensParams> requestParams =
         transformer.asTextDocumentCodeLensParams(messageParams);
       TextDocumentCodeLensResult result =
-        handleTextDocumentCodeLens(*requestParams);
+        receiveTextDocument_codeLens(*requestParams);
       response.result = transformer.textDocumentCodeLensResultToAny(result);
       break;
     }
@@ -624,7 +624,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<CodeLens> requestParams =
         transformer.asCodeLensResolveParams(messageParams);
       CodeLensResolveResult result =
-        handleCodeLensResolve(*requestParams);
+        receiveCodeLens_resolve(*requestParams);
       response.result = transformer.codeLensResolveResultToAny(result);
       break;
     }
@@ -633,7 +633,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentLinkParams> requestParams =
         transformer.asTextDocumentDocumentLinkParams(messageParams);
       TextDocumentDocumentLinkResult result =
-        handleTextDocumentDocumentLink(*requestParams);
+        receiveTextDocument_documentLink(*requestParams);
       response.result = transformer.textDocumentDocumentLinkResultToAny(result);
       break;
     }
@@ -642,7 +642,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentLink> requestParams =
         transformer.asDocumentLinkResolveParams(messageParams);
       DocumentLinkResolveResult result =
-        handleDocumentLinkResolve(*requestParams);
+        receiveDocumentLink_resolve(*requestParams);
       response.result = transformer.documentLinkResolveResultToAny(result);
       break;
     }
@@ -651,7 +651,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentFormattingParams> requestParams =
         transformer.asTextDocumentFormattingParams(messageParams);
       TextDocumentFormattingResult result =
-        handleTextDocumentFormatting(*requestParams);
+        receiveTextDocument_formatting(*requestParams);
       response.result = transformer.textDocumentFormattingResultToAny(result);
       break;
     }
@@ -660,7 +660,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentRangeFormattingParams> requestParams =
         transformer.asTextDocumentRangeFormattingParams(messageParams);
       TextDocumentRangeFormattingResult result =
-        handleTextDocumentRangeFormatting(*requestParams);
+        receiveTextDocument_rangeFormatting(*requestParams);
       response.result = transformer.textDocumentRangeFormattingResultToAny(result);
       break;
     }
@@ -669,7 +669,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentRangesFormattingParams> requestParams =
         transformer.asTextDocumentRangesFormattingParams(messageParams);
       TextDocumentRangesFormattingResult result =
-        handleTextDocumentRangesFormatting(*requestParams);
+        receiveTextDocument_rangesFormatting(*requestParams);
       response.result = transformer.textDocumentRangesFormattingResultToAny(result);
       break;
     }
@@ -678,7 +678,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<DocumentOnTypeFormattingParams> requestParams =
         transformer.asTextDocumentOnTypeFormattingParams(messageParams);
       TextDocumentOnTypeFormattingResult result =
-        handleTextDocumentOnTypeFormatting(*requestParams);
+        receiveTextDocument_onTypeFormatting(*requestParams);
       response.result = transformer.textDocumentOnTypeFormattingResultToAny(result);
       break;
     }
@@ -687,7 +687,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<RenameParams> requestParams =
         transformer.asTextDocumentRenameParams(messageParams);
       TextDocumentRenameResult result =
-        handleTextDocumentRename(*requestParams);
+        receiveTextDocument_rename(*requestParams);
       response.result = transformer.textDocumentRenameResultToAny(result);
       break;
     }
@@ -696,7 +696,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<PrepareRenameParams> requestParams =
         transformer.asTextDocumentPrepareRenameParams(messageParams);
       TextDocumentPrepareRenameResult result =
-        handleTextDocumentPrepareRename(*requestParams);
+        receiveTextDocument_prepareRename(*requestParams);
       response.result = transformer.textDocumentPrepareRenameResultToAny(result);
       break;
     }
@@ -705,25 +705,21 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_ptr<ExecuteCommandParams> requestParams =
         transformer.asWorkspaceExecuteCommandParams(messageParams);
       WorkspaceExecuteCommandResult result =
-        handleWorkspaceExecuteCommand(*requestParams);
+        receiveWorkspace_executeCommand(*requestParams);
       response.result = transformer.workspaceExecuteCommandResultToAny(result);
       break;
     }
     default: {
     invalidMethod:
-      throw LspException(
-        ErrorCodes::METHOD_NOT_FOUND,
-        std::format(
-          "Unsupported request method: \"{}\"",
-          request.method
-        )
-      );
+      std::stringstream ss;
+      ss << "Unsupported request method: \"" << request.method << "\"";
+      throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());
     }
     }
   }
 
   auto LspLanguageServer::dispatch(
-    ResponseMessage &response,
+    ResponseMessage &/*response*/,
     NotificationMessage &notification
   ) -> void {
     IncomingNotification method;
@@ -745,141 +741,345 @@ namespace LCompilers::LanguageServerProtocol {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidChangeWorkspaceFoldersParams> notificationParams =
         transformer.asWorkspaceDidChangeWorkspaceFoldersParams(messageParams);
-      handleWorkspaceDidChangeWorkspaceFolders(*notificationParams);
+      receiveWorkspace_didChangeWorkspaceFolders(*notificationParams);
       break;
     }
     case IncomingNotification::WINDOW_WORK_DONE_PROGRESS_CANCEL: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<WorkDoneProgressCancelParams> notificationParams =
         transformer.asWindowWorkDoneProgressCancelParams(messageParams);
-      handleWindowWorkDoneProgressCancel(*notificationParams);
+      receiveWindow_workDoneProgress_cancel(*notificationParams);
       break;
     }
     case IncomingNotification::WORKSPACE_DID_CREATE_FILES: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<CreateFilesParams> notificationParams =
         transformer.asWorkspaceDidCreateFilesParams(messageParams);
-      handleWorkspaceDidCreateFiles(*notificationParams);
+      receiveWorkspace_didCreateFiles(*notificationParams);
       break;
     }
     case IncomingNotification::WORKSPACE_DID_RENAME_FILES: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<RenameFilesParams> notificationParams =
         transformer.asWorkspaceDidRenameFilesParams(messageParams);
-      handleWorkspaceDidRenameFiles(*notificationParams);
+      receiveWorkspace_didRenameFiles(*notificationParams);
       break;
     }
     case IncomingNotification::WORKSPACE_DID_DELETE_FILES: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DeleteFilesParams> notificationParams =
         transformer.asWorkspaceDidDeleteFilesParams(messageParams);
-      handleWorkspaceDidDeleteFiles(*notificationParams);
+      receiveWorkspace_didDeleteFiles(*notificationParams);
       break;
     }
     case IncomingNotification::NOTEBOOK_DOCUMENT_DID_OPEN: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidOpenNotebookDocumentParams> notificationParams =
         transformer.asNotebookDocumentDidOpenParams(messageParams);
-      handleNotebookDocumentDidOpen(*notificationParams);
+      receiveNotebookDocument_didOpen(*notificationParams);
       break;
     }
     case IncomingNotification::NOTEBOOK_DOCUMENT_DID_CHANGE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidChangeNotebookDocumentParams> notificationParams =
         transformer.asNotebookDocumentDidChangeParams(messageParams);
-      handleNotebookDocumentDidChange(*notificationParams);
+      receiveNotebookDocument_didChange(*notificationParams);
       break;
     }
     case IncomingNotification::NOTEBOOK_DOCUMENT_DID_SAVE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidSaveNotebookDocumentParams> notificationParams =
         transformer.asNotebookDocumentDidSaveParams(messageParams);
-      handleNotebookDocumentDidSave(*notificationParams);
+      receiveNotebookDocument_didSave(*notificationParams);
       break;
     }
     case IncomingNotification::NOTEBOOK_DOCUMENT_DID_CLOSE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidCloseNotebookDocumentParams> notificationParams =
         transformer.asNotebookDocumentDidCloseParams(messageParams);
-      handleNotebookDocumentDidClose(*notificationParams);
+      receiveNotebookDocument_didClose(*notificationParams);
       break;
     }
     case IncomingNotification::INITIALIZED: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<InitializedParams> notificationParams =
         transformer.asInitializedParams(messageParams);
-      handleInitialized(*notificationParams);
+      receiveInitialized(*notificationParams);
       break;
     }
     case IncomingNotification::EXIT: {
-      handleExit();
+      receiveExit();
       break;
     }
     case IncomingNotification::WORKSPACE_DID_CHANGE_CONFIGURATION: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidChangeConfigurationParams> notificationParams =
         transformer.asWorkspaceDidChangeConfigurationParams(messageParams);
-      handleWorkspaceDidChangeConfiguration(*notificationParams);
+      receiveWorkspace_didChangeConfiguration(*notificationParams);
       break;
     }
     case IncomingNotification::TEXT_DOCUMENT_DID_OPEN: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidOpenTextDocumentParams> notificationParams =
         transformer.asTextDocumentDidOpenParams(messageParams);
-      handleTextDocumentDidOpen(*notificationParams);
+      receiveTextDocument_didOpen(*notificationParams);
       break;
     }
     case IncomingNotification::TEXT_DOCUMENT_DID_CHANGE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidChangeTextDocumentParams> notificationParams =
         transformer.asTextDocumentDidChangeParams(messageParams);
-      handleTextDocumentDidChange(*notificationParams);
+      receiveTextDocument_didChange(*notificationParams);
       break;
     }
     case IncomingNotification::TEXT_DOCUMENT_DID_CLOSE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidCloseTextDocumentParams> notificationParams =
         transformer.asTextDocumentDidCloseParams(messageParams);
-      handleTextDocumentDidClose(*notificationParams);
+      receiveTextDocument_didClose(*notificationParams);
       break;
     }
     case IncomingNotification::TEXT_DOCUMENT_DID_SAVE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidSaveTextDocumentParams> notificationParams =
         transformer.asTextDocumentDidSaveParams(messageParams);
-      handleTextDocumentDidSave(*notificationParams);
+      receiveTextDocument_didSave(*notificationParams);
       break;
     }
     case IncomingNotification::TEXT_DOCUMENT_WILL_SAVE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<WillSaveTextDocumentParams> notificationParams =
         transformer.asTextDocumentWillSaveParams(messageParams);
-      handleTextDocumentWillSave(*notificationParams);
+      receiveTextDocument_willSave(*notificationParams);
       break;
     }
     case IncomingNotification::WORKSPACE_DID_CHANGE_WATCHED_FILES: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<DidChangeWatchedFilesParams> notificationParams =
         transformer.asWorkspaceDidChangeWatchedFilesParams(messageParams);
-      handleWorkspaceDidChangeWatchedFiles(*notificationParams);
+      receiveWorkspace_didChangeWatchedFiles(*notificationParams);
       break;
     }
     case IncomingNotification::SET_TRACE: {
       MessageParams &messageParams = requireMessageParams(notification);
       std::unique_ptr<SetTraceParams> notificationParams =
         transformer.asSetTraceParams(messageParams);
-      handleSetTrace(*notificationParams);
+      receiveSetTrace(*notificationParams);
       break;
     }
     default: {
     invalidMethod:
-      throw LspException(
-        ErrorCodes::METHOD_NOT_FOUND,
-        std::format(
-          "Unsupported notification method: \"{}\"",
-          notification.method
-        )
-      );
+      std::stringstream ss;
+      ss << "Unsupported notification method: \"" << notification.method << "\"";
+      throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());
+    }
+    }
+  }
+  auto LspLanguageServer::dispatch(ResponseMessage &response) -> void {
+    ResponseIdType responseIdType =
+      static_cast<ResponseIdType>(response.id.index());
+    if (responseIdType != ResponseIdType::INTEGER_TYPE) {
+      auto loggerLock = logger.lock();
+      logger
+        << "Cannot dispatch response with id of type ResponseIdType::"
+        << ResponseIdTypeNames.at(responseIdType)
+        << std::endl;
+    }
+    int responseId = std::get<int>(response.id);
+    std::string method;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      auto iter = callbacksById.find(responseId);
+      if (iter != callbacksById.end()) {
+        method = iter->second;
+        callbacksById.erase(iter);
+      } else {
+        auto loggerLock = logger.lock();
+        logger << "Cannot locate request with id: " << responseId << std::endl;
+        return;
+      }
+    }
+
+    OutgoingRequest request;
+    try {
+      request = outgoingRequestByValue(method);
+    } catch (std::invalid_argument &e) {
+      goto invalidMethod;
+    }
+
+    switch (request) {
+    case OutgoingRequest::WORKSPACE_WORKSPACE_FOLDERS: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/workspaceFolders\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceWorkspaceFoldersResult params =
+        transformer.anyToWorkspaceWorkspaceFoldersResult(*result);
+      receiveWorkspace_workspaceFolders(params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_CONFIGURATION: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/configuration\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceConfigurationResult params =
+        transformer.anyToWorkspaceConfigurationResult(*result);
+      receiveWorkspace_configuration(params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_FOLDING_RANGE_REFRESH: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/foldingRange/refresh\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceFoldingRangeRefreshResult params =
+        transformer.anyToWorkspaceFoldingRangeRefreshResult(*result);
+      receiveWorkspace_foldingRange_refresh(params);
+      break;
+    }
+    case OutgoingRequest::WINDOW_WORK_DONE_PROGRESS_CREATE: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"window/workDoneProgress/create\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WindowWorkDoneProgressCreateResult params =
+        transformer.anyToWindowWorkDoneProgressCreateResult(*result);
+      receiveWindow_workDoneProgress_create(params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_SEMANTIC_TOKENS_REFRESH: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/semanticTokens/refresh\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceSemanticTokensRefreshResult params =
+        transformer.anyToWorkspaceSemanticTokensRefreshResult(*result);
+      receiveWorkspace_semanticTokens_refresh(params);
+      break;
+    }
+    case OutgoingRequest::WINDOW_SHOW_DOCUMENT: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"window/showDocument\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      std::unique_ptr<WindowShowDocumentResult> params =
+        transformer.anyToWindowShowDocumentResult(*result);
+      receiveWindow_showDocument(*params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_INLINE_VALUE_REFRESH: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/inlineValue/refresh\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceInlineValueRefreshResult params =
+        transformer.anyToWorkspaceInlineValueRefreshResult(*result);
+      receiveWorkspace_inlineValue_refresh(params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_INLAY_HINT_REFRESH: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/inlayHint/refresh\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceInlayHintRefreshResult params =
+        transformer.anyToWorkspaceInlayHintRefreshResult(*result);
+      receiveWorkspace_inlayHint_refresh(params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_DIAGNOSTIC_REFRESH: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/diagnostic/refresh\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceDiagnosticRefreshResult params =
+        transformer.anyToWorkspaceDiagnosticRefreshResult(*result);
+      receiveWorkspace_diagnostic_refresh(params);
+      break;
+    }
+    case OutgoingRequest::CLIENT_REGISTER_CAPABILITY: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"client/registerCapability\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      ClientRegisterCapabilityResult params =
+        transformer.anyToClientRegisterCapabilityResult(*result);
+      receiveClient_registerCapability(params);
+      break;
+    }
+    case OutgoingRequest::CLIENT_UNREGISTER_CAPABILITY: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"client/unregisterCapability\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      ClientUnregisterCapabilityResult params =
+        transformer.anyToClientUnregisterCapabilityResult(*result);
+      receiveClient_unregisterCapability(params);
+      break;
+    }
+    case OutgoingRequest::WINDOW_SHOW_MESSAGE_REQUEST: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"window/showMessageRequest\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WindowShowMessageRequestResult params =
+        transformer.anyToWindowShowMessageRequestResult(*result);
+      receiveWindow_showMessageRequest(params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_CODE_LENS_REFRESH: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/codeLens/refresh\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      WorkspaceCodeLensRefreshResult params =
+        transformer.anyToWorkspaceCodeLensRefreshResult(*result);
+      receiveWorkspace_codeLens_refresh(params);
+      break;
+    }
+    case OutgoingRequest::WORKSPACE_APPLY_EDIT: {
+      if (!response.result.has_value()) {
+        auto loggerLock = logger.lock();
+        logger << "Missing required attribute for method \"workspace/applyEdit\": result" << std::endl;
+        return;
+      }
+      std::unique_ptr<LSPAny> &result = response.result.value();
+      std::unique_ptr<WorkspaceApplyEditResult> params =
+        transformer.anyToWorkspaceApplyEditResult(*result);
+      receiveWorkspace_applyEdit(*params);
+      break;
+    }
+    default: {
+    invalidMethod:
+      auto loggerLock = logger.lock();
+      logger << "Unsupported request method: \"" << method << "\"";
     }
     }
   }
@@ -889,13 +1089,9 @@ namespace LCompilers::LanguageServerProtocol {
     if (request.params.has_value()) {
       return request.params.value();
     }
-    throw LspException(
-      ErrorCodes::INVALID_PARAMS,
-      std::format(
-        "RequestMessage.params must be defined for method=\"{}\"",
-        request.method
-      )
-    );
+    std::stringstream ss;
+    ss << "RequestMessage.params must be defined for method=\"" << request.method << "\"";
+    throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
   }
 
   auto LspLanguageServer::requireMessageParams(
@@ -904,13 +1100,10 @@ namespace LCompilers::LanguageServerProtocol {
     if (notification.params.has_value()) {
       return notification.params.value();
     }
-    throw LspException(
-      ErrorCodes::INVALID_PARAMS,
-      std::format(
-        "NotificationMessage.params must be defined for method=\"{}\"",
-        notification.method
-      )
-    );
+    std::stringstream ss;
+    ss << "NotificationMessage.params must be defined for method=\""
+       << notification.method << "\"";
+    throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
   }
 
   // ================= //
@@ -918,306 +1111,289 @@ namespace LCompilers::LanguageServerProtocol {
   // ================= //
 
   // request: "textDocument/implementation"
-  auto LspLanguageServer::handleTextDocumentImplementation(
-    ImplementationParams &params
+  auto LspLanguageServer::receiveTextDocument_implementation(
+    ImplementationParams &/*params*/
   ) -> TextDocumentImplementationResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/implementation\""
     );
   }
 
   // request: "textDocument/typeDefinition"
-  auto LspLanguageServer::handleTextDocumentTypeDefinition(
-    TypeDefinitionParams &params
+  auto LspLanguageServer::receiveTextDocument_typeDefinition(
+    TypeDefinitionParams &/*params*/
   ) -> TextDocumentTypeDefinitionResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/typeDefinition\""
     );
   }
 
   // request: "textDocument/documentColor"
-  auto LspLanguageServer::handleTextDocumentDocumentColor(
-    DocumentColorParams &params
+  auto LspLanguageServer::receiveTextDocument_documentColor(
+    DocumentColorParams &/*params*/
   ) -> TextDocumentDocumentColorResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/documentColor\""
     );
   }
 
   // request: "textDocument/colorPresentation"
-  auto LspLanguageServer::handleTextDocumentColorPresentation(
-    ColorPresentationParams &params
+  auto LspLanguageServer::receiveTextDocument_colorPresentation(
+    ColorPresentationParams &/*params*/
   ) -> TextDocumentColorPresentationResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/colorPresentation\""
     );
   }
 
   // request: "textDocument/foldingRange"
-  auto LspLanguageServer::handleTextDocumentFoldingRange(
-    FoldingRangeParams &params
+  auto LspLanguageServer::receiveTextDocument_foldingRange(
+    FoldingRangeParams &/*params*/
   ) -> TextDocumentFoldingRangeResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/foldingRange\""
     );
   }
 
   // request: "textDocument/declaration"
-  auto LspLanguageServer::handleTextDocumentDeclaration(
-    DeclarationParams &params
+  auto LspLanguageServer::receiveTextDocument_declaration(
+    DeclarationParams &/*params*/
   ) -> TextDocumentDeclarationResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/declaration\""
     );
   }
 
   // request: "textDocument/selectionRange"
-  auto LspLanguageServer::handleTextDocumentSelectionRange(
-    SelectionRangeParams &params
+  auto LspLanguageServer::receiveTextDocument_selectionRange(
+    SelectionRangeParams &/*params*/
   ) -> TextDocumentSelectionRangeResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/selectionRange\""
     );
   }
 
   // request: "textDocument/prepareCallHierarchy"
-  auto LspLanguageServer::handleTextDocumentPrepareCallHierarchy(
-    CallHierarchyPrepareParams &params
+  auto LspLanguageServer::receiveTextDocument_prepareCallHierarchy(
+    CallHierarchyPrepareParams &/*params*/
   ) -> TextDocumentPrepareCallHierarchyResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/prepareCallHierarchy\""
     );
   }
 
   // request: "callHierarchy/incomingCalls"
-  auto LspLanguageServer::handleCallHierarchyIncomingCalls(
-    CallHierarchyIncomingCallsParams &params
+  auto LspLanguageServer::receiveCallHierarchy_incomingCalls(
+    CallHierarchyIncomingCallsParams &/*params*/
   ) -> CallHierarchyIncomingCallsResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"callHierarchy/incomingCalls\""
     );
   }
 
   // request: "callHierarchy/outgoingCalls"
-  auto LspLanguageServer::handleCallHierarchyOutgoingCalls(
-    CallHierarchyOutgoingCallsParams &params
+  auto LspLanguageServer::receiveCallHierarchy_outgoingCalls(
+    CallHierarchyOutgoingCallsParams &/*params*/
   ) -> CallHierarchyOutgoingCallsResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"callHierarchy/outgoingCalls\""
     );
   }
 
   // request: "textDocument/semanticTokens/full"
-  auto LspLanguageServer::handleTextDocumentSemanticTokensFull(
-    SemanticTokensParams &params
+  auto LspLanguageServer::receiveTextDocument_semanticTokens_full(
+    SemanticTokensParams &/*params*/
   ) -> TextDocumentSemanticTokensFullResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/semanticTokens/full\""
     );
   }
 
   // request: "textDocument/semanticTokens/full/delta"
-  auto LspLanguageServer::handleTextDocumentSemanticTokensFullDelta(
-    SemanticTokensDeltaParams &params
+  auto LspLanguageServer::receiveTextDocument_semanticTokens_full_delta(
+    SemanticTokensDeltaParams &/*params*/
   ) -> TextDocumentSemanticTokensFullDeltaResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/semanticTokens/full/delta\""
     );
   }
 
   // request: "textDocument/semanticTokens/range"
-  auto LspLanguageServer::handleTextDocumentSemanticTokensRange(
-    SemanticTokensRangeParams &params
+  auto LspLanguageServer::receiveTextDocument_semanticTokens_range(
+    SemanticTokensRangeParams &/*params*/
   ) -> TextDocumentSemanticTokensRangeResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/semanticTokens/range\""
     );
   }
 
   // request: "textDocument/linkedEditingRange"
-  auto LspLanguageServer::handleTextDocumentLinkedEditingRange(
-    LinkedEditingRangeParams &params
+  auto LspLanguageServer::receiveTextDocument_linkedEditingRange(
+    LinkedEditingRangeParams &/*params*/
   ) -> TextDocumentLinkedEditingRangeResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/linkedEditingRange\""
     );
   }
 
   // request: "workspace/willCreateFiles"
-  auto LspLanguageServer::handleWorkspaceWillCreateFiles(
-    CreateFilesParams &params
+  auto LspLanguageServer::receiveWorkspace_willCreateFiles(
+    CreateFilesParams &/*params*/
   ) -> WorkspaceWillCreateFilesResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/willCreateFiles\""
     );
   }
 
   // request: "workspace/willRenameFiles"
-  auto LspLanguageServer::handleWorkspaceWillRenameFiles(
-    RenameFilesParams &params
+  auto LspLanguageServer::receiveWorkspace_willRenameFiles(
+    RenameFilesParams &/*params*/
   ) -> WorkspaceWillRenameFilesResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/willRenameFiles\""
     );
   }
 
   // request: "workspace/willDeleteFiles"
-  auto LspLanguageServer::handleWorkspaceWillDeleteFiles(
-    DeleteFilesParams &params
+  auto LspLanguageServer::receiveWorkspace_willDeleteFiles(
+    DeleteFilesParams &/*params*/
   ) -> WorkspaceWillDeleteFilesResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/willDeleteFiles\""
     );
   }
 
   // request: "textDocument/moniker"
-  auto LspLanguageServer::handleTextDocumentMoniker(
-    MonikerParams &params
+  auto LspLanguageServer::receiveTextDocument_moniker(
+    MonikerParams &/*params*/
   ) -> TextDocumentMonikerResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/moniker\""
     );
   }
 
   // request: "textDocument/prepareTypeHierarchy"
-  auto LspLanguageServer::handleTextDocumentPrepareTypeHierarchy(
-    TypeHierarchyPrepareParams &params
+  auto LspLanguageServer::receiveTextDocument_prepareTypeHierarchy(
+    TypeHierarchyPrepareParams &/*params*/
   ) -> TextDocumentPrepareTypeHierarchyResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/prepareTypeHierarchy\""
     );
   }
 
   // request: "typeHierarchy/supertypes"
-  auto LspLanguageServer::handleTypeHierarchySupertypes(
-    TypeHierarchySupertypesParams &params
+  auto LspLanguageServer::receiveTypeHierarchy_supertypes(
+    TypeHierarchySupertypesParams &/*params*/
   ) -> TypeHierarchySupertypesResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"typeHierarchy/supertypes\""
     );
   }
 
   // request: "typeHierarchy/subtypes"
-  auto LspLanguageServer::handleTypeHierarchySubtypes(
-    TypeHierarchySubtypesParams &params
+  auto LspLanguageServer::receiveTypeHierarchy_subtypes(
+    TypeHierarchySubtypesParams &/*params*/
   ) -> TypeHierarchySubtypesResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"typeHierarchy/subtypes\""
     );
   }
 
   // request: "textDocument/inlineValue"
-  auto LspLanguageServer::handleTextDocumentInlineValue(
-    InlineValueParams &params
+  auto LspLanguageServer::receiveTextDocument_inlineValue(
+    InlineValueParams &/*params*/
   ) -> TextDocumentInlineValueResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/inlineValue\""
     );
   }
 
   // request: "textDocument/inlayHint"
-  auto LspLanguageServer::handleTextDocumentInlayHint(
-    InlayHintParams &params
+  auto LspLanguageServer::receiveTextDocument_inlayHint(
+    InlayHintParams &/*params*/
   ) -> TextDocumentInlayHintResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/inlayHint\""
     );
   }
 
   // request: "inlayHint/resolve"
-  auto LspLanguageServer::handleInlayHintResolve(
-    InlayHint &params
+  auto LspLanguageServer::receiveInlayHint_resolve(
+    InlayHint &/*params*/
   ) -> InlayHintResolveResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"inlayHint/resolve\""
     );
   }
 
   // request: "textDocument/diagnostic"
-  auto LspLanguageServer::handleTextDocumentDiagnostic(
-    DocumentDiagnosticParams &params
+  auto LspLanguageServer::receiveTextDocument_diagnostic(
+    DocumentDiagnosticParams &/*params*/
   ) -> TextDocumentDiagnosticResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/diagnostic\""
     );
   }
 
   // request: "workspace/diagnostic"
-  auto LspLanguageServer::handleWorkspaceDiagnostic(
-    WorkspaceDiagnosticParams &params
+  auto LspLanguageServer::receiveWorkspace_diagnostic(
+    WorkspaceDiagnosticParams &/*params*/
   ) -> WorkspaceDiagnosticResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/diagnostic\""
     );
   }
 
   // request: "textDocument/inlineCompletion"
-  auto LspLanguageServer::handleTextDocumentInlineCompletion(
-    InlineCompletionParams &params
+  auto LspLanguageServer::receiveTextDocument_inlineCompletion(
+    InlineCompletionParams &/*params*/
   ) -> TextDocumentInlineCompletionResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/inlineCompletion\""
     );
   }
 
   // request: "initialize"
-  auto LspLanguageServer::handleInitialize(
-    InitializeParams &params
+  auto LspLanguageServer::receiveInitialize(
+    InitializeParams &/*params*/
   ) -> InitializeResult {
     InitializeResult result;
 
     std::unique_ptr<ServerCapabilities> capabilities =
       std::make_unique<ServerCapabilities>();
 
-    // ------------------------- //
-    // TextDocument Sync Options //
-    // ------------------------- //
-    ServerCapabilities_textDocumentSync textDocumentSync;
-    std::unique_ptr<TextDocumentSyncOptions> textDocumentSyncOptions =
-      std::make_unique<TextDocumentSyncOptions>();
-    textDocumentSyncOptions->openClose = true;
-    textDocumentSyncOptions->change = TextDocumentSyncKind::INCREMENTAL;
-    TextDocumentSyncOptions_save save;
-    std::unique_ptr<SaveOptions> saveOptions = std::make_unique<SaveOptions>();
-    saveOptions->includeText = true;
-    save = std::move(saveOptions);
-    textDocumentSyncOptions->save = std::move(save);
-    textDocumentSync = std::move(textDocumentSyncOptions);
-    capabilities->textDocumentSync = std::move(textDocumentSync);
-    result.capabilities = std::move(capabilities);
-
     return result;
   }
 
   // request: "shutdown"
-  auto LspLanguageServer::handleShutdown() -> ShutdownResult {
+  auto LspLanguageServer::receiveShutdown() -> ShutdownResult {
     bool shutdown = false;
     if (_shutdown.compare_exchange_strong(shutdown, true)) {
       logger << "Shutting down server." << std::endl;
@@ -1226,240 +1402,240 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   // request: "textDocument/willSaveWaitUntil"
-  auto LspLanguageServer::handleTextDocumentWillSaveWaitUntil(
-    WillSaveTextDocumentParams &params
+  auto LspLanguageServer::receiveTextDocument_willSaveWaitUntil(
+    WillSaveTextDocumentParams &/*params*/
   ) -> TextDocumentWillSaveWaitUntilResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/willSaveWaitUntil\""
     );
   }
 
   // request: "textDocument/completion"
-  auto LspLanguageServer::handleTextDocumentCompletion(
-    CompletionParams &params
+  auto LspLanguageServer::receiveTextDocument_completion(
+    CompletionParams &/*params*/
   ) -> TextDocumentCompletionResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/completion\""
     );
   }
 
   // request: "completionItem/resolve"
-  auto LspLanguageServer::handleCompletionItemResolve(
-    CompletionItem &params
+  auto LspLanguageServer::receiveCompletionItem_resolve(
+    CompletionItem &/*params*/
   ) -> CompletionItemResolveResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"completionItem/resolve\""
     );
   }
 
   // request: "textDocument/hover"
-  auto LspLanguageServer::handleTextDocumentHover(
-    HoverParams &params
+  auto LspLanguageServer::receiveTextDocument_hover(
+    HoverParams &/*params*/
   ) -> TextDocumentHoverResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/hover\""
     );
   }
 
   // request: "textDocument/signatureHelp"
-  auto LspLanguageServer::handleTextDocumentSignatureHelp(
-    SignatureHelpParams &params
+  auto LspLanguageServer::receiveTextDocument_signatureHelp(
+    SignatureHelpParams &/*params*/
   ) -> TextDocumentSignatureHelpResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/signatureHelp\""
     );
   }
 
   // request: "textDocument/definition"
-  auto LspLanguageServer::handleTextDocumentDefinition(
-    DefinitionParams &params
+  auto LspLanguageServer::receiveTextDocument_definition(
+    DefinitionParams &/*params*/
   ) -> TextDocumentDefinitionResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/definition\""
     );
   }
 
   // request: "textDocument/references"
-  auto LspLanguageServer::handleTextDocumentReferences(
-    ReferenceParams &params
+  auto LspLanguageServer::receiveTextDocument_references(
+    ReferenceParams &/*params*/
   ) -> TextDocumentReferencesResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/references\""
     );
   }
 
   // request: "textDocument/documentHighlight"
-  auto LspLanguageServer::handleTextDocumentDocumentHighlight(
-    DocumentHighlightParams &params
+  auto LspLanguageServer::receiveTextDocument_documentHighlight(
+    DocumentHighlightParams &/*params*/
   ) -> TextDocumentDocumentHighlightResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/documentHighlight\""
     );
   }
 
   // request: "textDocument/documentSymbol"
-  auto LspLanguageServer::handleTextDocumentDocumentSymbol(
-    DocumentSymbolParams &params
+  auto LspLanguageServer::receiveTextDocument_documentSymbol(
+    DocumentSymbolParams &/*params*/
   ) -> TextDocumentDocumentSymbolResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/documentSymbol\""
     );
   }
 
   // request: "textDocument/codeAction"
-  auto LspLanguageServer::handleTextDocumentCodeAction(
-    CodeActionParams &params
+  auto LspLanguageServer::receiveTextDocument_codeAction(
+    CodeActionParams &/*params*/
   ) -> TextDocumentCodeActionResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/codeAction\""
     );
   }
 
   // request: "codeAction/resolve"
-  auto LspLanguageServer::handleCodeActionResolve(
-    CodeAction &params
+  auto LspLanguageServer::receiveCodeAction_resolve(
+    CodeAction &/*params*/
   ) -> CodeActionResolveResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"codeAction/resolve\""
     );
   }
 
   // request: "workspace/symbol"
-  auto LspLanguageServer::handleWorkspaceSymbol(
-    WorkspaceSymbolParams &params
+  auto LspLanguageServer::receiveWorkspace_symbol(
+    WorkspaceSymbolParams &/*params*/
   ) -> WorkspaceSymbolResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/symbol\""
     );
   }
 
   // request: "workspaceSymbol/resolve"
-  auto LspLanguageServer::handleWorkspaceSymbolResolve(
-    WorkspaceSymbol &params
+  auto LspLanguageServer::receiveWorkspaceSymbol_resolve(
+    WorkspaceSymbol &/*params*/
   ) -> WorkspaceSymbolResolveResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspaceSymbol/resolve\""
     );
   }
 
   // request: "textDocument/codeLens"
-  auto LspLanguageServer::handleTextDocumentCodeLens(
-    CodeLensParams &params
+  auto LspLanguageServer::receiveTextDocument_codeLens(
+    CodeLensParams &/*params*/
   ) -> TextDocumentCodeLensResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/codeLens\""
     );
   }
 
   // request: "codeLens/resolve"
-  auto LspLanguageServer::handleCodeLensResolve(
-    CodeLens &params
+  auto LspLanguageServer::receiveCodeLens_resolve(
+    CodeLens &/*params*/
   ) -> CodeLensResolveResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"codeLens/resolve\""
     );
   }
 
   // request: "textDocument/documentLink"
-  auto LspLanguageServer::handleTextDocumentDocumentLink(
-    DocumentLinkParams &params
+  auto LspLanguageServer::receiveTextDocument_documentLink(
+    DocumentLinkParams &/*params*/
   ) -> TextDocumentDocumentLinkResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/documentLink\""
     );
   }
 
   // request: "documentLink/resolve"
-  auto LspLanguageServer::handleDocumentLinkResolve(
-    DocumentLink &params
+  auto LspLanguageServer::receiveDocumentLink_resolve(
+    DocumentLink &/*params*/
   ) -> DocumentLinkResolveResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"documentLink/resolve\""
     );
   }
 
   // request: "textDocument/formatting"
-  auto LspLanguageServer::handleTextDocumentFormatting(
-    DocumentFormattingParams &params
+  auto LspLanguageServer::receiveTextDocument_formatting(
+    DocumentFormattingParams &/*params*/
   ) -> TextDocumentFormattingResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/formatting\""
     );
   }
 
   // request: "textDocument/rangeFormatting"
-  auto LspLanguageServer::handleTextDocumentRangeFormatting(
-    DocumentRangeFormattingParams &params
+  auto LspLanguageServer::receiveTextDocument_rangeFormatting(
+    DocumentRangeFormattingParams &/*params*/
   ) -> TextDocumentRangeFormattingResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/rangeFormatting\""
     );
   }
 
   // request: "textDocument/rangesFormatting"
-  auto LspLanguageServer::handleTextDocumentRangesFormatting(
-    DocumentRangesFormattingParams &params
+  auto LspLanguageServer::receiveTextDocument_rangesFormatting(
+    DocumentRangesFormattingParams &/*params*/
   ) -> TextDocumentRangesFormattingResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/rangesFormatting\""
     );
   }
 
   // request: "textDocument/onTypeFormatting"
-  auto LspLanguageServer::handleTextDocumentOnTypeFormatting(
-    DocumentOnTypeFormattingParams &params
+  auto LspLanguageServer::receiveTextDocument_onTypeFormatting(
+    DocumentOnTypeFormattingParams &/*params*/
   ) -> TextDocumentOnTypeFormattingResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/onTypeFormatting\""
     );
   }
 
   // request: "textDocument/rename"
-  auto LspLanguageServer::handleTextDocumentRename(
-    RenameParams &params
+  auto LspLanguageServer::receiveTextDocument_rename(
+    RenameParams &/*params*/
   ) -> TextDocumentRenameResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/rename\""
     );
   }
 
   // request: "textDocument/prepareRename"
-  auto LspLanguageServer::handleTextDocumentPrepareRename(
-    PrepareRenameParams &params
+  auto LspLanguageServer::receiveTextDocument_prepareRename(
+    PrepareRenameParams &/*params*/
   ) -> TextDocumentPrepareRenameResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/prepareRename\""
     );
   }
 
   // request: "workspace/executeCommand"
-  auto LspLanguageServer::handleWorkspaceExecuteCommand(
-    ExecuteCommandParams &params
+  auto LspLanguageServer::receiveWorkspace_executeCommand(
+    ExecuteCommandParams &/*params*/
   ) -> WorkspaceExecuteCommandResult {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/executeCommand\""
     );
@@ -1470,216 +1646,198 @@ namespace LCompilers::LanguageServerProtocol {
   // ====================== //
 
   // notification: "workspace/didChangeWorkspaceFolders"
-  auto LspLanguageServer::handleWorkspaceDidChangeWorkspaceFolders(
-    DidChangeWorkspaceFoldersParams &params
+  auto LspLanguageServer::receiveWorkspace_didChangeWorkspaceFolders(
+    DidChangeWorkspaceFoldersParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/didChangeWorkspaceFolders\""
     );
   }
 
   // notification: "window/workDoneProgress/cancel"
-  auto LspLanguageServer::handleWindowWorkDoneProgressCancel(
-    WorkDoneProgressCancelParams &params
+  auto LspLanguageServer::receiveWindow_workDoneProgress_cancel(
+    WorkDoneProgressCancelParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"window/workDoneProgress/cancel\""
     );
   }
 
   // notification: "workspace/didCreateFiles"
-  auto LspLanguageServer::handleWorkspaceDidCreateFiles(
-    CreateFilesParams &params
+  auto LspLanguageServer::receiveWorkspace_didCreateFiles(
+    CreateFilesParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/didCreateFiles\""
     );
   }
 
   // notification: "workspace/didRenameFiles"
-  auto LspLanguageServer::handleWorkspaceDidRenameFiles(
-    RenameFilesParams &params
+  auto LspLanguageServer::receiveWorkspace_didRenameFiles(
+    RenameFilesParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/didRenameFiles\""
     );
   }
 
   // notification: "workspace/didDeleteFiles"
-  auto LspLanguageServer::handleWorkspaceDidDeleteFiles(
-    DeleteFilesParams &params
+  auto LspLanguageServer::receiveWorkspace_didDeleteFiles(
+    DeleteFilesParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/didDeleteFiles\""
     );
   }
 
   // notification: "notebookDocument/didOpen"
-  auto LspLanguageServer::handleNotebookDocumentDidOpen(
-    DidOpenNotebookDocumentParams &params
+  auto LspLanguageServer::receiveNotebookDocument_didOpen(
+    DidOpenNotebookDocumentParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"notebookDocument/didOpen\""
     );
   }
 
   // notification: "notebookDocument/didChange"
-  auto LspLanguageServer::handleNotebookDocumentDidChange(
-    DidChangeNotebookDocumentParams &params
+  auto LspLanguageServer::receiveNotebookDocument_didChange(
+    DidChangeNotebookDocumentParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"notebookDocument/didChange\""
     );
   }
 
   // notification: "notebookDocument/didSave"
-  auto LspLanguageServer::handleNotebookDocumentDidSave(
-    DidSaveNotebookDocumentParams &params
+  auto LspLanguageServer::receiveNotebookDocument_didSave(
+    DidSaveNotebookDocumentParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"notebookDocument/didSave\""
     );
   }
 
   // notification: "notebookDocument/didClose"
-  auto LspLanguageServer::handleNotebookDocumentDidClose(
-    DidCloseNotebookDocumentParams &params
+  auto LspLanguageServer::receiveNotebookDocument_didClose(
+    DidCloseNotebookDocumentParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"notebookDocument/didClose\""
     );
   }
 
   // notification: "initialized"
-  auto LspLanguageServer::handleInitialized(
-    InitializedParams &params
+  auto LspLanguageServer::receiveInitialized(
+    InitializedParams &/*params*/
   ) -> void {
     // empty
   }
 
   // notification: "exit"
-  auto LspLanguageServer::handleExit() -> void {
+  auto LspLanguageServer::receiveExit() -> void {
     bool exit = false;
     if (_exit.compare_exchange_strong(exit, true)) {
       logger << "Exiting server." << std::endl;
       bool shutdown = false;
       if (_shutdown.compare_exchange_strong(shutdown, true)) {
+        auto loggerLock = logger.lock();
         logger
           << "Server exited before being notified to shutdown!"
           << std::endl;
       }
+      incomingMessages.stop();
+      requestPool.stop();
+      workerPool.stop();
+      requestPool.join();
+      workerPool.join();
+      listener.join();
     }
   }
 
   // notification: "workspace/didChangeConfiguration"
-  auto LspLanguageServer::handleWorkspaceDidChangeConfiguration(
-    DidChangeConfigurationParams &params
+  auto LspLanguageServer::receiveWorkspace_didChangeConfiguration(
+    DidChangeConfigurationParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/didChangeConfiguration\""
     );
   }
 
   // notification: "textDocument/didOpen"
-  auto LspLanguageServer::handleTextDocumentDidOpen(
-    DidOpenTextDocumentParams &params
+  auto LspLanguageServer::receiveTextDocument_didOpen(
+    DidOpenTextDocumentParams &/*params*/
   ) -> void {
-    const TextDocumentItem &textDocumentItem = *params.textDocument;
-    const DocumentUri &uri = textDocumentItem.uri;
-    const std::string &text = textDocumentItem.text;
-    {
-      std::unique_lock<std::shared_mutex> writeLock(readWriteMutex);
-      textDocuments.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(uri),
-        std::forward_as_tuple(uri, text, logger)
-      );
-    }
+    throw LSP_EXCEPTION(
+      ErrorCodes::METHOD_NOT_FOUND,
+      "No handler exists for method: \"textDocument/didOpen\""
+    );
   }
 
   // notification: "textDocument/didChange"
-  auto LspLanguageServer::handleTextDocumentDidChange(
-    DidChangeTextDocumentParams &params
+  auto LspLanguageServer::receiveTextDocument_didChange(
+    DidChangeTextDocumentParams &/*params*/
   ) -> void {
-    const DocumentUri &uri = params.textDocument->uri;
-    {
-      std::shared_lock<std::shared_mutex> readLock(readWriteMutex);
-      TextDocument &textDocument = textDocuments.at(uri);
-      readLock.unlock();
-      textDocument.apply(params.contentChanges);
-    }
+    throw LSP_EXCEPTION(
+      ErrorCodes::METHOD_NOT_FOUND,
+      "No handler exists for method: \"textDocument/didChange\""
+    );
   }
 
   // notification: "textDocument/didClose"
-  auto LspLanguageServer::handleTextDocumentDidClose(
-    DidCloseTextDocumentParams &params
+  auto LspLanguageServer::receiveTextDocument_didClose(
+    DidCloseTextDocumentParams &/*params*/
   ) -> void {
-    const DocumentUri &uri = params.textDocument->uri;
-    {
-      std::shared_lock<std::shared_mutex> readLock(readWriteMutex);
-      auto pos = textDocuments.find(uri);
-      readLock.unlock();
-      if (pos != textDocuments.end()) {
-        std::unique_lock<std::shared_mutex> writeLock(readWriteMutex);
-        pos = textDocuments.find(uri);
-        if (pos != textDocuments.end()) {
-          textDocuments.erase(pos);
-        }
-      }
-    }
+    throw LSP_EXCEPTION(
+      ErrorCodes::METHOD_NOT_FOUND,
+      "No handler exists for method: \"textDocument/didClose\""
+    );
   }
 
   // notification: "textDocument/didSave"
-  auto LspLanguageServer::handleTextDocumentDidSave(
-    DidSaveTextDocumentParams &params
+  auto LspLanguageServer::receiveTextDocument_didSave(
+    DidSaveTextDocumentParams &/*params*/
   ) -> void {
-    if (params.text.has_value()) {
-      const std::string &text = params.text.value();
-      const DocumentUri &uri = params.textDocument->uri;
-      {
-        std::shared_lock<std::shared_mutex> readLock(readWriteMutex);
-        TextDocument &textDocument = textDocuments.at(uri);
-        readLock.unlock();
-        textDocument.setText(text);
-      }
-    }
+    throw LSP_EXCEPTION(
+      ErrorCodes::METHOD_NOT_FOUND,
+      "No handler exists for method: \"textDocument/didSave\""
+    );
   }
 
   // notification: "textDocument/willSave"
-  auto LspLanguageServer::handleTextDocumentWillSave(
-    WillSaveTextDocumentParams &params
+  auto LspLanguageServer::receiveTextDocument_willSave(
+    WillSaveTextDocumentParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"textDocument/willSave\""
     );
   }
 
   // notification: "workspace/didChangeWatchedFiles"
-  auto LspLanguageServer::handleWorkspaceDidChangeWatchedFiles(
-    DidChangeWatchedFilesParams &params
+  auto LspLanguageServer::receiveWorkspace_didChangeWatchedFiles(
+    DidChangeWatchedFilesParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"workspace/didChangeWatchedFiles\""
     );
   }
 
   // notification: "$/setTrace"
-  auto LspLanguageServer::handleSetTrace(
-    SetTraceParams &params
+  auto LspLanguageServer::receiveSetTrace(
+    SetTraceParams &/*params*/
   ) -> void {
-    throw LspException(
+    throw LSP_EXCEPTION(
       ErrorCodes::METHOD_NOT_FOUND,
       "No handler exists for method: \"$/setTrace\""
     );
@@ -1690,164 +1848,346 @@ namespace LCompilers::LanguageServerProtocol {
   // ================= //
 
   // request: "workspace/workspaceFolders"
-  auto LspLanguageServer::requestWorkspaceWorkspaceFolders() -> void {
+  auto LspLanguageServer::sendWorkspace_workspaceFolders() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/workspaceFolders");
+    }
     request.method = "workspace/workspaceFolders";
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_workspaceFolders(
+    WorkspaceWorkspaceFoldersResult &/*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/workspaceFolders\"" << std::endl;
   }
 
   // request: "workspace/configuration"
-  auto LspLanguageServer::requestWorkspaceConfiguration(
+  auto LspLanguageServer::sendWorkspace_configuration(
     ConfigurationParams &params
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/configuration");
+    }
     request.method = "workspace/configuration";
     request.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_configuration(
+    WorkspaceConfigurationResult &/*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/configuration\"" << std::endl;
   }
 
   // request: "workspace/foldingRange/refresh"
-  auto LspLanguageServer::requestWorkspaceFoldingRangeRefresh() -> void {
+  auto LspLanguageServer::sendWorkspace_foldingRange_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/foldingRange/refresh");
+    }
     request.method = "workspace/foldingRange/refresh";
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_foldingRange_refresh(
+    WorkspaceFoldingRangeRefreshResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/foldingRange/refresh\"" << std::endl;
   }
 
   // request: "window/workDoneProgress/create"
-  auto LspLanguageServer::requestWindowWorkDoneProgressCreate(
+  auto LspLanguageServer::sendWindow_workDoneProgress_create(
     WorkDoneProgressCreateParams &params
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "window/workDoneProgress/create");
+    }
     request.method = "window/workDoneProgress/create";
     request.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWindow_workDoneProgress_create(
+    WindowWorkDoneProgressCreateResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"window/workDoneProgress/create\"" << std::endl;
   }
 
   // request: "workspace/semanticTokens/refresh"
-  auto LspLanguageServer::requestWorkspaceSemanticTokensRefresh() -> void {
+  auto LspLanguageServer::sendWorkspace_semanticTokens_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/semanticTokens/refresh");
+    }
     request.method = "workspace/semanticTokens/refresh";
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_semanticTokens_refresh(
+    WorkspaceSemanticTokensRefreshResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/semanticTokens/refresh\"" << std::endl;
   }
 
   // request: "window/showDocument"
-  auto LspLanguageServer::requestWindowShowDocument(
+  auto LspLanguageServer::sendWindow_showDocument(
     ShowDocumentParams &params
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "window/showDocument");
+    }
     request.method = "window/showDocument";
     request.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWindow_showDocument(
+    WindowShowDocumentResult &/*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"window/showDocument\"" << std::endl;
   }
 
   // request: "workspace/inlineValue/refresh"
-  auto LspLanguageServer::requestWorkspaceInlineValueRefresh() -> void {
+  auto LspLanguageServer::sendWorkspace_inlineValue_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/inlineValue/refresh");
+    }
     request.method = "workspace/inlineValue/refresh";
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_inlineValue_refresh(
+    WorkspaceInlineValueRefreshResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/inlineValue/refresh\"" << std::endl;
   }
 
   // request: "workspace/inlayHint/refresh"
-  auto LspLanguageServer::requestWorkspaceInlayHintRefresh() -> void {
+  auto LspLanguageServer::sendWorkspace_inlayHint_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/inlayHint/refresh");
+    }
     request.method = "workspace/inlayHint/refresh";
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_inlayHint_refresh(
+    WorkspaceInlayHintRefreshResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/inlayHint/refresh\"" << std::endl;
   }
 
   // request: "workspace/diagnostic/refresh"
-  auto LspLanguageServer::requestWorkspaceDiagnosticRefresh() -> void {
+  auto LspLanguageServer::sendWorkspace_diagnostic_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/diagnostic/refresh");
+    }
     request.method = "workspace/diagnostic/refresh";
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_diagnostic_refresh(
+    WorkspaceDiagnosticRefreshResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/diagnostic/refresh\"" << std::endl;
   }
 
   // request: "client/registerCapability"
-  auto LspLanguageServer::requestClientRegisterCapability(
+  auto LspLanguageServer::sendClient_registerCapability(
     RegistrationParams &params
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "client/registerCapability");
+    }
     request.method = "client/registerCapability";
     request.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveClient_registerCapability(
+    ClientRegisterCapabilityResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"client/registerCapability\"" << std::endl;
   }
 
   // request: "client/unregisterCapability"
-  auto LspLanguageServer::requestClientUnregisterCapability(
+  auto LspLanguageServer::sendClient_unregisterCapability(
     UnregistrationParams &params
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "client/unregisterCapability");
+    }
     request.method = "client/unregisterCapability";
     request.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveClient_unregisterCapability(
+    ClientUnregisterCapabilityResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"client/unregisterCapability\"" << std::endl;
   }
 
   // request: "window/showMessageRequest"
-  auto LspLanguageServer::requestWindowShowMessageRequest(
+  auto LspLanguageServer::sendWindow_showMessageRequest(
     ShowMessageRequestParams &params
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "window/showMessageRequest");
+    }
     request.method = "window/showMessageRequest";
     request.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWindow_showMessageRequest(
+    WindowShowMessageRequestResult &/*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"window/showMessageRequest\"" << std::endl;
   }
 
   // request: "workspace/codeLens/refresh"
-  auto LspLanguageServer::requestWorkspaceCodeLensRefresh() -> void {
+  auto LspLanguageServer::sendWorkspace_codeLens_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/codeLens/refresh");
+    }
     request.method = "workspace/codeLens/refresh";
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_codeLens_refresh(
+    WorkspaceCodeLensRefreshResult /*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/codeLens/refresh\"" << std::endl;
   }
 
   // request: "workspace/applyEdit"
-  auto LspLanguageServer::requestWorkspaceApplyEdit(
+  auto LspLanguageServer::sendWorkspace_applyEdit(
     ApplyWorkspaceEditParams &params
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    request.id = nextId();
+    int requestId = nextId();
+    request.id = requestId;
+    {
+      std::unique_lock<std::mutex> callbackLock(callbackMutex);
+      callbacksById.emplace(requestId, "workspace/applyEdit");
+    }
     request.method = "workspace/applyEdit";
     request.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeRequest(request);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeRequest(request);
+    send(message);
+  }
+
+  auto LspLanguageServer::receiveWorkspace_applyEdit(
+    WorkspaceApplyEditResult &/*params*/
+  ) -> void {
+    auto loggerLock = logger.lock();
+    logger << "No handler exists for method: \"workspace/applyEdit\"" << std::endl;
   }
 
   // ====================== //
@@ -1855,63 +2195,68 @@ namespace LCompilers::LanguageServerProtocol {
   // ====================== //
 
   // notification: "window/showMessage"
-  auto LspLanguageServer::notifyWindowShowMessage(
+  auto LspLanguageServer::sendWindow_showMessage(
     ShowMessageParams &params
   ) -> void {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "window/showMessage";
     notification.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeNotification(notification);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeNotification(notification);
+    send(message);
   }
 
   // notification: "window/logMessage"
-  auto LspLanguageServer::notifyWindowLogMessage(
+  auto LspLanguageServer::sendWindow_logMessage(
     LogMessageParams &params
   ) -> void {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "window/logMessage";
     notification.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeNotification(notification);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeNotification(notification);
+    send(message);
   }
 
   // notification: "telemetry/event"
-  auto LspLanguageServer::notifyTelemetryEvent(
+  auto LspLanguageServer::sendTelemetry_event(
     LSPAny &params
   ) -> void {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "telemetry/event";
     notification.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeNotification(notification);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeNotification(notification);
+    send(message);
   }
 
   // notification: "textDocument/publishDiagnostics"
-  auto LspLanguageServer::notifyTextDocumentPublishDiagnostics(
+  auto LspLanguageServer::sendTextDocument_publishDiagnostics(
     PublishDiagnosticsParams &params
   ) -> void {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "textDocument/publishDiagnostics";
     notification.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeNotification(notification);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeNotification(notification);
+    send(message);
   }
 
   // notification: "$/logTrace"
-  auto LspLanguageServer::notifyLogTrace(
+  auto LspLanguageServer::sendLogTrace(
     LogTraceParams &params
   ) -> void {
     NotificationMessage notification;
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "$/logTrace";
     notification.params = transformer.asMessageParams(params);
-    const std::string message = serializer.serializeNotification(notification);
-    outgoingMessages.enqueue(message);
+    const std::string message =
+      serializer.serializeNotification(notification);
+    send(message);
   }
 
 } // namespace LCompilers::LanguageServerProtocol

@@ -51,7 +51,9 @@
 
 #include <cpp-terminal/terminal.h>
 #include <cpp-terminal/prompt0.h>
-#include "libasr/lsp.cpp"
+
+#include "bin/lsp/cli.h"
+#include "bin/lsp/interface.h"
 
 #ifdef HAVE_BUILD_TO_WASM
     #include <emscripten/emscripten.h>
@@ -64,6 +66,12 @@ namespace {
 
 using LCompilers::endswith;
 using LCompilers::CompilerOptions;
+
+#ifdef WITH_LSP
+namespace ls = LCompilers::LanguageServer;
+namespace lsl = LCompilers::LanguageServer::Logging;
+namespace lsi = LCompilers::LanguageServer::Interface;
+#endif
 
 enum Backend {
     llvm, c, cpp, x86, wasm, fortran, mlir
@@ -2337,6 +2345,11 @@ int main_app(int argc, char *argv[]) {
     pywrap.add_option("--array-order", arg_pywrap_array_order,
             "Select array order (c, f)")->capture_default_str();
 
+#ifdef WITH_LSP
+    // server
+    lsi::CommandLineInterface lsp_cli;
+    CLI::App &server = lsp_cli.prepare(app);
+#endif
 
     app.get_formatter()->column_width(25);
     app.require_subcommand(0, 1);
@@ -2477,6 +2490,16 @@ int main_app(int argc, char *argv[]) {
         std::cerr << "The backend must be one of: llvm, cpp, x86, wasm, fortran, mlir." << std::endl;
         return 1;
     }
+
+#ifdef WITH_LSP
+    if (server) {
+      lsi::ExitCode exit_code = lsp_cli.validate();
+      if (exit_code == lsi::ExitCode::SUCCESS) {
+        exit_code = lsp_cli.serve();
+      }
+      return static_cast<int>(exit_code);
+    }
+#endif
 
     if (arg_files.size() == 0) {
 #ifdef HAVE_LFORTRAN_LLVM

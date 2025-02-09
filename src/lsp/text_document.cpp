@@ -1,7 +1,7 @@
 #include <algorithm>
-#include <format>
 #include <iostream>
 #include <mutex>
+#include <sstream>
 #include <stdexcept>
 
 #include <lsp/lsp_exception.h>
@@ -12,11 +12,15 @@ namespace LCompilers::LanguageServerProtocol {
 
   TextDocument::TextDocument(
     const DocumentUri &uri,
+    const std::string &languageId,
+    int version,
     const std::string &text,
     lsl::Logger &logger
-  ) : logger(logger)
-    , _uri(uri)
+  ) : _uri(uri)
+    , _languageId(languageId)
+    , _version(version)
     , _text(text)
+    ,  logger(logger)
   {
     validateUriAndSetPath();
     // logger  // DEBUG
@@ -26,20 +30,41 @@ namespace LCompilers::LanguageServerProtocol {
     indexLines();
   }
 
+  TextDocument::TextDocument(TextDocument &&other) noexcept
+    : _uri(std::move(other._uri))
+    , _languageId(std::move(other._languageId))
+    , _version(other._version)
+    , _text(std::move(other._text))
+    , logger(other.logger)
+    , _path(std::move(other._path))
+    , ss(std::move(other.ss))
+    , lineIndices(std::move(other.lineIndices))
+  {
+    // empty
+  }
+
   auto TextDocument::validateUriAndSetPath() -> void {
     std::string path = std::regex_replace(_uri, RE_FILE_URI, "");
     _path = fs::canonical(path);
   }
 
-  auto TextDocument::uri() -> const DocumentUri & {
+  auto TextDocument::uri() const -> const DocumentUri & {
     return _uri;
   }
 
-  auto TextDocument::path() -> const fs::path & {
+  auto TextDocument::path() const -> const fs::path & {
     return _path;
   }
 
-  auto TextDocument::text() -> const std::string & {
+  auto TextDocument::languageId() const -> const std::string & {
+    return _languageId;
+  }
+
+  auto TextDocument::version() const -> int {
+    return _version;
+  }
+
+  auto TextDocument::text() const -> const std::string & {
     return _text;
   }
 
@@ -54,7 +79,8 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::apply(
-    std::vector<TextDocumentContentChangeEvent> &changes
+    std::vector<TextDocumentContentChangeEvent> &changes,
+    int version
   ) -> void {
     std::sort(
       changes.begin(),
@@ -98,6 +124,7 @@ namespace LCompilers::LanguageServerProtocol {
       }
       std::string text = ss.str();
       setText(text);
+      _version = version;
     }
   }
 
@@ -149,7 +176,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto TextDocument::from(
-    const TextDocumentContentChangeEvent_1 &event
+    const TextDocumentContentChangeEvent_1 &/*event*/
   ) const -> std::size_t {
     return 0;
   }
@@ -159,7 +186,7 @@ namespace LCompilers::LanguageServerProtocol {
     std::size_t &j,
     std::size_t &k,
     std::string &patch
-  ) const -> void {
+  ) -> void {
     switch (static_cast<TextDocumentContentChangeEventType>(event.index())) {
     case TextDocumentContentChangeEventType::TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_0: {
       const TextDocumentContentChangeEvent_0 &partial =
@@ -181,31 +208,23 @@ namespace LCompilers::LanguageServerProtocol {
     std::size_t &j,
     std::size_t &k,
     std::string &patch
-  ) const -> void {
+  ) -> void {
     const Range &range = *event.range;
     const Position &start = *range.start;
     const Position &end = *range.end;
 
     if (start.line > end.line) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "start.line must be <= end.line, but {} > {}",
-          start.line,
-          end.line
-        )
-      );
+      ss.str("");
+      ss << "start.line must be <= end.line, but "
+         << start.line << " > " << end.line;
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
     }
 
     if ((start.line == end.line) && (start.character > end.character)) {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "start.character must be <= end.character when colinear, but {} > {}",
-          start.character,
-          end.character
-        )
-      );
+      ss.str("");
+      ss << "start.character must be <= end.character when colinear, but "
+         << start.character << " > " << end.character;
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
     }
 
     if (start.line < lineIndices.size()) {
@@ -213,14 +232,11 @@ namespace LCompilers::LanguageServerProtocol {
     } else if (start.line == lineIndices[lineIndices.size() - 1] + 1) {
       j = _text.length();
     } else {
-      throw LspException(
-        ErrorCodes::INVALID_PARAMS,
-        std::format(
-          "start.line must be <= {} but was: {}",
-          lineIndices[lineIndices.size() - 1] + 1,
-          start.line
-        )
-      );
+      ss.str("");
+      ss << "start.line must be <= "
+         << (lineIndices[lineIndices.size() - 1] + 1)
+         << " but was: " << start.line;
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
     }
 
     if (end.line < lineIndices.size()) {
@@ -237,7 +253,7 @@ namespace LCompilers::LanguageServerProtocol {
     std::size_t &j,
     std::size_t &k,
     std::string &patch
-  ) const -> void {
+  ) -> void {
     j = 0;
     k = _text.length();
     patch = event.text;

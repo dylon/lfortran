@@ -3,22 +3,11 @@
 // specification. Please do not edit it by hand.
 // -----------------------------------------------------------------------------
 
-#include <format>
+#include <sstream>
 #include <stdexcept>
 
 #include <lsp/specification.h>
 namespace LCompilers::LanguageServerProtocol {
-  std::map<LSPAnyType, std::string> LSPAnyTypeNames = {
-    {LSPAnyType::OBJECT_TYPE, "OBJECT_TYPE"},
-    {LSPAnyType::ARRAY_TYPE, "ARRAY_TYPE"},
-    {LSPAnyType::STRING_TYPE, "STRING_TYPE"},
-    {LSPAnyType::INTEGER_TYPE, "INTEGER_TYPE"},
-    {LSPAnyType::UINTEGER_TYPE, "UINTEGER_TYPE"},
-    {LSPAnyType::DECIMAL_TYPE, "DECIMAL_TYPE"},
-    {LSPAnyType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
-    {LSPAnyType::NULL_TYPE, "NULL_TYPE"},
-  };
-
   std::map<
     SemanticTokenTypes,
     std::string
@@ -86,12 +75,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SemanticTokenTypes name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SemanticTokenTypes name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto semanticTokenTypesByValue(
@@ -103,12 +89,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SemanticTokenTypes value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SemanticTokenTypes value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -152,12 +135,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SemanticTokenModifiers name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SemanticTokenModifiers name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto semanticTokenModifiersByValue(
@@ -169,12 +149,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SemanticTokenModifiers value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SemanticTokenModifiers value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -202,12 +179,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DocumentDiagnosticReportKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DocumentDiagnosticReportKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto documentDiagnosticReportKindByValue(
@@ -219,12 +193,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DocumentDiagnosticReportKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DocumentDiagnosticReportKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -249,12 +220,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid ErrorCodes name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid ErrorCodes name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto errorCodesByValue(
@@ -266,12 +234,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid ErrorCodes value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid ErrorCodes value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -293,12 +258,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid LSPErrorCodes name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid LSPErrorCodes name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto lspErrorCodesByValue(
@@ -310,12 +272,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid LSPErrorCodes value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid LSPErrorCodes value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -345,12 +304,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FoldingRangeKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FoldingRangeKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto foldingRangeKindByValue(
@@ -362,12 +318,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FoldingRangeKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FoldingRangeKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -411,12 +364,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SymbolKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SymbolKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto symbolKindByValue(
@@ -428,12 +378,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SymbolKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SymbolKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -452,12 +399,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SymbolTag name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SymbolTag name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto symbolTagByValue(
@@ -469,12 +413,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SymbolTag value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SymbolTag value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -508,12 +449,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid UniquenessLevel name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid UniquenessLevel name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto uniquenessLevelByValue(
@@ -525,12 +463,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid UniquenessLevel value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid UniquenessLevel value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -560,12 +495,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid MonikerKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid MonikerKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto monikerKindByValue(
@@ -577,12 +509,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid MonikerKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid MonikerKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -602,12 +531,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InlayHintKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InlayHintKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto inlayHintKindByValue(
@@ -619,12 +545,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InlayHintKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InlayHintKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -647,12 +570,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid MessageType name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid MessageType name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto messageTypeByValue(
@@ -664,12 +584,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid MessageType value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid MessageType value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -690,12 +607,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TextDocumentSyncKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TextDocumentSyncKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto textDocumentSyncKindByValue(
@@ -707,12 +621,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TextDocumentSyncKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TextDocumentSyncKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -733,12 +644,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TextDocumentSaveReason name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TextDocumentSaveReason name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto textDocumentSaveReasonByValue(
@@ -750,12 +658,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TextDocumentSaveReason value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TextDocumentSaveReason value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -798,12 +703,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CompletionItemKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CompletionItemKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto completionItemKindByValue(
@@ -815,12 +717,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CompletionItemKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CompletionItemKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -839,12 +738,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CompletionItemTag name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CompletionItemTag name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto completionItemTagByValue(
@@ -856,12 +752,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CompletionItemTag value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CompletionItemTag value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -881,12 +774,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InsertTextFormat name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InsertTextFormat name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto insertTextFormatByValue(
@@ -898,12 +788,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InsertTextFormat value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InsertTextFormat value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -923,12 +810,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InsertTextMode name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InsertTextMode name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto insertTextModeByValue(
@@ -940,12 +824,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InsertTextMode value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InsertTextMode value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -966,12 +847,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DocumentHighlightKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DocumentHighlightKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto documentHighlightKindByValue(
@@ -983,12 +861,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DocumentHighlightKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DocumentHighlightKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1030,12 +905,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CodeActionKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CodeActionKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto codeActionKindByValue(
@@ -1047,12 +919,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CodeActionKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CodeActionKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1082,12 +951,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TraceValues name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TraceValues name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto traceValuesByValue(
@@ -1099,12 +965,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TraceValues value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TraceValues value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1132,12 +995,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid MarkupKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid MarkupKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto markupKindByValue(
@@ -1149,12 +1009,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid MarkupKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid MarkupKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1174,12 +1031,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InlineCompletionTriggerKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InlineCompletionTriggerKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto inlineCompletionTriggerKindByValue(
@@ -1191,12 +1045,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid InlineCompletionTriggerKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid InlineCompletionTriggerKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1226,12 +1077,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid PositionEncodingKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid PositionEncodingKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto positionEncodingKindByValue(
@@ -1243,12 +1091,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid PositionEncodingKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid PositionEncodingKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1269,12 +1114,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FileChangeType name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FileChangeType name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto fileChangeTypeByValue(
@@ -1286,12 +1128,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FileChangeType value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FileChangeType value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1312,12 +1151,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid WatchKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid WatchKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto watchKindByValue(
@@ -1329,12 +1165,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid WatchKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid WatchKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1356,12 +1189,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DiagnosticSeverity name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DiagnosticSeverity name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto diagnosticSeverityByValue(
@@ -1373,12 +1203,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DiagnosticSeverity value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DiagnosticSeverity value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1398,12 +1225,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DiagnosticTag name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DiagnosticTag name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto diagnosticTagByValue(
@@ -1415,12 +1239,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid DiagnosticTag value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid DiagnosticTag value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1441,12 +1262,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CompletionTriggerKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CompletionTriggerKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto completionTriggerKindByValue(
@@ -1458,12 +1276,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CompletionTriggerKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CompletionTriggerKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1484,12 +1299,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SignatureHelpTriggerKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SignatureHelpTriggerKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto signatureHelpTriggerKindByValue(
@@ -1501,12 +1313,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid SignatureHelpTriggerKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid SignatureHelpTriggerKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1526,12 +1335,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CodeActionTriggerKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CodeActionTriggerKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto codeActionTriggerKindByValue(
@@ -1543,12 +1349,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid CodeActionTriggerKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid CodeActionTriggerKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1576,12 +1379,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FileOperationPatternKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FileOperationPatternKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto fileOperationPatternKindByValue(
@@ -1593,12 +1393,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FileOperationPatternKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FileOperationPatternKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1618,12 +1415,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid NotebookCellKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid NotebookCellKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto notebookCellKindByValue(
@@ -1635,12 +1429,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid NotebookCellKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid NotebookCellKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1670,12 +1461,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid ResourceOperationKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid ResourceOperationKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto resourceOperationKindByValue(
@@ -1687,12 +1475,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid ResourceOperationKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid ResourceOperationKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1724,12 +1509,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FailureHandlingKind name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FailureHandlingKind name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto failureHandlingKindByValue(
@@ -1741,12 +1523,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid FailureHandlingKind value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid FailureHandlingKind value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1765,12 +1544,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid PrepareSupportDefaultBehavior name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid PrepareSupportDefaultBehavior name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto prepareSupportDefaultBehaviorByValue(
@@ -1782,12 +1558,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid PrepareSupportDefaultBehavior value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid PrepareSupportDefaultBehavior value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -1813,12 +1586,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TokenFormat name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TokenFormat name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto tokenFormatByValue(
@@ -1830,13 +1600,451 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid TokenFormat value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid TokenFormat value: " << value;
+    throw std::invalid_argument(ss.str());
   }
+
+  std::map<TextDocumentRegistrationOptions_documentSelectorType, std::string> TextDocumentRegistrationOptions_documentSelectorTypeNames = {
+    {TextDocumentRegistrationOptions_documentSelectorType::DOCUMENT_SELECTOR, "DOCUMENT_SELECTOR"},
+    {TextDocumentRegistrationOptions_documentSelectorType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<WorkspaceEdit_documentChangesType, std::string> WorkspaceEdit_documentChangesTypeNames = {
+    {WorkspaceEdit_documentChangesType::TEXT_DOCUMENT_EDIT, "TEXT_DOCUMENT_EDIT"},
+    {WorkspaceEdit_documentChangesType::CREATE_FILE, "CREATE_FILE"},
+    {WorkspaceEdit_documentChangesType::RENAME_FILE, "RENAME_FILE"},
+    {WorkspaceEdit_documentChangesType::DELETE_FILE, "DELETE_FILE"},
+  };
+
+  std::map<InlayHint_labelType, std::string> InlayHint_labelTypeNames = {
+    {InlayHint_labelType::STRING_TYPE, "STRING_TYPE"},
+    {InlayHint_labelType::INLAY_HINT_LABEL_PART_ARRAY, "INLAY_HINT_LABEL_PART_ARRAY"},
+  };
+
+  std::map<InlayHint_tooltipType, std::string> InlayHint_tooltipTypeNames = {
+    {InlayHint_tooltipType::STRING_TYPE, "STRING_TYPE"},
+    {InlayHint_tooltipType::MARKUP_CONTENT, "MARKUP_CONTENT"},
+  };
+
+  std::map<DocumentDiagnosticReportPartialResult_relatedDocumentsType, std::string> DocumentDiagnosticReportPartialResult_relatedDocumentsTypeNames = {
+    {DocumentDiagnosticReportPartialResult_relatedDocumentsType::FULL_DOCUMENT_DIAGNOSTIC_REPORT, "FULL_DOCUMENT_DIAGNOSTIC_REPORT"},
+    {DocumentDiagnosticReportPartialResult_relatedDocumentsType::UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT, "UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT"},
+  };
+
+  std::map<InlineCompletionItem_insertTextType, std::string> InlineCompletionItem_insertTextTypeNames = {
+    {InlineCompletionItem_insertTextType::STRING_TYPE, "STRING_TYPE"},
+    {InlineCompletionItem_insertTextType::STRING_VALUE, "STRING_VALUE"},
+  };
+
+  std::map<DidChangeConfigurationRegistrationOptions_sectionType, std::string> DidChangeConfigurationRegistrationOptions_sectionTypeNames = {
+    {DidChangeConfigurationRegistrationOptions_sectionType::STRING_TYPE, "STRING_TYPE"},
+    {DidChangeConfigurationRegistrationOptions_sectionType::STRING_TYPE_ARRAY, "STRING_TYPE_ARRAY"},
+  };
+
+  std::map<CompletionItem_documentationType, std::string> CompletionItem_documentationTypeNames = {
+    {CompletionItem_documentationType::STRING_TYPE, "STRING_TYPE"},
+    {CompletionItem_documentationType::MARKUP_CONTENT, "MARKUP_CONTENT"},
+  };
+
+  std::map<CompletionItem_textEditType, std::string> CompletionItem_textEditTypeNames = {
+    {CompletionItem_textEditType::TEXT_EDIT, "TEXT_EDIT"},
+    {CompletionItem_textEditType::INSERT_REPLACE_EDIT, "INSERT_REPLACE_EDIT"},
+  };
+
+  std::map<CompletionList_itemDefaults_editRangeType, std::string> CompletionList_itemDefaults_editRangeTypeNames = {
+    {CompletionList_itemDefaults_editRangeType::RANGE, "RANGE"},
+    {CompletionList_itemDefaults_editRangeType::COMPLETION_LIST_ITEM_DEFAULTS_EDIT_RANGE_1, "COMPLETION_LIST_ITEM_DEFAULTS_EDIT_RANGE_1"},
+  };
+
+  std::map<Hover_contentsType, std::string> Hover_contentsTypeNames = {
+    {Hover_contentsType::MARKUP_CONTENT, "MARKUP_CONTENT"},
+    {Hover_contentsType::MARKED_STRING, "MARKED_STRING"},
+    {Hover_contentsType::MARKED_STRING_ARRAY, "MARKED_STRING_ARRAY"},
+  };
+
+  std::map<WorkspaceSymbol_locationType, std::string> WorkspaceSymbol_locationTypeNames = {
+    {WorkspaceSymbol_locationType::LOCATION, "LOCATION"},
+    {WorkspaceSymbol_locationType::WORKSPACE_SYMBOL_LOCATION_1, "WORKSPACE_SYMBOL_LOCATION_1"},
+  };
+
+  std::map<CancelParams_idType, std::string> CancelParams_idTypeNames = {
+    {CancelParams_idType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {CancelParams_idType::STRING_TYPE, "STRING_TYPE"},
+  };
+
+  std::map<SemanticTokensOptions_rangeType, std::string> SemanticTokensOptions_rangeTypeNames = {
+    {SemanticTokensOptions_rangeType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {SemanticTokensOptions_rangeType::SEMANTIC_TOKENS_OPTIONS_RANGE_1, "SEMANTIC_TOKENS_OPTIONS_RANGE_1"},
+  };
+
+  std::map<SemanticTokensOptions_fullType, std::string> SemanticTokensOptions_fullTypeNames = {
+    {SemanticTokensOptions_fullType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {SemanticTokensOptions_fullType::SEMANTIC_TOKENS_OPTIONS_FULL_1, "SEMANTIC_TOKENS_OPTIONS_FULL_1"},
+  };
+
+  std::map<TextDocumentEdit_editsType, std::string> TextDocumentEdit_editsTypeNames = {
+    {TextDocumentEdit_editsType::TEXT_EDIT, "TEXT_EDIT"},
+    {TextDocumentEdit_editsType::ANNOTATED_TEXT_EDIT, "ANNOTATED_TEXT_EDIT"},
+  };
+
+  std::map<InlayHintLabelPart_tooltipType, std::string> InlayHintLabelPart_tooltipTypeNames = {
+    {InlayHintLabelPart_tooltipType::STRING_TYPE, "STRING_TYPE"},
+    {InlayHintLabelPart_tooltipType::MARKUP_CONTENT, "MARKUP_CONTENT"},
+  };
+
+  std::map<RelatedFullDocumentDiagnosticReport_relatedDocumentsType, std::string> RelatedFullDocumentDiagnosticReport_relatedDocumentsTypeNames = {
+    {RelatedFullDocumentDiagnosticReport_relatedDocumentsType::FULL_DOCUMENT_DIAGNOSTIC_REPORT, "FULL_DOCUMENT_DIAGNOSTIC_REPORT"},
+    {RelatedFullDocumentDiagnosticReport_relatedDocumentsType::UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT, "UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT"},
+  };
+
+  std::map<RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType, std::string> RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsTypeNames = {
+    {RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType::FULL_DOCUMENT_DIAGNOSTIC_REPORT, "FULL_DOCUMENT_DIAGNOSTIC_REPORT"},
+    {RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType::UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT, "UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT"},
+  };
+
+  std::map<_InitializeParams_processIdType, std::string> _InitializeParams_processIdTypeNames = {
+    {_InitializeParams_processIdType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {_InitializeParams_processIdType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<_InitializeParams_rootPathType, std::string> _InitializeParams_rootPathTypeNames = {
+    {_InitializeParams_rootPathType::STRING_TYPE, "STRING_TYPE"},
+    {_InitializeParams_rootPathType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<_InitializeParams_rootUriType, std::string> _InitializeParams_rootUriTypeNames = {
+    {_InitializeParams_rootUriType::DOCUMENT_URI, "DOCUMENT_URI"},
+    {_InitializeParams_rootUriType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<WorkspaceFoldersInitializeParams_workspaceFoldersType, std::string> WorkspaceFoldersInitializeParams_workspaceFoldersTypeNames = {
+    {WorkspaceFoldersInitializeParams_workspaceFoldersType::WORKSPACE_FOLDER_ARRAY, "WORKSPACE_FOLDER_ARRAY"},
+    {WorkspaceFoldersInitializeParams_workspaceFoldersType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<ServerCapabilities_textDocumentSyncType, std::string> ServerCapabilities_textDocumentSyncTypeNames = {
+    {ServerCapabilities_textDocumentSyncType::TEXT_DOCUMENT_SYNC_OPTIONS, "TEXT_DOCUMENT_SYNC_OPTIONS"},
+    {ServerCapabilities_textDocumentSyncType::TEXT_DOCUMENT_SYNC_KIND, "TEXT_DOCUMENT_SYNC_KIND"},
+  };
+
+  std::map<ServerCapabilities_notebookDocumentSyncType, std::string> ServerCapabilities_notebookDocumentSyncTypeNames = {
+    {ServerCapabilities_notebookDocumentSyncType::NOTEBOOK_DOCUMENT_SYNC_OPTIONS, "NOTEBOOK_DOCUMENT_SYNC_OPTIONS"},
+    {ServerCapabilities_notebookDocumentSyncType::NOTEBOOK_DOCUMENT_SYNC_REGISTRATION_OPTIONS, "NOTEBOOK_DOCUMENT_SYNC_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_hoverProviderType, std::string> ServerCapabilities_hoverProviderTypeNames = {
+    {ServerCapabilities_hoverProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_hoverProviderType::HOVER_OPTIONS, "HOVER_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_declarationProviderType, std::string> ServerCapabilities_declarationProviderTypeNames = {
+    {ServerCapabilities_declarationProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_declarationProviderType::DECLARATION_OPTIONS, "DECLARATION_OPTIONS"},
+    {ServerCapabilities_declarationProviderType::DECLARATION_REGISTRATION_OPTIONS, "DECLARATION_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_definitionProviderType, std::string> ServerCapabilities_definitionProviderTypeNames = {
+    {ServerCapabilities_definitionProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_definitionProviderType::DEFINITION_OPTIONS, "DEFINITION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_typeDefinitionProviderType, std::string> ServerCapabilities_typeDefinitionProviderTypeNames = {
+    {ServerCapabilities_typeDefinitionProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_typeDefinitionProviderType::TYPE_DEFINITION_OPTIONS, "TYPE_DEFINITION_OPTIONS"},
+    {ServerCapabilities_typeDefinitionProviderType::TYPE_DEFINITION_REGISTRATION_OPTIONS, "TYPE_DEFINITION_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_implementationProviderType, std::string> ServerCapabilities_implementationProviderTypeNames = {
+    {ServerCapabilities_implementationProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_implementationProviderType::IMPLEMENTATION_OPTIONS, "IMPLEMENTATION_OPTIONS"},
+    {ServerCapabilities_implementationProviderType::IMPLEMENTATION_REGISTRATION_OPTIONS, "IMPLEMENTATION_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_referencesProviderType, std::string> ServerCapabilities_referencesProviderTypeNames = {
+    {ServerCapabilities_referencesProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_referencesProviderType::REFERENCE_OPTIONS, "REFERENCE_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_documentHighlightProviderType, std::string> ServerCapabilities_documentHighlightProviderTypeNames = {
+    {ServerCapabilities_documentHighlightProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_documentHighlightProviderType::DOCUMENT_HIGHLIGHT_OPTIONS, "DOCUMENT_HIGHLIGHT_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_documentSymbolProviderType, std::string> ServerCapabilities_documentSymbolProviderTypeNames = {
+    {ServerCapabilities_documentSymbolProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_documentSymbolProviderType::DOCUMENT_SYMBOL_OPTIONS, "DOCUMENT_SYMBOL_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_codeActionProviderType, std::string> ServerCapabilities_codeActionProviderTypeNames = {
+    {ServerCapabilities_codeActionProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_codeActionProviderType::CODE_ACTION_OPTIONS, "CODE_ACTION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_colorProviderType, std::string> ServerCapabilities_colorProviderTypeNames = {
+    {ServerCapabilities_colorProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_colorProviderType::DOCUMENT_COLOR_OPTIONS, "DOCUMENT_COLOR_OPTIONS"},
+    {ServerCapabilities_colorProviderType::DOCUMENT_COLOR_REGISTRATION_OPTIONS, "DOCUMENT_COLOR_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_workspaceSymbolProviderType, std::string> ServerCapabilities_workspaceSymbolProviderTypeNames = {
+    {ServerCapabilities_workspaceSymbolProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_workspaceSymbolProviderType::WORKSPACE_SYMBOL_OPTIONS, "WORKSPACE_SYMBOL_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_documentFormattingProviderType, std::string> ServerCapabilities_documentFormattingProviderTypeNames = {
+    {ServerCapabilities_documentFormattingProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_documentFormattingProviderType::DOCUMENT_FORMATTING_OPTIONS, "DOCUMENT_FORMATTING_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_documentRangeFormattingProviderType, std::string> ServerCapabilities_documentRangeFormattingProviderTypeNames = {
+    {ServerCapabilities_documentRangeFormattingProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_documentRangeFormattingProviderType::DOCUMENT_RANGE_FORMATTING_OPTIONS, "DOCUMENT_RANGE_FORMATTING_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_renameProviderType, std::string> ServerCapabilities_renameProviderTypeNames = {
+    {ServerCapabilities_renameProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_renameProviderType::RENAME_OPTIONS, "RENAME_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_foldingRangeProviderType, std::string> ServerCapabilities_foldingRangeProviderTypeNames = {
+    {ServerCapabilities_foldingRangeProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_foldingRangeProviderType::FOLDING_RANGE_OPTIONS, "FOLDING_RANGE_OPTIONS"},
+    {ServerCapabilities_foldingRangeProviderType::FOLDING_RANGE_REGISTRATION_OPTIONS, "FOLDING_RANGE_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_selectionRangeProviderType, std::string> ServerCapabilities_selectionRangeProviderTypeNames = {
+    {ServerCapabilities_selectionRangeProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_selectionRangeProviderType::SELECTION_RANGE_OPTIONS, "SELECTION_RANGE_OPTIONS"},
+    {ServerCapabilities_selectionRangeProviderType::SELECTION_RANGE_REGISTRATION_OPTIONS, "SELECTION_RANGE_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_callHierarchyProviderType, std::string> ServerCapabilities_callHierarchyProviderTypeNames = {
+    {ServerCapabilities_callHierarchyProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_callHierarchyProviderType::CALL_HIERARCHY_OPTIONS, "CALL_HIERARCHY_OPTIONS"},
+    {ServerCapabilities_callHierarchyProviderType::CALL_HIERARCHY_REGISTRATION_OPTIONS, "CALL_HIERARCHY_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_linkedEditingRangeProviderType, std::string> ServerCapabilities_linkedEditingRangeProviderTypeNames = {
+    {ServerCapabilities_linkedEditingRangeProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_linkedEditingRangeProviderType::LINKED_EDITING_RANGE_OPTIONS, "LINKED_EDITING_RANGE_OPTIONS"},
+    {ServerCapabilities_linkedEditingRangeProviderType::LINKED_EDITING_RANGE_REGISTRATION_OPTIONS, "LINKED_EDITING_RANGE_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_semanticTokensProviderType, std::string> ServerCapabilities_semanticTokensProviderTypeNames = {
+    {ServerCapabilities_semanticTokensProviderType::SEMANTIC_TOKENS_OPTIONS, "SEMANTIC_TOKENS_OPTIONS"},
+    {ServerCapabilities_semanticTokensProviderType::SEMANTIC_TOKENS_REGISTRATION_OPTIONS, "SEMANTIC_TOKENS_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_monikerProviderType, std::string> ServerCapabilities_monikerProviderTypeNames = {
+    {ServerCapabilities_monikerProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_monikerProviderType::MONIKER_OPTIONS, "MONIKER_OPTIONS"},
+    {ServerCapabilities_monikerProviderType::MONIKER_REGISTRATION_OPTIONS, "MONIKER_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_typeHierarchyProviderType, std::string> ServerCapabilities_typeHierarchyProviderTypeNames = {
+    {ServerCapabilities_typeHierarchyProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_typeHierarchyProviderType::TYPE_HIERARCHY_OPTIONS, "TYPE_HIERARCHY_OPTIONS"},
+    {ServerCapabilities_typeHierarchyProviderType::TYPE_HIERARCHY_REGISTRATION_OPTIONS, "TYPE_HIERARCHY_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_inlineValueProviderType, std::string> ServerCapabilities_inlineValueProviderTypeNames = {
+    {ServerCapabilities_inlineValueProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_inlineValueProviderType::INLINE_VALUE_OPTIONS, "INLINE_VALUE_OPTIONS"},
+    {ServerCapabilities_inlineValueProviderType::INLINE_VALUE_REGISTRATION_OPTIONS, "INLINE_VALUE_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_inlayHintProviderType, std::string> ServerCapabilities_inlayHintProviderTypeNames = {
+    {ServerCapabilities_inlayHintProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_inlayHintProviderType::INLAY_HINT_OPTIONS, "INLAY_HINT_OPTIONS"},
+    {ServerCapabilities_inlayHintProviderType::INLAY_HINT_REGISTRATION_OPTIONS, "INLAY_HINT_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_diagnosticProviderType, std::string> ServerCapabilities_diagnosticProviderTypeNames = {
+    {ServerCapabilities_diagnosticProviderType::DIAGNOSTIC_OPTIONS, "DIAGNOSTIC_OPTIONS"},
+    {ServerCapabilities_diagnosticProviderType::DIAGNOSTIC_REGISTRATION_OPTIONS, "DIAGNOSTIC_REGISTRATION_OPTIONS"},
+  };
+
+  std::map<ServerCapabilities_inlineCompletionProviderType, std::string> ServerCapabilities_inlineCompletionProviderTypeNames = {
+    {ServerCapabilities_inlineCompletionProviderType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {ServerCapabilities_inlineCompletionProviderType::INLINE_COMPLETION_OPTIONS, "INLINE_COMPLETION_OPTIONS"},
+  };
+
+  std::map<Diagnostic_codeType, std::string> Diagnostic_codeTypeNames = {
+    {Diagnostic_codeType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {Diagnostic_codeType::STRING_TYPE, "STRING_TYPE"},
+  };
+
+  std::map<SignatureInformation_documentationType, std::string> SignatureInformation_documentationTypeNames = {
+    {SignatureInformation_documentationType::STRING_TYPE, "STRING_TYPE"},
+    {SignatureInformation_documentationType::MARKUP_CONTENT, "MARKUP_CONTENT"},
+  };
+
+  std::map<OptionalVersionedTextDocumentIdentifier_versionType, std::string> OptionalVersionedTextDocumentIdentifier_versionTypeNames = {
+    {OptionalVersionedTextDocumentIdentifier_versionType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {OptionalVersionedTextDocumentIdentifier_versionType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<WorkspaceFullDocumentDiagnosticReport_versionType, std::string> WorkspaceFullDocumentDiagnosticReport_versionTypeNames = {
+    {WorkspaceFullDocumentDiagnosticReport_versionType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {WorkspaceFullDocumentDiagnosticReport_versionType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<WorkspaceUnchangedDocumentDiagnosticReport_versionType, std::string> WorkspaceUnchangedDocumentDiagnosticReport_versionTypeNames = {
+    {WorkspaceUnchangedDocumentDiagnosticReport_versionType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {WorkspaceUnchangedDocumentDiagnosticReport_versionType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<TextDocumentSyncOptions_saveType, std::string> TextDocumentSyncOptions_saveTypeNames = {
+    {TextDocumentSyncOptions_saveType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {TextDocumentSyncOptions_saveType::SAVE_OPTIONS, "SAVE_OPTIONS"},
+  };
+
+  std::map<NotebookDocumentSyncOptions_notebookSelector_1_notebookType, std::string> NotebookDocumentSyncOptions_notebookSelector_1_notebookTypeNames = {
+    {NotebookDocumentSyncOptions_notebookSelector_1_notebookType::STRING_TYPE, "STRING_TYPE"},
+    {NotebookDocumentSyncOptions_notebookSelector_1_notebookType::NOTEBOOK_DOCUMENT_FILTER, "NOTEBOOK_DOCUMENT_FILTER"},
+  };
+
+  std::map<NotebookDocumentSyncOptions_notebookSelector_0_notebookType, std::string> NotebookDocumentSyncOptions_notebookSelector_0_notebookTypeNames = {
+    {NotebookDocumentSyncOptions_notebookSelector_0_notebookType::STRING_TYPE, "STRING_TYPE"},
+    {NotebookDocumentSyncOptions_notebookSelector_0_notebookType::NOTEBOOK_DOCUMENT_FILTER, "NOTEBOOK_DOCUMENT_FILTER"},
+  };
+
+  std::map<NotebookDocumentSyncOptions_notebookSelectorType, std::string> NotebookDocumentSyncOptions_notebookSelectorTypeNames = {
+    {NotebookDocumentSyncOptions_notebookSelectorType::NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_0, "NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_0"},
+    {NotebookDocumentSyncOptions_notebookSelectorType::NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_1, "NOTEBOOK_DOCUMENT_SYNC_OPTIONS_NOTEBOOK_SELECTOR_1"},
+  };
+
+  std::map<WorkspaceFoldersServerCapabilities_changeNotificationsType, std::string> WorkspaceFoldersServerCapabilities_changeNotificationsTypeNames = {
+    {WorkspaceFoldersServerCapabilities_changeNotificationsType::STRING_TYPE, "STRING_TYPE"},
+    {WorkspaceFoldersServerCapabilities_changeNotificationsType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+  };
+
+  std::map<ParameterInformation_labelType, std::string> ParameterInformation_labelTypeNames = {
+    {ParameterInformation_labelType::STRING_TYPE, "STRING_TYPE"},
+    {ParameterInformation_labelType::PAIR_OF_UINTEGER_TYPE_AND_UINTEGER_TYPE, "PAIR_OF_UINTEGER_TYPE_AND_UINTEGER_TYPE"},
+  };
+
+  std::map<ParameterInformation_documentationType, std::string> ParameterInformation_documentationTypeNames = {
+    {ParameterInformation_documentationType::STRING_TYPE, "STRING_TYPE"},
+    {ParameterInformation_documentationType::MARKUP_CONTENT, "MARKUP_CONTENT"},
+  };
+
+  std::map<NotebookCellTextDocumentFilter_notebookType, std::string> NotebookCellTextDocumentFilter_notebookTypeNames = {
+    {NotebookCellTextDocumentFilter_notebookType::STRING_TYPE, "STRING_TYPE"},
+    {NotebookCellTextDocumentFilter_notebookType::NOTEBOOK_DOCUMENT_FILTER, "NOTEBOOK_DOCUMENT_FILTER"},
+  };
+
+  std::map<RelativePattern_baseUriType, std::string> RelativePattern_baseUriTypeNames = {
+    {RelativePattern_baseUriType::WORKSPACE_FOLDER, "WORKSPACE_FOLDER"},
+    {RelativePattern_baseUriType::URI, "URI"},
+  };
+
+  std::map<SemanticTokensClientCapabilities_requests_fullType, std::string> SemanticTokensClientCapabilities_requests_fullTypeNames = {
+    {SemanticTokensClientCapabilities_requests_fullType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {SemanticTokensClientCapabilities_requests_fullType::SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_FULL_1, "SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_FULL_1"},
+  };
+
+  std::map<SemanticTokensClientCapabilities_requests_rangeType, std::string> SemanticTokensClientCapabilities_requests_rangeTypeNames = {
+    {SemanticTokensClientCapabilities_requests_rangeType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {SemanticTokensClientCapabilities_requests_rangeType::SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_RANGE_1, "SEMANTIC_TOKENS_CLIENT_CAPABILITIES_REQUESTS_RANGE_1"},
+  };
+
+  std::map<RequestIdType, std::string> RequestIdTypeNames = {
+    {RequestIdType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {RequestIdType::STRING_TYPE, "STRING_TYPE"},
+  };
+
+  std::map<MessageParamsType, std::string> MessageParamsTypeNames = {
+    {MessageParamsType::ARRAY_TYPE, "ARRAY_TYPE"},
+    {MessageParamsType::OBJECT_TYPE, "OBJECT_TYPE"},
+  };
+
+  std::map<ResponseIdType, std::string> ResponseIdTypeNames = {
+    {ResponseIdType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {ResponseIdType::STRING_TYPE, "STRING_TYPE"},
+    {ResponseIdType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<DefinitionType, std::string> DefinitionTypeNames = {
+    {DefinitionType::LOCATION, "LOCATION"},
+    {DefinitionType::LOCATION_ARRAY, "LOCATION_ARRAY"},
+  };
+
+  std::map<LSPAnyType, std::string> LSPAnyTypeNames = {
+    {LSPAnyType::OBJECT_TYPE, "OBJECT_TYPE"},
+    {LSPAnyType::ARRAY_TYPE, "ARRAY_TYPE"},
+    {LSPAnyType::STRING_TYPE, "STRING_TYPE"},
+    {LSPAnyType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {LSPAnyType::UINTEGER_TYPE, "UINTEGER_TYPE"},
+    {LSPAnyType::DECIMAL_TYPE, "DECIMAL_TYPE"},
+    {LSPAnyType::BOOLEAN_TYPE, "BOOLEAN_TYPE"},
+    {LSPAnyType::NULL_TYPE, "NULL_TYPE"},
+  };
+
+  std::map<DeclarationType, std::string> DeclarationTypeNames = {
+    {DeclarationType::LOCATION, "LOCATION"},
+    {DeclarationType::LOCATION_ARRAY, "LOCATION_ARRAY"},
+  };
+
+  std::map<InlineValueType, std::string> InlineValueTypeNames = {
+    {InlineValueType::INLINE_VALUE_TEXT, "INLINE_VALUE_TEXT"},
+    {InlineValueType::INLINE_VALUE_VARIABLE_LOOKUP, "INLINE_VALUE_VARIABLE_LOOKUP"},
+    {InlineValueType::INLINE_VALUE_EVALUATABLE_EXPRESSION, "INLINE_VALUE_EVALUATABLE_EXPRESSION"},
+  };
+
+  std::map<DocumentDiagnosticReportType, std::string> DocumentDiagnosticReportTypeNames = {
+    {DocumentDiagnosticReportType::RELATED_FULL_DOCUMENT_DIAGNOSTIC_REPORT, "RELATED_FULL_DOCUMENT_DIAGNOSTIC_REPORT"},
+    {DocumentDiagnosticReportType::RELATED_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT, "RELATED_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT"},
+  };
+
+  std::map<PrepareRenameResultType, std::string> PrepareRenameResultTypeNames = {
+    {PrepareRenameResultType::RANGE, "RANGE"},
+    {PrepareRenameResultType::PREPARE_RENAME_RESULT_1, "PREPARE_RENAME_RESULT_1"},
+    {PrepareRenameResultType::PREPARE_RENAME_RESULT_2, "PREPARE_RENAME_RESULT_2"},
+  };
+
+  std::map<ProgressTokenType, std::string> ProgressTokenTypeNames = {
+    {ProgressTokenType::INTEGER_TYPE, "INTEGER_TYPE"},
+    {ProgressTokenType::STRING_TYPE, "STRING_TYPE"},
+  };
+
+  std::map<WorkspaceDocumentDiagnosticReportType, std::string> WorkspaceDocumentDiagnosticReportTypeNames = {
+    {WorkspaceDocumentDiagnosticReportType::WORKSPACE_FULL_DOCUMENT_DIAGNOSTIC_REPORT, "WORKSPACE_FULL_DOCUMENT_DIAGNOSTIC_REPORT"},
+    {WorkspaceDocumentDiagnosticReportType::WORKSPACE_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT, "WORKSPACE_UNCHANGED_DOCUMENT_DIAGNOSTIC_REPORT"},
+  };
+
+  std::map<TextDocumentContentChangeEventType, std::string> TextDocumentContentChangeEventTypeNames = {
+    {TextDocumentContentChangeEventType::TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_0, "TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_0"},
+    {TextDocumentContentChangeEventType::TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_1, "TEXT_DOCUMENT_CONTENT_CHANGE_EVENT_1"},
+  };
+
+  std::map<MarkedStringType, std::string> MarkedStringTypeNames = {
+    {MarkedStringType::STRING_TYPE, "STRING_TYPE"},
+    {MarkedStringType::MARKED_STRING_1, "MARKED_STRING_1"},
+  };
+
+  std::map<DocumentFilterType, std::string> DocumentFilterTypeNames = {
+    {DocumentFilterType::TEXT_DOCUMENT_FILTER, "TEXT_DOCUMENT_FILTER"},
+    {DocumentFilterType::NOTEBOOK_CELL_TEXT_DOCUMENT_FILTER, "NOTEBOOK_CELL_TEXT_DOCUMENT_FILTER"},
+  };
+
+  std::map<GlobPatternType, std::string> GlobPatternTypeNames = {
+    {GlobPatternType::PATTERN, "PATTERN"},
+    {GlobPatternType::RELATIVE_PATTERN, "RELATIVE_PATTERN"},
+  };
+
+  std::map<TextDocumentFilterType, std::string> TextDocumentFilterTypeNames = {
+    {TextDocumentFilterType::TEXT_DOCUMENT_FILTER_0, "TEXT_DOCUMENT_FILTER_0"},
+    {TextDocumentFilterType::TEXT_DOCUMENT_FILTER_1, "TEXT_DOCUMENT_FILTER_1"},
+    {TextDocumentFilterType::TEXT_DOCUMENT_FILTER_2, "TEXT_DOCUMENT_FILTER_2"},
+  };
+
+  std::map<NotebookDocumentFilterType, std::string> NotebookDocumentFilterTypeNames = {
+    {NotebookDocumentFilterType::NOTEBOOK_DOCUMENT_FILTER_0, "NOTEBOOK_DOCUMENT_FILTER_0"},
+    {NotebookDocumentFilterType::NOTEBOOK_DOCUMENT_FILTER_1, "NOTEBOOK_DOCUMENT_FILTER_1"},
+    {NotebookDocumentFilterType::NOTEBOOK_DOCUMENT_FILTER_2, "NOTEBOOK_DOCUMENT_FILTER_2"},
+  };
 
   std::map<
     IncomingRequest,
@@ -1965,12 +2173,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid IncomingRequest name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid IncomingRequest name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto incomingRequestByValue(
@@ -1982,12 +2187,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid IncomingRequest value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid IncomingRequest value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   auto isIncomingRequest(const std::string &value) -> bool {
@@ -2048,12 +2250,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid OutgoingRequest name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid OutgoingRequest name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto outgoingRequestByValue(
@@ -2065,12 +2264,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid OutgoingRequest value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid OutgoingRequest value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   std::map<
@@ -2132,12 +2328,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid IncomingNotification name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid IncomingNotification name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto incomingNotificationByValue(
@@ -2149,12 +2342,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid IncomingNotification value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid IncomingNotification value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
   auto isIncomingNotification(const std::string &value) -> bool {
@@ -2197,12 +2387,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid OutgoingNotification name: {}",
-        name
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid OutgoingNotification name: " << name;
+    throw std::invalid_argument(ss.str());
   }
 
   auto outgoingNotificationByValue(
@@ -2214,12 +2401,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    throw std::invalid_argument(
-      std::format(
-        "Invalid OutgoingNotification value: {}",
-        value
-      )
-    );
+    std::stringstream ss;
+    ss << "Invalid OutgoingNotification value: " << value;
+    throw std::invalid_argument(ss.str());
   }
 
 } // namespace LCompilers::LanguageServerProtocol

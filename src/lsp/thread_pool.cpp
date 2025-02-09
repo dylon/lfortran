@@ -8,33 +8,34 @@ namespace LCompilers::LanguageServer::Threading {
   using namespace std::literals::chrono_literals;
 
   ThreadPool::ThreadPool(
+    const std::string &name,
     std::size_t numThreads,
     lsl::Logger &logger
-  ) : numThreads(numThreads)
+  ) : _name(name)
+    , _numThreads(numThreads)
     , logger(logger)
   {
     for (std::size_t threadId = 0; threadId < numThreads; ++threadId) {
-      logger << "Starting thread with id=" << threadId << std::endl;
+      {
+        auto loggerLock = logger.lock();
+        logger << "Starting thread with id=" << threadId << std::endl;
+      }
       workers.emplace_back([this, threadId]() {
         run(threadId);
       });
     }
   }
 
-  auto ThreadPool::getNumThreads() -> std::size_t {
-    return numThreads;
+  auto ThreadPool::name() const -> const std::string & {
+    return _name;
   }
 
-  auto ThreadPool::isRunning() -> bool {
+  auto ThreadPool::numThreads() const -> std::size_t {
+    return _numThreads;
+  }
+
+  auto ThreadPool::isRunning() const -> bool {
     return running;
-  }
-
-  auto ThreadPool::getStdoutMutex() -> std::mutex & {
-    return stdoutMutex;
-  }
-
-  auto ThreadPool::getStderrMutex() -> std::mutex & {
-    return stderrMutex;
   }
 
   auto ThreadPool::execute(Task task) -> bool {
@@ -51,7 +52,7 @@ namespace LCompilers::LanguageServer::Threading {
 
   auto ThreadPool::stop() -> void {
     {
-      std::unique_lock<std::mutex> stderrLock(stderrMutex);
+      auto loggerLock = logger.lock();
       logger
         << "Thread pool will no longer accept new tasks and will shut down "
         << "once those pending have returned."
@@ -63,7 +64,7 @@ namespace LCompilers::LanguageServer::Threading {
 
   auto ThreadPool::stopNow() -> void {
     {
-      std::unique_lock<std::mutex> stderrLock(stderrMutex);
+      auto loggerLock = logger.lock();
       logger
         << "Stopping thread pool as quickly as possible."
         << std::endl;
@@ -92,27 +93,27 @@ namespace LCompilers::LanguageServer::Threading {
           tasks.pop();
           taskLock.unlock();
           try {
-            task(threadId);
+            task(_name, threadId);
           } catch (std::exception &e) {
-            std::unique_lock<std::mutex> stderrLock(stderrMutex);
+            auto loggerLock = logger.lock();
             logger
-              << "[thread.id=" << threadId << "] "
+              << "[" << _name << "_" << threadId << "] "
               << "Failed to execute task: " << e.what()
               << std::endl;
           }
         }
       }
       {
-        std::unique_lock<std::mutex> stderrLock(stderrMutex);
+        auto loggerLock = logger.lock();
         logger
-          << "[thread.id=" << threadId << "] "
+          << "[" << _name << "_" << threadId << "] "
           << "Shutting down thread."
           << std::endl;
       }
     } catch (std::exception &e) {
-      std::unique_lock<std::mutex> stderrLock(stderrMutex);
+      auto loggerLock = logger.lock();
       logger
-        << "[thread.id=" << threadId << "] "
+        << "[" << _name << "_" << threadId << "] "
         << "Unhandled exception caught: " << e.what()
         << std::endl;
     }

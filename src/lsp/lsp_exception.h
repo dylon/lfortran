@@ -1,7 +1,5 @@
-#ifndef LCOMPILERS_LSP_EXCEPTION_H
-#define LCOMPILERS_LSP_EXCEPTION_H
+#pragma once
 
-#include <source_location>
 #include <stdexcept>
 #include <string>
 #include <variant>
@@ -25,15 +23,19 @@ namespace LCompilers::LanguageServerProtocol {
     LspException(
       ErrorCode code,
       const std::string &message,
-      const std::source_location location = std::source_location::current()
+      const char *file,
+      int line
     );
     auto code() const -> const ErrorCode &;
-    auto where() const -> const std::source_location &;
+    auto file() const -> const char *;
+    auto line() const -> int;
   protected:
     ErrorCode _code;
-    std::source_location _location;
+    const char *_file;
+    int _line;
   };
 
-} // namespace LCompilers::LanguageServerProtocol
+#define LSP_EXCEPTION(code, message) \
+  LspException((code), (message), __FILE__, __LINE__)
 
-#endif // LCOMPILERS_LSP_EXCEPTION_H
+} // namespace LCompilers::LanguageServerProtocol
