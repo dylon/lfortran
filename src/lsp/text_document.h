@@ -31,11 +31,27 @@ namespace LCompilers::LanguageServerProtocol {
       lsl::Logger &logger
     );
     TextDocument(TextDocument &&other) noexcept;  // move constructor
-    auto uri() const -> const DocumentUri &;
-    auto path() const -> const fs::path &;
-    auto languageId() const -> const std::string &;
-    auto version() const -> int;
-    auto text() const -> const std::string &;
+
+    inline auto uri() const -> const DocumentUri & {
+      return _uri;
+    }
+
+    inline auto path() const -> const fs::path & {
+      return _path;
+    }
+
+    inline auto languageId() const -> const std::string & {
+      return _languageId;
+    }
+
+    inline auto version() const -> int {
+      return _version;
+    }
+
+    inline auto text() const -> const std::string & {
+      return _text;
+    }
+
     auto setText(const std::string &text) -> void;
     auto apply(
       std::vector<TextDocumentContentChangeEvent> &changes,

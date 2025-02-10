@@ -40,18 +40,6 @@ namespace LCompilers::LanguageServer {
     throw std::runtime_error("Failed to read message from queue.");
   }
 
-  auto MessageQueue::size() const -> std::size_t {
-    return _size;
-  }
-
-  auto MessageQueue::isRunning() const -> bool {
-    return running;
-  }
-
-  auto MessageQueue::isStopped() const -> bool {
-    return !running;
-  }
-
   auto MessageQueue::stop() -> void {
     bool expected = true;
     if (running.compare_exchange_strong(expected, false)) {

@@ -1,5 +1,4 @@
 #include <cctype>
-#include <stdexcept>
 
 #include <lsp/lsp_exception.h>
 #include <lsp/lsp_json_parser.h>

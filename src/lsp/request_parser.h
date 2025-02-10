@@ -51,16 +51,30 @@ namespace LCompilers::LanguageServer {
   class RequestParser {
   public:
     RequestParser(lsl::Logger &logger);
-    auto startLine() -> const std::string &;
-    auto headers() -> const std::map<std::string, std::string> &;
-    auto body() -> const std::string &;
-    auto state() -> RequestParserState;
-    auto error() -> const std::string &;
+
+    inline auto startLine() -> const std::string & {
+      return _startLine;
+    }
+
+    inline auto headers() -> const std::map<std::string, std::string> & {
+      return _headers;
+    }
+
+    inline auto body() -> const std::string & {
+      return _body;
+    }
+
+    inline auto state() -> RequestParserState {
+      return _state;
+    }
+
+    inline auto error() -> const std::string & {
+      return _error;
+    }
 
     void reset();
     void finish();
     virtual bool parse(unsigned char c) = 0;
-
   protected:
     lsl::Logger &logger;
     std::string _startLine = "";

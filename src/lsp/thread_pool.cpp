@@ -26,18 +26,6 @@ namespace LCompilers::LanguageServer::Threading {
     }
   }
 
-  auto ThreadPool::name() const -> const std::string & {
-    return _name;
-  }
-
-  auto ThreadPool::numThreads() const -> std::size_t {
-    return _numThreads;
-  }
-
-  auto ThreadPool::isRunning() const -> bool {
-    return running;
-  }
-
   auto ThreadPool::execute(Task task) -> bool {
     if (!stopRunning) {
       std::unique_lock<std::mutex> taskLock(taskMutex);

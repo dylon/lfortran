@@ -48,26 +48,6 @@ namespace LCompilers::LanguageServerProtocol {
     _path = fs::canonical(path);
   }
 
-  auto TextDocument::uri() const -> const DocumentUri & {
-    return _uri;
-  }
-
-  auto TextDocument::path() const -> const fs::path & {
-    return _path;
-  }
-
-  auto TextDocument::languageId() const -> const std::string & {
-    return _languageId;
-  }
-
-  auto TextDocument::version() const -> int {
-    return _version;
-  }
-
-  auto TextDocument::text() const -> const std::string & {
-    return _text;
-  }
-
   auto TextDocument::setText(const std::string &text) -> void {
     std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
     _text = text;

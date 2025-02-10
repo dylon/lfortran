@@ -1,9 +1,6 @@
 #include <cctype>
-#include <condition_variable>
 #include <cstdio>
 #include <iostream>
-#include <mutex>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -132,15 +129,20 @@ namespace LCompilers::LanguageServer {
       }
       if (pending) {
         parser->finish();
-        for (auto const &[header, value] : parser->headers()) {
-          auto loggerLock = logger.lock();
-          logger
-            << "request.headers[\"" << header << "\"] = \"" << value << "\""
-            << std::endl;
-        }
         const std::string &message = parser->body();
         {
           auto loggerLock = logger.lock();
+          const std::string &startLine = parser->startLine();
+          if (startLine.length() > 0) {
+            logger
+              << "request.startLine = \"" << startLine << "\""
+              << std::endl;
+          }
+          for (auto const &[header, value] : parser->headers()) {
+            logger
+              << "request.headers[\"" << header << "\"] = \"" << value << "\""
+              << std::endl;
+          }
           logger << "request.body = " << message << std::endl;
         }
         if (message.length() > 0) {

@@ -27,10 +27,20 @@ namespace LCompilers::LanguageServer::Threading {
       std::size_t numThreads,
       lsl::Logger &logger
     );
+
+    inline auto name() const -> const std::string & {
+      return _name;
+    }
+
+    inline auto numThreads() const -> std::size_t {
+      return _numThreads;
+    }
+
+    inline auto isRunning() const -> bool {
+      return running;
+    }
+
     auto execute(Task task) -> bool;
-    auto name() const -> const std::string &;
-    auto numThreads() const -> std::size_t;
-    auto isRunning() const -> bool;
     auto stop() -> void;
     auto stopNow() -> void;
     auto join() -> void;

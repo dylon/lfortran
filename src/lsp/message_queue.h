@@ -16,11 +16,21 @@ namespace LCompilers::LanguageServer {
   class MessageQueue {
   public:
     MessageQueue(lsl::Logger &logger);
+
+    inline auto size() const -> std::size_t {
+      return _size;
+    }
+
+    inline auto isRunning() const -> bool {
+      return running;
+    }
+
+    inline auto isStopped() const -> bool {
+      return !running;
+    }
+
     auto enqueue(const std::string &message) -> bool;
     auto dequeue() -> const std::string;
-    auto size() const -> std::size_t;
-    auto isRunning() const -> bool;
-    auto isStopped() const -> bool;
     auto stop() -> void;
   private:
     lsl::Logger &logger;
