@@ -1,6 +1,7 @@
 #include <cctype>
 #include <stdexcept>
 
+#include <lsp/lsp_exception.h>
 #include <lsp/lsp_json_parser.h>
 #include <lsp/specification.h>
 
@@ -21,7 +22,10 @@ namespace LCompilers::LanguageServerProtocol {
         (*object) = parseObject();
         dropWhitespace();
         if (hasNext()) {
-          throw std::invalid_argument("Not a valid JSON object (trailing characters): '" + message + "'");
+          throw LSP_EXCEPTION(
+            ErrorCodes::PARSE_ERROR,
+            "Not a valid JSON object (trailing characters): '" + message + "'"
+          );
         }
         return object;
       }
@@ -30,16 +34,25 @@ namespace LCompilers::LanguageServerProtocol {
         (*array) = parseArray();
         dropWhitespace();
         if (hasNext()) {
-          throw std::invalid_argument("Not a valid JSON array (trailing characters): '" + message + "'");
+          throw LSP_EXCEPTION(
+            ErrorCodes::PARSE_ERROR,
+            "Not a valid JSON array (trailing characters): '" + message + "'"
+          );
         }
         return array;
       }
       default: {
-        throw std::invalid_argument("Not a valid JSON message: '" + message + "'");
+        throw LSP_EXCEPTION(
+          ErrorCodes::PARSE_ERROR,
+          "Not a valid JSON message: '" + message + "'"
+        );
       }
       }
     }
-    throw std::invalid_argument("Cannot parse empty message.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Cannot parse empty message."
+    );
   }
 
   auto LspJsonParser::dropWhitespace() -> void {
@@ -78,17 +91,25 @@ namespace LCompilers::LanguageServerProtocol {
             hasAttribute = true;
           } else {
             ss.str("");
-            ss << "Expected ':' to follow object attribute name, not: '" << c << "'";
-            throw std::invalid_argument(ss.str());
+            ss << "Expected ':' to follow object attribute name, not: '"
+               << c << "'";
+            throw LSP_EXCEPTION(
+              ErrorCodes::PARSE_ERROR,
+              ss.str()
+            );
           }
         } else {
-          throw std::invalid_argument("Reached end-of-message while parsing object attribute.");
+          throw LSP_EXCEPTION(
+            ErrorCodes::PARSE_ERROR,
+            "Reached end-of-message while parsing object attribute."
+          );
         }
         break;
       }
       case ',': {
         if (!hasAttribute) {
-          throw std::invalid_argument(
+          throw LSP_EXCEPTION(
+            ErrorCodes::PARSE_ERROR,
             "Found out-of-sequence separator (',') while parsing object."
           );
         }
@@ -104,11 +125,17 @@ namespace LCompilers::LanguageServerProtocol {
         ss << "Found invalid character while parsing object: '";
         escapeAndBuffer(c);
         ss << '\'';
-        throw std::invalid_argument(ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::PARSE_ERROR,
+          ss.str()
+        );
       }
       }
     }
-    throw std::invalid_argument("Reached end-of-message while parsing object.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Reached end-of-message while parsing object."
+    );
   }
 
   auto LspJsonParser::parseArray() -> LSPArray {
@@ -120,7 +147,8 @@ namespace LCompilers::LanguageServerProtocol {
       switch (c) {
       case ',': {
         if (!hasValue) {
-          throw std::invalid_argument(
+          throw LSP_EXCEPTION(
+            ErrorCodes::PARSE_ERROR,
             "Found out-of-sequence separator (',') while parsing array"
           );
         }
@@ -138,7 +166,10 @@ namespace LCompilers::LanguageServerProtocol {
       }
       }
     }
-    throw std::invalid_argument("Reached end-of-message while parsing array.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Reached end-of-message while parsing array."
+    );
   }
 
   auto LspJsonParser::parseValue() -> std::unique_ptr<LSPAny> {
@@ -197,7 +228,10 @@ namespace LCompilers::LanguageServerProtocol {
       dropWhitespace();
       return value;
     }
-    throw std::invalid_argument("Reached end-of-message while parsing value.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Reached end-of-message while parsing value."
+    );
   }
 
   auto LspJsonParser::parseString() -> string_t {
@@ -303,11 +337,15 @@ namespace LCompilers::LanguageServerProtocol {
               ss << "Found non-hex digit while parsing unicode character: '";
               escapeAndBuffer(c);
               ss << '\'';
-              throw std::invalid_argument(ss.str());
+              throw LSP_EXCEPTION(
+                ErrorCodes::PARSE_ERROR,
+                ss.str()
+              );
             }
           }
           if (i < 4) {
-            throw std::invalid_argument(
+            throw LSP_EXCEPTION(
+              ErrorCodes::PARSE_ERROR,
               "Reached end-of-message while parsing unicode literal."
             );
           }
@@ -330,7 +368,10 @@ namespace LCompilers::LanguageServerProtocol {
       }
       }
     }
-    throw std::invalid_argument("Cannot parse string without closing parenthesis.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Cannot parse string without closing parenthesis."
+    );
   }
 
   auto LspJsonParser::escapeAndBuffer(unsigned char c) -> void {
@@ -370,7 +411,10 @@ namespace LCompilers::LanguageServerProtocol {
       switch (c) {
       case '-': {
         if (isNegated) {
-          throw std::invalid_argument("Found double-negative while parsing number");
+          throw LSP_EXCEPTION(
+            ErrorCodes::PARSE_ERROR,
+            "Found double-negative while parsing number"
+          );
         }
         isNegated = true;
         ss << c;
@@ -416,11 +460,17 @@ namespace LCompilers::LanguageServerProtocol {
           (*number) = std::stoi(ss.str());
           return number;
         }
-        throw std::invalid_argument("Failed to parse number: no digits.");
+        throw LSP_EXCEPTION(
+          ErrorCodes::PARSE_ERROR,
+          "Failed to parse number: no digits."
+        );
       }
       }
     }
-    throw std::invalid_argument("Reached end-of-message while parsing number.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Reached end-of-message while parsing number."
+    );
   }
 
   auto LspJsonParser::parseFraction() -> std::unique_ptr<LSPAny> {
@@ -455,11 +505,17 @@ namespace LCompilers::LanguageServerProtocol {
           (*number) = std::stod(ss.str());
           return number;
         }
-        throw std::invalid_argument("Failed to parse fraction: no digits.");
+        throw LSP_EXCEPTION(
+          ErrorCodes::PARSE_ERROR,
+          "Failed to parse fraction: no digits."
+        );
       }
       }
     }
-    throw std::invalid_argument("Reached end-of-message while parsing decimal.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Reached end-of-message while parsing decimal."
+    );
   }
 
   auto LspJsonParser::parseExponent() -> std::unique_ptr<LSPAny> {
@@ -471,7 +527,10 @@ namespace LCompilers::LanguageServerProtocol {
       case '-': // fallthrough
       case '+': {
         if (hasSign) {
-          throw std::invalid_argument("Found multiple signs for exponent.");
+          throw LSP_EXCEPTION(
+            ErrorCodes::PARSE_ERROR,
+            "Found multiple signs for exponent."
+          );
         }
         hasSign = true;
         ss << c;
@@ -499,11 +558,17 @@ namespace LCompilers::LanguageServerProtocol {
           (*number) = std::stod(ss.str());
           return number;
         }
-        throw std::invalid_argument("Failed to parse exponent: no digits.");
+        throw LSP_EXCEPTION(
+          ErrorCodes::PARSE_ERROR,
+          "Failed to parse exponent: no digits."
+        );
       }
       }
     }
-    throw std::invalid_argument("Reached end-of-message while parsing exponent.");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Reached end-of-message while parsing exponent."
+    );
   }
 
   auto LspJsonParser::parseTrue() -> std::unique_ptr<LSPAny> {
@@ -518,7 +583,10 @@ namespace LCompilers::LanguageServerProtocol {
         }
       }
     // }
-    throw std::invalid_argument("Failed to parse literal: true");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Failed to parse literal: true"
+    );
   }
 
   auto LspJsonParser::parseFalse() -> std::unique_ptr<LSPAny> {
@@ -535,7 +603,10 @@ namespace LCompilers::LanguageServerProtocol {
         }
       }
     // }
-    throw std::invalid_argument("Failed to parse literal: false");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Failed to parse literal: false"
+    );
   }
 
   auto LspJsonParser::parseNull() -> std::unique_ptr<LSPAny> {
@@ -550,7 +621,10 @@ namespace LCompilers::LanguageServerProtocol {
         }
       }
     // }
-    throw std::invalid_argument("Failed to parse literal: true");
+    throw LSP_EXCEPTION(
+      ErrorCodes::PARSE_ERROR,
+      "Failed to parse literal: true"
+    );
   }
 
 } // namespace LCompilers::LanguageServerProtocol

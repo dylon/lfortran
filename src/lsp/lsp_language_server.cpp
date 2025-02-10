@@ -9,6 +9,7 @@
 
 #include <lsp/specification.h>
 #include <lsp/lsp_exception.h>
+#include <lsp/lsp_json_parser.h>
 #include <lsp/lsp_language_server.h>
 
 namespace LCompilers::LanguageServerProtocol {
@@ -38,8 +39,7 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspLanguageServer::handle(
-    // TODO: Add support for batched messages, i.e. multiple messages within an array.
-    const std::string &request,
+    const std::string &message,
     std::size_t sendId
   ) -> void {
     ResponseMessage response;
@@ -48,64 +48,73 @@ namespace LCompilers::LanguageServerProtocol {
       response.jsonrpc = JSON_RPC_VERSION;
       response.id = nullptr;
 
-      rapidjson::Document document = deserializer.deserialize(request);
-      if (document.HasParseError()) {
-        std::stringstream ss;
-        ss << "Invalid JSON request (error="
-           << static_cast<int>(document.GetParseError())
-           << "): " << request;
-        throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, ss.str());
-      }
+      LspJsonParser parser(message);
+      std::unique_ptr<LSPAny> document = parser.parse();
+      LSPAnyType documentType = static_cast<LSPAnyType>(document->index());
 
-      if (document.HasMember("id")) {
-        const rapidjson::Value &idValue = document["id"];
-        if (idValue.IsString()) {
-          response.id = idValue.GetString();
-        } else if (idValue.IsInt()) {
-          response.id = idValue.GetInt();
-        } else if (!idValue.IsNull()) { // null => notification
-          std::stringstream ss;
-          ss << "Unsupported type for id attribute: "
-             << static_cast<int>(idValue.GetType());
-          throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      if (documentType != LSPAnyType::OBJECT_TYPE) {
+        // TODO: Add support for batched messages, i.e. multiple messages within
+        // an array.
+        if (documentType == LSPAnyType::ARRAY_TYPE) {
+          throw LSP_EXCEPTION(
+            ErrorCodes::INVALID_PARAMS,
+            "Batched requests are not supported (currently)."
+          );
         }
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "Invalid request message: " + message
+        );
       }
 
-      if (document.HasMember("method")) {
-        const std::string &method = document["method"].GetString();
+      const LSPObject &object = std::get<LSPObject>(*document);
+      LSPObject::const_iterator iter;
+
+      if ((iter = object.find("id")) != object.end()) {
+        response.id = transformer.anyToResponseId(*iter->second);
+      }
+
+      if ((iter = object.find("method")) != object.end()) {
+        const std::string &method =
+          transformer.anyToString(*iter->second);
         if (isIncomingRequest(method)) {
-          if (static_cast<ResponseIdType>(response.id.index()) == ResponseIdType::NULL_TYPE) {
+          if (static_cast<ResponseIdType>(response.id.index()) ==
+              ResponseIdType::NULL_TYPE) {
             std::stringstream ss;
-            ss << "Missing request method=\"" << method << "\" attribute: id";
+            ss << "Missing request method=\""
+               << method << "\" attribute: id";
             throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
           }
-          RequestMessage request = deserializer.deserializeRequest(document);
-          response.jsonrpc = request.jsonrpc;
-          dispatch(response, request);
+          std::unique_ptr<RequestMessage> request =
+            transformer.anyToRequestMessage(*document);
+          response.jsonrpc = request->jsonrpc;
+          dispatch(response, *request);
         } else if (isIncomingNotification(method)) {
-          if (static_cast<ResponseIdType>(response.id.index()) != ResponseIdType::NULL_TYPE) {
+          if (static_cast<ResponseIdType>(response.id.index()) !=
+              ResponseIdType::NULL_TYPE) {
             std::stringstream ss;
-            ss << "Notification method=\"" << method << "\" must not contain the attribute: id";
+            ss << "Notification method=\""
+               << method
+               << "\" must not contain the attribute: id";
+            throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
           }
-          NotificationMessage notification =
-            deserializer.deserializeNotification(document);
-          response.jsonrpc = notification.jsonrpc;
-          dispatch(response, notification);
+          std::unique_ptr<NotificationMessage> notification =
+            transformer.anyToNotificationMessage(*document);
+          response.jsonrpc = notification->jsonrpc;
+          dispatch(response, *notification);
         } else {
           std::stringstream ss;
           ss << "Unsupported method: \"" << method << "\"";
           throw LSP_EXCEPTION(ErrorCodes::INVALID_REQUEST, ss.str());
         }
-      } else if (document.HasMember("result") || document.HasMember("error")) {
+      } else if ((iter = object.find("result")) != object.end()) {
         notifySent();
-        if (document.HasMember("result")) {
-          const rapidjson::Value &result = document["result"];
-          response.result = deserializer.jsonToLsp(result);
-        } else if (document.HasMember("error")) {
-          std::unique_ptr<LSPAny> error =
-            deserializer.jsonToLsp(document["error"]);
-          response.error = transformer.anyToResponseError(*error);
-        }
+        response.result = transformer.copy(iter->second);
+        dispatch(response);
+        return;
+      } else if ((iter = object.find("error")) != object.end()) {
+        notifySent();
+        response.error = transformer.anyToResponseError(*iter->second);
         dispatch(response);
         return;
       } else {
@@ -144,7 +153,8 @@ namespace LCompilers::LanguageServerProtocol {
         "An unexpected exception occurred. If it continues, please file a ticket.";
       response.error = std::move(error);
     }
-    const std::string message = serializer.serializeResponse(response);
+    std::unique_ptr<LSPAny> any = transformer.responseMessageToAny(response);
+    const std::string message = serializer.serialize(*any);
     send(message, sendId);
   }
 
@@ -1858,8 +1868,8 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/workspaceFolders");
     }
     request.method = "workspace/workspaceFolders";
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -1884,8 +1894,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "workspace/configuration";
     request.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -1907,8 +1917,8 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/foldingRange/refresh");
     }
     request.method = "workspace/foldingRange/refresh";
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -1933,8 +1943,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "window/workDoneProgress/create";
     request.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -1956,8 +1966,8 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/semanticTokens/refresh");
     }
     request.method = "workspace/semanticTokens/refresh";
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -1982,8 +1992,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "window/showDocument";
     request.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2005,8 +2015,8 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/inlineValue/refresh");
     }
     request.method = "workspace/inlineValue/refresh";
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2028,8 +2038,8 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/inlayHint/refresh");
     }
     request.method = "workspace/inlayHint/refresh";
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2051,8 +2061,8 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/diagnostic/refresh");
     }
     request.method = "workspace/diagnostic/refresh";
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2077,8 +2087,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "client/registerCapability";
     request.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2103,8 +2113,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "client/unregisterCapability";
     request.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2129,8 +2139,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "window/showMessageRequest";
     request.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2152,8 +2162,8 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/codeLens/refresh");
     }
     request.method = "workspace/codeLens/refresh";
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2178,8 +2188,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "workspace/applyEdit";
     request.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeRequest(request);
+    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2202,8 +2212,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "window/showMessage";
     notification.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeNotification(notification);
+    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2215,8 +2225,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "window/logMessage";
     notification.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeNotification(notification);
+    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2228,8 +2238,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "telemetry/event";
     notification.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeNotification(notification);
+    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2241,8 +2251,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "textDocument/publishDiagnostics";
     notification.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeNotification(notification);
+    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 
@@ -2254,8 +2264,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "$/logTrace";
     notification.params = transformer.asMessageParams(params);
-    const std::string message =
-      serializer.serializeNotification(notification);
+    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    const std::string message = serializer.serialize(*any);
     send(message);
   }
 

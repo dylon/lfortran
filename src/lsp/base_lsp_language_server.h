@@ -5,8 +5,6 @@
 
 #include <lsp/logger.h>
 #include <lsp/lsp_language_server.h>
-#include <lsp/lsp_serializer.h>
-#include <lsp/lsp_transformer.h>
 #include <lsp/specification.h>
 #include <lsp/text_document.h>
 

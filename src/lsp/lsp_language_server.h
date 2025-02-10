@@ -10,7 +10,7 @@
 
 #include <lsp/language_server.h>
 #include <lsp/logger.h>
-#include <lsp/lsp_serializer.h>
+#include <lsp/lsp_json_serializer.h>
 #include <lsp/lsp_transformer.h>
 #include <lsp/specification.h>
 
@@ -35,8 +35,7 @@ namespace LCompilers::LanguageServerProtocol {
     auto isRunning() const -> bool;
   protected:
     const std::string configSection;
-    JsonRpcLspSerializer serializer;
-    JsonRpcLspDeserializer deserializer;
+    LspJsonSerializer serializer;
     LspTransformer transformer;
     std::unique_ptr<InitializeParams> _initializeParams;
     std::atomic_bool _initialized = false;

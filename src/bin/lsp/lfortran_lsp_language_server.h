@@ -2,7 +2,6 @@
 
 #include <lsp/logger.h>
 #include <lsp/base_lsp_language_server.h>
-#include <lsp/lsp_serializer.h>
 #include <lsp/message_queue.h>
 #include <lsp/specification.h>
 

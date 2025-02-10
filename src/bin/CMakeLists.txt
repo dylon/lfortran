@@ -18,7 +18,6 @@ if (WITH_LSP)
   set(LFORTRAN_LINK_LIBRARIES
     ${LFORTRAN_LINK_LIBRARIES}
     asr
-    p::rapidjson
     lcompilers_lsp
   )
 endif()

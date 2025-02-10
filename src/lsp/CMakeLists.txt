@@ -4,14 +4,13 @@ project(lcompilers-lsp)
 
 set(LCOMPILERS_LSP_SRC
   specification.cpp
-  lsp_json_parser.cpp
-  logger.cpp
   lsp_exception.cpp
+  lsp_json_parser.cpp
+  lsp_json_serializer.cpp
+  logger.cpp
   text_document.cpp
   message_queue.cpp
   thread_pool.cpp
-  serializer.cpp
-  lsp_serializer.cpp
   lsp_transformer.cpp
   language_server.cpp
   lsp_language_server.cpp
@@ -24,4 +23,4 @@ set(LCOMPILERS_LSP_SRC
 add_library(lcompilers_lsp STATIC ${LCOMPILERS_LSP_SRC})
 target_include_directories(lcompilers_lsp BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_include_directories(lcompilers_lsp BEFORE PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/..)
-target_link_libraries(lcompilers_lsp asr p::rapidjson)
+target_link_libraries(lcompilers_lsp asr)
