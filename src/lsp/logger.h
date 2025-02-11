@@ -6,6 +6,7 @@
 #include <iostream>
 #include <mutex>
 #include <string>
+#include <string_view>
 
 namespace LCompilers::LanguageServer::Logging {
   namespace fs = std::filesystem;
@@ -14,10 +15,14 @@ namespace LCompilers::LanguageServer::Logging {
   public:
     Logger(const fs::path &logPath);
     ~Logger();
+
+    inline auto mutex() -> std::mutex & {
+      return _mutex;
+    }
+
     auto logPath() const -> const fs::path &;
     auto isOpen() const -> bool;
     auto close() -> void;
-    auto lock() -> std::unique_lock<std::mutex>;
     auto operator<<(unsigned char c) -> Logger &;
     auto operator<<(char c) -> Logger &;
     auto operator<<(short unsigned int value) -> Logger &;
@@ -26,11 +31,12 @@ namespace LCompilers::LanguageServer::Logging {
     auto operator<<(std::size_t value) -> Logger &;
     auto operator<<(const char *str) -> Logger &;
     auto operator<<(const std::string &str) -> Logger &;
+    auto operator<<(const std::string_view &view) -> Logger &;
     auto operator<<(std::ostream& (*manip)(std::ostream&)) -> Logger &;
   private:
     fs::path _logPath;
     std::ofstream logFile;
-    std::mutex mutex;
+    std::mutex _mutex;
   };
 
 } // namespace LCompilers::LanguageServer::Logging

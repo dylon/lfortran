@@ -14,14 +14,13 @@
 #include <lsp/language_server.h>
 #include <lsp/logger.h>
 #include <lsp/message_queue.h>
-#include <lsp/request_parser.h>
+#include <lsp/message_stream.h>
 #include <lsp/thread_pool.h>
 
 namespace LCompilers::LanguageServer::Interface {
   namespace fs = std::filesystem;
 
   namespace ls = LCompilers::LanguageServer;
-  namespace lst = LCompilers::LanguageServer::Threading;
   namespace lsl = LCompilers::LanguageServer::Logging;
 
   const std::regex RE_CONFIG_SECTION(
@@ -132,11 +131,12 @@ namespace LCompilers::LanguageServer::Interface {
     auto validateAndSetServerProtocol() -> ExitCode;
     auto validateAndSetInteractive() -> ExitCode;
     auto validateAndSetNumRequestThreads() -> ExitCode;
+    auto validateAndSetNumWorkerThreads() -> ExitCode;
     auto validateAndSetConfigSection() -> ExitCode;
 
-    auto buildRequestParserFactory(
+    auto buildMessageStream(
       lsl::Logger &logger
-    ) -> std::unique_ptr<ls::RequestParserFactory>;
+    ) -> std::unique_ptr<ls::MessageStream>;
 
     auto buildLanguageServer(
       ls::MessageQueue &incomingMessages,
@@ -146,7 +146,7 @@ namespace LCompilers::LanguageServer::Interface {
 
     auto buildCommunicationProtocol(
       ls::LanguageServer &languageServer,
-      ls::RequestParserFactory &requestParserFactory,
+      ls::MessageStream &messageStream,
       ls::MessageQueue &incomingMessages,
       ls::MessageQueue &outgoingMessages,
       lsl::Logger &logger

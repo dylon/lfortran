@@ -4,7 +4,6 @@
 // -----------------------------------------------------------------------------
 
 #include <cmath>
-#include <sstream>
 #include <stdexcept>
 
 #include <lsp/specification.h>
@@ -89,10 +88,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) SemanticTokenTypes must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) SemanticTokenTypes must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -122,10 +122,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) SemanticTokenModifiers must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) SemanticTokenModifiers must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -155,10 +156,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) DocumentDiagnosticReportKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) DocumentDiagnosticReportKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -195,10 +197,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) ErrorCodes must be of type LSPAnyType::INTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) ErrorCodes must be of type LSPAnyType::INTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -235,10 +238,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) LSPErrorCodes must be of type LSPAnyType::INTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) LSPErrorCodes must be of type LSPAnyType::INTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -268,10 +272,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) FoldingRangeKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) FoldingRangeKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -308,10 +313,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) SymbolKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) SymbolKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -348,10 +354,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) SymbolTag must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) SymbolTag must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -381,10 +388,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) UniquenessLevel must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) UniquenessLevel must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -414,10 +422,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) MonikerKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) MonikerKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -454,10 +463,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) InlayHintKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) InlayHintKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -494,10 +504,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) MessageType must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) MessageType must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -534,10 +545,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) TextDocumentSyncKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) TextDocumentSyncKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -574,10 +586,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) TextDocumentSaveReason must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) TextDocumentSaveReason must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -614,10 +627,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) CompletionItemKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) CompletionItemKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -654,10 +668,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) CompletionItemTag must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) CompletionItemTag must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -694,10 +709,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) InsertTextFormat must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) InsertTextFormat must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -734,10 +750,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) InsertTextMode must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) InsertTextMode must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -774,10 +791,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) DocumentHighlightKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) DocumentHighlightKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -807,10 +825,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) CodeActionKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) CodeActionKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -840,10 +859,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) TraceValues must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) TraceValues must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -873,10 +893,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) MarkupKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) MarkupKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -913,10 +934,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) InlineCompletionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) InlineCompletionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -946,10 +968,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) PositionEncodingKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) PositionEncodingKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -986,10 +1009,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) FileChangeType must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) FileChangeType must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1026,10 +1050,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) WatchKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) WatchKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1066,10 +1091,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) DiagnosticSeverity must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) DiagnosticSeverity must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1106,10 +1132,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) DiagnosticTag must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) DiagnosticTag must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1146,10 +1173,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) CompletionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) CompletionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1186,10 +1214,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) SignatureHelpTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) SignatureHelpTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1226,10 +1255,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) CodeActionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) CodeActionTriggerKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1259,10 +1289,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) FileOperationPatternKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) FileOperationPatternKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1299,10 +1330,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) NotebookCellKind must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) NotebookCellKind must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1332,10 +1364,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) ResourceOperationKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) ResourceOperationKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1365,10 +1398,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) FailureHandlingKind must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) FailureHandlingKind must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1405,10 +1439,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) PrepareSupportDefaultBehavior must be of type LSPAnyType::UINTEGER_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) PrepareSupportDefaultBehavior must be of type LSPAnyType::UINTEGER_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1438,10 +1473,11 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       default: {
-        std::stringstream ss;
-        ss << "LSPAnyType for a(n) TokenFormat must be of type LSPAnyType::STRING_TYPE but received type "
-           << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          ("LSPAnyType for a(n) TokenFormat must be of type LSPAnyType::STRING_TYPE but received type " +
+           LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+        );
       }
       }
     } catch (std::invalid_argument &e) {
@@ -1468,10 +1504,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Message> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Message must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Message must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Message> value =
@@ -1481,10 +1518,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Message: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Message: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("jsonrpc");
@@ -1516,10 +1553,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RequestMessage> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RequestMessage must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RequestMessage must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RequestMessage> value =
@@ -1529,10 +1567,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RequestMessage: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RequestMessage: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("id");
@@ -1594,10 +1632,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotificationMessage> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotificationMessage must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotificationMessage must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotificationMessage> value =
@@ -1607,10 +1646,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotificationMessage: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotificationMessage: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("method");
@@ -1661,10 +1700,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ResponseError> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ResponseError must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ResponseError must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ResponseError> value =
@@ -1674,10 +1714,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ResponseError: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ResponseError: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("code");
@@ -1728,10 +1768,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ResponseMessage> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ResponseMessage must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ResponseMessage must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ResponseMessage> value =
@@ -1741,10 +1782,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ResponseMessage: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ResponseMessage: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("id");
@@ -1803,10 +1844,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ImplementationParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ImplementationParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ImplementationParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ImplementationParams> value =
@@ -1816,10 +1858,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ImplementationParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ImplementationParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -1878,10 +1920,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Location> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Location must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Location must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Location> value =
@@ -1891,10 +1934,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Location: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Location: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -1937,10 +1980,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ImplementationRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ImplementationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ImplementationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ImplementationRegistrationOptions> value =
@@ -1950,10 +1994,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ImplementationRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ImplementationRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -2001,10 +2045,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeDefinitionParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeDefinitionParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeDefinitionParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeDefinitionParams> value =
@@ -2014,10 +2059,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeDefinitionParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeDefinitionParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -2076,10 +2121,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeDefinitionRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeDefinitionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeDefinitionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeDefinitionRegistrationOptions> value =
@@ -2089,10 +2135,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeDefinitionRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeDefinitionRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -2140,10 +2186,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceFolder> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceFolder must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceFolder must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceFolder> value =
@@ -2153,10 +2200,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceFolder: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceFolder: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -2199,10 +2246,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeWorkspaceFoldersParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeWorkspaceFoldersParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeWorkspaceFoldersParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeWorkspaceFoldersParams> value =
@@ -2212,10 +2260,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeWorkspaceFoldersParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeWorkspaceFoldersParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("event");
@@ -2247,10 +2295,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ConfigurationParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ConfigurationParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ConfigurationParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ConfigurationParams> value =
@@ -2260,10 +2309,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ConfigurationParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ConfigurationParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("items");
@@ -2308,10 +2357,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentColorParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentColorParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentColorParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentColorParams> value =
@@ -2321,10 +2371,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentColorParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentColorParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -2372,10 +2422,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ColorInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ColorInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ColorInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ColorInformation> value =
@@ -2385,10 +2436,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ColorInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ColorInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -2431,10 +2482,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentColorRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentColorRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentColorRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentColorRegistrationOptions> value =
@@ -2444,10 +2496,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentColorRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentColorRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -2495,10 +2547,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ColorPresentationParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ColorPresentationParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ColorPresentationParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ColorPresentationParams> value =
@@ -2508,10 +2561,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ColorPresentationParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ColorPresentationParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -2581,10 +2634,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ColorPresentation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ColorPresentation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ColorPresentation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ColorPresentation> value =
@@ -2594,10 +2648,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ColorPresentation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ColorPresentation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("label");
@@ -2656,10 +2710,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkDoneProgressOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkDoneProgressOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkDoneProgressOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkDoneProgressOptions> value =
@@ -2669,10 +2724,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkDoneProgressOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkDoneProgressOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -2724,10 +2779,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) TextDocumentRegistrationOptions_documentSelector: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) TextDocumentRegistrationOptions_documentSelector: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -2749,10 +2805,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported TextDocumentRegistrationOptions_documentSelectorType: "
-         << TextDocumentRegistrationOptions_documentSelectorTypeNames.at(static_cast<TextDocumentRegistrationOptions_documentSelectorType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported TextDocumentRegistrationOptions_documentSelectorType: " +
+         TextDocumentRegistrationOptions_documentSelectorTypeNames.at(static_cast<TextDocumentRegistrationOptions_documentSelectorType>(variant.index())))
+      );
     }
     }
   }
@@ -2761,10 +2818,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentRegistrationOptions> value =
@@ -2774,10 +2832,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -2809,10 +2867,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRangeParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRangeParams> value =
@@ -2822,10 +2881,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRangeParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRangeParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -2873,10 +2932,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRange> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRange must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRange must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRange> value =
@@ -2886,10 +2946,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRange: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRange: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("startLine");
@@ -2964,10 +3024,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRangeRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRangeRegistrationOptions> value =
@@ -2977,10 +3038,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRangeRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRangeRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -3028,10 +3089,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DeclarationParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DeclarationParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DeclarationParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DeclarationParams> value =
@@ -3041,10 +3103,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DeclarationParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DeclarationParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -3103,10 +3165,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DeclarationRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DeclarationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DeclarationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DeclarationRegistrationOptions> value =
@@ -3116,10 +3179,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DeclarationRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DeclarationRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -3167,10 +3230,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SelectionRangeParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SelectionRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SelectionRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SelectionRangeParams> value =
@@ -3180,10 +3244,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SelectionRangeParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SelectionRangeParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -3255,10 +3319,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SelectionRange> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SelectionRange must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SelectionRange must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SelectionRange> value =
@@ -3268,10 +3333,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SelectionRange: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SelectionRange: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -3311,10 +3376,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SelectionRangeRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SelectionRangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SelectionRangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SelectionRangeRegistrationOptions> value =
@@ -3324,10 +3390,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SelectionRangeRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SelectionRangeRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -3375,10 +3441,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkDoneProgressCreateParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkDoneProgressCreateParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkDoneProgressCreateParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkDoneProgressCreateParams> value =
@@ -3388,10 +3455,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkDoneProgressCreateParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkDoneProgressCreateParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("token");
@@ -3423,10 +3490,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkDoneProgressCancelParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkDoneProgressCancelParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkDoneProgressCancelParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkDoneProgressCancelParams> value =
@@ -3436,10 +3504,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkDoneProgressCancelParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkDoneProgressCancelParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("token");
@@ -3471,10 +3539,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyPrepareParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyPrepareParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyPrepareParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyPrepareParams> value =
@@ -3484,10 +3553,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyPrepareParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyPrepareParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -3538,10 +3607,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyItem> value =
@@ -3551,10 +3621,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 8) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("name");
@@ -3665,10 +3735,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyRegistrationOptions> value =
@@ -3678,10 +3749,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -3729,10 +3800,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyIncomingCallsParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyIncomingCallsParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyIncomingCallsParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyIncomingCallsParams> value =
@@ -3742,10 +3814,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyIncomingCallsParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyIncomingCallsParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("item");
@@ -3793,10 +3865,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyIncomingCall> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyIncomingCall must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyIncomingCall must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyIncomingCall> value =
@@ -3806,10 +3879,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyIncomingCall: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyIncomingCall: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("from");
@@ -3865,10 +3938,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyOutgoingCallsParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyOutgoingCallsParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyOutgoingCallsParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyOutgoingCallsParams> value =
@@ -3878,10 +3952,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyOutgoingCallsParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyOutgoingCallsParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("item");
@@ -3929,10 +4003,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyOutgoingCall> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyOutgoingCall must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyOutgoingCall must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyOutgoingCall> value =
@@ -3942,10 +4017,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyOutgoingCall: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyOutgoingCall: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("to");
@@ -4001,10 +4076,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensParams> value =
@@ -4014,10 +4090,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -4065,10 +4141,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokens> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokens must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokens must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokens> value =
@@ -4078,10 +4155,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokens: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokens: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resultId");
@@ -4134,10 +4211,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensPartialResult> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensPartialResult> value =
@@ -4147,10 +4225,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensPartialResult: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensPartialResult: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("data");
@@ -4195,10 +4273,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensRegistrationOptions> value =
@@ -4208,10 +4287,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -4286,10 +4365,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensDeltaParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensDeltaParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensDeltaParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensDeltaParams> value =
@@ -4299,10 +4379,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensDeltaParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensDeltaParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -4361,10 +4441,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensDelta> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensDelta must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensDelta must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensDelta> value =
@@ -4374,10 +4455,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensDelta: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensDelta: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resultId");
@@ -4430,10 +4511,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensDeltaPartialResult> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensDeltaPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensDeltaPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensDeltaPartialResult> value =
@@ -4443,10 +4525,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensDeltaPartialResult: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensDeltaPartialResult: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("edits");
@@ -4491,10 +4573,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensRangeParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensRangeParams> value =
@@ -4504,10 +4587,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensRangeParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensRangeParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -4566,10 +4649,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ShowDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ShowDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ShowDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ShowDocumentParams> value =
@@ -4579,10 +4663,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ShowDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ShowDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -4638,10 +4722,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ShowDocumentResult> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ShowDocumentResult must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ShowDocumentResult must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ShowDocumentResult> value =
@@ -4651,10 +4736,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ShowDocumentResult: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ShowDocumentResult: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("success");
@@ -4686,10 +4771,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LinkedEditingRangeParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LinkedEditingRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LinkedEditingRangeParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LinkedEditingRangeParams> value =
@@ -4699,10 +4785,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LinkedEditingRangeParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LinkedEditingRangeParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -4753,10 +4839,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LinkedEditingRanges> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LinkedEditingRanges must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LinkedEditingRanges must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LinkedEditingRanges> value =
@@ -4766,10 +4853,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LinkedEditingRanges: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LinkedEditingRanges: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("ranges");
@@ -4822,10 +4909,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LinkedEditingRangeRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LinkedEditingRangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LinkedEditingRangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LinkedEditingRangeRegistrationOptions> value =
@@ -4835,10 +4923,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LinkedEditingRangeRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LinkedEditingRangeRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -4886,10 +4974,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CreateFilesParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CreateFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CreateFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CreateFilesParams> value =
@@ -4899,10 +4988,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CreateFilesParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CreateFilesParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("files");
@@ -4973,10 +5062,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceEdit_documentChanges: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceEdit_documentChanges: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -5008,10 +5098,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported WorkspaceEdit_documentChangesType: "
-         << WorkspaceEdit_documentChangesTypeNames.at(static_cast<WorkspaceEdit_documentChangesType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported WorkspaceEdit_documentChangesType: " +
+         WorkspaceEdit_documentChangesTypeNames.at(static_cast<WorkspaceEdit_documentChangesType>(variant.index())))
+      );
     }
     }
   }
@@ -5020,10 +5111,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceEdit> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceEdit must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceEdit must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceEdit> value =
@@ -5033,10 +5125,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceEdit: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceEdit: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("changes");
@@ -5124,10 +5216,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileOperationRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileOperationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileOperationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileOperationRegistrationOptions> value =
@@ -5137,10 +5230,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileOperationRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileOperationRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("filters");
@@ -5185,10 +5278,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RenameFilesParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RenameFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RenameFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RenameFilesParams> value =
@@ -5198,10 +5292,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RenameFilesParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RenameFilesParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("files");
@@ -5246,10 +5340,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DeleteFilesParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DeleteFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DeleteFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DeleteFilesParams> value =
@@ -5259,10 +5354,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DeleteFilesParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DeleteFilesParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("files");
@@ -5307,10 +5402,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MonikerParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MonikerParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MonikerParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MonikerParams> value =
@@ -5320,10 +5416,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MonikerParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MonikerParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -5382,10 +5478,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Moniker> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Moniker must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Moniker must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Moniker> value =
@@ -5395,10 +5492,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Moniker: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Moniker: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("scheme");
@@ -5460,10 +5557,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MonikerRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MonikerRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MonikerRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MonikerRegistrationOptions> value =
@@ -5473,10 +5571,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MonikerRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MonikerRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -5516,10 +5614,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeHierarchyPrepareParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeHierarchyPrepareParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeHierarchyPrepareParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeHierarchyPrepareParams> value =
@@ -5529,10 +5628,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeHierarchyPrepareParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeHierarchyPrepareParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -5583,10 +5682,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeHierarchyItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeHierarchyItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeHierarchyItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeHierarchyItem> value =
@@ -5596,10 +5696,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 8) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeHierarchyItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeHierarchyItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("name");
@@ -5710,10 +5810,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeHierarchyRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeHierarchyRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeHierarchyRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeHierarchyRegistrationOptions> value =
@@ -5723,10 +5824,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeHierarchyRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeHierarchyRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -5774,10 +5875,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeHierarchySupertypesParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeHierarchySupertypesParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeHierarchySupertypesParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeHierarchySupertypesParams> value =
@@ -5787,10 +5889,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeHierarchySupertypesParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeHierarchySupertypesParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("item");
@@ -5838,10 +5940,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeHierarchySubtypesParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeHierarchySubtypesParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeHierarchySubtypesParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeHierarchySubtypesParams> value =
@@ -5851,10 +5954,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeHierarchySubtypesParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeHierarchySubtypesParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("item");
@@ -5902,10 +6005,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueParams> value =
@@ -5915,10 +6019,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -5980,10 +6084,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueRegistrationOptions> value =
@@ -5993,10 +6098,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -6044,10 +6149,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHintParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHintParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHintParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHintParams> value =
@@ -6057,10 +6163,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHintParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHintParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -6134,10 +6240,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) InlayHint_label: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) InlayHint_label: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -6164,10 +6271,11 @@ namespace LCompilers::LanguageServerProtocol {
       return any;
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported InlayHint_labelType: "
-         << InlayHint_labelTypeNames.at(static_cast<InlayHint_labelType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported InlayHint_labelType: " +
+         InlayHint_labelTypeNames.at(static_cast<InlayHint_labelType>(variant.index())))
+      );
     }
     }
   }
@@ -6194,10 +6302,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) InlayHint_tooltip: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) InlayHint_tooltip: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -6219,10 +6328,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported InlayHint_tooltipType: "
-         << InlayHint_tooltipTypeNames.at(static_cast<InlayHint_tooltipType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported InlayHint_tooltipType: " +
+         InlayHint_tooltipTypeNames.at(static_cast<InlayHint_tooltipType>(variant.index())))
+      );
     }
     }
   }
@@ -6231,10 +6341,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHint> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHint must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHint must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHint> value =
@@ -6244,10 +6355,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 8) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHint: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHint: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("position");
@@ -6349,10 +6460,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHintRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHintRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHintRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHintRegistrationOptions> value =
@@ -6362,10 +6474,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHintRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHintRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resolveProvider");
@@ -6421,10 +6533,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentDiagnosticParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentDiagnosticParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentDiagnosticParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentDiagnosticParams> value =
@@ -6434,10 +6547,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentDiagnosticParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentDiagnosticParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -6519,10 +6632,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) DocumentDiagnosticReportPartialResult_relatedDocuments: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) DocumentDiagnosticReportPartialResult_relatedDocuments: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -6544,10 +6658,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported DocumentDiagnosticReportPartialResult_relatedDocumentsType: "
-         << DocumentDiagnosticReportPartialResult_relatedDocumentsTypeNames.at(static_cast<DocumentDiagnosticReportPartialResult_relatedDocumentsType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported DocumentDiagnosticReportPartialResult_relatedDocumentsType: " +
+         DocumentDiagnosticReportPartialResult_relatedDocumentsTypeNames.at(static_cast<DocumentDiagnosticReportPartialResult_relatedDocumentsType>(variant.index())))
+      );
     }
     }
   }
@@ -6556,10 +6671,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentDiagnosticReportPartialResult> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentDiagnosticReportPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentDiagnosticReportPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentDiagnosticReportPartialResult> value =
@@ -6569,10 +6685,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentDiagnosticReportPartialResult: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentDiagnosticReportPartialResult: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("relatedDocuments");
@@ -6617,10 +6733,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DiagnosticServerCancellationData> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DiagnosticServerCancellationData must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DiagnosticServerCancellationData must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DiagnosticServerCancellationData> value =
@@ -6630,10 +6747,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DiagnosticServerCancellationData: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DiagnosticServerCancellationData: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("retriggerRequest");
@@ -6665,10 +6782,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DiagnosticRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DiagnosticRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DiagnosticRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DiagnosticRegistrationOptions> value =
@@ -6678,10 +6796,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DiagnosticRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DiagnosticRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -6759,10 +6877,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceDiagnosticParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceDiagnosticParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceDiagnosticParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceDiagnosticParams> value =
@@ -6772,10 +6891,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceDiagnosticParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceDiagnosticParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("identifier");
@@ -6844,10 +6963,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceDiagnosticReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceDiagnosticReport> value =
@@ -6857,10 +6977,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceDiagnosticReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceDiagnosticReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("items");
@@ -6905,10 +7025,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceDiagnosticReportPartialResult> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceDiagnosticReportPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceDiagnosticReportPartialResult must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceDiagnosticReportPartialResult> value =
@@ -6918,10 +7039,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceDiagnosticReportPartialResult: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceDiagnosticReportPartialResult: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("items");
@@ -6966,10 +7087,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidOpenNotebookDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidOpenNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidOpenNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidOpenNotebookDocumentParams> value =
@@ -6979,10 +7101,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidOpenNotebookDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidOpenNotebookDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookDocument");
@@ -7038,10 +7160,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeNotebookDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeNotebookDocumentParams> value =
@@ -7051,10 +7174,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeNotebookDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeNotebookDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookDocument");
@@ -7097,10 +7220,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidSaveNotebookDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidSaveNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidSaveNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidSaveNotebookDocumentParams> value =
@@ -7110,10 +7234,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidSaveNotebookDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidSaveNotebookDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookDocument");
@@ -7145,10 +7269,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidCloseNotebookDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidCloseNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidCloseNotebookDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidCloseNotebookDocumentParams> value =
@@ -7158,10 +7283,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidCloseNotebookDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidCloseNotebookDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookDocument");
@@ -7217,10 +7342,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineCompletionParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineCompletionParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineCompletionParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineCompletionParams> value =
@@ -7230,10 +7356,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineCompletionParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineCompletionParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("context");
@@ -7295,10 +7421,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineCompletionList> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineCompletionList must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineCompletionList must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineCompletionList> value =
@@ -7308,10 +7435,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineCompletionList: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineCompletionList: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("items");
@@ -7374,10 +7501,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) InlineCompletionItem_insertText: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) InlineCompletionItem_insertText: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -7399,10 +7527,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported InlineCompletionItem_insertTextType: "
-         << InlineCompletionItem_insertTextTypeNames.at(static_cast<InlineCompletionItem_insertTextType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported InlineCompletionItem_insertTextType: " +
+         InlineCompletionItem_insertTextTypeNames.at(static_cast<InlineCompletionItem_insertTextType>(variant.index())))
+      );
     }
     }
   }
@@ -7411,10 +7540,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineCompletionItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineCompletionItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineCompletionItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineCompletionItem> value =
@@ -7424,10 +7554,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineCompletionItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineCompletionItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("insertText");
@@ -7483,10 +7613,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineCompletionRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineCompletionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineCompletionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineCompletionRegistrationOptions> value =
@@ -7496,10 +7627,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineCompletionRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineCompletionRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -7547,10 +7678,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RegistrationParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RegistrationParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RegistrationParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RegistrationParams> value =
@@ -7560,10 +7692,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RegistrationParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RegistrationParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("registrations");
@@ -7608,10 +7740,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<UnregistrationParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) UnregistrationParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) UnregistrationParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<UnregistrationParams> value =
@@ -7621,10 +7754,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) UnregistrationParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) UnregistrationParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("unregisterations");
@@ -7669,10 +7802,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InitializeParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InitializeParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InitializeParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InitializeParams> value =
@@ -7682,10 +7816,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 10) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InitializeParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InitializeParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("processId");
@@ -7795,10 +7929,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InitializeResult_serverInfo> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InitializeResult_serverInfo must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InitializeResult_serverInfo must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InitializeResult_serverInfo> value =
@@ -7808,10 +7943,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InitializeResult_serverInfo: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InitializeResult_serverInfo: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("name");
@@ -7851,10 +7986,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InitializeResult> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InitializeResult must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InitializeResult must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InitializeResult> value =
@@ -7864,10 +8000,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InitializeResult: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InitializeResult: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("capabilities");
@@ -7907,10 +8043,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InitializeError> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InitializeError must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InitializeError must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InitializeError> value =
@@ -7920,10 +8057,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InitializeError: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InitializeError: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("retry");
@@ -7955,10 +8092,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InitializedParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InitializedParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InitializedParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InitializedParams> value =
@@ -7968,10 +8106,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 0) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InitializedParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InitializedParams: " + std::to_string(object.size())
+      );
     }
 
     return value;
@@ -7993,10 +8131,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeConfigurationParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeConfigurationParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeConfigurationParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeConfigurationParams> value =
@@ -8006,10 +8145,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeConfigurationParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeConfigurationParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("settings");
@@ -8064,10 +8203,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) DidChangeConfigurationRegistrationOptions_section: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) DidChangeConfigurationRegistrationOptions_section: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -8094,10 +8234,11 @@ namespace LCompilers::LanguageServerProtocol {
       return any;
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported DidChangeConfigurationRegistrationOptions_sectionType: "
-         << DidChangeConfigurationRegistrationOptions_sectionTypeNames.at(static_cast<DidChangeConfigurationRegistrationOptions_sectionType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported DidChangeConfigurationRegistrationOptions_sectionType: " +
+         DidChangeConfigurationRegistrationOptions_sectionTypeNames.at(static_cast<DidChangeConfigurationRegistrationOptions_sectionType>(variant.index())))
+      );
     }
     }
   }
@@ -8106,10 +8247,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeConfigurationRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeConfigurationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeConfigurationRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeConfigurationRegistrationOptions> value =
@@ -8119,10 +8261,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeConfigurationRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeConfigurationRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("section");
@@ -8151,10 +8293,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ShowMessageParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ShowMessageParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ShowMessageParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ShowMessageParams> value =
@@ -8164,10 +8307,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ShowMessageParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ShowMessageParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("type");
@@ -8210,10 +8353,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ShowMessageRequestParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ShowMessageRequestParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ShowMessageRequestParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ShowMessageRequestParams> value =
@@ -8223,10 +8367,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ShowMessageRequestParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ShowMessageRequestParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("type");
@@ -8288,10 +8432,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MessageActionItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MessageActionItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MessageActionItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MessageActionItem> value =
@@ -8301,10 +8446,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MessageActionItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MessageActionItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("title");
@@ -8336,10 +8481,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LogMessageParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LogMessageParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LogMessageParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LogMessageParams> value =
@@ -8349,10 +8495,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LogMessageParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LogMessageParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("type");
@@ -8395,10 +8541,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidOpenTextDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidOpenTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidOpenTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidOpenTextDocumentParams> value =
@@ -8408,10 +8555,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidOpenTextDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidOpenTextDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -8443,10 +8590,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeTextDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeTextDocumentParams> value =
@@ -8456,10 +8604,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeTextDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeTextDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -8515,10 +8663,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentChangeRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentChangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentChangeRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentChangeRegistrationOptions> value =
@@ -8528,10 +8677,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentChangeRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentChangeRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("syncKind");
@@ -8574,10 +8723,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidCloseTextDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidCloseTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidCloseTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidCloseTextDocumentParams> value =
@@ -8587,10 +8737,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidCloseTextDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidCloseTextDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -8622,10 +8772,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidSaveTextDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidSaveTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidSaveTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidSaveTextDocumentParams> value =
@@ -8635,10 +8786,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidSaveTextDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidSaveTextDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -8678,10 +8829,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentSaveRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentSaveRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentSaveRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentSaveRegistrationOptions> value =
@@ -8691,10 +8843,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentSaveRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentSaveRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -8734,10 +8886,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WillSaveTextDocumentParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WillSaveTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WillSaveTextDocumentParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WillSaveTextDocumentParams> value =
@@ -8747,10 +8900,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WillSaveTextDocumentParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WillSaveTextDocumentParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -8793,10 +8946,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextEdit> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextEdit must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextEdit must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextEdit> value =
@@ -8806,10 +8960,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextEdit: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextEdit: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -8852,10 +9006,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeWatchedFilesParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeWatchedFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeWatchedFilesParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeWatchedFilesParams> value =
@@ -8865,10 +9020,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeWatchedFilesParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeWatchedFilesParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("changes");
@@ -8913,10 +9068,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeWatchedFilesRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeWatchedFilesRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeWatchedFilesRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeWatchedFilesRegistrationOptions> value =
@@ -8926,10 +9082,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeWatchedFilesRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeWatchedFilesRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("watchers");
@@ -8974,10 +9130,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PublishDiagnosticsParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PublishDiagnosticsParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PublishDiagnosticsParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PublishDiagnosticsParams> value =
@@ -8987,10 +9144,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PublishDiagnosticsParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PublishDiagnosticsParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -9054,10 +9211,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionParams> value =
@@ -9067,10 +9225,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("context");
@@ -9155,10 +9313,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) CompletionItem_documentation: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) CompletionItem_documentation: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -9180,10 +9339,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported CompletionItem_documentationType: "
-         << CompletionItem_documentationTypeNames.at(static_cast<CompletionItem_documentationType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported CompletionItem_documentationType: " +
+         CompletionItem_documentationTypeNames.at(static_cast<CompletionItem_documentationType>(variant.index())))
+      );
     }
     }
   }
@@ -9210,10 +9370,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) CompletionItem_textEdit: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) CompletionItem_textEdit: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -9235,10 +9396,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported CompletionItem_textEditType: "
-         << CompletionItem_textEditTypeNames.at(static_cast<CompletionItem_textEditType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported CompletionItem_textEditType: " +
+         CompletionItem_textEditTypeNames.at(static_cast<CompletionItem_textEditType>(variant.index())))
+      );
     }
     }
   }
@@ -9247,10 +9409,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionItem> value =
@@ -9260,10 +9423,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 19) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("label");
@@ -9472,10 +9635,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionList_itemDefaults_editRange_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionList_itemDefaults_editRange_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionList_itemDefaults_editRange_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionList_itemDefaults_editRange_1> value =
@@ -9485,10 +9649,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionList_itemDefaults_editRange_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionList_itemDefaults_editRange_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("insert");
@@ -9549,10 +9713,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) CompletionList_itemDefaults_editRange: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) CompletionList_itemDefaults_editRange: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -9574,10 +9739,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported CompletionList_itemDefaults_editRangeType: "
-         << CompletionList_itemDefaults_editRangeTypeNames.at(static_cast<CompletionList_itemDefaults_editRangeType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported CompletionList_itemDefaults_editRangeType: " +
+         CompletionList_itemDefaults_editRangeTypeNames.at(static_cast<CompletionList_itemDefaults_editRangeType>(variant.index())))
+      );
     }
     }
   }
@@ -9586,10 +9752,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionList_itemDefaults> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionList_itemDefaults must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionList_itemDefaults must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionList_itemDefaults> value =
@@ -9599,10 +9766,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionList_itemDefaults: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionList_itemDefaults: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("commitCharacters");
@@ -9674,10 +9841,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionList> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionList must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionList must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionList> value =
@@ -9687,10 +9855,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionList: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionList: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("isIncomplete");
@@ -9754,10 +9922,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionRegistrationOptions> value =
@@ -9767,10 +9936,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -9864,10 +10033,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<HoverParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) HoverParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) HoverParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<HoverParams> value =
@@ -9877,10 +10047,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) HoverParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) HoverParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -9965,10 +10135,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) Hover_contents: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) Hover_contents: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -10000,10 +10171,11 @@ namespace LCompilers::LanguageServerProtocol {
       return any;
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported Hover_contentsType: "
-         << Hover_contentsTypeNames.at(static_cast<Hover_contentsType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported Hover_contentsType: " +
+         Hover_contentsTypeNames.at(static_cast<Hover_contentsType>(variant.index())))
+      );
     }
     }
   }
@@ -10012,10 +10184,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Hover> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Hover must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Hover must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Hover> value =
@@ -10025,10 +10198,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Hover: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Hover: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("contents");
@@ -10068,10 +10241,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<HoverRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) HoverRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) HoverRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<HoverRegistrationOptions> value =
@@ -10081,10 +10255,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) HoverRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) HoverRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -10124,10 +10298,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelpParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelpParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelpParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelpParams> value =
@@ -10137,10 +10312,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelpParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelpParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("context");
@@ -10199,10 +10374,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelp> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelp must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelp must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelp> value =
@@ -10212,10 +10388,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelp: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelp: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("signatures");
@@ -10276,10 +10452,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelpRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelpRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelpRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelpRegistrationOptions> value =
@@ -10289,10 +10466,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelpRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelpRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -10370,10 +10547,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DefinitionParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DefinitionParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DefinitionParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DefinitionParams> value =
@@ -10383,10 +10561,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DefinitionParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DefinitionParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -10445,10 +10623,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DefinitionRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DefinitionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DefinitionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DefinitionRegistrationOptions> value =
@@ -10458,10 +10637,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DefinitionRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DefinitionRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -10501,10 +10680,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ReferenceParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ReferenceParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ReferenceParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ReferenceParams> value =
@@ -10514,10 +10694,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ReferenceParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ReferenceParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("context");
@@ -10587,10 +10767,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ReferenceRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ReferenceRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ReferenceRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ReferenceRegistrationOptions> value =
@@ -10600,10 +10781,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ReferenceRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ReferenceRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -10643,10 +10824,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentHighlightParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentHighlightParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentHighlightParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentHighlightParams> value =
@@ -10656,10 +10838,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentHighlightParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentHighlightParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -10718,10 +10900,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentHighlight> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentHighlight must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentHighlight must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentHighlight> value =
@@ -10731,10 +10914,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentHighlight: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentHighlight: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -10774,10 +10957,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentHighlightRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentHighlightRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentHighlightRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentHighlightRegistrationOptions> value =
@@ -10787,10 +10971,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentHighlightRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentHighlightRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -10830,10 +11014,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentSymbolParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentSymbolParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentSymbolParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentSymbolParams> value =
@@ -10843,10 +11028,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentSymbolParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentSymbolParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -10894,10 +11079,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SymbolInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SymbolInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SymbolInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SymbolInformation> value =
@@ -10907,10 +11093,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SymbolInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SymbolInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("deprecated");
@@ -10999,10 +11185,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentSymbol> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentSymbol must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentSymbol must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentSymbol> value =
@@ -11012,10 +11199,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 8) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentSymbol: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentSymbol: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("name");
@@ -11134,10 +11321,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentSymbolRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentSymbolRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentSymbolRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentSymbolRegistrationOptions> value =
@@ -11147,10 +11335,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentSymbolRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentSymbolRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -11198,10 +11386,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionParams> value =
@@ -11211,10 +11400,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -11284,10 +11473,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Command> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Command must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Command must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Command> value =
@@ -11297,10 +11487,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Command: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Command: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("title");
@@ -11362,10 +11552,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeAction_disabled> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeAction_disabled must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeAction_disabled must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeAction_disabled> value =
@@ -11375,10 +11566,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeAction_disabled: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeAction_disabled: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("reason");
@@ -11410,10 +11601,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeAction> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeAction must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeAction must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeAction> value =
@@ -11423,10 +11615,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 8) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeAction: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeAction: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("title");
@@ -11525,10 +11717,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionRegistrationOptions> value =
@@ -11538,10 +11731,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -11608,10 +11801,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbolParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbolParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbolParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbolParams> value =
@@ -11621,10 +11815,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbolParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbolParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("query");
@@ -11672,10 +11866,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbol_location_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbol_location_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbol_location_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbol_location_1> value =
@@ -11685,10 +11880,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbol_location_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbol_location_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -11738,10 +11933,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceSymbol_location: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceSymbol_location: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -11763,10 +11959,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported WorkspaceSymbol_locationType: "
-         << WorkspaceSymbol_locationTypeNames.at(static_cast<WorkspaceSymbol_locationType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported WorkspaceSymbol_locationType: " +
+         WorkspaceSymbol_locationTypeNames.at(static_cast<WorkspaceSymbol_locationType>(variant.index())))
+      );
     }
     }
   }
@@ -11775,10 +11972,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbol> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbol must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbol must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbol> value =
@@ -11788,10 +11986,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbol: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbol: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("location");
@@ -11880,10 +12078,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbolRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbolRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbolRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbolRegistrationOptions> value =
@@ -11893,10 +12092,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbolRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbolRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resolveProvider");
@@ -11933,10 +12132,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeLensParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeLensParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeLensParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeLensParams> value =
@@ -11946,10 +12146,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeLensParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeLensParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -11997,10 +12197,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeLens> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeLens must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeLens must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeLens> value =
@@ -12010,10 +12211,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeLens: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeLens: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -12061,10 +12262,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeLensRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeLensRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeLensRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeLensRegistrationOptions> value =
@@ -12074,10 +12276,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeLensRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeLensRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -12125,10 +12327,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentLinkParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentLinkParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentLinkParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentLinkParams> value =
@@ -12138,10 +12341,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentLinkParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentLinkParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -12189,10 +12392,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentLink> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentLink must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentLink must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentLink> value =
@@ -12202,10 +12406,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentLink: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentLink: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -12261,10 +12465,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentLinkRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentLinkRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentLinkRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentLinkRegistrationOptions> value =
@@ -12274,10 +12479,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentLinkRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentLinkRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -12325,10 +12530,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentFormattingParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentFormattingParams> value =
@@ -12338,10 +12544,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentFormattingParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentFormattingParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -12392,10 +12598,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentFormattingRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentFormattingRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentFormattingRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentFormattingRegistrationOptions> value =
@@ -12405,10 +12612,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentFormattingRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentFormattingRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -12448,10 +12655,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentRangeFormattingParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentRangeFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentRangeFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentRangeFormattingParams> value =
@@ -12461,10 +12669,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentRangeFormattingParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentRangeFormattingParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -12526,10 +12734,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentRangeFormattingRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentRangeFormattingRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentRangeFormattingRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentRangeFormattingRegistrationOptions> value =
@@ -12539,10 +12748,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentRangeFormattingRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentRangeFormattingRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -12590,10 +12799,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentRangesFormattingParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentRangesFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentRangesFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentRangesFormattingParams> value =
@@ -12603,10 +12813,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentRangesFormattingParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentRangesFormattingParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -12681,10 +12891,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentOnTypeFormattingParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentOnTypeFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentOnTypeFormattingParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentOnTypeFormattingParams> value =
@@ -12694,10 +12905,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentOnTypeFormattingParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentOnTypeFormattingParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -12762,10 +12973,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentOnTypeFormattingRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentOnTypeFormattingRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentOnTypeFormattingRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentOnTypeFormattingRegistrationOptions> value =
@@ -12775,10 +12987,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentOnTypeFormattingRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentOnTypeFormattingRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -12840,10 +13052,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RenameParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RenameParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RenameParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RenameParams> value =
@@ -12853,10 +13066,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RenameParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RenameParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -12918,10 +13131,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RenameRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RenameRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RenameRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RenameRegistrationOptions> value =
@@ -12931,10 +13145,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RenameRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RenameRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentSelector");
@@ -12982,10 +13196,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PrepareRenameParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PrepareRenameParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PrepareRenameParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PrepareRenameParams> value =
@@ -12995,10 +13210,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PrepareRenameParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PrepareRenameParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -13049,10 +13264,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ExecuteCommandParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ExecuteCommandParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ExecuteCommandParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ExecuteCommandParams> value =
@@ -13062,10 +13278,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ExecuteCommandParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ExecuteCommandParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("command");
@@ -13124,10 +13340,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ExecuteCommandRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ExecuteCommandRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ExecuteCommandRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ExecuteCommandRegistrationOptions> value =
@@ -13137,10 +13354,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ExecuteCommandRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ExecuteCommandRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("commands");
@@ -13193,10 +13410,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ApplyWorkspaceEditParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ApplyWorkspaceEditParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ApplyWorkspaceEditParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ApplyWorkspaceEditParams> value =
@@ -13206,10 +13424,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ApplyWorkspaceEditParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ApplyWorkspaceEditParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("label");
@@ -13249,10 +13467,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ApplyWorkspaceEditResult> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ApplyWorkspaceEditResult must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ApplyWorkspaceEditResult must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ApplyWorkspaceEditResult> value =
@@ -13262,10 +13481,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ApplyWorkspaceEditResult: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ApplyWorkspaceEditResult: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("applied");
@@ -13313,10 +13532,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkDoneProgressBegin> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkDoneProgressBegin must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkDoneProgressBegin must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkDoneProgressBegin> value =
@@ -13326,19 +13546,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkDoneProgressBegin: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkDoneProgressBegin: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "begin") {
-        std::stringstream ss;
-        ss << "String value for WorkDoneProgressBegin.kind must be \"begin\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for WorkDoneProgressBegin.kind must be \"begin\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -13402,10 +13623,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkDoneProgressReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkDoneProgressReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkDoneProgressReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkDoneProgressReport> value =
@@ -13415,19 +13637,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkDoneProgressReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkDoneProgressReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "report") {
-        std::stringstream ss;
-        ss << "String value for WorkDoneProgressReport.kind must be \"report\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for WorkDoneProgressReport.kind must be \"report\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -13480,10 +13703,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkDoneProgressEnd> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkDoneProgressEnd must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkDoneProgressEnd must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkDoneProgressEnd> value =
@@ -13493,19 +13717,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkDoneProgressEnd: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkDoneProgressEnd: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "end") {
-        std::stringstream ss;
-        ss << "String value for WorkDoneProgressEnd.kind must be \"end\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for WorkDoneProgressEnd.kind must be \"end\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -13542,10 +13767,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SetTraceParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SetTraceParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SetTraceParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SetTraceParams> value =
@@ -13555,10 +13781,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SetTraceParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SetTraceParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("value");
@@ -13590,10 +13816,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LogTraceParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LogTraceParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LogTraceParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LogTraceParams> value =
@@ -13603,10 +13830,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LogTraceParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LogTraceParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("message");
@@ -13657,10 +13884,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) CancelParams_id: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) CancelParams_id: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -13682,10 +13910,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported CancelParams_idType: "
-         << CancelParams_idTypeNames.at(static_cast<CancelParams_idType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported CancelParams_idType: " +
+         CancelParams_idTypeNames.at(static_cast<CancelParams_idType>(variant.index())))
+      );
     }
     }
   }
@@ -13694,10 +13923,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CancelParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CancelParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CancelParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CancelParams> value =
@@ -13707,10 +13937,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CancelParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CancelParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("id");
@@ -13742,10 +13972,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ProgressParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ProgressParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ProgressParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ProgressParams> value =
@@ -13755,10 +13986,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ProgressParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ProgressParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("token");
@@ -13801,10 +14032,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentPositionParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentPositionParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentPositionParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentPositionParams> value =
@@ -13814,10 +14046,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentPositionParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentPositionParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -13860,10 +14092,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkDoneProgressParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkDoneProgressParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkDoneProgressParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkDoneProgressParams> value =
@@ -13873,10 +14106,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkDoneProgressParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkDoneProgressParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneToken");
@@ -13905,10 +14138,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PartialResultParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PartialResultParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PartialResultParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PartialResultParams> value =
@@ -13918,10 +14152,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PartialResultParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PartialResultParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("partialResultToken");
@@ -13950,10 +14184,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LocationLink> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LocationLink must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LocationLink must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LocationLink> value =
@@ -13963,10 +14198,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LocationLink: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LocationLink: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("originSelectionRange");
@@ -14028,10 +14263,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Range> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Range must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Range must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Range> value =
@@ -14041,10 +14277,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Range: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Range: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("start");
@@ -14087,10 +14323,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ImplementationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ImplementationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ImplementationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ImplementationOptions> value =
@@ -14100,10 +14337,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ImplementationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ImplementationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -14132,10 +14369,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<StaticRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) StaticRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) StaticRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<StaticRegistrationOptions> value =
@@ -14145,10 +14383,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) StaticRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) StaticRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("id");
@@ -14177,10 +14415,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeDefinitionOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeDefinitionOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeDefinitionOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeDefinitionOptions> value =
@@ -14190,10 +14429,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeDefinitionOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeDefinitionOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -14222,10 +14461,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceFoldersChangeEvent> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceFoldersChangeEvent must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceFoldersChangeEvent must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceFoldersChangeEvent> value =
@@ -14235,10 +14475,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceFoldersChangeEvent: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceFoldersChangeEvent: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("added");
@@ -14307,10 +14547,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ConfigurationItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ConfigurationItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ConfigurationItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ConfigurationItem> value =
@@ -14320,10 +14561,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ConfigurationItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ConfigurationItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("scopeUri");
@@ -14360,10 +14601,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentIdentifier> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentIdentifier> value =
@@ -14373,10 +14615,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentIdentifier: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentIdentifier: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -14408,10 +14650,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Color> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Color must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Color must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Color> value =
@@ -14421,10 +14664,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Color: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Color: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("red");
@@ -14489,10 +14732,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentColorOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentColorOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentColorOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentColorOptions> value =
@@ -14502,10 +14746,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentColorOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentColorOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -14534,10 +14778,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRangeOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRangeOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRangeOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRangeOptions> value =
@@ -14547,10 +14792,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRangeOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRangeOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -14579,10 +14824,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DeclarationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DeclarationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DeclarationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DeclarationOptions> value =
@@ -14592,10 +14838,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DeclarationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DeclarationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -14624,10 +14870,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Position> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Position must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Position must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Position> value =
@@ -14637,10 +14884,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Position: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Position: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("line");
@@ -14683,10 +14930,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SelectionRangeOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SelectionRangeOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SelectionRangeOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SelectionRangeOptions> value =
@@ -14696,10 +14944,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SelectionRangeOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SelectionRangeOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -14728,10 +14976,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyOptions> value =
@@ -14741,10 +14990,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -14773,10 +15022,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensOptions_range_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensOptions_range_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensOptions_range_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensOptions_range_1> value =
@@ -14786,10 +15036,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 0) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensOptions_range_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensOptions_range_1: " + std::to_string(object.size())
+      );
     }
 
     return value;
@@ -14829,10 +15079,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) SemanticTokensOptions_range: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) SemanticTokensOptions_range: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -14854,10 +15105,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported SemanticTokensOptions_rangeType: "
-         << SemanticTokensOptions_rangeTypeNames.at(static_cast<SemanticTokensOptions_rangeType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported SemanticTokensOptions_rangeType: " +
+         SemanticTokensOptions_rangeTypeNames.at(static_cast<SemanticTokensOptions_rangeType>(variant.index())))
+      );
     }
     }
   }
@@ -14866,10 +15118,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensOptions_full_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensOptions_full_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensOptions_full_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensOptions_full_1> value =
@@ -14879,10 +15132,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensOptions_full_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensOptions_full_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("delta");
@@ -14929,10 +15182,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) SemanticTokensOptions_full: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) SemanticTokensOptions_full: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -14954,10 +15208,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported SemanticTokensOptions_fullType: "
-         << SemanticTokensOptions_fullTypeNames.at(static_cast<SemanticTokensOptions_fullType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported SemanticTokensOptions_fullType: " +
+         SemanticTokensOptions_fullTypeNames.at(static_cast<SemanticTokensOptions_fullType>(variant.index())))
+      );
     }
     }
   }
@@ -14966,10 +15221,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensOptions> value =
@@ -14979,10 +15235,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("legend");
@@ -15038,10 +15294,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensEdit> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensEdit must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensEdit must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensEdit> value =
@@ -15051,10 +15308,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensEdit: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensEdit: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("start");
@@ -15116,10 +15373,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LinkedEditingRangeOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LinkedEditingRangeOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LinkedEditingRangeOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LinkedEditingRangeOptions> value =
@@ -15129,10 +15387,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LinkedEditingRangeOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LinkedEditingRangeOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -15161,10 +15419,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileCreate> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileCreate must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileCreate must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileCreate> value =
@@ -15174,10 +15433,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileCreate: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileCreate: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -15227,10 +15486,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) TextDocumentEdit_edits: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) TextDocumentEdit_edits: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -15252,10 +15512,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported TextDocumentEdit_editsType: "
-         << TextDocumentEdit_editsTypeNames.at(static_cast<TextDocumentEdit_editsType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported TextDocumentEdit_editsType: " +
+         TextDocumentEdit_editsTypeNames.at(static_cast<TextDocumentEdit_editsType>(variant.index())))
+      );
     }
     }
   }
@@ -15264,10 +15525,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentEdit> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentEdit must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentEdit must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentEdit> value =
@@ -15277,10 +15539,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentEdit: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentEdit: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("textDocument");
@@ -15336,10 +15598,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CreateFile> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CreateFile must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CreateFile must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CreateFile> value =
@@ -15349,19 +15612,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CreateFile: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CreateFile: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "create") {
-        std::stringstream ss;
-        ss << "String value for CreateFile.kind must be \"create\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for CreateFile.kind must be \"create\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -15417,10 +15681,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RenameFile> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RenameFile must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RenameFile must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RenameFile> value =
@@ -15430,19 +15695,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RenameFile: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RenameFile: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "rename") {
-        std::stringstream ss;
-        ss << "String value for RenameFile.kind must be \"rename\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for RenameFile.kind must be \"rename\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -15509,10 +15775,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DeleteFile> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DeleteFile must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DeleteFile must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DeleteFile> value =
@@ -15522,19 +15789,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DeleteFile: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DeleteFile: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "delete") {
-        std::stringstream ss;
-        ss << "String value for DeleteFile.kind must be \"delete\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for DeleteFile.kind must be \"delete\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -15590,10 +15858,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ChangeAnnotation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ChangeAnnotation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ChangeAnnotation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ChangeAnnotation> value =
@@ -15603,10 +15872,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ChangeAnnotation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ChangeAnnotation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("label");
@@ -15654,10 +15923,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileOperationFilter> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileOperationFilter must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileOperationFilter must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileOperationFilter> value =
@@ -15667,10 +15937,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileOperationFilter: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileOperationFilter: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("scheme");
@@ -15710,10 +15980,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileRename> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileRename must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileRename must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileRename> value =
@@ -15723,10 +15994,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileRename: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileRename: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("oldUri");
@@ -15769,10 +16040,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileDelete> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileDelete must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileDelete must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileDelete> value =
@@ -15782,10 +16054,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileDelete: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileDelete: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -15817,10 +16089,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MonikerOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MonikerOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MonikerOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MonikerOptions> value =
@@ -15830,10 +16103,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MonikerOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MonikerOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -15862,10 +16135,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeHierarchyOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeHierarchyOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeHierarchyOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeHierarchyOptions> value =
@@ -15875,10 +16149,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeHierarchyOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeHierarchyOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -15907,10 +16181,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueContext> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueContext must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueContext must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueContext> value =
@@ -15920,10 +16195,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueContext: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueContext: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("frameId");
@@ -15966,10 +16241,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueText> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueText must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueText must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueText> value =
@@ -15979,10 +16255,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueText: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueText: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -16025,10 +16301,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueVariableLookup> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueVariableLookup must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueVariableLookup must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueVariableLookup> value =
@@ -16038,10 +16315,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueVariableLookup: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueVariableLookup: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -16092,10 +16369,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueEvaluatableExpression> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueEvaluatableExpression must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueEvaluatableExpression must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueEvaluatableExpression> value =
@@ -16105,10 +16383,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueEvaluatableExpression: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueEvaluatableExpression: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -16148,10 +16426,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueOptions> value =
@@ -16161,10 +16440,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -16211,10 +16490,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) InlayHintLabelPart_tooltip: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) InlayHintLabelPart_tooltip: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -16236,10 +16516,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported InlayHintLabelPart_tooltipType: "
-         << InlayHintLabelPart_tooltipTypeNames.at(static_cast<InlayHintLabelPart_tooltipType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported InlayHintLabelPart_tooltipType: " +
+         InlayHintLabelPart_tooltipTypeNames.at(static_cast<InlayHintLabelPart_tooltipType>(variant.index())))
+      );
     }
     }
   }
@@ -16248,10 +16529,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHintLabelPart> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHintLabelPart must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHintLabelPart must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHintLabelPart> value =
@@ -16261,10 +16543,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHintLabelPart: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHintLabelPart: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("value");
@@ -16320,10 +16602,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MarkupContent> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MarkupContent must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MarkupContent must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MarkupContent> value =
@@ -16333,10 +16616,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MarkupContent: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MarkupContent: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
@@ -16379,10 +16662,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHintOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHintOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHintOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHintOptions> value =
@@ -16392,10 +16676,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHintOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHintOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resolveProvider");
@@ -16450,10 +16734,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) RelatedFullDocumentDiagnosticReport_relatedDocuments: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) RelatedFullDocumentDiagnosticReport_relatedDocuments: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -16475,10 +16760,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported RelatedFullDocumentDiagnosticReport_relatedDocumentsType: "
-         << RelatedFullDocumentDiagnosticReport_relatedDocumentsTypeNames.at(static_cast<RelatedFullDocumentDiagnosticReport_relatedDocumentsType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported RelatedFullDocumentDiagnosticReport_relatedDocumentsType: " +
+         RelatedFullDocumentDiagnosticReport_relatedDocumentsTypeNames.at(static_cast<RelatedFullDocumentDiagnosticReport_relatedDocumentsType>(variant.index())))
+      );
     }
     }
   }
@@ -16487,10 +16773,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RelatedFullDocumentDiagnosticReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RelatedFullDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RelatedFullDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RelatedFullDocumentDiagnosticReport> value =
@@ -16500,10 +16787,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RelatedFullDocumentDiagnosticReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RelatedFullDocumentDiagnosticReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("relatedDocuments");
@@ -16520,9 +16807,10 @@ namespace LCompilers::LanguageServerProtocol {
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "full") {
-        std::stringstream ss;
-        ss << "String value for RelatedFullDocumentDiagnosticReport.kind must be \"full\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for RelatedFullDocumentDiagnosticReport.kind must be \"full\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -16610,10 +16898,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) RelatedUnchangedDocumentDiagnosticReport_relatedDocuments: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) RelatedUnchangedDocumentDiagnosticReport_relatedDocuments: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -16635,10 +16924,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType: "
-         << RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsTypeNames.at(static_cast<RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType: " +
+         RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsTypeNames.at(static_cast<RelatedUnchangedDocumentDiagnosticReport_relatedDocumentsType>(variant.index())))
+      );
     }
     }
   }
@@ -16647,10 +16937,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RelatedUnchangedDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RelatedUnchangedDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RelatedUnchangedDocumentDiagnosticReport> value =
@@ -16660,10 +16951,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RelatedUnchangedDocumentDiagnosticReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RelatedUnchangedDocumentDiagnosticReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("relatedDocuments");
@@ -16680,9 +16971,10 @@ namespace LCompilers::LanguageServerProtocol {
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "unchanged") {
-        std::stringstream ss;
-        ss << "String value for RelatedUnchangedDocumentDiagnosticReport.kind must be \"unchanged\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for RelatedUnchangedDocumentDiagnosticReport.kind must be \"unchanged\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -16731,10 +17023,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FullDocumentDiagnosticReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FullDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FullDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FullDocumentDiagnosticReport> value =
@@ -16744,19 +17037,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FullDocumentDiagnosticReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FullDocumentDiagnosticReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "full") {
-        std::stringstream ss;
-        ss << "String value for FullDocumentDiagnosticReport.kind must be \"full\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for FullDocumentDiagnosticReport.kind must be \"full\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -16817,10 +17111,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<UnchangedDocumentDiagnosticReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) UnchangedDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) UnchangedDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<UnchangedDocumentDiagnosticReport> value =
@@ -16830,19 +17125,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) UnchangedDocumentDiagnosticReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) UnchangedDocumentDiagnosticReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "unchanged") {
-        std::stringstream ss;
-        ss << "String value for UnchangedDocumentDiagnosticReport.kind must be \"unchanged\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for UnchangedDocumentDiagnosticReport.kind must be \"unchanged\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -16882,10 +17178,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DiagnosticOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DiagnosticOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DiagnosticOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DiagnosticOptions> value =
@@ -16895,10 +17192,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DiagnosticOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DiagnosticOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("identifier");
@@ -16957,10 +17254,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PreviousResultId> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PreviousResultId must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PreviousResultId must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PreviousResultId> value =
@@ -16970,10 +17268,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PreviousResultId: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PreviousResultId: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -17016,10 +17314,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocument> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocument must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocument must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocument> value =
@@ -17029,10 +17328,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocument: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocument: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -17121,10 +17420,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentItem> value =
@@ -17134,10 +17434,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -17202,10 +17502,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<VersionedNotebookDocumentIdentifier> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) VersionedNotebookDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) VersionedNotebookDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<VersionedNotebookDocumentIdentifier> value =
@@ -17215,10 +17516,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) VersionedNotebookDocumentIdentifier: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) VersionedNotebookDocumentIdentifier: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("version");
@@ -17261,10 +17562,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentChangeEvent_cells_textContent> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentChangeEvent_cells_textContent must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentChangeEvent_cells_textContent must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentChangeEvent_cells_textContent> value =
@@ -17274,10 +17576,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentChangeEvent_cells_textContent: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentChangeEvent_cells_textContent: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("document");
@@ -17333,10 +17635,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentChangeEvent_cells_structure> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentChangeEvent_cells_structure must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentChangeEvent_cells_structure must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentChangeEvent_cells_structure> value =
@@ -17346,10 +17649,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentChangeEvent_cells_structure: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentChangeEvent_cells_structure: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("array");
@@ -17419,10 +17722,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentChangeEvent_cells> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentChangeEvent_cells must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentChangeEvent_cells must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentChangeEvent_cells> value =
@@ -17432,10 +17736,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentChangeEvent_cells: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentChangeEvent_cells: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("structure");
@@ -17502,10 +17806,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentChangeEvent> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentChangeEvent must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentChangeEvent must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentChangeEvent> value =
@@ -17515,10 +17820,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentChangeEvent: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentChangeEvent: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("metadata");
@@ -17558,10 +17863,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentIdentifier> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentIdentifier> value =
@@ -17571,10 +17877,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentIdentifier: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentIdentifier: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -17606,10 +17912,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineCompletionContext> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineCompletionContext must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineCompletionContext must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineCompletionContext> value =
@@ -17619,10 +17926,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineCompletionContext: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineCompletionContext: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("triggerKind");
@@ -17662,10 +17969,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<StringValue> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) StringValue must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) StringValue must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<StringValue> value =
@@ -17675,19 +17983,20 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) StringValue: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) StringValue: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "snippet") {
-        std::stringstream ss;
-        ss << "String value for StringValue.kind must be \"snippet\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for StringValue.kind must be \"snippet\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -17727,10 +18036,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineCompletionOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineCompletionOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineCompletionOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineCompletionOptions> value =
@@ -17740,10 +18050,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineCompletionOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineCompletionOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -17772,10 +18082,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Registration> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Registration must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Registration must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Registration> value =
@@ -17785,10 +18096,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Registration: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Registration: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("id");
@@ -17839,10 +18150,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Unregistration> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Unregistration must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Unregistration must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Unregistration> value =
@@ -17852,10 +18164,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Unregistration: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Unregistration: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("id");
@@ -17909,10 +18221,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) _InitializeParams_processId: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) _InitializeParams_processId: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -17934,10 +18247,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported _InitializeParams_processIdType: "
-         << _InitializeParams_processIdTypeNames.at(static_cast<_InitializeParams_processIdType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported _InitializeParams_processIdType: " +
+         _InitializeParams_processIdTypeNames.at(static_cast<_InitializeParams_processIdType>(variant.index())))
+      );
     }
     }
   }
@@ -17946,10 +18260,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<_InitializeParams_clientInfo> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) _InitializeParams_clientInfo must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) _InitializeParams_clientInfo must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<_InitializeParams_clientInfo> value =
@@ -17959,10 +18274,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) _InitializeParams_clientInfo: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) _InitializeParams_clientInfo: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("name");
@@ -18013,10 +18328,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) _InitializeParams_rootPath: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) _InitializeParams_rootPath: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18038,10 +18354,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported _InitializeParams_rootPathType: "
-         << _InitializeParams_rootPathTypeNames.at(static_cast<_InitializeParams_rootPathType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported _InitializeParams_rootPathType: " +
+         _InitializeParams_rootPathTypeNames.at(static_cast<_InitializeParams_rootPathType>(variant.index())))
+      );
     }
     }
   }
@@ -18061,10 +18378,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) _InitializeParams_rootUri: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) _InitializeParams_rootUri: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18086,10 +18404,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported _InitializeParams_rootUriType: "
-         << _InitializeParams_rootUriTypeNames.at(static_cast<_InitializeParams_rootUriType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported _InitializeParams_rootUriType: " +
+         _InitializeParams_rootUriTypeNames.at(static_cast<_InitializeParams_rootUriType>(variant.index())))
+      );
     }
     }
   }
@@ -18098,10 +18417,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<_InitializeParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) _InitializeParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) _InitializeParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<_InitializeParams> value =
@@ -18111,10 +18431,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 9) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) _InitializeParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) _InitializeParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("processId");
@@ -18239,10 +18559,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceFoldersInitializeParams_workspaceFolders: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceFoldersInitializeParams_workspaceFolders: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18269,10 +18590,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported WorkspaceFoldersInitializeParams_workspaceFoldersType: "
-         << WorkspaceFoldersInitializeParams_workspaceFoldersTypeNames.at(static_cast<WorkspaceFoldersInitializeParams_workspaceFoldersType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported WorkspaceFoldersInitializeParams_workspaceFoldersType: " +
+         WorkspaceFoldersInitializeParams_workspaceFoldersTypeNames.at(static_cast<WorkspaceFoldersInitializeParams_workspaceFoldersType>(variant.index())))
+      );
     }
     }
   }
@@ -18281,10 +18603,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceFoldersInitializeParams> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceFoldersInitializeParams must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceFoldersInitializeParams must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceFoldersInitializeParams> value =
@@ -18294,10 +18617,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceFoldersInitializeParams: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceFoldersInitializeParams: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workspaceFolders");
@@ -18351,10 +18674,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_textDocumentSync: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_textDocumentSync: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18376,10 +18700,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_textDocumentSyncType: "
-         << ServerCapabilities_textDocumentSyncTypeNames.at(static_cast<ServerCapabilities_textDocumentSyncType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_textDocumentSyncType: " +
+         ServerCapabilities_textDocumentSyncTypeNames.at(static_cast<ServerCapabilities_textDocumentSyncType>(variant.index())))
+      );
     }
     }
   }
@@ -18406,10 +18731,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_notebookDocumentSync: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_notebookDocumentSync: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18431,10 +18757,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_notebookDocumentSyncType: "
-         << ServerCapabilities_notebookDocumentSyncTypeNames.at(static_cast<ServerCapabilities_notebookDocumentSyncType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_notebookDocumentSyncType: " +
+         ServerCapabilities_notebookDocumentSyncTypeNames.at(static_cast<ServerCapabilities_notebookDocumentSyncType>(variant.index())))
+      );
     }
     }
   }
@@ -18461,10 +18788,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_hoverProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_hoverProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18486,10 +18814,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_hoverProviderType: "
-         << ServerCapabilities_hoverProviderTypeNames.at(static_cast<ServerCapabilities_hoverProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_hoverProviderType: " +
+         ServerCapabilities_hoverProviderTypeNames.at(static_cast<ServerCapabilities_hoverProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18520,10 +18849,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_declarationProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_declarationProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18550,10 +18880,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_declarationProviderType: "
-         << ServerCapabilities_declarationProviderTypeNames.at(static_cast<ServerCapabilities_declarationProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_declarationProviderType: " +
+         ServerCapabilities_declarationProviderTypeNames.at(static_cast<ServerCapabilities_declarationProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18580,10 +18911,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_definitionProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_definitionProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18605,10 +18937,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_definitionProviderType: "
-         << ServerCapabilities_definitionProviderTypeNames.at(static_cast<ServerCapabilities_definitionProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_definitionProviderType: " +
+         ServerCapabilities_definitionProviderTypeNames.at(static_cast<ServerCapabilities_definitionProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18639,10 +18972,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_typeDefinitionProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_typeDefinitionProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18669,10 +19003,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_typeDefinitionProviderType: "
-         << ServerCapabilities_typeDefinitionProviderTypeNames.at(static_cast<ServerCapabilities_typeDefinitionProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_typeDefinitionProviderType: " +
+         ServerCapabilities_typeDefinitionProviderTypeNames.at(static_cast<ServerCapabilities_typeDefinitionProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18703,10 +19038,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_implementationProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_implementationProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18733,10 +19069,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_implementationProviderType: "
-         << ServerCapabilities_implementationProviderTypeNames.at(static_cast<ServerCapabilities_implementationProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_implementationProviderType: " +
+         ServerCapabilities_implementationProviderTypeNames.at(static_cast<ServerCapabilities_implementationProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18763,10 +19100,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_referencesProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_referencesProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18788,10 +19126,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_referencesProviderType: "
-         << ServerCapabilities_referencesProviderTypeNames.at(static_cast<ServerCapabilities_referencesProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_referencesProviderType: " +
+         ServerCapabilities_referencesProviderTypeNames.at(static_cast<ServerCapabilities_referencesProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18818,10 +19157,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_documentHighlightProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_documentHighlightProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18843,10 +19183,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_documentHighlightProviderType: "
-         << ServerCapabilities_documentHighlightProviderTypeNames.at(static_cast<ServerCapabilities_documentHighlightProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_documentHighlightProviderType: " +
+         ServerCapabilities_documentHighlightProviderTypeNames.at(static_cast<ServerCapabilities_documentHighlightProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18873,10 +19214,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_documentSymbolProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_documentSymbolProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18898,10 +19240,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_documentSymbolProviderType: "
-         << ServerCapabilities_documentSymbolProviderTypeNames.at(static_cast<ServerCapabilities_documentSymbolProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_documentSymbolProviderType: " +
+         ServerCapabilities_documentSymbolProviderTypeNames.at(static_cast<ServerCapabilities_documentSymbolProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18928,10 +19271,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_codeActionProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_codeActionProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -18953,10 +19297,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_codeActionProviderType: "
-         << ServerCapabilities_codeActionProviderTypeNames.at(static_cast<ServerCapabilities_codeActionProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_codeActionProviderType: " +
+         ServerCapabilities_codeActionProviderTypeNames.at(static_cast<ServerCapabilities_codeActionProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -18987,10 +19332,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_colorProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_colorProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19017,10 +19363,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_colorProviderType: "
-         << ServerCapabilities_colorProviderTypeNames.at(static_cast<ServerCapabilities_colorProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_colorProviderType: " +
+         ServerCapabilities_colorProviderTypeNames.at(static_cast<ServerCapabilities_colorProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19047,10 +19394,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_workspaceSymbolProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_workspaceSymbolProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19072,10 +19420,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_workspaceSymbolProviderType: "
-         << ServerCapabilities_workspaceSymbolProviderTypeNames.at(static_cast<ServerCapabilities_workspaceSymbolProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_workspaceSymbolProviderType: " +
+         ServerCapabilities_workspaceSymbolProviderTypeNames.at(static_cast<ServerCapabilities_workspaceSymbolProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19102,10 +19451,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_documentFormattingProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_documentFormattingProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19127,10 +19477,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_documentFormattingProviderType: "
-         << ServerCapabilities_documentFormattingProviderTypeNames.at(static_cast<ServerCapabilities_documentFormattingProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_documentFormattingProviderType: " +
+         ServerCapabilities_documentFormattingProviderTypeNames.at(static_cast<ServerCapabilities_documentFormattingProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19157,10 +19508,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_documentRangeFormattingProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_documentRangeFormattingProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19182,10 +19534,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_documentRangeFormattingProviderType: "
-         << ServerCapabilities_documentRangeFormattingProviderTypeNames.at(static_cast<ServerCapabilities_documentRangeFormattingProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_documentRangeFormattingProviderType: " +
+         ServerCapabilities_documentRangeFormattingProviderTypeNames.at(static_cast<ServerCapabilities_documentRangeFormattingProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19212,10 +19565,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_renameProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_renameProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19237,10 +19591,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_renameProviderType: "
-         << ServerCapabilities_renameProviderTypeNames.at(static_cast<ServerCapabilities_renameProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_renameProviderType: " +
+         ServerCapabilities_renameProviderTypeNames.at(static_cast<ServerCapabilities_renameProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19271,10 +19626,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_foldingRangeProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_foldingRangeProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19301,10 +19657,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_foldingRangeProviderType: "
-         << ServerCapabilities_foldingRangeProviderTypeNames.at(static_cast<ServerCapabilities_foldingRangeProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_foldingRangeProviderType: " +
+         ServerCapabilities_foldingRangeProviderTypeNames.at(static_cast<ServerCapabilities_foldingRangeProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19335,10 +19692,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_selectionRangeProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_selectionRangeProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19365,10 +19723,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_selectionRangeProviderType: "
-         << ServerCapabilities_selectionRangeProviderTypeNames.at(static_cast<ServerCapabilities_selectionRangeProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_selectionRangeProviderType: " +
+         ServerCapabilities_selectionRangeProviderTypeNames.at(static_cast<ServerCapabilities_selectionRangeProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19399,10 +19758,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_callHierarchyProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_callHierarchyProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19429,10 +19789,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_callHierarchyProviderType: "
-         << ServerCapabilities_callHierarchyProviderTypeNames.at(static_cast<ServerCapabilities_callHierarchyProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_callHierarchyProviderType: " +
+         ServerCapabilities_callHierarchyProviderTypeNames.at(static_cast<ServerCapabilities_callHierarchyProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19463,10 +19824,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_linkedEditingRangeProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_linkedEditingRangeProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19493,10 +19855,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_linkedEditingRangeProviderType: "
-         << ServerCapabilities_linkedEditingRangeProviderTypeNames.at(static_cast<ServerCapabilities_linkedEditingRangeProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_linkedEditingRangeProviderType: " +
+         ServerCapabilities_linkedEditingRangeProviderTypeNames.at(static_cast<ServerCapabilities_linkedEditingRangeProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19523,10 +19886,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_semanticTokensProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_semanticTokensProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19548,10 +19912,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_semanticTokensProviderType: "
-         << ServerCapabilities_semanticTokensProviderTypeNames.at(static_cast<ServerCapabilities_semanticTokensProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_semanticTokensProviderType: " +
+         ServerCapabilities_semanticTokensProviderTypeNames.at(static_cast<ServerCapabilities_semanticTokensProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19582,10 +19947,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_monikerProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_monikerProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19612,10 +19978,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_monikerProviderType: "
-         << ServerCapabilities_monikerProviderTypeNames.at(static_cast<ServerCapabilities_monikerProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_monikerProviderType: " +
+         ServerCapabilities_monikerProviderTypeNames.at(static_cast<ServerCapabilities_monikerProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19646,10 +20013,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_typeHierarchyProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_typeHierarchyProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19676,10 +20044,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_typeHierarchyProviderType: "
-         << ServerCapabilities_typeHierarchyProviderTypeNames.at(static_cast<ServerCapabilities_typeHierarchyProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_typeHierarchyProviderType: " +
+         ServerCapabilities_typeHierarchyProviderTypeNames.at(static_cast<ServerCapabilities_typeHierarchyProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19710,10 +20079,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_inlineValueProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_inlineValueProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19740,10 +20110,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_inlineValueProviderType: "
-         << ServerCapabilities_inlineValueProviderTypeNames.at(static_cast<ServerCapabilities_inlineValueProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_inlineValueProviderType: " +
+         ServerCapabilities_inlineValueProviderTypeNames.at(static_cast<ServerCapabilities_inlineValueProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19774,10 +20145,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_inlayHintProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_inlayHintProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19804,10 +20176,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_inlayHintProviderType: "
-         << ServerCapabilities_inlayHintProviderTypeNames.at(static_cast<ServerCapabilities_inlayHintProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_inlayHintProviderType: " +
+         ServerCapabilities_inlayHintProviderTypeNames.at(static_cast<ServerCapabilities_inlayHintProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19834,10 +20207,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_diagnosticProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_diagnosticProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19859,10 +20233,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_diagnosticProviderType: "
-         << ServerCapabilities_diagnosticProviderTypeNames.at(static_cast<ServerCapabilities_diagnosticProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_diagnosticProviderType: " +
+         ServerCapabilities_diagnosticProviderTypeNames.at(static_cast<ServerCapabilities_diagnosticProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19889,10 +20264,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ServerCapabilities_inlineCompletionProvider: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ServerCapabilities_inlineCompletionProvider: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -19914,10 +20290,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ServerCapabilities_inlineCompletionProviderType: "
-         << ServerCapabilities_inlineCompletionProviderTypeNames.at(static_cast<ServerCapabilities_inlineCompletionProviderType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ServerCapabilities_inlineCompletionProviderType: " +
+         ServerCapabilities_inlineCompletionProviderTypeNames.at(static_cast<ServerCapabilities_inlineCompletionProviderType>(variant.index())))
+      );
     }
     }
   }
@@ -19926,10 +20303,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ServerCapabilities_workspace> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ServerCapabilities_workspace must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ServerCapabilities_workspace must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ServerCapabilities_workspace> value =
@@ -19939,10 +20317,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ServerCapabilities_workspace: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ServerCapabilities_workspace: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workspaceFolders");
@@ -19979,10 +20357,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ServerCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ServerCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ServerCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ServerCapabilities> value =
@@ -19992,10 +20371,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 36) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ServerCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ServerCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("positionEncoding");
@@ -20304,10 +20683,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<VersionedTextDocumentIdentifier> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) VersionedTextDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) VersionedTextDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<VersionedTextDocumentIdentifier> value =
@@ -20317,10 +20697,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) VersionedTextDocumentIdentifier: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) VersionedTextDocumentIdentifier: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("version");
@@ -20363,10 +20743,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SaveOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SaveOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SaveOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SaveOptions> value =
@@ -20376,10 +20757,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SaveOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SaveOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("includeText");
@@ -20408,10 +20789,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileEvent> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileEvent must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileEvent must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileEvent> value =
@@ -20421,10 +20803,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileEvent: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileEvent: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -20467,10 +20849,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileSystemWatcher> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileSystemWatcher must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileSystemWatcher must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileSystemWatcher> value =
@@ -20480,10 +20863,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileSystemWatcher: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileSystemWatcher: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("globPattern");
@@ -20534,10 +20917,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) Diagnostic_code: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) Diagnostic_code: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -20559,10 +20943,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported Diagnostic_codeType: "
-         << Diagnostic_codeTypeNames.at(static_cast<Diagnostic_codeType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported Diagnostic_codeType: " +
+         Diagnostic_codeTypeNames.at(static_cast<Diagnostic_codeType>(variant.index())))
+      );
     }
     }
   }
@@ -20571,10 +20956,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<Diagnostic> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) Diagnostic must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) Diagnostic must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<Diagnostic> value =
@@ -20584,10 +20970,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 9) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) Diagnostic: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) Diagnostic: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -20708,10 +21094,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionContext> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionContext must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionContext must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionContext> value =
@@ -20721,10 +21108,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionContext: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionContext: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("triggerKind");
@@ -20764,10 +21151,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionItemLabelDetails> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionItemLabelDetails must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionItemLabelDetails must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionItemLabelDetails> value =
@@ -20777,10 +21165,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionItemLabelDetails: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionItemLabelDetails: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("detail");
@@ -20817,10 +21205,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InsertReplaceEdit> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InsertReplaceEdit must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InsertReplaceEdit must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InsertReplaceEdit> value =
@@ -20830,10 +21219,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InsertReplaceEdit: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InsertReplaceEdit: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("newText");
@@ -20887,10 +21276,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionOptions_completionItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionOptions_completionItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionOptions_completionItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionOptions_completionItem> value =
@@ -20900,10 +21290,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionOptions_completionItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionOptions_completionItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("labelDetailsSupport");
@@ -20932,10 +21322,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionOptions> value =
@@ -20945,10 +21336,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("triggerCharacters");
@@ -21031,10 +21422,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<HoverOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) HoverOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) HoverOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<HoverOptions> value =
@@ -21044,10 +21436,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) HoverOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) HoverOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -21076,10 +21468,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelpContext> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelpContext must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelpContext must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelpContext> value =
@@ -21089,10 +21482,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelpContext: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelpContext: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("triggerKind");
@@ -21169,10 +21562,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) SignatureInformation_documentation: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) SignatureInformation_documentation: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -21194,10 +21588,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported SignatureInformation_documentationType: "
-         << SignatureInformation_documentationTypeNames.at(static_cast<SignatureInformation_documentationType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported SignatureInformation_documentationType: " +
+         SignatureInformation_documentationTypeNames.at(static_cast<SignatureInformation_documentationType>(variant.index())))
+      );
     }
     }
   }
@@ -21206,10 +21601,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureInformation> value =
@@ -21219,10 +21615,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("label");
@@ -21289,10 +21685,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelpOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelpOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelpOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelpOptions> value =
@@ -21302,10 +21699,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelpOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelpOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("triggerCharacters");
@@ -21372,10 +21769,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DefinitionOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DefinitionOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DefinitionOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DefinitionOptions> value =
@@ -21385,10 +21783,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DefinitionOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DefinitionOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -21417,10 +21815,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ReferenceContext> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ReferenceContext must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ReferenceContext must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ReferenceContext> value =
@@ -21430,10 +21829,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ReferenceContext: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ReferenceContext: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("includeDeclaration");
@@ -21465,10 +21864,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ReferenceOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ReferenceOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ReferenceOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ReferenceOptions> value =
@@ -21478,10 +21878,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ReferenceOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ReferenceOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -21510,10 +21910,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentHighlightOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentHighlightOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentHighlightOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentHighlightOptions> value =
@@ -21523,10 +21924,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentHighlightOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentHighlightOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -21555,10 +21956,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<BaseSymbolInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) BaseSymbolInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) BaseSymbolInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<BaseSymbolInformation> value =
@@ -21568,10 +21970,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) BaseSymbolInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) BaseSymbolInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("name");
@@ -21641,10 +22043,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentSymbolOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentSymbolOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentSymbolOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentSymbolOptions> value =
@@ -21654,10 +22057,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentSymbolOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentSymbolOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("label");
@@ -21694,10 +22097,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionContext> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionContext must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionContext must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionContext> value =
@@ -21707,10 +22111,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionContext: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionContext: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("diagnostics");
@@ -21782,10 +22186,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionOptions> value =
@@ -21795,10 +22200,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("codeActionKinds");
@@ -21854,10 +22259,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbolOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbolOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbolOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbolOptions> value =
@@ -21867,10 +22273,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbolOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbolOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resolveProvider");
@@ -21907,10 +22313,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeLensOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeLensOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeLensOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeLensOptions> value =
@@ -21920,10 +22327,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeLensOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeLensOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resolveProvider");
@@ -21960,10 +22367,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentLinkOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentLinkOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentLinkOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentLinkOptions> value =
@@ -21973,10 +22381,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentLinkOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentLinkOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("resolveProvider");
@@ -22013,10 +22421,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FormattingOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FormattingOptions> value =
@@ -22026,10 +22435,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FormattingOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FormattingOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("tabSize");
@@ -22096,10 +22505,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentFormattingOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentFormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentFormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentFormattingOptions> value =
@@ -22109,10 +22519,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentFormattingOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentFormattingOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -22141,10 +22551,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentRangeFormattingOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentRangeFormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentRangeFormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentRangeFormattingOptions> value =
@@ -22154,10 +22565,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentRangeFormattingOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentRangeFormattingOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("rangesSupport");
@@ -22194,10 +22605,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentOnTypeFormattingOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentOnTypeFormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentOnTypeFormattingOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentOnTypeFormattingOptions> value =
@@ -22207,10 +22619,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentOnTypeFormattingOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentOnTypeFormattingOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("firstTriggerCharacter");
@@ -22261,10 +22673,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RenameOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RenameOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RenameOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RenameOptions> value =
@@ -22274,10 +22687,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RenameOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RenameOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("prepareProvider");
@@ -22314,10 +22727,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ExecuteCommandOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ExecuteCommandOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ExecuteCommandOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ExecuteCommandOptions> value =
@@ -22327,10 +22741,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ExecuteCommandOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ExecuteCommandOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("commands");
@@ -22383,10 +22797,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensLegend> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensLegend must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensLegend must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensLegend> value =
@@ -22396,10 +22811,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensLegend: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensLegend: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("tokenTypes");
@@ -22479,10 +22894,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) OptionalVersionedTextDocumentIdentifier_version: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) OptionalVersionedTextDocumentIdentifier_version: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -22504,10 +22920,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported OptionalVersionedTextDocumentIdentifier_versionType: "
-         << OptionalVersionedTextDocumentIdentifier_versionTypeNames.at(static_cast<OptionalVersionedTextDocumentIdentifier_versionType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported OptionalVersionedTextDocumentIdentifier_versionType: " +
+         OptionalVersionedTextDocumentIdentifier_versionTypeNames.at(static_cast<OptionalVersionedTextDocumentIdentifier_versionType>(variant.index())))
+      );
     }
     }
   }
@@ -22516,10 +22933,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<OptionalVersionedTextDocumentIdentifier> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) OptionalVersionedTextDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) OptionalVersionedTextDocumentIdentifier must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<OptionalVersionedTextDocumentIdentifier> value =
@@ -22529,10 +22947,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) OptionalVersionedTextDocumentIdentifier: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) OptionalVersionedTextDocumentIdentifier: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("version");
@@ -22575,10 +22993,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<AnnotatedTextEdit> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) AnnotatedTextEdit must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) AnnotatedTextEdit must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<AnnotatedTextEdit> value =
@@ -22588,10 +23007,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) AnnotatedTextEdit: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) AnnotatedTextEdit: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("annotationId");
@@ -22645,10 +23064,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ResourceOperation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ResourceOperation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ResourceOperation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ResourceOperation> value =
@@ -22658,10 +23078,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ResourceOperation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ResourceOperation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
@@ -22701,10 +23121,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CreateFileOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CreateFileOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CreateFileOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CreateFileOptions> value =
@@ -22714,10 +23135,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CreateFileOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CreateFileOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("overwrite");
@@ -22754,10 +23175,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RenameFileOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RenameFileOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RenameFileOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RenameFileOptions> value =
@@ -22767,10 +23189,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RenameFileOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RenameFileOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("overwrite");
@@ -22807,10 +23229,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DeleteFileOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DeleteFileOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DeleteFileOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DeleteFileOptions> value =
@@ -22820,10 +23243,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DeleteFileOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DeleteFileOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("recursive");
@@ -22860,10 +23283,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileOperationPattern> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileOperationPattern must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileOperationPattern must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileOperationPattern> value =
@@ -22873,10 +23297,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileOperationPattern: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileOperationPattern: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("glob");
@@ -22935,10 +23359,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceFullDocumentDiagnosticReport_version: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceFullDocumentDiagnosticReport_version: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -22960,10 +23385,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported WorkspaceFullDocumentDiagnosticReport_versionType: "
-         << WorkspaceFullDocumentDiagnosticReport_versionTypeNames.at(static_cast<WorkspaceFullDocumentDiagnosticReport_versionType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported WorkspaceFullDocumentDiagnosticReport_versionType: " +
+         WorkspaceFullDocumentDiagnosticReport_versionTypeNames.at(static_cast<WorkspaceFullDocumentDiagnosticReport_versionType>(variant.index())))
+      );
     }
     }
   }
@@ -22972,10 +23398,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceFullDocumentDiagnosticReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceFullDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceFullDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceFullDocumentDiagnosticReport> value =
@@ -22985,10 +23412,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceFullDocumentDiagnosticReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceFullDocumentDiagnosticReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -23015,9 +23442,10 @@ namespace LCompilers::LanguageServerProtocol {
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "full") {
-        std::stringstream ss;
-        ss << "String value for WorkspaceFullDocumentDiagnosticReport.kind must be \"full\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for WorkspaceFullDocumentDiagnosticReport.kind must be \"full\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -23091,10 +23519,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceUnchangedDocumentDiagnosticReport_version: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceUnchangedDocumentDiagnosticReport_version: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -23116,10 +23545,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported WorkspaceUnchangedDocumentDiagnosticReport_versionType: "
-         << WorkspaceUnchangedDocumentDiagnosticReport_versionTypeNames.at(static_cast<WorkspaceUnchangedDocumentDiagnosticReport_versionType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported WorkspaceUnchangedDocumentDiagnosticReport_versionType: " +
+         WorkspaceUnchangedDocumentDiagnosticReport_versionTypeNames.at(static_cast<WorkspaceUnchangedDocumentDiagnosticReport_versionType>(variant.index())))
+      );
     }
     }
   }
@@ -23128,10 +23558,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceUnchangedDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceUnchangedDocumentDiagnosticReport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceUnchangedDocumentDiagnosticReport> value =
@@ -23141,10 +23572,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceUnchangedDocumentDiagnosticReport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceUnchangedDocumentDiagnosticReport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("uri");
@@ -23171,9 +23602,10 @@ namespace LCompilers::LanguageServerProtocol {
     if (iter != object.end()) {
       const string_t &stringValue = anyToString(*iter->second);
       if (stringValue != "unchanged") {
-        std::stringstream ss;
-        ss << "String value for WorkspaceUnchangedDocumentDiagnosticReport.kind must be \"unchanged\" but was: \"" << stringValue << "\"";
-        throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+        throw LSP_EXCEPTION(
+          ErrorCodes::INVALID_PARAMS,
+          "String value for WorkspaceUnchangedDocumentDiagnosticReport.kind must be \"unchanged\" but was: \"" + stringValue + "\""
+        );
       }
       value->kind = stringValue;
     } else {
@@ -23215,10 +23647,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookCell> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookCell must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookCell must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookCell> value =
@@ -23228,10 +23661,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookCell: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookCell: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("kind");
@@ -23293,10 +23726,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookCellArrayChange> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookCellArrayChange must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookCellArrayChange must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookCellArrayChange> value =
@@ -23306,10 +23740,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookCellArrayChange: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookCellArrayChange: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("start");
@@ -23371,10 +23805,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SelectedCompletionInfo> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SelectedCompletionInfo must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SelectedCompletionInfo must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SelectedCompletionInfo> value =
@@ -23384,10 +23819,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SelectedCompletionInfo: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SelectedCompletionInfo: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -23430,10 +23865,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ClientCapabilities> value =
@@ -23443,10 +23879,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workspace");
@@ -23533,10 +23969,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) TextDocumentSyncOptions_save: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) TextDocumentSyncOptions_save: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -23558,10 +23995,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported TextDocumentSyncOptions_saveType: "
-         << TextDocumentSyncOptions_saveTypeNames.at(static_cast<TextDocumentSyncOptions_saveType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported TextDocumentSyncOptions_saveType: " +
+         TextDocumentSyncOptions_saveTypeNames.at(static_cast<TextDocumentSyncOptions_saveType>(variant.index())))
+      );
     }
     }
   }
@@ -23570,10 +24008,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentSyncOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentSyncOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentSyncOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentSyncOptions> value =
@@ -23583,10 +24022,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentSyncOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentSyncOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("openClose");
@@ -23647,10 +24086,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_1_cells> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_1_cells must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_1_cells must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_1_cells> value =
@@ -23660,10 +24100,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_1_cells: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_1_cells: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("language");
@@ -23713,10 +24153,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_1_notebook: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_1_notebook: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -23738,10 +24179,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported NotebookDocumentSyncOptions_notebookSelector_1_notebookType: "
-         << NotebookDocumentSyncOptions_notebookSelector_1_notebookTypeNames.at(static_cast<NotebookDocumentSyncOptions_notebookSelector_1_notebookType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported NotebookDocumentSyncOptions_notebookSelector_1_notebookType: " +
+         NotebookDocumentSyncOptions_notebookSelector_1_notebookTypeNames.at(static_cast<NotebookDocumentSyncOptions_notebookSelector_1_notebookType>(variant.index())))
+      );
     }
     }
   }
@@ -23750,10 +24192,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_1> value =
@@ -23763,10 +24206,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebook");
@@ -23819,10 +24262,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_0_cells> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_0_cells must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_0_cells must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_0_cells> value =
@@ -23832,10 +24276,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_0_cells: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_0_cells: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("language");
@@ -23885,10 +24329,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_0_notebook: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_0_notebook: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -23910,10 +24355,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported NotebookDocumentSyncOptions_notebookSelector_0_notebookType: "
-         << NotebookDocumentSyncOptions_notebookSelector_0_notebookTypeNames.at(static_cast<NotebookDocumentSyncOptions_notebookSelector_0_notebookType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported NotebookDocumentSyncOptions_notebookSelector_0_notebookType: " +
+         NotebookDocumentSyncOptions_notebookSelector_0_notebookTypeNames.at(static_cast<NotebookDocumentSyncOptions_notebookSelector_0_notebookType>(variant.index())))
+      );
     }
     }
   }
@@ -23922,10 +24368,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_0> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_0 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector_0 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentSyncOptions_notebookSelector_0> value =
@@ -23935,10 +24382,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_0: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentSyncOptions_notebookSelector_0: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebook");
@@ -24007,10 +24454,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) NotebookDocumentSyncOptions_notebookSelector: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -24032,10 +24480,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported NotebookDocumentSyncOptions_notebookSelectorType: "
-         << NotebookDocumentSyncOptions_notebookSelectorTypeNames.at(static_cast<NotebookDocumentSyncOptions_notebookSelectorType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported NotebookDocumentSyncOptions_notebookSelectorType: " +
+         NotebookDocumentSyncOptions_notebookSelectorTypeNames.at(static_cast<NotebookDocumentSyncOptions_notebookSelectorType>(variant.index())))
+      );
     }
     }
   }
@@ -24044,10 +24493,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentSyncOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentSyncOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentSyncOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentSyncOptions> value =
@@ -24057,10 +24507,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentSyncOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentSyncOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookSelector");
@@ -24113,10 +24563,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentSyncRegistrationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentSyncRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentSyncRegistrationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentSyncRegistrationOptions> value =
@@ -24126,10 +24577,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentSyncRegistrationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentSyncRegistrationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookSelector");
@@ -24201,10 +24652,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceFoldersServerCapabilities_changeNotifications: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceFoldersServerCapabilities_changeNotifications: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -24226,10 +24678,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported WorkspaceFoldersServerCapabilities_changeNotificationsType: "
-         << WorkspaceFoldersServerCapabilities_changeNotificationsTypeNames.at(static_cast<WorkspaceFoldersServerCapabilities_changeNotificationsType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported WorkspaceFoldersServerCapabilities_changeNotificationsType: " +
+         WorkspaceFoldersServerCapabilities_changeNotificationsTypeNames.at(static_cast<WorkspaceFoldersServerCapabilities_changeNotificationsType>(variant.index())))
+      );
     }
     }
   }
@@ -24238,10 +24691,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceFoldersServerCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceFoldersServerCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceFoldersServerCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceFoldersServerCapabilities> value =
@@ -24251,10 +24705,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceFoldersServerCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceFoldersServerCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("supported");
@@ -24291,10 +24745,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileOperationOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileOperationOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileOperationOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileOperationOptions> value =
@@ -24304,10 +24759,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileOperationOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileOperationOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("didCreate");
@@ -24376,10 +24831,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeDescription> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeDescription must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeDescription must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeDescription> value =
@@ -24389,10 +24845,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeDescription: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeDescription: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("href");
@@ -24424,10 +24880,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DiagnosticRelatedInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DiagnosticRelatedInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DiagnosticRelatedInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DiagnosticRelatedInformation> value =
@@ -24437,10 +24894,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DiagnosticRelatedInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DiagnosticRelatedInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("location");
@@ -24490,10 +24947,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ParameterInformation_label: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ParameterInformation_label: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -24520,10 +24978,11 @@ namespace LCompilers::LanguageServerProtocol {
       return any;
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ParameterInformation_labelType: "
-         << ParameterInformation_labelTypeNames.at(static_cast<ParameterInformation_labelType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ParameterInformation_labelType: " +
+         ParameterInformation_labelTypeNames.at(static_cast<ParameterInformation_labelType>(variant.index())))
+      );
     }
     }
   }
@@ -24550,10 +25009,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ParameterInformation_documentation: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ParameterInformation_documentation: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -24575,10 +25035,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ParameterInformation_documentationType: "
-         << ParameterInformation_documentationTypeNames.at(static_cast<ParameterInformation_documentationType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ParameterInformation_documentationType: " +
+         ParameterInformation_documentationTypeNames.at(static_cast<ParameterInformation_documentationType>(variant.index())))
+      );
     }
     }
   }
@@ -24587,10 +25048,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ParameterInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ParameterInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ParameterInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ParameterInformation> value =
@@ -24600,10 +25062,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ParameterInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ParameterInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("label");
@@ -24661,10 +25123,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) NotebookCellTextDocumentFilter_notebook: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) NotebookCellTextDocumentFilter_notebook: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -24686,10 +25149,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported NotebookCellTextDocumentFilter_notebookType: "
-         << NotebookCellTextDocumentFilter_notebookTypeNames.at(static_cast<NotebookCellTextDocumentFilter_notebookType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported NotebookCellTextDocumentFilter_notebookType: " +
+         NotebookCellTextDocumentFilter_notebookTypeNames.at(static_cast<NotebookCellTextDocumentFilter_notebookType>(variant.index())))
+      );
     }
     }
   }
@@ -24698,10 +25162,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookCellTextDocumentFilter> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookCellTextDocumentFilter must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookCellTextDocumentFilter must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookCellTextDocumentFilter> value =
@@ -24711,10 +25176,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookCellTextDocumentFilter: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookCellTextDocumentFilter: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebook");
@@ -24754,10 +25219,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileOperationPatternOptions> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileOperationPatternOptions must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileOperationPatternOptions must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileOperationPatternOptions> value =
@@ -24767,10 +25233,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileOperationPatternOptions: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileOperationPatternOptions: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("ignoreCase");
@@ -24799,10 +25265,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ExecutionSummary> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ExecutionSummary must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ExecutionSummary must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ExecutionSummary> value =
@@ -24812,10 +25279,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ExecutionSummary: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ExecutionSummary: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("executionOrder");
@@ -24855,10 +25322,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceClientCapabilities> value =
@@ -24868,10 +25336,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 15) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("applyEdit");
@@ -25012,10 +25480,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentClientCapabilities> value =
@@ -25025,10 +25494,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 31) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("synchronization");
@@ -25297,10 +25766,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentClientCapabilities> value =
@@ -25310,10 +25780,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("synchronization");
@@ -25345,10 +25815,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WindowClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WindowClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WindowClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WindowClientCapabilities> value =
@@ -25358,10 +25829,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WindowClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WindowClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("workDoneProgress");
@@ -25406,10 +25877,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<GeneralClientCapabilities_staleRequestSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) GeneralClientCapabilities_staleRequestSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) GeneralClientCapabilities_staleRequestSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<GeneralClientCapabilities_staleRequestSupport> value =
@@ -25419,10 +25891,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) GeneralClientCapabilities_staleRequestSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) GeneralClientCapabilities_staleRequestSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("cancel");
@@ -25478,10 +25950,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<GeneralClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) GeneralClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) GeneralClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<GeneralClientCapabilities> value =
@@ -25491,10 +25964,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) GeneralClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) GeneralClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("staleRequestSupport");
@@ -25576,10 +26049,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) RelativePattern_baseUri: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) RelativePattern_baseUri: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -25601,10 +26075,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported RelativePattern_baseUriType: "
-         << RelativePattern_baseUriTypeNames.at(static_cast<RelativePattern_baseUriType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported RelativePattern_baseUriType: " +
+         RelativePattern_baseUriTypeNames.at(static_cast<RelativePattern_baseUriType>(variant.index())))
+      );
     }
     }
   }
@@ -25613,10 +26088,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RelativePattern> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RelativePattern must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RelativePattern must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RelativePattern> value =
@@ -25626,10 +26102,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RelativePattern: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RelativePattern: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("baseUri");
@@ -25672,10 +26148,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceEditClientCapabilities_changeAnnotationSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceEditClientCapabilities_changeAnnotationSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceEditClientCapabilities_changeAnnotationSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceEditClientCapabilities_changeAnnotationSupport> value =
@@ -25685,10 +26162,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceEditClientCapabilities_changeAnnotationSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceEditClientCapabilities_changeAnnotationSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("groupsOnLabel");
@@ -25717,10 +26194,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceEditClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceEditClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceEditClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceEditClientCapabilities> value =
@@ -25730,10 +26208,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceEditClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceEditClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentChanges");
@@ -25805,10 +26283,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeConfigurationClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeConfigurationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeConfigurationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeConfigurationClientCapabilities> value =
@@ -25818,10 +26297,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeConfigurationClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeConfigurationClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -25850,10 +26329,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DidChangeWatchedFilesClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DidChangeWatchedFilesClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DidChangeWatchedFilesClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DidChangeWatchedFilesClientCapabilities> value =
@@ -25863,10 +26343,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DidChangeWatchedFilesClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DidChangeWatchedFilesClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -25903,10 +26383,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbolClientCapabilities_symbolKind> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbolClientCapabilities_symbolKind must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbolClientCapabilities_symbolKind must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbolClientCapabilities_symbolKind> value =
@@ -25916,10 +26397,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities_symbolKind: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities_symbolKind: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -25959,10 +26440,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbolClientCapabilities_tagSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbolClientCapabilities_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbolClientCapabilities_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbolClientCapabilities_tagSupport> value =
@@ -25972,10 +26454,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities_tagSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities_tagSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -26020,10 +26502,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbolClientCapabilities_resolveSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbolClientCapabilities_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbolClientCapabilities_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbolClientCapabilities_resolveSupport> value =
@@ -26033,10 +26516,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities_resolveSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities_resolveSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("properties");
@@ -26081,10 +26564,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<WorkspaceSymbolClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) WorkspaceSymbolClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) WorkspaceSymbolClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<WorkspaceSymbolClientCapabilities> value =
@@ -26094,10 +26578,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) WorkspaceSymbolClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -26150,10 +26634,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ExecuteCommandClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ExecuteCommandClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ExecuteCommandClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ExecuteCommandClientCapabilities> value =
@@ -26163,10 +26648,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ExecuteCommandClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ExecuteCommandClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -26195,10 +26680,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensWorkspaceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensWorkspaceClientCapabilities> value =
@@ -26208,10 +26694,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensWorkspaceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensWorkspaceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("refreshSupport");
@@ -26240,10 +26726,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeLensWorkspaceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeLensWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeLensWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeLensWorkspaceClientCapabilities> value =
@@ -26253,10 +26740,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeLensWorkspaceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeLensWorkspaceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("refreshSupport");
@@ -26285,10 +26772,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FileOperationClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FileOperationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FileOperationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FileOperationClientCapabilities> value =
@@ -26298,10 +26786,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 7) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FileOperationClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FileOperationClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -26378,10 +26866,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueWorkspaceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueWorkspaceClientCapabilities> value =
@@ -26391,10 +26880,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueWorkspaceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueWorkspaceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("refreshSupport");
@@ -26423,10 +26912,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHintWorkspaceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHintWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHintWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHintWorkspaceClientCapabilities> value =
@@ -26436,10 +26926,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHintWorkspaceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHintWorkspaceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("refreshSupport");
@@ -26468,10 +26958,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DiagnosticWorkspaceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DiagnosticWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DiagnosticWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DiagnosticWorkspaceClientCapabilities> value =
@@ -26481,10 +26972,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DiagnosticWorkspaceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DiagnosticWorkspaceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("refreshSupport");
@@ -26513,10 +27004,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRangeWorkspaceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRangeWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRangeWorkspaceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRangeWorkspaceClientCapabilities> value =
@@ -26526,10 +27018,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRangeWorkspaceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRangeWorkspaceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("refreshSupport");
@@ -26558,10 +27050,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentSyncClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentSyncClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentSyncClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentSyncClientCapabilities> value =
@@ -26571,10 +27064,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentSyncClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentSyncClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -26627,10 +27120,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionClientCapabilities_completionItem_insertTextModeSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionClientCapabilities_completionItem_insertTextModeSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionClientCapabilities_completionItem_insertTextModeSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionClientCapabilities_completionItem_insertTextModeSupport> value =
@@ -26640,10 +27134,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem_insertTextModeSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem_insertTextModeSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -26688,10 +27182,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionClientCapabilities_completionItem_resolveSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionClientCapabilities_completionItem_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionClientCapabilities_completionItem_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionClientCapabilities_completionItem_resolveSupport> value =
@@ -26701,10 +27196,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem_resolveSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem_resolveSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("properties");
@@ -26749,10 +27244,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionClientCapabilities_completionItem_tagSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionClientCapabilities_completionItem_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionClientCapabilities_completionItem_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionClientCapabilities_completionItem_tagSupport> value =
@@ -26762,10 +27258,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem_tagSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem_tagSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -26810,10 +27306,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionClientCapabilities_completionItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionClientCapabilities_completionItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionClientCapabilities_completionItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionClientCapabilities_completionItem> value =
@@ -26823,10 +27320,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 10) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("snippetSupport");
@@ -26938,10 +27435,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionClientCapabilities_completionItemKind> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionClientCapabilities_completionItemKind must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionClientCapabilities_completionItemKind must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionClientCapabilities_completionItemKind> value =
@@ -26951,10 +27449,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItemKind: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionClientCapabilities_completionItemKind: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -26994,10 +27492,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionClientCapabilities_completionList> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionClientCapabilities_completionList must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionClientCapabilities_completionList must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionClientCapabilities_completionList> value =
@@ -27007,10 +27506,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionClientCapabilities_completionList: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionClientCapabilities_completionList: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("itemDefaults");
@@ -27050,10 +27549,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CompletionClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CompletionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CompletionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CompletionClientCapabilities> value =
@@ -27063,10 +27563,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 6) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CompletionClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CompletionClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27135,10 +27635,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<HoverClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) HoverClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) HoverClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<HoverClientCapabilities> value =
@@ -27148,10 +27649,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) HoverClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) HoverClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27199,10 +27700,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelpClientCapabilities_signatureInformation_parameterInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelpClientCapabilities_signatureInformation_parameterInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelpClientCapabilities_signatureInformation_parameterInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelpClientCapabilities_signatureInformation_parameterInformation> value =
@@ -27212,10 +27714,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelpClientCapabilities_signatureInformation_parameterInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelpClientCapabilities_signatureInformation_parameterInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("labelOffsetSupport");
@@ -27244,10 +27746,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelpClientCapabilities_signatureInformation> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelpClientCapabilities_signatureInformation must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelpClientCapabilities_signatureInformation must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelpClientCapabilities_signatureInformation> value =
@@ -27257,10 +27760,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelpClientCapabilities_signatureInformation: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelpClientCapabilities_signatureInformation: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("documentationFormat");
@@ -27316,10 +27819,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SignatureHelpClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SignatureHelpClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SignatureHelpClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SignatureHelpClientCapabilities> value =
@@ -27329,10 +27833,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SignatureHelpClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SignatureHelpClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27377,10 +27881,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DeclarationClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DeclarationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DeclarationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DeclarationClientCapabilities> value =
@@ -27390,10 +27895,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DeclarationClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DeclarationClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27430,10 +27935,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DefinitionClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DefinitionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DefinitionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DefinitionClientCapabilities> value =
@@ -27443,10 +27949,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DefinitionClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DefinitionClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27483,10 +27989,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeDefinitionClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeDefinitionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeDefinitionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeDefinitionClientCapabilities> value =
@@ -27496,10 +28003,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeDefinitionClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeDefinitionClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27536,10 +28043,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ImplementationClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ImplementationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ImplementationClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ImplementationClientCapabilities> value =
@@ -27549,10 +28057,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ImplementationClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ImplementationClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27589,10 +28097,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ReferenceClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ReferenceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ReferenceClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ReferenceClientCapabilities> value =
@@ -27602,10 +28111,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ReferenceClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ReferenceClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27634,10 +28143,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentHighlightClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentHighlightClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentHighlightClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentHighlightClientCapabilities> value =
@@ -27647,10 +28157,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentHighlightClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentHighlightClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27679,10 +28189,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentSymbolClientCapabilities_symbolKind> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentSymbolClientCapabilities_symbolKind must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentSymbolClientCapabilities_symbolKind must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentSymbolClientCapabilities_symbolKind> value =
@@ -27692,10 +28203,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentSymbolClientCapabilities_symbolKind: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentSymbolClientCapabilities_symbolKind: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -27735,10 +28246,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentSymbolClientCapabilities_tagSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentSymbolClientCapabilities_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentSymbolClientCapabilities_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentSymbolClientCapabilities_tagSupport> value =
@@ -27748,10 +28260,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentSymbolClientCapabilities_tagSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentSymbolClientCapabilities_tagSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -27796,10 +28308,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentSymbolClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentSymbolClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentSymbolClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentSymbolClientCapabilities> value =
@@ -27809,10 +28322,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentSymbolClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentSymbolClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -27873,10 +28386,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind> value =
@@ -27886,10 +28400,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionClientCapabilities_codeActionLiteralSupport_codeActionKind: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -27934,10 +28448,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionClientCapabilities_codeActionLiteralSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionClientCapabilities_codeActionLiteralSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionClientCapabilities_codeActionLiteralSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionClientCapabilities_codeActionLiteralSupport> value =
@@ -27947,10 +28462,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionClientCapabilities_codeActionLiteralSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionClientCapabilities_codeActionLiteralSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("codeActionKind");
@@ -27982,10 +28497,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionClientCapabilities_resolveSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionClientCapabilities_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionClientCapabilities_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionClientCapabilities_resolveSupport> value =
@@ -27995,10 +28511,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionClientCapabilities_resolveSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionClientCapabilities_resolveSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("properties");
@@ -28043,10 +28559,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeActionClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeActionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeActionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeActionClientCapabilities> value =
@@ -28056,10 +28573,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 7) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeActionClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeActionClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28136,10 +28653,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CodeLensClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CodeLensClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CodeLensClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CodeLensClientCapabilities> value =
@@ -28149,10 +28667,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CodeLensClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CodeLensClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28181,10 +28699,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentLinkClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentLinkClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentLinkClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentLinkClientCapabilities> value =
@@ -28194,10 +28713,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentLinkClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentLinkClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28234,10 +28753,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentColorClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentColorClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentColorClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentColorClientCapabilities> value =
@@ -28247,10 +28767,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentColorClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentColorClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28279,10 +28799,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentFormattingClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentFormattingClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentFormattingClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentFormattingClientCapabilities> value =
@@ -28292,10 +28813,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentFormattingClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentFormattingClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28324,10 +28845,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentRangeFormattingClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentRangeFormattingClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentRangeFormattingClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentRangeFormattingClientCapabilities> value =
@@ -28337,10 +28859,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentRangeFormattingClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentRangeFormattingClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28377,10 +28899,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DocumentOnTypeFormattingClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DocumentOnTypeFormattingClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DocumentOnTypeFormattingClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DocumentOnTypeFormattingClientCapabilities> value =
@@ -28390,10 +28913,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DocumentOnTypeFormattingClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DocumentOnTypeFormattingClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28422,10 +28945,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RenameClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RenameClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RenameClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RenameClientCapabilities> value =
@@ -28435,10 +28959,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 4) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RenameClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RenameClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28491,10 +29015,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRangeClientCapabilities_foldingRangeKind> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRangeClientCapabilities_foldingRangeKind must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRangeClientCapabilities_foldingRangeKind must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRangeClientCapabilities_foldingRangeKind> value =
@@ -28504,10 +29029,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRangeClientCapabilities_foldingRangeKind: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRangeClientCapabilities_foldingRangeKind: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -28547,10 +29072,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRangeClientCapabilities_foldingRange> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRangeClientCapabilities_foldingRange must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRangeClientCapabilities_foldingRange must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRangeClientCapabilities_foldingRange> value =
@@ -28560,10 +29086,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRangeClientCapabilities_foldingRange: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRangeClientCapabilities_foldingRange: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("collapsedText");
@@ -28592,10 +29118,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<FoldingRangeClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) FoldingRangeClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) FoldingRangeClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<FoldingRangeClientCapabilities> value =
@@ -28605,10 +29132,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) FoldingRangeClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) FoldingRangeClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28669,10 +29196,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SelectionRangeClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SelectionRangeClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SelectionRangeClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SelectionRangeClientCapabilities> value =
@@ -28682,10 +29210,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SelectionRangeClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SelectionRangeClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28714,10 +29242,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PublishDiagnosticsClientCapabilities_tagSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PublishDiagnosticsClientCapabilities_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PublishDiagnosticsClientCapabilities_tagSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PublishDiagnosticsClientCapabilities_tagSupport> value =
@@ -28727,10 +29256,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PublishDiagnosticsClientCapabilities_tagSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PublishDiagnosticsClientCapabilities_tagSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("valueSet");
@@ -28775,10 +29304,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PublishDiagnosticsClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PublishDiagnosticsClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PublishDiagnosticsClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PublishDiagnosticsClientCapabilities> value =
@@ -28788,10 +29318,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 5) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PublishDiagnosticsClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PublishDiagnosticsClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("relatedInformation");
@@ -28852,10 +29382,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<CallHierarchyClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) CallHierarchyClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) CallHierarchyClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<CallHierarchyClientCapabilities> value =
@@ -28865,10 +29396,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) CallHierarchyClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) CallHierarchyClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -28897,10 +29428,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensClientCapabilities_requests_full_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_full_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_full_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensClientCapabilities_requests_full_1> value =
@@ -28910,10 +29442,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensClientCapabilities_requests_full_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensClientCapabilities_requests_full_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("delta");
@@ -28960,10 +29492,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_full: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_full: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -28985,10 +29518,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported SemanticTokensClientCapabilities_requests_fullType: "
-         << SemanticTokensClientCapabilities_requests_fullTypeNames.at(static_cast<SemanticTokensClientCapabilities_requests_fullType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported SemanticTokensClientCapabilities_requests_fullType: " +
+         SemanticTokensClientCapabilities_requests_fullTypeNames.at(static_cast<SemanticTokensClientCapabilities_requests_fullType>(variant.index())))
+      );
     }
     }
   }
@@ -28997,10 +29531,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensClientCapabilities_requests_range_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_range_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_range_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensClientCapabilities_requests_range_1> value =
@@ -29010,10 +29545,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 0) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensClientCapabilities_requests_range_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensClientCapabilities_requests_range_1: " + std::to_string(object.size())
+      );
     }
 
     return value;
@@ -29053,10 +29588,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_range: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) SemanticTokensClientCapabilities_requests_range: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -29078,10 +29614,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported SemanticTokensClientCapabilities_requests_rangeType: "
-         << SemanticTokensClientCapabilities_requests_rangeTypeNames.at(static_cast<SemanticTokensClientCapabilities_requests_rangeType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported SemanticTokensClientCapabilities_requests_rangeType: " +
+         SemanticTokensClientCapabilities_requests_rangeTypeNames.at(static_cast<SemanticTokensClientCapabilities_requests_rangeType>(variant.index())))
+      );
     }
     }
   }
@@ -29090,10 +29627,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensClientCapabilities_requests> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensClientCapabilities_requests must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensClientCapabilities_requests must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensClientCapabilities_requests> value =
@@ -29103,10 +29641,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensClientCapabilities_requests: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensClientCapabilities_requests: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -29143,10 +29681,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<SemanticTokensClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) SemanticTokensClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) SemanticTokensClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<SemanticTokensClientCapabilities> value =
@@ -29156,10 +29695,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 9) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) SemanticTokensClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) SemanticTokensClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29303,10 +29842,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<LinkedEditingRangeClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) LinkedEditingRangeClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) LinkedEditingRangeClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<LinkedEditingRangeClientCapabilities> value =
@@ -29316,10 +29856,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) LinkedEditingRangeClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) LinkedEditingRangeClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29348,10 +29888,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MonikerClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MonikerClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MonikerClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MonikerClientCapabilities> value =
@@ -29361,10 +29902,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MonikerClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MonikerClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29393,10 +29934,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TypeHierarchyClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TypeHierarchyClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TypeHierarchyClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TypeHierarchyClientCapabilities> value =
@@ -29406,10 +29948,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TypeHierarchyClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TypeHierarchyClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29438,10 +29980,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineValueClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineValueClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineValueClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineValueClientCapabilities> value =
@@ -29451,10 +29994,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineValueClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineValueClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29483,10 +30026,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHintClientCapabilities_resolveSupport> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHintClientCapabilities_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHintClientCapabilities_resolveSupport must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHintClientCapabilities_resolveSupport> value =
@@ -29496,10 +30040,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHintClientCapabilities_resolveSupport: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHintClientCapabilities_resolveSupport: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("properties");
@@ -29544,10 +30088,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlayHintClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlayHintClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlayHintClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlayHintClientCapabilities> value =
@@ -29557,10 +30102,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlayHintClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlayHintClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29597,10 +30142,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<DiagnosticClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) DiagnosticClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) DiagnosticClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<DiagnosticClientCapabilities> value =
@@ -29610,10 +30156,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) DiagnosticClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) DiagnosticClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29650,10 +30196,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<InlineCompletionClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) InlineCompletionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) InlineCompletionClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<InlineCompletionClientCapabilities> value =
@@ -29663,10 +30210,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) InlineCompletionClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) InlineCompletionClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29695,10 +30242,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentSyncClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentSyncClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentSyncClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentSyncClientCapabilities> value =
@@ -29708,10 +30256,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentSyncClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentSyncClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("dynamicRegistration");
@@ -29748,10 +30296,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ShowMessageRequestClientCapabilities_messageActionItem> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ShowMessageRequestClientCapabilities_messageActionItem must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ShowMessageRequestClientCapabilities_messageActionItem must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ShowMessageRequestClientCapabilities_messageActionItem> value =
@@ -29761,10 +30310,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ShowMessageRequestClientCapabilities_messageActionItem: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ShowMessageRequestClientCapabilities_messageActionItem: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("additionalPropertiesSupport");
@@ -29793,10 +30342,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ShowMessageRequestClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ShowMessageRequestClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ShowMessageRequestClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ShowMessageRequestClientCapabilities> value =
@@ -29806,10 +30356,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ShowMessageRequestClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ShowMessageRequestClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("messageActionItem");
@@ -29838,10 +30388,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<ShowDocumentClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) ShowDocumentClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) ShowDocumentClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<ShowDocumentClientCapabilities> value =
@@ -29851,10 +30402,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) ShowDocumentClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) ShowDocumentClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("support");
@@ -29886,10 +30437,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<RegularExpressionsClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) RegularExpressionsClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) RegularExpressionsClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<RegularExpressionsClientCapabilities> value =
@@ -29899,10 +30451,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) RegularExpressionsClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) RegularExpressionsClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("engine");
@@ -29942,10 +30494,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MarkdownClientCapabilities> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MarkdownClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MarkdownClientCapabilities must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MarkdownClientCapabilities> value =
@@ -29955,10 +30508,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MarkdownClientCapabilities: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MarkdownClientCapabilities: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("parser");
@@ -30029,11 +30582,12 @@ namespace LCompilers::LanguageServerProtocol {
       return static_cast<integer_t>(value);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type integer_t";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type integer_t")
+      );
     }
     }
   }
@@ -30058,11 +30612,12 @@ namespace LCompilers::LanguageServerProtocol {
       return static_cast<uinteger_t>(value);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type uinteger_t";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type uinteger_t")
+      );
     }
     }
   }
@@ -30091,11 +30646,12 @@ namespace LCompilers::LanguageServerProtocol {
       return static_cast<decimal_t>(value);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type decimal_t";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type decimal_t")
+      );
     }
     }
   }
@@ -30116,11 +30672,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<boolean_t>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type boolean_t";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type boolean_t")
+      );
     }
     }
   }
@@ -30141,11 +30698,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<null_t>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type null_t";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type null_t")
+      );
     }
     }
   }
@@ -30166,11 +30724,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<string_t>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type string_t";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type string_t")
+      );
     }
     }
   }
@@ -30191,11 +30750,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<URI>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type URI";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type URI")
+      );
     }
     }
   }
@@ -30216,11 +30776,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<DocumentUri>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type DocumentUri";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type DocumentUri")
+      );
     }
     }
   }
@@ -30241,11 +30802,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<RegExp>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type RegExp";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type RegExp")
+      );
     }
     }
   }
@@ -30273,10 +30835,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) RequestId: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) RequestId: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30298,10 +30861,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported RequestIdType: "
-         << RequestIdTypeNames.at(static_cast<RequestIdType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported RequestIdType: " +
+         RequestIdTypeNames.at(static_cast<RequestIdType>(variant.index())))
+      );
     }
     }
   }
@@ -30337,10 +30901,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) MessageParams: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) MessageParams: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30362,10 +30927,11 @@ namespace LCompilers::LanguageServerProtocol {
       return any;
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported MessageParamsType: "
-         << MessageParamsTypeNames.at(static_cast<MessageParamsType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported MessageParamsType: " +
+         MessageParamsTypeNames.at(static_cast<MessageParamsType>(variant.index())))
+      );
     }
     }
   }
@@ -30389,10 +30955,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ResponseId: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ResponseId: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30419,10 +30986,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ResponseIdType: "
-         << ResponseIdTypeNames.at(static_cast<ResponseIdType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ResponseIdType: " +
+         ResponseIdTypeNames.at(static_cast<ResponseIdType>(variant.index())))
+      );
     }
     }
   }
@@ -30461,10 +31029,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) Definition: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) Definition: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30491,10 +31060,11 @@ namespace LCompilers::LanguageServerProtocol {
       return any;
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported DefinitionType: "
-         << DefinitionTypeNames.at(static_cast<DefinitionType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported DefinitionType: " +
+         DefinitionTypeNames.at(static_cast<DefinitionType>(variant.index())))
+      );
     }
     }
   }
@@ -30545,10 +31115,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) Declaration: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) Declaration: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30575,10 +31146,11 @@ namespace LCompilers::LanguageServerProtocol {
       return any;
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported DeclarationType: "
-         << DeclarationTypeNames.at(static_cast<DeclarationType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported DeclarationType: " +
+         DeclarationTypeNames.at(static_cast<DeclarationType>(variant.index())))
+      );
     }
     }
   }
@@ -30621,10 +31193,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) InlineValue: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) InlineValue: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30651,10 +31224,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported InlineValueType: "
-         << InlineValueTypeNames.at(static_cast<InlineValueType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported InlineValueType: " +
+         InlineValueTypeNames.at(static_cast<InlineValueType>(variant.index())))
+      );
     }
     }
   }
@@ -30681,10 +31255,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) DocumentDiagnosticReport: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) DocumentDiagnosticReport: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30706,10 +31281,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported DocumentDiagnosticReportType: "
-         << DocumentDiagnosticReportTypeNames.at(static_cast<DocumentDiagnosticReportType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported DocumentDiagnosticReportType: " +
+         DocumentDiagnosticReportTypeNames.at(static_cast<DocumentDiagnosticReportType>(variant.index())))
+      );
     }
     }
   }
@@ -30718,10 +31294,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PrepareRenameResult_2> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PrepareRenameResult_2 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PrepareRenameResult_2 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PrepareRenameResult_2> value =
@@ -30731,10 +31308,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PrepareRenameResult_2: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PrepareRenameResult_2: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("defaultBehavior");
@@ -30766,10 +31343,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<PrepareRenameResult_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) PrepareRenameResult_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) PrepareRenameResult_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<PrepareRenameResult_1> value =
@@ -30779,10 +31357,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) PrepareRenameResult_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) PrepareRenameResult_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -30847,10 +31425,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) PrepareRenameResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) PrepareRenameResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30877,10 +31456,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported PrepareRenameResultType: "
-         << PrepareRenameResultTypeNames.at(static_cast<PrepareRenameResultType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported PrepareRenameResultType: " +
+         PrepareRenameResultTypeNames.at(static_cast<PrepareRenameResultType>(variant.index())))
+      );
     }
     }
   }
@@ -30923,10 +31503,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ProgressToken: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ProgressToken: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -30948,10 +31529,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported ProgressTokenType: "
-         << ProgressTokenTypeNames.at(static_cast<ProgressTokenType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported ProgressTokenType: " +
+         ProgressTokenTypeNames.at(static_cast<ProgressTokenType>(variant.index())))
+      );
     }
     }
   }
@@ -30964,11 +31546,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<ChangeAnnotationIdentifier>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type ChangeAnnotationIdentifier";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type ChangeAnnotationIdentifier")
+      );
     }
     }
   }
@@ -31003,10 +31586,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceDocumentDiagnosticReport: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceDocumentDiagnosticReport: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -31028,10 +31612,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported WorkspaceDocumentDiagnosticReportType: "
-         << WorkspaceDocumentDiagnosticReportTypeNames.at(static_cast<WorkspaceDocumentDiagnosticReportType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported WorkspaceDocumentDiagnosticReportType: " +
+         WorkspaceDocumentDiagnosticReportTypeNames.at(static_cast<WorkspaceDocumentDiagnosticReportType>(variant.index())))
+      );
     }
     }
   }
@@ -31040,10 +31625,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentContentChangeEvent_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentContentChangeEvent_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentContentChangeEvent_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentContentChangeEvent_1> value =
@@ -31053,10 +31639,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 1) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentContentChangeEvent_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentContentChangeEvent_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("text");
@@ -31088,10 +31674,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentContentChangeEvent_0> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentContentChangeEvent_0 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentContentChangeEvent_0 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentContentChangeEvent_0> value =
@@ -31101,10 +31688,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentContentChangeEvent_0: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentContentChangeEvent_0: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("range");
@@ -31173,10 +31760,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) TextDocumentContentChangeEvent: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) TextDocumentContentChangeEvent: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -31198,10 +31786,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported TextDocumentContentChangeEventType: "
-         << TextDocumentContentChangeEventTypeNames.at(static_cast<TextDocumentContentChangeEventType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported TextDocumentContentChangeEventType: " +
+         TextDocumentContentChangeEventTypeNames.at(static_cast<TextDocumentContentChangeEventType>(variant.index())))
+      );
     }
     }
   }
@@ -31210,10 +31799,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<MarkedString_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) MarkedString_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) MarkedString_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<MarkedString_1> value =
@@ -31223,10 +31813,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 2) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) MarkedString_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) MarkedString_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("language");
@@ -31287,10 +31877,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) MarkedString: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) MarkedString: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -31312,10 +31903,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported MarkedStringType: "
-         << MarkedStringTypeNames.at(static_cast<MarkedStringType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported MarkedStringType: " +
+         MarkedStringTypeNames.at(static_cast<MarkedStringType>(variant.index())))
+      );
     }
     }
   }
@@ -31342,10 +31934,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) DocumentFilter: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) DocumentFilter: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -31367,10 +31960,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported DocumentFilterType: "
-         << DocumentFilterTypeNames.at(static_cast<DocumentFilterType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported DocumentFilterType: " +
+         DocumentFilterTypeNames.at(static_cast<DocumentFilterType>(variant.index())))
+      );
     }
     }
   }
@@ -31397,10 +31991,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) GlobPattern: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) GlobPattern: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -31422,10 +32017,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported GlobPatternType: "
-         << GlobPatternTypeNames.at(static_cast<GlobPatternType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported GlobPatternType: " +
+         GlobPatternTypeNames.at(static_cast<GlobPatternType>(variant.index())))
+      );
     }
     }
   }
@@ -31434,10 +32030,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentFilter_2> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentFilter_2 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentFilter_2 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentFilter_2> value =
@@ -31447,10 +32044,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentFilter_2: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentFilter_2: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("language");
@@ -31498,10 +32095,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentFilter_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentFilter_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentFilter_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentFilter_1> value =
@@ -31511,10 +32109,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentFilter_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentFilter_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("language");
@@ -31562,10 +32160,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<TextDocumentFilter_0> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) TextDocumentFilter_0 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) TextDocumentFilter_0 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<TextDocumentFilter_0> value =
@@ -31575,10 +32174,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) TextDocumentFilter_0: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) TextDocumentFilter_0: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("language");
@@ -31648,10 +32247,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) TextDocumentFilter: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) TextDocumentFilter: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -31678,10 +32278,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported TextDocumentFilterType: "
-         << TextDocumentFilterTypeNames.at(static_cast<TextDocumentFilterType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported TextDocumentFilterType: " +
+         TextDocumentFilterTypeNames.at(static_cast<TextDocumentFilterType>(variant.index())))
+      );
     }
     }
   }
@@ -31690,10 +32291,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentFilter_2> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentFilter_2 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentFilter_2 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentFilter_2> value =
@@ -31703,10 +32305,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentFilter_2: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentFilter_2: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookType");
@@ -31754,10 +32356,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentFilter_1> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentFilter_1 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentFilter_1 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentFilter_1> value =
@@ -31767,10 +32370,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentFilter_1: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentFilter_1: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookType");
@@ -31818,10 +32421,11 @@ namespace LCompilers::LanguageServerProtocol {
     const LSPAny &any
   ) const -> std::unique_ptr<NotebookDocumentFilter_0> {
     if (static_cast<LSPAnyType>(any.index()) != LSPAnyType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "LSPAnyType for a(n) NotebookDocumentFilter_0 must be of type LSPAnyType::OBJECT_TYPE but received type "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("LSPAnyType for a(n) NotebookDocumentFilter_0 must be of type LSPAnyType::OBJECT_TYPE but received type " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
 
     std::unique_ptr<NotebookDocumentFilter_0> value =
@@ -31831,10 +32435,10 @@ namespace LCompilers::LanguageServerProtocol {
     LSPObject::const_iterator iter;
 
     if (object.size() > 3) {
-      std::stringstream ss;
-      ss << "Too many attributes to transform to a(n) NotebookDocumentFilter_0: "
-         << object.size();
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        "Too many attributes to transform to a(n) NotebookDocumentFilter_0: " + std::to_string(object.size())
+      );
     }
 
     iter = object.find("notebookType");
@@ -31904,10 +32508,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) NotebookDocumentFilter: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) NotebookDocumentFilter: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -31934,10 +32539,11 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     default: {
-      std::stringstream ss;
-      ss << "Unsupported NotebookDocumentFilterType: "
-         << NotebookDocumentFilterTypeNames.at(static_cast<NotebookDocumentFilterType>(variant.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Unsupported NotebookDocumentFilterType: " +
+         NotebookDocumentFilterTypeNames.at(static_cast<NotebookDocumentFilterType>(variant.index())))
+      );
     }
     }
   }
@@ -31950,11 +32556,12 @@ namespace LCompilers::LanguageServerProtocol {
       return std::get<Pattern>(any);
     }
     default: {
-      std::stringstream ss;
-      ss << "Cannot transform LSPAny of type LSPAnyType::"
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))
-         << " to type Pattern";
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Cannot transform LSPAny of type LSPAnyType::" +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +
+         " to type Pattern")
+      );
     }
     }
   }
@@ -31975,12 +32582,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<ImplementationParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/implementation\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/implementation\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32063,12 +32671,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<TypeDefinitionParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/typeDefinition\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/typeDefinition\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32151,12 +32760,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentColorParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/documentColor\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/documentColor\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32203,12 +32813,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<ColorPresentationParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/colorPresentation\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/colorPresentation\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32275,12 +32886,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<FoldingRangeParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/foldingRange\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/foldingRange\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32340,12 +32952,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DeclarationParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/declaration\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/declaration\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32428,12 +33041,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<SelectionRangeParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/selectionRange\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/selectionRange\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32508,12 +33122,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CallHierarchyPrepareParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/prepareCallHierarchy\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/prepareCallHierarchy\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32578,12 +33193,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CallHierarchyIncomingCallsParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"callHierarchy/incomingCalls\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"callHierarchy/incomingCalls\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32643,12 +33259,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CallHierarchyOutgoingCallsParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"callHierarchy/outgoingCalls\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"callHierarchy/outgoingCalls\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32708,12 +33325,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<SemanticTokensParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/semanticTokens/full\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/semanticTokens/full\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32769,12 +33387,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<SemanticTokensDeltaParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/semanticTokens/full/delta\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/semanticTokens/full/delta\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32846,12 +33465,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<SemanticTokensRangeParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/semanticTokens/range\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/semanticTokens/range\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32917,12 +33537,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<LinkedEditingRangeParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/linkedEditingRange\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/linkedEditingRange\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -32980,12 +33601,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CreateFilesParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/willCreateFiles\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/willCreateFiles\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33033,12 +33655,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<RenameFilesParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/willRenameFiles\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/willRenameFiles\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33086,12 +33709,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DeleteFilesParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/willDeleteFiles\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/willDeleteFiles\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33139,12 +33763,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<MonikerParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/moniker\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/moniker\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33214,12 +33839,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<TypeHierarchyPrepareParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/prepareTypeHierarchy\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/prepareTypeHierarchy\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33284,12 +33910,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<TypeHierarchySupertypesParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"typeHierarchy/supertypes\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"typeHierarchy/supertypes\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33349,12 +33976,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<TypeHierarchySubtypesParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"typeHierarchy/subtypes\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"typeHierarchy/subtypes\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33414,12 +34042,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<InlineValueParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/inlineValue\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/inlineValue\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33494,12 +34123,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<InlayHintParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/inlayHint\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/inlayHint\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33564,12 +34194,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<InlayHint> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"inlayHint/resolve\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"inlayHint/resolve\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33646,12 +34277,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentDiagnosticParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/diagnostic\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/diagnostic\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33714,12 +34346,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<WorkspaceDiagnosticParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/diagnostic\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/diagnostic\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33782,12 +34415,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<InlineCompletionParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/inlineCompletion\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/inlineCompletion\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33865,12 +34499,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<InitializeParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"initialize\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"initialize\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -33957,12 +34592,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<WillSaveTextDocumentParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/willSaveWaitUntil\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/willSaveWaitUntil\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34022,12 +34658,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CompletionParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/completion\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/completion\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34105,12 +34742,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CompletionItem> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"completionItem/resolve\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"completionItem/resolve\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34247,12 +34885,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<HoverParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/hover\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/hover\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34310,12 +34949,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<SignatureHelpParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/signatureHelp\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/signatureHelp\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34378,12 +35018,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DefinitionParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/definition\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/definition\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34466,12 +35107,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<ReferenceParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/references\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/references\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34551,12 +35193,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentHighlightParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/documentHighlight\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/documentHighlight\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34626,12 +35269,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentSymbolParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/documentSymbol\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/documentSymbol\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34701,12 +35345,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CodeActionParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/codeAction\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/codeAction\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34795,12 +35440,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CodeAction> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"codeAction/resolve\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"codeAction/resolve\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34872,12 +35518,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<WorkspaceSymbolParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/symbol\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/symbol\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -34947,12 +35594,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<WorkspaceSymbol> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspaceSymbol/resolve\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspaceSymbol/resolve\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35024,12 +35672,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CodeLensParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/codeLens\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/codeLens\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35089,12 +35738,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<CodeLens> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"codeLens/resolve\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"codeLens/resolve\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35136,12 +35786,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentLinkParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/documentLink\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/documentLink\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35201,12 +35852,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentLink> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"documentLink/resolve\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"documentLink/resolve\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35253,12 +35905,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentFormattingParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/formatting\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/formatting\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35323,12 +35976,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentRangeFormattingParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/rangeFormatting\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/rangeFormatting\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35403,12 +36057,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentRangesFormattingParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/rangesFormatting\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/rangesFormatting\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35488,12 +36143,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<DocumentOnTypeFormattingParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/onTypeFormatting\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/onTypeFormatting\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35573,12 +36229,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<RenameParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/rename\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/rename\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35646,12 +36303,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<PrepareRenameParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/prepareRename\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/prepareRename\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35709,12 +36367,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &requestParams
   ) const -> std::unique_ptr<ExecuteCommandParams> {
     if (static_cast<MessageParamsType>(requestParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/executeCommand\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/executeCommand\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(requestParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(requestParams);
@@ -35776,12 +36435,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidChangeWorkspaceFoldersParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/didChangeWorkspaceFolders\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/didChangeWorkspaceFolders\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -35807,12 +36467,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<WorkDoneProgressCancelParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"window/workDoneProgress/cancel\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"window/workDoneProgress/cancel\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -35838,12 +36499,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<CreateFilesParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/didCreateFiles\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/didCreateFiles\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -35874,12 +36536,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<RenameFilesParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/didRenameFiles\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/didRenameFiles\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -35910,12 +36573,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DeleteFilesParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/didDeleteFiles\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/didDeleteFiles\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -35946,12 +36610,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidOpenNotebookDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"notebookDocument/didOpen\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"notebookDocument/didOpen\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -35992,12 +36657,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidChangeNotebookDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"notebookDocument/didChange\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"notebookDocument/didChange\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36033,12 +36699,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidSaveNotebookDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"notebookDocument/didSave\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"notebookDocument/didSave\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36064,12 +36731,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidCloseNotebookDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"notebookDocument/didClose\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"notebookDocument/didClose\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36110,12 +36778,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<InitializedParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"initialized\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"initialized\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     std::unique_ptr<InitializedParams> initializedParams =
@@ -36128,12 +36797,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidChangeConfigurationParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/didChangeConfiguration\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/didChangeConfiguration\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36159,12 +36829,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidOpenTextDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/didOpen\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/didOpen\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36190,12 +36861,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidChangeTextDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/didChange\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/didChange\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36236,12 +36908,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidCloseTextDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/didClose\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/didClose\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36267,12 +36940,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidSaveTextDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/didSave\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/didSave\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36303,12 +36977,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<WillSaveTextDocumentParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"textDocument/willSave\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"textDocument/willSave\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36344,12 +37019,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<DidChangeWatchedFilesParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"workspace/didChangeWatchedFiles\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"workspace/didChangeWatchedFiles\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36380,12 +37056,13 @@ namespace LCompilers::LanguageServerProtocol {
     const MessageParams &notificationParams
   ) const -> std::unique_ptr<SetTraceParams> {
     if (static_cast<MessageParamsType>(notificationParams.index()) != MessageParamsType::OBJECT_TYPE) {
-      std::stringstream ss;
-      ss << "Message parameter type must be MessageParamsType::"
-         << MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE)
-         << " for method=\"$/setTrace\" but received type "
-         << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Message parameter type must be MessageParamsType::" +
+         MessageParamsTypeNames.at(MessageParamsType::OBJECT_TYPE) +
+         " for method=\"$/setTrace\" but received type " +
+         "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>(notificationParams.index())))
+      );
     }
 
     const LSPObject &object = std::get<LSPObject>(notificationParams);
@@ -36438,10 +37115,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceWorkspaceFoldersResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceWorkspaceFoldersResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36491,10 +37169,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceConfigurationResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceConfigurationResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36512,10 +37191,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceFoldingRangeRefreshResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceFoldingRangeRefreshResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36545,10 +37225,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WindowWorkDoneProgressCreateResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WindowWorkDoneProgressCreateResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36566,10 +37247,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceSemanticTokensRefreshResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceSemanticTokensRefreshResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36615,10 +37297,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WindowShowDocumentResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WindowShowDocumentResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36636,10 +37319,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceInlineValueRefreshResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceInlineValueRefreshResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36657,10 +37341,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceInlayHintRefreshResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceInlayHintRefreshResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36678,10 +37363,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceDiagnosticRefreshResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceDiagnosticRefreshResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36719,10 +37405,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ClientRegisterCapabilityResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ClientRegisterCapabilityResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36760,10 +37447,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) ClientUnregisterCapabilityResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) ClientUnregisterCapabilityResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36816,10 +37504,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WindowShowMessageRequestResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WindowShowMessageRequestResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36837,10 +37526,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceCodeLensRefreshResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceCodeLensRefreshResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36880,10 +37570,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAnyType for a(n) WorkspaceApplyEditResult: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAnyType for a(n) WorkspaceApplyEditResult: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))
+      );
     }
     }
 
@@ -36936,10 +37627,11 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::stringstream ss;
-      ss << "Invalid LSPAny type for LSPAny: "
-         << LSPAnyTypeNames.at(static_cast<LSPAnyType>(notificationParams.index()));
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::INVALID_PARAMS,
+        ("Invalid LSPAny type for LSPAny: " +
+         LSPAnyTypeNames.at(static_cast<LSPAnyType>(notificationParams.index())))
+      );
     }
     }
 

@@ -10,9 +10,9 @@ namespace LCompilers::LanguageServer::Logging {
     , logFile(logPath, std::ios::out | std::ios::trunc)
   {
     if (!logFile.is_open()) {
-      std::stringstream ss;
-      ss << "Failed to open log file for writing: " << logPath;
-      throw std::invalid_argument(ss.str());
+      throw std::invalid_argument(
+        "Failed to open log file for writing: " + logPath.string()
+      );
     }
   }
 
@@ -37,10 +37,6 @@ namespace LCompilers::LanguageServer::Logging {
     } else {
       throw std::runtime_error("Logger has already been closed.");
     }
-  }
-
-  auto Logger::lock() -> std::unique_lock<std::mutex> {
-    return std::unique_lock<std::mutex>(mutex);
   }
 
   auto Logger::operator<<(unsigned char c) -> Logger & {
@@ -88,6 +84,12 @@ namespace LCompilers::LanguageServer::Logging {
   auto Logger::operator<<(const std::string &str) -> Logger & {
     logFile << str;
     std::cerr << str;
+    return *this;
+  }
+
+  auto Logger::operator<<(const std::string_view &view) -> Logger & {
+    logFile << view;
+    std::cerr << view;
     return *this;
   }
 

@@ -4,7 +4,6 @@
 #include <filesystem>
 #include <mutex>
 #include <regex>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -64,7 +63,7 @@ namespace LCompilers::LanguageServerProtocol {
     std::string _text;
     lsl::Logger &logger;
     fs::path _path;
-    std::stringstream ss;
+    std::string buffer;
     std::vector<std::size_t> lineIndices;
     std::recursive_mutex reentrantMutex;
 

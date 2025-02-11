@@ -81,9 +81,21 @@ namespace LCompilers::LanguageServerProtocol {
     DeleteFilesParams &/*params*/
   ) -> void {
     std::shared_lock<std::shared_mutex> readLock(documentMutex);
-    // TODO: Parallelize this if LFortran is thread-safe.
     for (const auto &[uri, document] : documentsByUri) {
-      validate(document);
+      workerPool.execute([this, uri, &document](
+        const std::string &threadName,
+        const std::size_t threadId
+      ) {
+        try {
+          validate(document);
+        } catch (std::exception &e) {
+          logger
+            << "[" << threadName << "_" << threadId << "] "
+            << "Failed to validate document (uri=\""
+            << uri << "\"): " << e.what()
+            << std::endl;
+        }
+      });
     }
   }
 
@@ -93,9 +105,21 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     BaseLspLanguageServer::receiveWorkspace_didChangeConfiguration(params);
     std::shared_lock<std::shared_mutex> readLock(documentMutex);
-    // TODO: Parallelize this if LFortran is thread-safe.
     for (const auto &[uri, document] : documentsByUri) {
-      validate(document);
+      workerPool.execute([this, uri, &document](
+        const std::string &threadName,
+        const std::size_t threadId
+      ) {
+        try {
+          validate(document);
+        } catch (std::exception &e) {
+          logger
+            << "[" << threadName << "_" << threadId << "] "
+            << "Failed to validate document (uri=\""
+            << uri << "\"): " << e.what()
+            << std::endl;
+        }
+      });
     }
   }
 
@@ -130,9 +154,21 @@ namespace LCompilers::LanguageServerProtocol {
     DidChangeWatchedFilesParams &/*params*/
   ) -> void {
     std::shared_lock<std::shared_mutex> readLock(documentMutex);
-    // TODO: Parallelize this if LFortran is thread-safe.
     for (const auto &[uri, document] : documentsByUri) {
-      validate(document);
+      workerPool.execute([this, uri, &document](
+        const std::string &threadName,
+        const std::size_t threadId
+      ) {
+        try {
+          validate(document);
+        } catch (std::exception &e) {
+          logger
+            << "[" << threadName << "_" << threadId << "] "
+            << "Failed to validate document (uri=\""
+            << uri << "\"): " << e.what()
+            << std::endl;
+        }
+      });
     }
   }
 

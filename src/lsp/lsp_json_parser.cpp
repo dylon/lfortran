@@ -9,7 +9,7 @@ namespace LCompilers::LanguageServerProtocol {
   LspJsonParser::LspJsonParser(const std::string &message)
     : message(message)
   {
-    // empty
+    buffer.reserve(16384);
   }
 
   auto LspJsonParser::parse() -> std::unique_ptr<LSPAny> {
@@ -89,13 +89,11 @@ namespace LCompilers::LanguageServerProtocol {
             object.emplace(key, std::move(value));
             hasAttribute = true;
           } else {
-            ss.str("");
-            ss << "Expected ':' to follow object attribute name, not: '"
-               << c << "'";
-            throw LSP_EXCEPTION(
-              ErrorCodes::PARSE_ERROR,
-              ss.str()
-            );
+            buffer.clear();
+            buffer.append("Expected ':' to follow object attribute name, not: '");
+            escapeAndBuffer(c);
+            buffer.push_back('\'');
+            throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, buffer);
           }
         } else {
           throw LSP_EXCEPTION(
@@ -107,10 +105,14 @@ namespace LCompilers::LanguageServerProtocol {
       }
       case ',': {
         if (!hasAttribute) {
-          throw LSP_EXCEPTION(
-            ErrorCodes::PARSE_ERROR,
-            "Found out-of-sequence separator (',') while parsing object."
-          );
+          buffer.clear();
+          buffer.append("Found out-of-sequence separator (',') at position ");
+          buffer.append(std::to_string(index));
+          buffer.append(" while parsing object: ");
+          for (std::size_t i = 0; i <= index; ++i) {
+            escapeAndBuffer(message[i]);
+          }
+          throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, buffer);
         }
         hasAttribute = false;
         dropWhitespace();
@@ -120,14 +122,11 @@ namespace LCompilers::LanguageServerProtocol {
         return object;
       }
       default: {
-        ss.str("");
-        ss << "Found invalid character while parsing object: '";
+        buffer.clear();
+        buffer.append("Found invalid character while parsing object: '");
         escapeAndBuffer(c);
-        ss << '\'';
-        throw LSP_EXCEPTION(
-          ErrorCodes::PARSE_ERROR,
-          ss.str()
-        );
+        buffer.push_back('\'');
+        throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, buffer);
       }
       }
     }
@@ -146,11 +145,16 @@ namespace LCompilers::LanguageServerProtocol {
       switch (c) {
       case ',': {
         if (!hasValue) {
-          throw LSP_EXCEPTION(
-            ErrorCodes::PARSE_ERROR,
-            "Found out-of-sequence separator (',') while parsing array"
-          );
+          buffer.clear();
+          buffer.append("Found out-of-sequence separator (',') at position ");
+          buffer.append(std::to_string(index));
+          buffer.append(" while parsing array: ");
+          for (std::size_t i = 0; i <= index; ++i) {
+            escapeAndBuffer(message[i]);
+          }
+          throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, buffer);
         }
+        advance();
         hasValue = false;
         break;
       }
@@ -234,112 +238,109 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspJsonParser::parseString() -> string_t {
-    ss.str("");
+    buffer.clear();
     bool escaped = false;
     while (hasNext()) {
       unsigned char c = nextChar();
       switch (c) {
       case '\\': {
         if (escaped) {
-          ss << c;
+          buffer.push_back(c);
         }
         escaped = !escaped;
         break;
       }
       case 'n': {
         if (!escaped) {
-          ss << c;
+          buffer.push_back(c);
         } else {
-          ss << '\n';
+          buffer.push_back('\n');
           escaped = false;
         }
         break;
       }
       case '\n': {
-        ss << c;
+        buffer.push_back(c);
         escaped = false;
         break;
       }
       case 't': {
         if (!escaped) {
-          ss << c;
+          buffer.push_back(c);
         } else {
-          ss << '\t';
+          buffer.push_back('\t');
           escaped = false;
         }
         break;
       }
       case '\t': {
-        ss << c;
+        buffer.push_back(c);
         escaped = false;
         break;
       }
       case 'b': {
         if (!escaped) {
-          ss << c;
+          buffer.push_back(c);
         } else {
-          ss << '\b';
+          buffer.push_back('\b');
           escaped = false;
         }
         break;
       }
       case '\b': {
-        ss << '\b';
+        buffer.push_back('\b');
         escaped = false;
         break;
       }
       case 'r': {
         if (!escaped) {
-          ss << c;
+          buffer.push_back(c);
         } else {
-          ss << '\r';
+          buffer.push_back('\r');
           escaped = false;
         }
         break;
       }
       case '\r': {
-        ss << c;
+        buffer.push_back(c);
         escaped = false;
         break;
       }
       case 'f': {
         if (!escaped) {
-          ss << c;
+          buffer.push_back(c);
         } else {
-          ss << '\f';
+          buffer.push_back('\f');
           escaped = false;
         }
         break;
       }
       case '\f': {
-        ss << c;
+        buffer.push_back(c);
         escaped = false;
         break;
       }
       case '\'': {
-        ss << c;
+        buffer.push_back(c);
         escaped = false;
         break;
       }
       case 'u': {
         if (!escaped) {
-          ss << c;
+          buffer.push_back(c);
         } else {
-          ss << "\\u";
+          buffer.append("\\u");
           std::size_t i;
           for (i = 0; (i < 4) && hasNext(); ++i) {
             unsigned char c = nextChar();
             if (std::isxdigit(static_cast<int>(c))) {
-              ss << c;
+              buffer.push_back(c);
             } else {
-              ss.str("");
-              ss << "Found non-hex digit while parsing unicode character: '";
+              buffer.clear();
+              buffer.append("Found non-hex digit while parsing unicode character: '");
               escapeAndBuffer(c);
-              ss << '\'';
-              throw LSP_EXCEPTION(
-                ErrorCodes::PARSE_ERROR,
-                ss.str()
-              );
+              buffer.push_back('\'');
+              throw LSP_EXCEPTION(ErrorCodes::PARSE_ERROR, buffer);
             }
           }
           if (i < 4) {
@@ -354,15 +355,15 @@ namespace LCompilers::LanguageServerProtocol {
       }
       case '"': {
         if (escaped) {
-          ss << c;
+          buffer.push_back(c);
           escaped = false;
         } else {
-          return ss.str();
+          return buffer;
         }
         break;
       }
       default: {
-        ss << c;
+        buffer.push_back(c);
         escaped = false;
       }
       }
@@ -376,27 +377,27 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspJsonParser::escapeAndBuffer(unsigned char c) -> void {
     switch (c) {
     case '\n': {
-      ss << "\\n";
+      buffer.append("\\n");
       break;
     }
     case '\t': {
-      ss << "\\t";
+      buffer.append("\\t");
       break;
     }
     case '\b': {
-      ss << "\\b";
+      buffer.append("\\b");
       break;
     }
     case '\r': {
-      ss << "\\r";
+      buffer.append("\\r");
       break;
     }
     case '\f': {
-      ss << "\\f";
+      buffer.append("\\f");
       break;
     }
     default: {
-      ss << c;
+      buffer.push_back(c);
     }
     }
   }
@@ -404,7 +405,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspJsonParser::parseNumber() -> std::unique_ptr<LSPAny> {
     bool isNegated = false;
     bool hasDigit = false;
-    ss.str("");
+    buffer.clear();
     while (hasNext()) {
       unsigned char c = peekChar();
       switch (c) {
@@ -416,23 +417,23 @@ namespace LCompilers::LanguageServerProtocol {
           );
         }
         isNegated = true;
-        ss << c;
+        buffer.push_back(c);
         advance();
         break;
       }
       case '0': {
         hasDigit = true;
-        ss << c;
+        buffer.push_back(c);
         advance();
         switch (peekChar()) {
         case '.': {
-          ss << c;
+          buffer.push_back(c);
           advance();
           return parseFraction();
         }
         case 'e': // fallthrough
         case 'E': {
-          ss << c;
+          buffer.push_back(c);
           advance();
           return parseExponent();
         }
@@ -449,14 +450,14 @@ namespace LCompilers::LanguageServerProtocol {
       case '8': // fallthrough
       case '9': {
         hasDigit = true;
-        ss << c;
+        buffer.push_back(c);
         advance();
         break;
       }
       default: {
         if (hasDigit) {
           std::unique_ptr<LSPAny> number = std::make_unique<LSPAny>();
-          (*number) = std::stoi(ss.str());
+          (*number) = std::stoi(buffer);
           return number;
         }
         throw LSP_EXCEPTION(
@@ -488,20 +489,20 @@ namespace LCompilers::LanguageServerProtocol {
       case '8': // fallthrough
       case '9': {
         hasDigit = true;
-        ss << c;
+        buffer.push_back(c);
         advance();
         break;
       }
       case 'e': // fallthrough
       case 'E': {
-        ss << c;
+        buffer.push_back(c);
         advance();
         return parseExponent();
       }
       default: {
         if (hasDigit) {
           std::unique_ptr<LSPAny> number = std::make_unique<LSPAny>();
-          (*number) = std::stod(ss.str());
+          (*number) = std::stod(buffer);
           return number;
         }
         throw LSP_EXCEPTION(
@@ -532,7 +533,7 @@ namespace LCompilers::LanguageServerProtocol {
           );
         }
         hasSign = true;
-        ss << c;
+        buffer.push_back(c);
         advance();
         break;
       }
@@ -547,14 +548,14 @@ namespace LCompilers::LanguageServerProtocol {
       case '8': // fallthrough
       case '9': {
         hasDigit = true;
-        ss << c;
+        buffer.push_back(c);
         advance();
         break;
       }
       default: {
         if (hasDigit) {
           std::unique_ptr<LSPAny> number = std::make_unique<LSPAny>();
-          (*number) = std::stod(ss.str());
+          (*number) = std::stod(buffer);
           return number;
         }
         throw LSP_EXCEPTION(

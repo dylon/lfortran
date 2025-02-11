@@ -22,23 +22,25 @@ namespace LCompilers::LanguageServer {
     }
 
     inline auto isRunning() const -> bool {
-      return running;
+      return sending || receiving;
     }
 
     inline auto isStopped() const -> bool {
-      return !running;
+      return !isRunning();
     }
 
     auto enqueue(const std::string &message) -> bool;
     auto dequeue() -> const std::string;
     auto stop() -> void;
+    auto stopNow() -> void;
   private:
     lsl::Logger &logger;
     std::string buffer[MESSAGE_QUEUE_CAPACITY];
-    std::atomic_bool running = true;
-    std::size_t head = 0;
-    std::size_t tail = 0;
-    std::size_t _size = 0;
+    std::atomic_bool sending = true;
+    std::atomic_bool receiving = true;
+    std::atomic_size_t head = 0;
+    std::atomic_size_t tail = 0;
+    std::atomic_size_t _size = 0;
     std::mutex mutex;
     std::condition_variable enqueued;
     std::condition_variable dequeued;

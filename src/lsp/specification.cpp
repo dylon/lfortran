@@ -3,7 +3,6 @@
 // specification. Please do not edit it by hand.
 // -----------------------------------------------------------------------------
 
-#include <sstream>
 #include <stdexcept>
 
 #include <lsp/specification.h>
@@ -75,9 +74,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SemanticTokenTypes name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SemanticTokenTypes name: " + name
+    );
   }
 
   auto semanticTokenTypesByValue(
@@ -89,9 +88,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SemanticTokenTypes value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SemanticTokenTypes value: " + value
+    );
   }
 
   std::map<
@@ -135,9 +134,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SemanticTokenModifiers name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SemanticTokenModifiers name: " + name
+    );
   }
 
   auto semanticTokenModifiersByValue(
@@ -149,9 +148,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SemanticTokenModifiers value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SemanticTokenModifiers value: " + value
+    );
   }
 
   std::map<
@@ -179,9 +178,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DocumentDiagnosticReportKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DocumentDiagnosticReportKind name: " + name
+    );
   }
 
   auto documentDiagnosticReportKindByValue(
@@ -193,9 +192,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DocumentDiagnosticReportKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DocumentDiagnosticReportKind value: " + value
+    );
   }
 
   std::map<
@@ -220,9 +219,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid ErrorCodes name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid ErrorCodes name: " + name
+    );
   }
 
   auto errorCodesByValue(
@@ -234,9 +233,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid ErrorCodes value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid ErrorCodes value: " + value
+    );
   }
 
   std::map<
@@ -258,9 +257,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid LSPErrorCodes name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid LSPErrorCodes name: " + name
+    );
   }
 
   auto lspErrorCodesByValue(
@@ -272,9 +271,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid LSPErrorCodes value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid LSPErrorCodes value: " + value
+    );
   }
 
   std::map<
@@ -304,9 +303,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FoldingRangeKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FoldingRangeKind name: " + name
+    );
   }
 
   auto foldingRangeKindByValue(
@@ -318,9 +317,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FoldingRangeKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FoldingRangeKind value: " + value
+    );
   }
 
   std::map<
@@ -364,9 +363,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SymbolKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SymbolKind name: " + name
+    );
   }
 
   auto symbolKindByValue(
@@ -378,9 +377,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SymbolKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SymbolKind value: " + value
+    );
   }
 
   std::map<
@@ -399,9 +398,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SymbolTag name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SymbolTag name: " + name
+    );
   }
 
   auto symbolTagByValue(
@@ -413,9 +412,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SymbolTag value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SymbolTag value: " + value
+    );
   }
 
   std::map<
@@ -449,9 +448,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid UniquenessLevel name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid UniquenessLevel name: " + name
+    );
   }
 
   auto uniquenessLevelByValue(
@@ -463,9 +462,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid UniquenessLevel value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid UniquenessLevel value: " + value
+    );
   }
 
   std::map<
@@ -495,9 +494,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid MonikerKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid MonikerKind name: " + name
+    );
   }
 
   auto monikerKindByValue(
@@ -509,9 +508,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid MonikerKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid MonikerKind value: " + value
+    );
   }
 
   std::map<
@@ -531,9 +530,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InlayHintKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InlayHintKind name: " + name
+    );
   }
 
   auto inlayHintKindByValue(
@@ -545,9 +544,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InlayHintKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InlayHintKind value: " + value
+    );
   }
 
   std::map<
@@ -570,9 +569,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid MessageType name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid MessageType name: " + name
+    );
   }
 
   auto messageTypeByValue(
@@ -584,9 +583,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid MessageType value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid MessageType value: " + value
+    );
   }
 
   std::map<
@@ -607,9 +606,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TextDocumentSyncKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TextDocumentSyncKind name: " + name
+    );
   }
 
   auto textDocumentSyncKindByValue(
@@ -621,9 +620,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TextDocumentSyncKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TextDocumentSyncKind value: " + value
+    );
   }
 
   std::map<
@@ -644,9 +643,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TextDocumentSaveReason name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TextDocumentSaveReason name: " + name
+    );
   }
 
   auto textDocumentSaveReasonByValue(
@@ -658,9 +657,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TextDocumentSaveReason value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TextDocumentSaveReason value: " + value
+    );
   }
 
   std::map<
@@ -703,9 +702,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CompletionItemKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CompletionItemKind name: " + name
+    );
   }
 
   auto completionItemKindByValue(
@@ -717,9 +716,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CompletionItemKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CompletionItemKind value: " + value
+    );
   }
 
   std::map<
@@ -738,9 +737,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CompletionItemTag name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CompletionItemTag name: " + name
+    );
   }
 
   auto completionItemTagByValue(
@@ -752,9 +751,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CompletionItemTag value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CompletionItemTag value: " + value
+    );
   }
 
   std::map<
@@ -774,9 +773,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InsertTextFormat name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InsertTextFormat name: " + name
+    );
   }
 
   auto insertTextFormatByValue(
@@ -788,9 +787,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InsertTextFormat value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InsertTextFormat value: " + value
+    );
   }
 
   std::map<
@@ -810,9 +809,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InsertTextMode name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InsertTextMode name: " + name
+    );
   }
 
   auto insertTextModeByValue(
@@ -824,9 +823,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InsertTextMode value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InsertTextMode value: " + value
+    );
   }
 
   std::map<
@@ -847,9 +846,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DocumentHighlightKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DocumentHighlightKind name: " + name
+    );
   }
 
   auto documentHighlightKindByValue(
@@ -861,9 +860,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DocumentHighlightKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DocumentHighlightKind value: " + value
+    );
   }
 
   std::map<
@@ -905,9 +904,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CodeActionKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CodeActionKind name: " + name
+    );
   }
 
   auto codeActionKindByValue(
@@ -919,9 +918,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CodeActionKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CodeActionKind value: " + value
+    );
   }
 
   std::map<
@@ -951,9 +950,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TraceValues name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TraceValues name: " + name
+    );
   }
 
   auto traceValuesByValue(
@@ -965,9 +964,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TraceValues value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TraceValues value: " + value
+    );
   }
 
   std::map<
@@ -995,9 +994,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid MarkupKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid MarkupKind name: " + name
+    );
   }
 
   auto markupKindByValue(
@@ -1009,9 +1008,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid MarkupKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid MarkupKind value: " + value
+    );
   }
 
   std::map<
@@ -1031,9 +1030,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InlineCompletionTriggerKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InlineCompletionTriggerKind name: " + name
+    );
   }
 
   auto inlineCompletionTriggerKindByValue(
@@ -1045,9 +1044,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid InlineCompletionTriggerKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid InlineCompletionTriggerKind value: " + value
+    );
   }
 
   std::map<
@@ -1077,9 +1076,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid PositionEncodingKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid PositionEncodingKind name: " + name
+    );
   }
 
   auto positionEncodingKindByValue(
@@ -1091,9 +1090,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid PositionEncodingKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid PositionEncodingKind value: " + value
+    );
   }
 
   std::map<
@@ -1114,9 +1113,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FileChangeType name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FileChangeType name: " + name
+    );
   }
 
   auto fileChangeTypeByValue(
@@ -1128,9 +1127,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FileChangeType value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FileChangeType value: " + value
+    );
   }
 
   std::map<
@@ -1151,9 +1150,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid WatchKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid WatchKind name: " + name
+    );
   }
 
   auto watchKindByValue(
@@ -1165,9 +1164,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid WatchKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid WatchKind value: " + value
+    );
   }
 
   std::map<
@@ -1189,9 +1188,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DiagnosticSeverity name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DiagnosticSeverity name: " + name
+    );
   }
 
   auto diagnosticSeverityByValue(
@@ -1203,9 +1202,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DiagnosticSeverity value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DiagnosticSeverity value: " + value
+    );
   }
 
   std::map<
@@ -1225,9 +1224,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DiagnosticTag name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DiagnosticTag name: " + name
+    );
   }
 
   auto diagnosticTagByValue(
@@ -1239,9 +1238,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid DiagnosticTag value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid DiagnosticTag value: " + value
+    );
   }
 
   std::map<
@@ -1262,9 +1261,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CompletionTriggerKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CompletionTriggerKind name: " + name
+    );
   }
 
   auto completionTriggerKindByValue(
@@ -1276,9 +1275,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CompletionTriggerKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CompletionTriggerKind value: " + value
+    );
   }
 
   std::map<
@@ -1299,9 +1298,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SignatureHelpTriggerKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SignatureHelpTriggerKind name: " + name
+    );
   }
 
   auto signatureHelpTriggerKindByValue(
@@ -1313,9 +1312,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid SignatureHelpTriggerKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid SignatureHelpTriggerKind value: " + value
+    );
   }
 
   std::map<
@@ -1335,9 +1334,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CodeActionTriggerKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CodeActionTriggerKind name: " + name
+    );
   }
 
   auto codeActionTriggerKindByValue(
@@ -1349,9 +1348,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid CodeActionTriggerKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid CodeActionTriggerKind value: " + value
+    );
   }
 
   std::map<
@@ -1379,9 +1378,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FileOperationPatternKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FileOperationPatternKind name: " + name
+    );
   }
 
   auto fileOperationPatternKindByValue(
@@ -1393,9 +1392,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FileOperationPatternKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FileOperationPatternKind value: " + value
+    );
   }
 
   std::map<
@@ -1415,9 +1414,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid NotebookCellKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid NotebookCellKind name: " + name
+    );
   }
 
   auto notebookCellKindByValue(
@@ -1429,9 +1428,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid NotebookCellKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid NotebookCellKind value: " + value
+    );
   }
 
   std::map<
@@ -1461,9 +1460,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid ResourceOperationKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid ResourceOperationKind name: " + name
+    );
   }
 
   auto resourceOperationKindByValue(
@@ -1475,9 +1474,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid ResourceOperationKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid ResourceOperationKind value: " + value
+    );
   }
 
   std::map<
@@ -1509,9 +1508,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FailureHandlingKind name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FailureHandlingKind name: " + name
+    );
   }
 
   auto failureHandlingKindByValue(
@@ -1523,9 +1522,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid FailureHandlingKind value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid FailureHandlingKind value: " + value
+    );
   }
 
   std::map<
@@ -1544,9 +1543,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid PrepareSupportDefaultBehavior name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid PrepareSupportDefaultBehavior name: " + name
+    );
   }
 
   auto prepareSupportDefaultBehaviorByValue(
@@ -1558,9 +1557,9 @@ namespace LCompilers::LanguageServerProtocol {
         return field_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid PrepareSupportDefaultBehavior value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid PrepareSupportDefaultBehavior value: " + value
+    );
   }
 
   std::map<
@@ -1586,9 +1585,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TokenFormat name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TokenFormat name: " + name
+    );
   }
 
   auto tokenFormatByValue(
@@ -1600,9 +1599,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid TokenFormat value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid TokenFormat value: " + value
+    );
   }
 
   std::map<TextDocumentRegistrationOptions_documentSelectorType, std::string> TextDocumentRegistrationOptions_documentSelectorTypeNames = {
@@ -2173,9 +2172,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid IncomingRequest name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid IncomingRequest name: " + name
+    );
   }
 
   auto incomingRequestByValue(
@@ -2187,9 +2186,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid IncomingRequest value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid IncomingRequest value: " + value
+    );
   }
 
   auto isIncomingRequest(const std::string &value) -> bool {
@@ -2250,9 +2249,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid OutgoingRequest name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid OutgoingRequest name: " + name
+    );
   }
 
   auto outgoingRequestByValue(
@@ -2264,9 +2263,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid OutgoingRequest value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid OutgoingRequest value: " + value
+    );
   }
 
   std::map<
@@ -2328,9 +2327,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid IncomingNotification name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid IncomingNotification name: " + name
+    );
   }
 
   auto incomingNotificationByValue(
@@ -2342,9 +2341,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid IncomingNotification value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid IncomingNotification value: " + value
+    );
   }
 
   auto isIncomingNotification(const std::string &value) -> bool {
@@ -2387,9 +2386,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid OutgoingNotification name: " << name;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid OutgoingNotification name: " + name
+    );
   }
 
   auto outgoingNotificationByValue(
@@ -2401,9 +2400,9 @@ namespace LCompilers::LanguageServerProtocol {
         return enum_name;
       }
     }
-    std::stringstream ss;
-    ss << "Invalid OutgoingNotification value: " << value;
-    throw std::invalid_argument(ss.str());
+    throw std::invalid_argument(
+      "Invalid OutgoingNotification value: " + value
+    );
   }
 
 } // namespace LCompilers::LanguageServerProtocol

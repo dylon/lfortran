@@ -55,6 +55,7 @@ namespace LCompilers::LanguageServer::Threading {
     std::mutex taskMutex;
     std::condition_variable taskAvailable;
     std::queue<Task> tasks;
+    std::atomic_size_t size;
 
     auto run(const std::size_t threadId) -> void;
   };

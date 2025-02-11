@@ -15,8 +15,7 @@ set(LCOMPILERS_LSP_SRC
   language_server.cpp
   lsp_language_server.cpp
   base_lsp_language_server.cpp
-  request_parser.cpp
-  lsp_request_parser.cpp
+  lsp_message_stream.cpp
   communication_protocol.cpp
 )
 

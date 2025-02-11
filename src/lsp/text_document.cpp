@@ -1,7 +1,5 @@
 #include <algorithm>
-#include <iostream>
 #include <mutex>
-#include <sstream>
 #include <stdexcept>
 
 #include <lsp/lsp_exception.h>
@@ -22,11 +20,8 @@ namespace LCompilers::LanguageServerProtocol {
     , _text(text)
     ,  logger(logger)
   {
+    buffer.reserve(8196);
     validateUriAndSetPath();
-    // logger  // DEBUG
-    //   << "================================================================================" << std::endl
-    //   << _text
-    //   << "================================================================================" << std::endl;
     indexLines();
   }
 
@@ -37,7 +32,7 @@ namespace LCompilers::LanguageServerProtocol {
     , _text(std::move(other._text))
     , logger(other.logger)
     , _path(std::move(other._path))
-    , ss(std::move(other.ss))
+    , buffer(std::move(other.buffer))
     , lineIndices(std::move(other.lineIndices))
   {
     // empty
@@ -51,10 +46,6 @@ namespace LCompilers::LanguageServerProtocol {
   auto TextDocument::setText(const std::string &text) -> void {
     std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
     _text = text;
-    // logger  // DEBUG
-    //   << "================================================================================" << std::endl
-    //   << _text
-    //   << "================================================================================" << std::endl;
     indexLines();
   }
 
@@ -73,7 +64,7 @@ namespace LCompilers::LanguageServerProtocol {
     {
       std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
 
-      ss.str("");
+      buffer.clear();
       std::size_t i = 0;
       for (const auto &change : changes) {
         std::size_t j;
@@ -81,29 +72,15 @@ namespace LCompilers::LanguageServerProtocol {
         std::string patch;
         decompose(change, j, k, patch);
         if (i < _text.length()) {
-          // logger
-          //   << "text[" << i << ":" << j << "] "
-          //   << "= text.substr(" << i << ", " << (j - i) << ") "
-          //   << "= \"" << _text.substr(i, (j - i)) << "\""
-          //   << std::endl;
-          ss << _text.substr(i, (j - i));
+          buffer.append(_text.substr(i, (j - i)));
         }
-        // logger
-        //   << "text[" << j << ":" << k << "] = \"" << patch << "\""
-        //   << std::endl;
-        ss << patch;
+        buffer.append(patch);
         i = k;
       }
       if (i < _text.length()) {
-        // logger
-        //   << "text[" << i << ":" << _text.length() << "] "
-        //   << "= text.substr(" << i << ", " << (_text.length() - i) << ") "
-        //   << "= \"" << _text.substr(i, (_text.length() - i)) << "\""
-        //   << std::endl;
-        ss << _text.substr(i, (_text.length() - i));
+        buffer.append(_text.substr(i, (_text.length() - i)));
       }
-      std::string text = ss.str();
-      setText(text);
+      setText(buffer);
       _version = version;
     }
   }
@@ -194,17 +171,21 @@ namespace LCompilers::LanguageServerProtocol {
     const Position &end = *range.end;
 
     if (start.line > end.line) {
-      ss.str("");
-      ss << "start.line must be <= end.line, but "
-         << start.line << " > " << end.line;
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      buffer.clear();
+      buffer.append("start.line must be <= end.line, but ");
+      buffer.append(std::to_string(start.line));
+      buffer.append(" > ");
+      buffer.append(std::to_string(end.line));
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, buffer);
     }
 
     if ((start.line == end.line) && (start.character > end.character)) {
-      ss.str("");
-      ss << "start.character must be <= end.character when colinear, but "
-         << start.character << " > " << end.character;
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      buffer.clear();
+      buffer.append("start.character must be <= end.character when colinear, but ");
+      buffer.append(std::to_string(start.character));
+      buffer.append(" > ");
+      buffer.append(std::to_string(end.character));
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, buffer);
     }
 
     if (start.line < lineIndices.size()) {
@@ -212,11 +193,12 @@ namespace LCompilers::LanguageServerProtocol {
     } else if (start.line == lineIndices[lineIndices.size() - 1] + 1) {
       j = _text.length();
     } else {
-      ss.str("");
-      ss << "start.line must be <= "
-         << (lineIndices[lineIndices.size() - 1] + 1)
-         << " but was: " << start.line;
-      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+      buffer.clear();
+      buffer.append("start.line must be <= ");
+      buffer.append(std::to_string(lineIndices[lineIndices.size() - 1] + 1));
+      buffer.append(" but was: ");
+      buffer.append(std::to_string(start.line));
+      throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, buffer);
     }
 
     if (end.line < lineIndices.size()) {

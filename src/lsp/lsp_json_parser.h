@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <sstream>
 #include <string>
 
 #include <lsp/specification.h>
@@ -16,8 +15,7 @@ namespace LCompilers::LanguageServerProtocol {
   private:
     const std::string message;
     std::size_t index = 0;
-    std::stringstream ss;
-    std::stringstream part;
+    std::string buffer;
 
     auto dropWhitespace() -> void;
     auto parseObject() -> LSPObject;

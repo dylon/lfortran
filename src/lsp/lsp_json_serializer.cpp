@@ -1,4 +1,3 @@
-#include <sstream>
 #include <utility>
 
 #include <lsp/specification.h>
@@ -8,15 +7,16 @@
 namespace LCompilers::LanguageServerProtocol {
 
   std::string LspJsonSerializer::serialize(const LSPAny &any) const {
-    std::stringstream ss;
+    std::string buffer;
+    buffer.reserve(32768);
     LSPAnyType anyType = static_cast<LSPAnyType>(any.index());
     switch (anyType) {
     case LSPAnyType::OBJECT_TYPE: {
-      serializeObject(ss, std::get<LSPObject>(any));
+      serializeObject(buffer, std::get<LSPObject>(any));
       break;
     }
     case LSPAnyType::ARRAY_TYPE: {
-      serializeArray(ss, std::get<LSPArray>(any));
+      serializeArray(buffer, std::get<LSPArray>(any));
       break;
     }
     default: {
@@ -28,125 +28,125 @@ namespace LCompilers::LanguageServerProtocol {
       );
     }
     }
-    return ss.str();
+    return buffer;
   }
 
   void LspJsonSerializer::serializeArray(
-    std::stringstream &ss,
+    std::string &buffer,
     const LSPArray &array
   ) const {
-    ss << "[";
+    buffer.push_back('[');
     LSPArray::const_iterator iter = array.begin();
     if (iter != array.end()) {
-      serializeValue(ss, **iter++);
+      serializeValue(buffer, **iter++);
       while (iter != array.end()) {
-        ss << ",";
-        serializeValue(ss, **iter++);
+        buffer.push_back(',');
+        serializeValue(buffer, **iter++);
       }
     }
-    ss << "]";
+    buffer.push_back(']');
   }
 
   void LspJsonSerializer::serializeObject(
-    std::stringstream &ss,
+    std::string &buffer,
     const LSPObject &object
   ) const {
-    ss << "{";
+    buffer.push_back('{');
     LSPObject::const_iterator iter = object.begin();
     if (iter != object.end()) {
-      serializeString(ss, iter->first);
-      ss << ":";
-      serializeValue(ss, *iter->second);
+      serializeString(buffer, iter->first);
+      buffer.push_back(':');
+      serializeValue(buffer, *iter->second);
       while ((++iter) != object.end()) {
-        ss << ",";
-        serializeString(ss, iter->first);
-        ss << ":";
-        serializeValue(ss, *iter->second);
+        buffer.push_back(',');
+        serializeString(buffer, iter->first);
+        buffer.push_back(':');
+        serializeValue(buffer, *iter->second);
       }
     }
-    ss << "}";
+    buffer.push_back('}');
   }
 
   void LspJsonSerializer::serializeValue(
-    std::stringstream &ss,
+    std::string &buffer,
     const LSPAny &value
   ) const {
     switch (static_cast<LSPAnyType>(value.index())) {
     case LSPAnyType::OBJECT_TYPE: {
-      serializeObject(ss, std::get<LSPObject>(value));
+      serializeObject(buffer, std::get<LSPObject>(value));
       break;
     }
     case LSPAnyType::ARRAY_TYPE: {
-      serializeArray(ss, std::get<LSPArray>(value));
+      serializeArray(buffer, std::get<LSPArray>(value));
       break;
     }
     case LSPAnyType::STRING_TYPE: {
-      serializeString(ss, value);
+      serializeString(buffer, value);
       break;
     }
     case LSPAnyType::INTEGER_TYPE: // fallthrough
     case LSPAnyType::UINTEGER_TYPE: // fallthrough
     case LSPAnyType::DECIMAL_TYPE: {
-      serializeNumber(ss, value);
+      serializeNumber(buffer, value);
       break;
     }
     case LSPAnyType::BOOLEAN_TYPE: {
-      serializeBoolean(ss, value);
+      serializeBoolean(buffer, value);
       break;
     }
     case LSPAnyType::NULL_TYPE: {
-      serializeNull(ss, value);
+      serializeNull(buffer, value);
       break;
     }
     }
   }
 
   void LspJsonSerializer::serializeString(
-    std::stringstream &ss,
+    std::string &buffer,
     const LSPAny &value
   ) const {
     LSPAnyType valueType = static_cast<LSPAnyType>(value.index());
     switch (valueType) {
     case LSPAnyType::STRING_TYPE: {
       const string_t &string = std::get<string_t>(value);
-      ss << '"';
+      buffer.push_back('"');
       for (std::size_t i = 0, k = string.length(); i < k; ++i) {
         unsigned char c = string[i];
         switch (c) {
         case '"': {
-          ss << "\\\"";
+          buffer.append("\\\"");
           break;
         }
         case '\\': {
-          ss << "\\\\";
+          buffer.append("\\\\");
           break;
         }
         case '\n': {
-          ss << "\\n";
+          buffer.append("\\n");
           break;
         }
         case '\t': {
-          ss << "\\t";
+          buffer.append("\\t");
           break;
         }
         case '\b': {
-          ss << "\\b";
+          buffer.append("\\b");
           break;
         }
         case '\r': {
-          ss << "\\r";
+          buffer.append("\\r");
           break;
         }
         case '\f': {
-          ss << "\\f";
+          buffer.append("\\f");
           break;
         }
         default: {
-          ss << c;
+          buffer.push_back(c);
         }
         }
       }
-      ss << '"';
+      buffer.push_back('"');
       break;
     }
     default: {
@@ -160,21 +160,21 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   void LspJsonSerializer::serializeNumber(
-    std::stringstream &ss,
+    std::string &buffer,
     const LSPAny &value
   ) const {
     LSPAnyType valueType = static_cast<LSPAnyType>(value.index());
     switch (valueType) {
     case LSPAnyType::INTEGER_TYPE: {
-      ss << std::get<integer_t>(value);
+      buffer.append(std::to_string(std::get<integer_t>(value)));
       break;
     }
     case LSPAnyType::UINTEGER_TYPE: {
-      ss << std::get<uinteger_t>(value);
+      buffer.append(std::to_string(std::get<uinteger_t>(value)));
       break;
     }
     case LSPAnyType::DECIMAL_TYPE: {
-      ss << std::get<decimal_t>(value);
+      buffer.append(std::to_string(std::get<decimal_t>(value)));
       break;
     }
     default: {
@@ -188,13 +188,13 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   void LspJsonSerializer::serializeBoolean(
-    std::stringstream &ss,
+    std::string &buffer,
     const LSPAny &value
   ) const {
     LSPAnyType valueType = static_cast<LSPAnyType>(value.index());
     switch (valueType) {
     case LSPAnyType::BOOLEAN_TYPE: {
-      ss << std::get<boolean_t>(value);
+      buffer.append(std::to_string(std::get<boolean_t>(value)));
       break;
     }
     default: {
@@ -208,13 +208,13 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   void LspJsonSerializer::serializeNull(
-    std::stringstream &ss,
+    std::string &buffer,
     const LSPAny &value
   ) const {
     LSPAnyType valueType = static_cast<LSPAnyType>(value.index());
     switch (valueType) {
     case LSPAnyType::NULL_TYPE: {
-      ss << std::get<null_t>(value);
+      buffer.append("null");
       break;
     }
     default: {

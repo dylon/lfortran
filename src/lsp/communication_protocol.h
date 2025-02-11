@@ -6,7 +6,7 @@
 #include <lsp/message_queue.h>
 #include <lsp/language_server.h>
 #include <lsp/logger.h>
-#include <lsp/request_parser.h>
+#include <lsp/message_stream.h>
 
 namespace LCompilers::LanguageServer {
   namespace lsl = LCompilers::LanguageServer::Logging;
@@ -15,32 +15,19 @@ namespace LCompilers::LanguageServer {
   public:
     CommunicationProtocol(
       LanguageServer &languageServer,
-      RequestParserFactory &parserFactory,
+      MessageStream &messageStream,
       MessageQueue &incomingMessages,
       MessageQueue &outgoingMessages,
       lsl::Logger &logger);
-    virtual void serve() = 0;
-  protected:
+    auto serve() -> void;
+  private:
     LanguageServer &languageServer;
-    RequestParserFactory &parserFactory;
+    MessageStream &messageStream;
     MessageQueue &incomingMessages;
     MessageQueue &outgoingMessages;
     lsl::Logger &logger;
-  };
-
-  class StdIOCommunicationProtocol : public CommunicationProtocol {
-  public:
-    StdIOCommunicationProtocol(
-      LanguageServer &languageServer,
-      RequestParserFactory &parserFactory,
-      MessageQueue &incomingMessages,
-      MessageQueue &outgoingMessages,
-      lsl::Logger &logger);
-    void serve() override;
-  private:
     std::thread listener;
     std::atomic_bool running = true;
-    std::stringstream ss;
 
     auto listen() -> void;
   };

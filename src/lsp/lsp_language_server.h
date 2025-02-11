@@ -6,7 +6,10 @@
 #pragma once
 
 #include <atomic>
+#include <condition_variable>
 #include <map>
+#include <mutex>
+#include <thread>
 
 #include <lsp/language_server.h>
 #include <lsp/logger.h>
@@ -17,6 +20,7 @@
 namespace LCompilers::LanguageServerProtocol {
   namespace ls = LCompilers::LanguageServer;
   namespace lsl = LCompilers::LanguageServer::Logging;
+  namespace lst = LCompilers::LanguageServer::Threading;
 
   class LspLanguageServer : public ls::LanguageServer {
   public:
@@ -28,25 +32,42 @@ namespace LCompilers::LanguageServerProtocol {
       lsl::Logger &logger,
       const std::string &configSection
     );
-    auto listen() -> void;
     auto isInitialized() const -> bool;
     auto isShutdown() const -> bool;
     bool isTerminated() const override;
     auto isRunning() const -> bool;
   protected:
     const std::string configSection;
+    std::thread listener;
+    lst::ThreadPool requestPool;
+    lst::ThreadPool workerPool;
+    std::atomic_size_t serialSendId = 0;
+    std::atomic_size_t pendingSendId = 0;
+    std::condition_variable sent;
+    std::mutex sentMutex;
     LspJsonSerializer serializer;
     LspTransformer transformer;
     std::unique_ptr<InitializeParams> _initializeParams;
     std::atomic_bool _initialized = false;
     std::atomic_bool _shutdown = false;
     std::atomic_bool _exit = false;
-    std::atomic_int serialId = 0;
+    std::atomic_int serialRequestId = 0;
     std::map<int, std::string> callbacksById;
     std::mutex callbackMutex;
 
-    void handle(const std::string &request, std::size_t sendId) override;
-    auto nextId() -> int;
+    inline auto nextSendId() -> std::size_t {
+      return serialSendId++;
+    }
+
+    inline auto nextRequestId() -> int {
+      return serialRequestId++;
+    }
+
+    void join() override;
+    auto listen() -> void;
+    auto notifySent() -> void;
+    auto send(const std::string &request, std::size_t sendId) -> void;
+    auto handle(const std::string &request, std::size_t sendId) -> void;
     auto initializeParams() const -> const InitializeParams &;
     auto assertInitialized() -> void;
     auto assertRunning() -> void;
@@ -64,7 +85,7 @@ namespace LCompilers::LanguageServerProtocol {
     auto dispatch(ResponseMessage &response) -> void;
 
     void prepare(
-      std::stringstream &ss,
+      std::string &buffer,
       const std::string &response
     ) const override;
 

@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <thread>
 
-#include <lsp/lsp_request_parser.h>
+#include <lsp/lsp_message_stream.h>
 
 #include "bin/lsp/interface.h"
 #include "bin/lsp/lfortran_lsp_language_server.h"
@@ -13,7 +13,6 @@ namespace  LCompilers::LanguageServer::Interface {
 
   namespace ls = LCompilers::LanguageServer;
   namespace lsp = LCompilers::LanguageServerProtocol;
-  namespace lst = LCompilers::LanguageServer::Threading;
   namespace lsl = LCompilers::LanguageServer::Logging;
 
   auto isValidConfigSection(const std::string &configSection) -> bool {
@@ -256,6 +255,11 @@ namespace  LCompilers::LanguageServer::Interface {
     return ExitCode::SUCCESS;
   }
 
+  auto CommandLineInterface::validateAndSetNumWorkerThreads() -> ExitCode {
+    opts.numWorkerThreads = args.numWorkerThreads;
+    return ExitCode::SUCCESS;
+  }
+
   auto CommandLineInterface::validateAndSetConfigSection() -> ExitCode {
     if (isValidConfigSection(args.configSection)) {
       opts.configSection = args.configSection;
@@ -411,6 +415,9 @@ namespace  LCompilers::LanguageServer::Interface {
       exitCode = validateAndSetNumRequestThreads();
     }
     if (exitCode == ExitCode::SUCCESS) {
+      exitCode = validateAndSetNumWorkerThreads();
+    }
+    if (exitCode == ExitCode::SUCCESS) {
       exitCode = validateAndSetLogPath();
     }
     if (exitCode == ExitCode::SUCCESS) {
@@ -419,15 +426,12 @@ namespace  LCompilers::LanguageServer::Interface {
     return exitCode;
   }
 
-  auto CommandLineInterface::buildRequestParserFactory(
+  auto CommandLineInterface::buildMessageStream(
     lsl::Logger &logger
-  ) -> std::unique_ptr<ls::RequestParserFactory> {
+  ) -> std::unique_ptr<ls::MessageStream> {
     switch (opts.serverProtocol) {
     case ServerProtocol::LSP: {
-      return std::make_unique<lsp::LspRequestParserFactory>(
-        opts.interactive,
-        logger
-      );
+      return std::make_unique<lsp::LspMessageStream>(std::cin, logger);
     }
     default: {
       std::stringstream ss;
@@ -475,16 +479,16 @@ namespace  LCompilers::LanguageServer::Interface {
 
   auto CommandLineInterface::buildCommunicationProtocol(
     ls::LanguageServer &languageServer,
-    ls::RequestParserFactory &requestParserFactory,
+    ls::MessageStream &messageStream,
     ls::MessageQueue &incomingMessages,
     ls::MessageQueue &outgoingMessages,
     lsl::Logger &logger
   ) -> std::unique_ptr<ls::CommunicationProtocol> {
     switch (opts.communicationProtocol) {
     case CommunicationProtocol::STDIO: {
-      return std::make_unique<ls::StdIOCommunicationProtocol>(
+      return std::make_unique<ls::CommunicationProtocol>(
         languageServer,
-        requestParserFactory,
+        messageStream,
         incomingMessages,
         outgoingMessages,
         logger
@@ -508,8 +512,8 @@ namespace  LCompilers::LanguageServer::Interface {
   auto CommandLineInterface::serve() -> ExitCode {
     try {
       lsl::Logger logger(opts.logPath);
-      std::unique_ptr<ls::RequestParserFactory> requestParserFactory =
-        buildRequestParserFactory(logger);
+      std::unique_ptr<ls::MessageStream> messageStream =
+        buildMessageStream(logger);
       ls::MessageQueue communicatorToServer(logger);
       ls::MessageQueue serverToCommunicator(logger);
       std::unique_ptr<ls::LanguageServer> languageServer =
@@ -520,7 +524,7 @@ namespace  LCompilers::LanguageServer::Interface {
       std::unique_ptr<ls::CommunicationProtocol> communicationProtocol =
         buildCommunicationProtocol(
           *languageServer,
-          *requestParserFactory,
+          *messageStream,
           serverToCommunicator,
           communicatorToServer,
           logger

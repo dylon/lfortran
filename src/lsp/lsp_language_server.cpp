@@ -4,6 +4,7 @@
 // -----------------------------------------------------------------------------
 
 #include <cctype>
+#include <cstdio>
 #include <iostream>
 #include <stdexcept>
 
@@ -24,18 +25,95 @@ namespace LCompilers::LanguageServerProtocol {
   ) : ls::LanguageServer(
       incomingMessages,
       outgoingMessages,
-      numRequestThreads,
-      numWorkerThreads,
       logger
     )
     , configSection(configSection)
+    , listener([this]() {
+      listen();
+    })
+    , requestPool("request", numRequestThreads, logger)
+    , workerPool("worker", numWorkerThreads, logger)
     , transformer(logger)
   {
     // empty
   }
 
-  auto LspLanguageServer::nextId() -> int {
-    return serialId++;
+  auto LspLanguageServer::join() -> void {
+    listener.join();
+    requestPool.join();
+    workerPool.join();
+  }
+
+  auto LspLanguageServer::listen() -> void {
+    try {
+      while (!_exit) {
+        const std::string message = incomingMessages.dequeue();
+        if (!_exit) {
+          std::size_t sendId = nextSendId();
+          requestPool.execute([this, message, sendId](
+            const std::string &threadName,
+            const std::size_t threadId
+          ) {
+            try {
+              handle(message, sendId);
+            } catch (std::exception &e) {
+              std::unique_lock<std::mutex> loggerLock(logger.mutex());
+              logger
+                << "[" << threadName << "_" << threadId << "] "
+                << "Failed to handle message: " << message
+                << std::endl;
+              logger
+                << "[" << threadName << "_" << threadId << "] "
+                << "Caught unhandled exception: " << e.what()
+                << std::endl;
+            }
+          });
+        }
+      }
+    } catch (std::exception &e) {
+      std::unique_lock<std::mutex> loggerLock(logger.mutex());
+      logger
+        << "[LspLanguageServer] Interrupted while dequeuing messages: "
+        << e.what()
+        << std::endl;
+    }
+    {
+      std::unique_lock<std::mutex> loggerLock(logger.mutex());
+      logger
+        << "[LspLanguageServer] Incoming-message listener terminated."
+        << std::endl;
+    }
+  }
+
+  auto LspLanguageServer::notifySent() -> void {
+    ++pendingSendId;
+    {
+      std::unique_lock<std::mutex> sentLock(sentMutex);
+      sent.notify_all();
+    }
+  }
+
+  auto LspLanguageServer::send(
+    const std::string &message,
+    std::size_t sendId
+  ) -> void {
+    // -------------------------------------------------------------------------
+    // NOTE: The LSP spec requires responses to be returned in roughly the same
+    // order of receipt of their corresponding requests. Some types of responses
+    // may be returned out-of-order, but in order to support those we will need
+    // to implement a sort of dependency graph. Without knowledge of their
+    // dependencies, we must respond to all requests in order of receipt.
+    // -------------------------------------------------------------------------
+    while ((pendingSendId < sendId) && !_exit) {
+      std::unique_lock<std::mutex> sentLock(sentMutex);
+      if ((pendingSendId < sendId) && !_exit) {
+        sent.wait(sentLock);
+      }
+    }
+    if (!_exit) {
+      ls::LanguageServer::send(message);
+      notifySent();
+    }
   }
 
   auto LspLanguageServer::handle(
@@ -80,10 +158,10 @@ namespace LCompilers::LanguageServerProtocol {
         if (isIncomingRequest(method)) {
           if (static_cast<ResponseIdType>(response.id.index()) ==
               ResponseIdType::NULL_TYPE) {
-            std::stringstream ss;
-            ss << "Missing request method=\""
-               << method << "\" attribute: id";
-            throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+            throw LSP_EXCEPTION(
+              ErrorCodes::INVALID_PARAMS,
+              "Missing request method=\"" + method + "\" attribute: id"
+            );
           }
           std::unique_ptr<RequestMessage> request =
             transformer.anyToRequestMessage(*document);
@@ -92,20 +170,20 @@ namespace LCompilers::LanguageServerProtocol {
         } else if (isIncomingNotification(method)) {
           if (static_cast<ResponseIdType>(response.id.index()) !=
               ResponseIdType::NULL_TYPE) {
-            std::stringstream ss;
-            ss << "Notification method=\""
-               << method
-               << "\" must not contain the attribute: id";
-            throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+            throw LSP_EXCEPTION(
+              ErrorCodes::INVALID_PARAMS,
+              "Notification method=\"" + method + "\" must not contain the attribute: id"
+            );
           }
           std::unique_ptr<NotificationMessage> notification =
             transformer.anyToNotificationMessage(*document);
           response.jsonrpc = notification->jsonrpc;
           dispatch(response, *notification);
         } else {
-          std::stringstream ss;
-          ss << "Unsupported method: \"" << method << "\"";
-          throw LSP_EXCEPTION(ErrorCodes::INVALID_REQUEST, ss.str());
+          throw LSP_EXCEPTION(
+            ErrorCodes::INVALID_REQUEST,
+            "Unsupported method: \"" + method + "\""
+          );
         }
       } else if ((iter = object.find("result")) != object.end()) {
         notifySent();
@@ -124,10 +202,13 @@ namespace LCompilers::LanguageServerProtocol {
         );
       }
     } catch (const LspException &e) {
-      logger
-        << "[" << e.file() << ":" << e.line() << "] "
-        << e.what()
-        << std::endl;
+      {
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "[" << e.file() << ":" << e.line() << "] "
+          << e.what()
+          << std::endl;
+      }
       std::unique_ptr<ResponseError> error =
         std::make_unique<ResponseError>();
       switch (static_cast<ErrorCodeType>(e.code().index())) {
@@ -145,7 +226,10 @@ namespace LCompilers::LanguageServerProtocol {
       error->message = e.what();
       response.error = std::move(error);
     } catch (const std::exception &e) {
-      logger << "Caught unhandled exception: " << e.what() << std::endl;
+      {
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger << "Caught unhandled exception: " << e.what() << std::endl;
+      }
       std::unique_ptr<ResponseError> error =
         std::make_unique<ResponseError>();
       error->code = static_cast<int>(ErrorCodes::INTERNAL_ERROR);
@@ -202,13 +286,15 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspLanguageServer::prepare(
-    std::stringstream &ss,
+    std::string &buffer,
     const std::string &response
   ) const -> void {
-    ss << "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
-       << "Content-Length: " << response.length() << "\r\n"
-       << "\r\n"
-       << response;
+    buffer.append("Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n");
+    buffer.append("Content-Length: ");
+    buffer.append(std::to_string(response.length()));
+    buffer.append("\r\n");
+    buffer.append("\r\n");
+    buffer.append(response);
   }
 
   auto LspLanguageServer::dispatch(
@@ -225,7 +311,7 @@ namespace LCompilers::LanguageServerProtocol {
     if (method != IncomingRequest::INITIALIZE) {
       assertInitialized();
     } else {
-      bool expected = false;  // a reference is required ...
+      bool expected = false;  // a reference is required
       if (!_initialized.compare_exchange_strong(expected, true)) {
         throw LSP_EXCEPTION(
           ErrorCodes::INVALID_REQUEST,
@@ -721,9 +807,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     default: {
     invalidMethod:
-      std::stringstream ss;
-      ss << "Unsupported request method: \"" << request.method << "\"";
-      throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::METHOD_NOT_FOUND,
+        "Unsupported request method: \"" + request.method + "\""
+      );
     }
     }
   }
@@ -879,9 +966,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     default: {
     invalidMethod:
-      std::stringstream ss;
-      ss << "Unsupported notification method: \"" << notification.method << "\"";
-      throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());
+      throw LSP_EXCEPTION(
+        ErrorCodes::METHOD_NOT_FOUND,
+        "Unsupported notification method: \"" + notification.method + "\""
+      );
     }
     }
   }
@@ -889,12 +977,14 @@ namespace LCompilers::LanguageServerProtocol {
     ResponseIdType responseIdType =
       static_cast<ResponseIdType>(response.id.index());
     if (responseIdType != ResponseIdType::INTEGER_TYPE) {
-      auto loggerLock = logger.lock();
+      std::unique_lock<std::mutex> loggerLock(logger.mutex());
       logger
         << "Cannot dispatch response with id of type ResponseIdType::"
         << ResponseIdTypeNames.at(responseIdType)
         << std::endl;
+      return;
     }
+
     int responseId = std::get<int>(response.id);
     std::string method;
     {
@@ -904,7 +994,7 @@ namespace LCompilers::LanguageServerProtocol {
         method = iter->second;
         callbacksById.erase(iter);
       } else {
-        auto loggerLock = logger.lock();
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
         logger << "Cannot locate request with id: " << responseId << std::endl;
         return;
       }
@@ -920,8 +1010,10 @@ namespace LCompilers::LanguageServerProtocol {
     switch (request) {
     case OutgoingRequest::WORKSPACE_WORKSPACE_FOLDERS: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/workspaceFolders\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/workspaceFolders\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -932,8 +1024,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_CONFIGURATION: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/configuration\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/configuration\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -944,8 +1038,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_FOLDING_RANGE_REFRESH: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/foldingRange/refresh\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/foldingRange/refresh\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -956,8 +1052,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WINDOW_WORK_DONE_PROGRESS_CREATE: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"window/workDoneProgress/create\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"window/workDoneProgress/create\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -968,8 +1066,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_SEMANTIC_TOKENS_REFRESH: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/semanticTokens/refresh\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/semanticTokens/refresh\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -980,8 +1080,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WINDOW_SHOW_DOCUMENT: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"window/showDocument\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"window/showDocument\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -992,8 +1094,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_INLINE_VALUE_REFRESH: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/inlineValue/refresh\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/inlineValue/refresh\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1004,8 +1108,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_INLAY_HINT_REFRESH: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/inlayHint/refresh\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/inlayHint/refresh\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1016,8 +1122,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_DIAGNOSTIC_REFRESH: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/diagnostic/refresh\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/diagnostic/refresh\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1028,8 +1136,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::CLIENT_REGISTER_CAPABILITY: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"client/registerCapability\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"client/registerCapability\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1040,8 +1150,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::CLIENT_UNREGISTER_CAPABILITY: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"client/unregisterCapability\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"client/unregisterCapability\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1052,8 +1164,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WINDOW_SHOW_MESSAGE_REQUEST: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"window/showMessageRequest\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"window/showMessageRequest\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1064,8 +1178,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_CODE_LENS_REFRESH: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/codeLens/refresh\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/codeLens/refresh\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1076,8 +1192,10 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_APPLY_EDIT: {
       if (!response.result.has_value()) {
-        auto loggerLock = logger.lock();
-        logger << "Missing required attribute for method \"workspace/applyEdit\": result" << std::endl;
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger
+          << "Missing required attribute for method \"workspace/applyEdit\": result"
+          << std::endl;
         return;
       }
       std::unique_ptr<LSPAny> &result = response.result.value();
@@ -1088,7 +1206,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     default: {
     invalidMethod:
-      auto loggerLock = logger.lock();
+      std::unique_lock<std::mutex> loggerLock(logger.mutex());
       logger << "Unsupported request method: \"" << method << "\"";
     }
     }
@@ -1099,9 +1217,10 @@ namespace LCompilers::LanguageServerProtocol {
     if (request.params.has_value()) {
       return request.params.value();
     }
-    std::stringstream ss;
-    ss << "RequestMessage.params must be defined for method=\"" << request.method << "\"";
-    throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+    throw LSP_EXCEPTION(
+      ErrorCodes::INVALID_PARAMS,
+      "RequestMessage.params must be defined for method=\"" + request.method + "\""
+    );
   }
 
   auto LspLanguageServer::requireMessageParams(
@@ -1110,10 +1229,10 @@ namespace LCompilers::LanguageServerProtocol {
     if (notification.params.has_value()) {
       return notification.params.value();
     }
-    std::stringstream ss;
-    ss << "NotificationMessage.params must be defined for method=\""
-       << notification.method << "\"";
-    throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());
+    throw LSP_EXCEPTION(
+      ErrorCodes::INVALID_PARAMS,
+      "NotificationMessage.params must be defined for method=\"" + notification.method + "\""
+    );
   }
 
   // ================= //
@@ -1404,9 +1523,12 @@ namespace LCompilers::LanguageServerProtocol {
 
   // request: "shutdown"
   auto LspLanguageServer::receiveShutdown() -> ShutdownResult {
-    bool shutdown = false;
-    if (_shutdown.compare_exchange_strong(shutdown, true)) {
-      logger << "Shutting down server." << std::endl;
+    bool expected = false;
+    if (_shutdown.compare_exchange_strong(expected, true)) {
+      {
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger << "Shutting down server." << std::endl;
+      }
     }
     return nullptr;
   }
@@ -1754,22 +1876,25 @@ namespace LCompilers::LanguageServerProtocol {
 
   // notification: "exit"
   auto LspLanguageServer::receiveExit() -> void {
-    bool exit = false;
-    if (_exit.compare_exchange_strong(exit, true)) {
-      logger << "Exiting server." << std::endl;
-      bool shutdown = false;
-      if (_shutdown.compare_exchange_strong(shutdown, true)) {
-        auto loggerLock = logger.lock();
+    bool expected = false;
+    if (_exit.compare_exchange_strong(expected, true)) {
+      {
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
+        logger << "Exiting server." << std::endl;
+      }
+      expected = false;
+      if (_shutdown.compare_exchange_strong(expected, true)) {
+        std::unique_lock<std::mutex> loggerLock(logger.mutex());
         logger
           << "Server exited before being notified to shutdown!"
           << std::endl;
       }
-      incomingMessages.stop();
-      requestPool.stop();
-      workerPool.stop();
-      requestPool.join();
-      workerPool.join();
-      listener.join();
+      incomingMessages.stopNow();
+      requestPool.stopNow();
+      workerPool.stopNow();
+      // TODO: Find a better way to terminate the message stream:
+      std::cin.putback('\0');
+      fclose(stdin);
     }
   }
 
@@ -1861,7 +1986,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::sendWorkspace_workspaceFolders() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -1870,13 +1995,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.method = "workspace/workspaceFolders";
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_workspaceFolders(
     WorkspaceWorkspaceFoldersResult &/*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/workspaceFolders\"" << std::endl;
   }
 
@@ -1886,7 +2011,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -1896,13 +2021,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_configuration(
     WorkspaceConfigurationResult &/*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/configuration\"" << std::endl;
   }
 
@@ -1910,7 +2035,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::sendWorkspace_foldingRange_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -1919,13 +2044,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.method = "workspace/foldingRange/refresh";
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_foldingRange_refresh(
     WorkspaceFoldingRangeRefreshResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/foldingRange/refresh\"" << std::endl;
   }
 
@@ -1935,7 +2060,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -1945,13 +2070,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWindow_workDoneProgress_create(
     WindowWorkDoneProgressCreateResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"window/workDoneProgress/create\"" << std::endl;
   }
 
@@ -1959,7 +2084,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::sendWorkspace_semanticTokens_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -1968,13 +2093,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.method = "workspace/semanticTokens/refresh";
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_semanticTokens_refresh(
     WorkspaceSemanticTokensRefreshResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/semanticTokens/refresh\"" << std::endl;
   }
 
@@ -1984,7 +2109,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -1994,13 +2119,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWindow_showDocument(
     WindowShowDocumentResult &/*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"window/showDocument\"" << std::endl;
   }
 
@@ -2008,7 +2133,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::sendWorkspace_inlineValue_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2017,13 +2142,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.method = "workspace/inlineValue/refresh";
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_inlineValue_refresh(
     WorkspaceInlineValueRefreshResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/inlineValue/refresh\"" << std::endl;
   }
 
@@ -2031,7 +2156,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::sendWorkspace_inlayHint_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2040,13 +2165,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.method = "workspace/inlayHint/refresh";
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_inlayHint_refresh(
     WorkspaceInlayHintRefreshResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/inlayHint/refresh\"" << std::endl;
   }
 
@@ -2054,7 +2179,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::sendWorkspace_diagnostic_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2063,13 +2188,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.method = "workspace/diagnostic/refresh";
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_diagnostic_refresh(
     WorkspaceDiagnosticRefreshResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/diagnostic/refresh\"" << std::endl;
   }
 
@@ -2079,7 +2204,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2089,13 +2214,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveClient_registerCapability(
     ClientRegisterCapabilityResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"client/registerCapability\"" << std::endl;
   }
 
@@ -2105,7 +2230,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2115,13 +2240,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveClient_unregisterCapability(
     ClientUnregisterCapabilityResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"client/unregisterCapability\"" << std::endl;
   }
 
@@ -2131,7 +2256,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2141,13 +2266,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWindow_showMessageRequest(
     WindowShowMessageRequestResult &/*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"window/showMessageRequest\"" << std::endl;
   }
 
@@ -2155,7 +2280,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::sendWorkspace_codeLens_refresh() -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2164,13 +2289,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.method = "workspace/codeLens/refresh";
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_codeLens_refresh(
     WorkspaceCodeLensRefreshResult /*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/codeLens/refresh\"" << std::endl;
   }
 
@@ -2180,7 +2305,7 @@ namespace LCompilers::LanguageServerProtocol {
   ) -> void {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
-    int requestId = nextId();
+    int requestId = nextRequestId();
     request.id = requestId;
     {
       std::unique_lock<std::mutex> callbackLock(callbackMutex);
@@ -2190,13 +2315,13 @@ namespace LCompilers::LanguageServerProtocol {
     request.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   auto LspLanguageServer::receiveWorkspace_applyEdit(
     WorkspaceApplyEditResult &/*params*/
   ) -> void {
-    auto loggerLock = logger.lock();
+    std::unique_lock<std::mutex> loggerLock(logger.mutex());
     logger << "No handler exists for method: \"workspace/applyEdit\"" << std::endl;
   }
 
@@ -2214,7 +2339,7 @@ namespace LCompilers::LanguageServerProtocol {
     notification.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   // notification: "window/logMessage"
@@ -2227,7 +2352,7 @@ namespace LCompilers::LanguageServerProtocol {
     notification.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   // notification: "telemetry/event"
@@ -2240,7 +2365,7 @@ namespace LCompilers::LanguageServerProtocol {
     notification.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   // notification: "textDocument/publishDiagnostics"
@@ -2253,7 +2378,7 @@ namespace LCompilers::LanguageServerProtocol {
     notification.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
   // notification: "$/logTrace"
@@ -2266,7 +2391,7 @@ namespace LCompilers::LanguageServerProtocol {
     notification.params = transformer.asMessageParams(params);
     std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
-    send(message);
+    ls::LanguageServer::send(message);
   }
 
 } // namespace LCompilers::LanguageServerProtocol

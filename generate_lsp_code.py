@@ -480,11 +480,11 @@ class LspCodeGenerator(ABC):
     self.args = args
 
   def generate_code(self: Self) -> None:
-    print('Creating parent directories ...')
+    print('Creating parent directories')
     self.args.output_dir.mkdir(parents=True, exist_ok=True)
-    print('Loading schema ...')
+    print('Loading schema')
     self.schema = json.loads(self.args.schema.read())
-    print('Generating files ...')
+    print('Generating files')
     self.generate_specification()
     self.generate_transformer()
     self.generate_server()
@@ -1474,7 +1474,7 @@ class CPlusPlusSpecificationHeaderGenerator(CPlusPlusFileGenerator):
         break
 
   def generate_code(self: Self) -> None:
-    print(f'Generating: {self.file_path} ...')
+    print(f'Generating: {self.file_path}')
     version: str = self.schema["metaData"]["version"]
 
     lower_index = 0
@@ -1617,9 +1617,10 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
         with self.indent(): self.write('return enum_name;')
         self.write('}')
       self.write('}')
-      self.write('std::stringstream ss;')
-      self.write(f'ss << "Invalid {enum_name} name: " << name;')
-      self.write(f'throw std::invalid_argument(ss.str());')
+      self.write('throw std::invalid_argument(')
+      with self.indent():
+        self.write(f'"Invalid {enum_name} name: " + name')
+      self.write(');')
     self.write('}')
     self.newline()
     if value_type == rename_type("string"):
@@ -1634,9 +1635,10 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
           with self.indent(): self.write('return enum_name;')
           self.write('}')
         self.write('}')
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "Invalid {enum_name} value: " << value;')
-        self.write(f'throw std::invalid_argument(ss.str());')
+        self.write('throw std::invalid_argument(')
+        with self.indent():
+          self.write(f'"Invalid {enum_name} value: " + value')
+        self.write(');')
       self.write('}')
     else:
       self.write(f'auto {lower_name}ByValue(')
@@ -1650,9 +1652,10 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
           with self.indent(): self.write('return field_name;')
           self.write('}')
         self.write('}')
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "Invalid {enum_name} value: " << value;')
-        self.write(f'throw std::invalid_argument(ss.str());')
+        self.write('throw std::invalid_argument(')
+        with self.indent():
+          self.write(f'"Invalid {enum_name} value: " + value')
+        self.write(');')
       self.write('}')
     self.newline()
 
@@ -1888,13 +1891,12 @@ class CPlusPlusSpecificationSourceGenerator(CPlusPlusFileGenerator):
     )
 
   def generate_code(self: Self) -> None:
-    print(f'Generating: {self.file_path} ...')
+    print(f'Generating: {self.file_path}')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
     self.write('// -----------------------------------------------------------------------------')
     self.newline()
-    self.write('#include <sstream>')
     self.write('#include <stdexcept>')
     self.newline()
     self.write('#include <lsp/specification.h>')
@@ -2208,7 +2210,7 @@ class CPlusPlusLspTransformerHeaderGenerator(CPlusPlusFileGenerator):
     self.write('auto copy(const LSPArray &array) const -> LSPArray;')
 
   def generate_code(self: Self) -> None:
-    print(f'Generating: {self.file_path} ...')
+    print(f'Generating: {self.file_path}')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
@@ -2331,10 +2333,12 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
               raise ValueError(f'Unsupported enumeration type ({type_name}): {enum_spec}')
           self.write('default: {')
           with self.indent():
-            self.write('std::stringstream ss;')
-            self.write(f'ss << "LSPAnyType for a(n) {enum_name} must be of type LSPAnyType::{enumerator} but received type "')
-            self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));')
-            self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+            self.write('throw LSP_EXCEPTION(')
+            with self.indent():
+              self.write('ErrorCodes::INVALID_PARAMS,')
+              self.write(f'("LSPAnyType for a(n) {enum_name} must be of type LSPAnyType::{enumerator} but received type " +')
+              self.write(f' LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))')
+            self.write(');')
           self.write('}')
           self.write('}')
         self.write('} catch (std::invalid_argument &e) {')
@@ -2904,10 +2908,12 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
         self.write('}')
       self.write('default: {')
       with self.indent():
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "Invalid LSPAnyType for a(n) {nested_name}: "')
-        self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));')
-        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+        self.write('throw LSP_EXCEPTION(')
+        with self.indent():
+          self.write('ErrorCodes::INVALID_PARAMS,')
+          self.write(f'("Invalid LSPAnyType for a(n) {nested_name}: " +')
+          self.write(' LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))')
+        self.write(');')
       self.write('}')
       self.write('}')
       self.newline()
@@ -3039,10 +3045,12 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
           self.write('}')
       self.write('default: {')
       with self.indent():
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "Unsupported {nested_name}Type: "')
-        self.write(f'   << {nested_name}TypeNames.at(static_cast<{nested_name}Type>(variant.index()));')
-        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+        self.write('throw LSP_EXCEPTION(')
+        with self.indent():
+          self.write('ErrorCodes::INVALID_PARAMS,')
+          self.write(f'("Unsupported {nested_name}Type: " +')
+          self.write(f' {nested_name}TypeNames.at(static_cast<{nested_name}Type>(variant.index())))')
+        self.write(');')
       self.write('}')
       self.write('}')
     self.write('}')
@@ -3075,10 +3083,12 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       self.inline(rename_enum("object"))
       self.inline(') {', end='\n')
       with self.indent():
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "LSPAnyType for a(n) {type_name} must be of type LSPAnyType::{rename_enum("object")} but received type "')
-        self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()));')
-        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+        self.write('throw LSP_EXCEPTION(')
+        with self.indent():
+          self.write('ErrorCodes::INVALID_PARAMS,')
+          self.write(f'("LSPAnyType for a(n) {type_name} must be of type LSPAnyType::{rename_enum("object")} but received type " +')
+          self.write(' LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())))')
+        self.write(');')
       self.write('}')
       self.newline()
       self.write(f'std::unique_ptr<{type_name}> value =')
@@ -3091,10 +3101,11 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
       self.newline()
       self.write(f'if (object.size() > {len(type_names_and_prop_specs)}) {{')
       with self.indent():
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "Too many attributes to transform to a(n) {type_name}: "')
-        self.write('   << object.size();')
-        self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+        self.write('throw LSP_EXCEPTION(')
+        with self.indent():
+          self.write('ErrorCodes::INVALID_PARAMS,')
+          self.write(f'"Too many attributes to transform to a(n) {type_name}: " + std::to_string(object.size())')
+        self.write(');')
       self.write('}')
       for prop_type_name, prop_spec in type_names_and_prop_specs:
         prop_name = prop_spec["name"]
@@ -3228,9 +3239,11 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
               self.write(f'const {rename_type("string")} &stringValue = anyToString(*iter->second);')
               self.write(f'if (stringValue != "{expected_value}") {{')
               with self.indent():
-                self.write('std::stringstream ss;')
-                self.write(f'ss << "String value for {type_name}.{prop_name} must be \\"{expected_value}\\" but was: \\"" << stringValue << "\\"";')
-                self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+                self.write('throw LSP_EXCEPTION(')
+                with self.indent():
+                  self.write('ErrorCodes::INVALID_PARAMS,')
+                  self.write(f'"String value for {type_name}.{prop_name} must be \\"{expected_value}\\" but was: \\"" + stringValue + "\\""')
+                self.write(');')
               self.write('}')
               self.write(f'value->{prop_name} = stringValue;')
             case _:
@@ -3592,11 +3605,13 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
               self.write('}')
           self.write('default: {')
           with self.indent():
-            self.write('std::stringstream ss;')
-            self.write(f'ss << "Cannot transform LSPAny of type LSPAnyType::"')
-            self.write('   << LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index()))')
-            self.write(f'   << " to type {rename_type(alias_name)}";')
-            self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+            self.write('throw LSP_EXCEPTION(')
+            with self.indent():
+              self.write('ErrorCodes::INVALID_PARAMS,')
+              self.write('("Cannot transform LSPAny of type LSPAnyType::" +')
+              self.write(' LSPAnyTypeNames.at(static_cast<LSPAnyType>(any.index())) +')
+              self.write(f' " to type {rename_type(alias_name)}")')
+            self.write(');')
           self.write('}')
           self.write('}')
         case "reference":
@@ -3823,18 +3838,20 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
             raise ValueError(f'Unsupported message parameter type ({params_spec["name"]}): {params_spec}')
         self.inline(') {', end='\n')
         with self.indent():
-          self.write('std::stringstream ss;')
-          self.write(f'ss << "Message parameter type must be MessageParamsType::"')
-          self.inline('   << MessageParamsTypeNames.at(MessageParamsType::', indent=True)
-          match params_spec["kind"]:
-            case "reference":
-              self.inline(rename_enum("object"))
-            case _:
-              raise ValueError(f'Unsupported message parameter type ({params_spec["name"]}): {params_spec}')
-          self.inline(')', end='\n')
-          self.write(f'   << " for method=\\"{message_spec["method"]}\\" but received type "')
-          self.write(f'   << "MessageParamsType::" << MessageParamsTypeNames.at(static_cast<MessageParamsType>({message_params_name}.index()));')
-          self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+          self.write('throw LSP_EXCEPTION(')
+          with self.indent():
+            self.write('ErrorCodes::INVALID_PARAMS,')
+            self.write('("Message parameter type must be MessageParamsType::" +')
+            self.inline(' MessageParamsTypeNames.at(MessageParamsType::', indent=True)
+            match params_spec["kind"]:
+              case "reference":
+                self.inline(rename_enum("object"))
+              case _:
+                raise ValueError(f'Unsupported message parameter type ({params_spec["name"]}): {params_spec}')
+            self.inline(') +', end='\n')
+            self.write(f' " for method=\\"{message_spec["method"]}\\" but received type " +')
+            self.write(f' "MessageParamsType::" + MessageParamsTypeNames.at(static_cast<MessageParamsType>({message_params_name}.index())))')
+          self.write(');')
         self.write('}')
         self.newline()
         match params_spec["kind"]:
@@ -4161,10 +4178,12 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
                 self.write('}')
                 self.write('default: {')
                 with self.indent():
-                  self.write('std::stringstream ss;')
-                  self.write(f'ss << "Invalid LSPAny type for {params_spec["name"]}: "')
-                  self.write(f'   << LSPAnyTypeNames.at(static_cast<LSPAnyType>({params_name}.index()));')
-                  self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+                  self.write('throw LSP_EXCEPTION(')
+                  with self.indent():
+                    self.write('ErrorCodes::INVALID_PARAMS,')
+                    self.write(f'("Invalid LSPAny type for {params_spec["name"]}: " +')
+                    self.write(f' LSPAnyTypeNames.at(static_cast<LSPAnyType>({params_name}.index())))')
+                  self.write(');')
                 self.write('}')
                 self.write('}')
                 self.newline()
@@ -4280,14 +4299,13 @@ class CPlusPlusLspTransformerSourceGenerator(CPlusPlusFileGenerator):
     self.newline()
 
   def generate_code(self: Self) -> None:
-    print(f'Generating: {self.file_path} ...')
+    print(f'Generating: {self.file_path}')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
     self.write('// -----------------------------------------------------------------------------')
     self.newline()
     self.write('#include <cmath>')
-    self.write('#include <sstream>')
     self.write('#include <stdexcept>')
     self.newline()
     self.write('#include <lsp/specification.h>')
@@ -4430,7 +4448,7 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
   def generate_prepare(self: Self) -> None:
     self.write('void prepare(')
     with self.indent():
-      self.write('std::stringstream &ss,')
+      self.write('std::string &buffer,')
       self.write('const std::string &response')
     self.write(') const override;')
     self.newline()
@@ -4447,8 +4465,22 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     self.write(') const -> MessageParams &;')
     self.newline()
 
+  def generate_next_send_id(self: Self) -> None:
+    self.write('inline auto nextSendId() -> std::size_t {')
+    with self.indent():
+      self.write('return serialSendId++;')
+    self.write('}')
+    self.newline()
+
+  def generate_next_request_id(self: Self) -> None:
+    self.write('inline auto nextRequestId() -> int {')
+    with self.indent():
+      self.write('return serialRequestId++;')
+    self.write('}')
+    self.newline()
+
   def generate_code(self: Self) -> None:
-    print(f'Generating: {self.file_path} ...')
+    print(f'Generating: {self.file_path}')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
@@ -4457,7 +4489,10 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     self.write('#pragma once')
     self.newline()
     self.write('#include <atomic>')
+    self.write('#include <condition_variable>')
     self.write('#include <map>')
+    self.write('#include <mutex>')
+    self.write('#include <thread>')
     self.newline()
     self.write('#include <lsp/language_server.h>')
     self.write('#include <lsp/logger.h>')
@@ -4469,6 +4504,7 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     with self.indent():
       self.write('namespace ls = LCompilers::LanguageServer;')
       self.write('namespace lsl = LCompilers::LanguageServer::Logging;')
+      self.write('namespace lst = LCompilers::LanguageServer::Threading;')
       self.newline()
       self.write('class LspLanguageServer : public ls::LanguageServer {')
       self.write('public:')
@@ -4482,7 +4518,6 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
           self.write('lsl::Logger &logger,')
           self.write('const std::string &configSection')
         self.write(');')
-        self.write('auto listen() -> void;')
         self.write('auto isInitialized() const -> bool;')
         self.write('auto isShutdown() const -> bool;')
         self.write('bool isTerminated() const override;')
@@ -4490,18 +4525,30 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
       self.write('protected:')
       with self.indent():
         self.write('const std::string configSection;')
+        self.write('std::thread listener;')
+        self.write('lst::ThreadPool requestPool;')
+        self.write('lst::ThreadPool workerPool;')
+        self.write('std::atomic_size_t serialSendId = 0;')
+        self.write('std::atomic_size_t pendingSendId = 0;')
+        self.write('std::condition_variable sent;')
+        self.write('std::mutex sentMutex;')
         self.write('LspJsonSerializer serializer;')
         self.write('LspTransformer transformer;')
         self.write('std::unique_ptr<InitializeParams> _initializeParams;')
         self.write('std::atomic_bool _initialized = false;')
         self.write('std::atomic_bool _shutdown = false;')
         self.write('std::atomic_bool _exit = false;')
-        self.write('std::atomic_int serialId = 0;')
+        self.write('std::atomic_int serialRequestId = 0;')
         self.write('std::map<int, std::string> callbacksById;')
         self.write('std::mutex callbackMutex;')
         self.newline()
-        self.write('void handle(const std::string &request, std::size_t sendId) override;')
-        self.write('auto nextId() -> int;')
+        self.generate_next_send_id()
+        self.generate_next_request_id()
+        self.write('void join() override;')
+        self.write('auto listen() -> void;')
+        self.write('auto notifySent() -> void;')
+        self.write('auto send(const std::string &request, std::size_t sendId) -> void;')
+        self.write('auto handle(const std::string &request, std::size_t sendId) -> void;')
         self.write('auto initializeParams() const -> const InitializeParams &;')
         self.write('auto assertInitialized() -> void;')
         self.write('auto assertRunning() -> void;')
@@ -4541,11 +4588,15 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     self.write(') : ls::LanguageServer(')
     self.write('    incomingMessages,')
     self.write('    outgoingMessages,')
-    self.write('    numRequestThreads,')
-    self.write('    numWorkerThreads,')
     self.write('    logger')
     self.write('  )')
     self.write('  , configSection(configSection)')
+    self.write('  , listener([this]() {')
+    with self.indent():
+      self.write('  listen();')
+    self.write('  })')
+    self.write('  , requestPool("request", numRequestThreads, logger)')
+    self.write('  , workerPool("worker", numWorkerThreads, logger)')
     self.write('  , transformer(logger)')
     self.write('{')
     with self.indent():
@@ -4553,10 +4604,111 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     self.write('}')
     self.newline()
 
-  def generate_next_id(self: Self) -> None:
-    self.write('auto LspLanguageServer::nextId() -> int {')
+  def generate_join(self: Self) -> None:
+    self.write('auto LspLanguageServer::join() -> void {')
     with self.indent():
-      self.write('return serialId++;')
+      self.write('listener.join();')
+      self.write('requestPool.join();')
+      self.write('workerPool.join();')
+    self.write('}')
+    self.newline()
+
+  def generate_listen(self: Self) -> None:
+    self.write('auto LspLanguageServer::listen() -> void {')
+    with self.indent():
+      self.write('try {')
+      with self.indent():
+        self.write('while (!_exit) {')
+        with self.indent():
+          self.write('const std::string message = incomingMessages.dequeue();')
+          self.write('if (!_exit) {')
+          with self.indent():
+            self.write('std::size_t sendId = nextSendId();')
+            self.write('requestPool.execute([this, message, sendId](')
+            with self.indent():
+              self.write('const std::string &threadName,')
+              self.write('const std::size_t threadId')
+            self.write(') {')
+            with self.indent():
+              self.write('try {')
+              with self.indent():
+                self.write('handle(message, sendId);')
+              self.write('} catch (std::exception &e) {')
+              with self.indent():
+                self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+                self.write('logger')
+                with self.indent():
+                  self.write('<< "[" << threadName << "_" << threadId << "] "')
+                  self.write('<< "Failed to handle message: " << message')
+                  self.write('<< std::endl;')
+                self.write('logger')
+                with self.indent():
+                  self.write('<< "[" << threadName << "_" << threadId << "] "')
+                  self.write('<< "Caught unhandled exception: " << e.what()')
+                  self.write('<< std::endl;')
+              self.write('}')
+            self.write('});')
+          self.write('}')
+        self.write('}')
+      self.write('} catch (std::exception &e) {')
+      with self.indent():
+        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+        self.write('logger')
+        with self.indent():
+          self.write('<< "[LspLanguageServer] Interrupted while dequeuing messages: "')
+          self.write('<< e.what()')
+          self.write('<< std::endl;')
+      self.write('}')
+      self.write('{')
+      with self.indent():
+        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+        self.write('logger')
+        with self.indent():
+          self.write('<< "[LspLanguageServer] Incoming-message listener terminated."')
+          self.write('<< std::endl;')
+      self.write('}')
+    self.write('}')
+    self.newline()
+
+  def generate_notify_sent(self: Self) -> None:
+    self.write('auto LspLanguageServer::notifySent() -> void {')
+    with self.indent():
+      self.write('++pendingSendId;')
+      self.write('{')
+      with self.indent():
+        self.write('std::unique_lock<std::mutex> sentLock(sentMutex);')
+        self.write('sent.notify_all();')
+      self.write('}')
+    self.write('}')
+    self.newline()
+
+  def generate_synchronized_send(self: Self) -> None:
+    self.write('auto LspLanguageServer::send(')
+    with self.indent():
+      self.write('const std::string &message,')
+      self.write('std::size_t sendId')
+    self.write(') -> void {')
+    with self.indent():
+      self.write('// -------------------------------------------------------------------------')
+      self.write('// NOTE: The LSP spec requires responses to be returned in roughly the same')
+      self.write('// order of receipt of their corresponding requests. Some types of responses')
+      self.write('// may be returned out-of-order, but in order to support those we will need')
+      self.write('// to implement a sort of dependency graph. Without knowledge of their')
+      self.write('// dependencies, we must respond to all requests in order of receipt.')
+      self.write('// -------------------------------------------------------------------------')
+      self.write('while ((pendingSendId < sendId) && !_exit) {')
+      with self.indent():
+        self.write('std::unique_lock<std::mutex> sentLock(sentMutex);')
+        self.write('if ((pendingSendId < sendId) && !_exit) {')
+        with self.indent():
+          self.write('sent.wait(sentLock);')
+        self.write('}')
+      self.write('}')
+      self.write('if (!_exit) {')
+      with self.indent():
+        self.write('ls::LanguageServer::send(message);')
+        self.write('notifySent();')
+      self.write('}')
     self.write('}')
     self.newline()
 
@@ -4615,10 +4767,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             self.write('if (static_cast<ResponseIdType>(response.id.index()) ==')
             with self.indent(2): self.write('ResponseIdType::NULL_TYPE) {')
             with self.indent():
-              self.write('std::stringstream ss;')
-              self.write('ss << "Missing request method=\\""')
-              self.write('   << method << "\\" attribute: id";')
-              self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+              self.write('throw LSP_EXCEPTION(')
+              with self.indent():
+                self.write('ErrorCodes::INVALID_PARAMS,')
+                self.write('"Missing request method=\\"" + method + "\\" attribute: id"')
+              self.write(');')
             self.write('}')
             self.write('std::unique_ptr<RequestMessage> request =')
             with self.indent():
@@ -4631,11 +4784,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             with self.indent(2):
               self.write('ResponseIdType::NULL_TYPE) {')
             with self.indent():
-              self.write('std::stringstream ss;')
-              self.write('ss << "Notification method=\\""')
-              self.write('   << method')
-              self.write('   << "\\" must not contain the attribute: id";')
-              self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+              self.write('throw LSP_EXCEPTION(')
+              with self.indent():
+                self.write('ErrorCodes::INVALID_PARAMS,')
+                self.write('"Notification method=\\"" + method + "\\" must not contain the attribute: id"')
+              self.write(');')
             self.write('}')
             self.write('std::unique_ptr<NotificationMessage> notification =')
             with self.indent():
@@ -4644,9 +4797,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             self.write('dispatch(response, *notification);')
           self.write('} else {')
           with self.indent():
-            self.write('std::stringstream ss;')
-            self.write(f'ss << "Unsupported method: \\"" << method << "\\"";')
-            self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_REQUEST, ss.str());')
+            self.write('throw LSP_EXCEPTION(')
+            with self.indent():
+              self.write('ErrorCodes::INVALID_REQUEST,')
+              self.write('"Unsupported method: \\"" + method + "\\""')
+            self.write(');')
           self.write('}')
         self.write('} else if ((iter = object.find("result")) != object.end()) {')
         with self.indent():
@@ -4670,11 +4825,15 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('}')
       self.write('} catch (const LspException &e) {')
       with self.indent():
-        self.write('logger')
+        self.write('{')
         with self.indent():
-          self.write('<< "[" << e.file() << ":" << e.line() << "] "')
-          self.write('<< e.what()')
-          self.write('<< std::endl;')
+          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+          self.write('logger')
+          with self.indent():
+            self.write('<< "[" << e.file() << ":" << e.line() << "] "')
+            self.write('<< e.what()')
+            self.write('<< std::endl;')
+        self.write('}')
         self.write('std::unique_ptr<ResponseError> error =')
         with self.indent():
           self.write('std::make_unique<ResponseError>();')
@@ -4696,7 +4855,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('response.error = std::move(error);')
       self.write('} catch (const std::exception &e) {')
       with self.indent():
-        self.write('logger << "Caught unhandled exception: " << e.what() << std::endl;')
+        self.write('{')
+        with self.indent():
+          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+          self.write('logger << "Caught unhandled exception: " << e.what() << std::endl;')
+        self.write('}')
         self.write('std::unique_ptr<ResponseError> error =')
         with self.indent():
           self.write('std::make_unique<ResponseError>();')
@@ -4803,7 +4966,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('assertInitialized();')
       self.write('} else {')
       with self.indent():
-        self.write('bool expected = false;  // a reference is required ...')
+        self.write('bool expected = false;  // a reference is required')
         self.write('if (!_initialized.compare_exchange_strong(expected, true)) {')
         with self.indent():
           self.write('throw LSP_EXCEPTION(')
@@ -4858,9 +5021,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('default: {')
       self.write('invalidMethod:')
       with self.indent():
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "Unsupported request method: \\"" << request.method << "\\"";')
-        self.write('throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());')
+        self.write('throw LSP_EXCEPTION(')
+        with self.indent():
+          self.write('ErrorCodes::METHOD_NOT_FOUND,')
+          self.write('"Unsupported request method: \\"" + request.method + "\\""')
+        self.write(');')
       self.write('}')
       self.write('}')
     self.write('}')
@@ -4911,9 +5076,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('default: {')
       self.write('invalidMethod:')
       with self.indent():
-        self.write('std::stringstream ss;')
-        self.write(f'ss << "Unsupported notification method: \\"" << notification.method << "\\"";')
-        self.write('throw LSP_EXCEPTION(ErrorCodes::METHOD_NOT_FOUND, ss.str());')
+        self.write('throw LSP_EXCEPTION(')
+        with self.indent():
+          self.write('ErrorCodes::METHOD_NOT_FOUND,')
+          self.write('"Unsupported notification method: \\"" + notification.method + "\\""')
+        self.write(');')
       self.write('}')
       self.write('}')
     self.write('}')
@@ -4926,13 +5093,15 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('static_cast<ResponseIdType>(response.id.index());')
       self.write(f'if (responseIdType != ResponseIdType::{rename_enum("integer")}) {{')
       with self.indent():
-        self.write('auto loggerLock = logger.lock();')
+        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
         self.write('logger')
         with self.indent():
           self.write('<< "Cannot dispatch response with id of type ResponseIdType::"')
           self.write('<< ResponseIdTypeNames.at(responseIdType)')
           self.write('<< std::endl;')
+        self.write('return;')
       self.write('}')
+      self.newline()
       self.write('int responseId = std::get<int>(response.id);')
       self.write('std::string method;')
       self.write('{')
@@ -4945,7 +5114,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           self.write('callbacksById.erase(iter);')
         self.write('} else {')
         with self.indent():
-          self.write('auto loggerLock = logger.lock();')
+          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
           self.write('logger << "Cannot locate request with id: " << responseId << std::endl;')
           self.write('return;')
         self.write('}')
@@ -4972,8 +5141,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             if result_spec is not None:
               self.write('if (!response.result.has_value()) {')
               with self.indent():
-                self.write('auto loggerLock = logger.lock();')
-                self.write(f'logger << "Missing required attribute for method \\"{request_method}\\": result" << std::endl;')
+                self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+                self.write(f'logger')
+                with self.indent():
+                  self.write(f'<< "Missing required attribute for method \\"{request_method}\\": result"')
+                  self.write('<< std::endl;')
                 self.write('return;')
               self.write('}')
               self.write('std::unique_ptr<LSPAny> &result = response.result.value();')
@@ -5000,7 +5172,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('default: {')
       self.write('invalidMethod:')
       with self.indent():
-        self.write('auto loggerLock = logger.lock();')
+        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
         self.write(f'logger << "Unsupported request method: \\"" << method << "\\"";')
       self.write('}')
       self.write('}')
@@ -5016,9 +5188,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       with self.indent():
         self.write('return request.params.value();')
       self.write('}')
-      self.write('std::stringstream ss;')
-      self.write(f'ss << "RequestMessage.params must be defined for method=\\"" << request.method << "\\"";')
-      self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+      self.write('throw LSP_EXCEPTION(')
+      with self.indent():
+        self.write('ErrorCodes::INVALID_PARAMS,')
+        self.write('"RequestMessage.params must be defined for method=\\"" + request.method + "\\""')
+      self.write(');')
     self.write('}')
     self.newline()
 
@@ -5032,10 +5206,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       with self.indent():
         self.write('return notification.params.value();')
       self.write('}')
-      self.write('std::stringstream ss;')
-      self.write(f'ss << "NotificationMessage.params must be defined for method=\\""')
-      self.write(f'   << notification.method << "\\"";')
-      self.write('throw LSP_EXCEPTION(ErrorCodes::INVALID_PARAMS, ss.str());')
+      self.write('throw LSP_EXCEPTION(')
+      with self.indent():
+        self.write('ErrorCodes::INVALID_PARAMS,')
+        self.write('"NotificationMessage.params must be defined for method=\\"" + notification.method + "\\""')
+      self.write(');')
     self.write('}')
     self.newline()
 
@@ -5072,10 +5247,14 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               self.newline()
               self.write('return result;')
             case "shutdown":
-              self.write('bool shutdown = false;')
-              self.write('if (_shutdown.compare_exchange_strong(shutdown, true)) {')
+              self.write('bool expected = false;')
+              self.write('if (_shutdown.compare_exchange_strong(expected, true)) {')
               with self.indent():
-                self.write('logger << "Shutting down server." << std::endl;')
+                self.write('{')
+                with self.indent():
+                  self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+                  self.write('logger << "Shutting down server." << std::endl;')
+                self.write('}')
               self.write('}')
               self.write('return nullptr;')
             case _:
@@ -5107,25 +5286,29 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         with self.indent():
           match notification_method:
             case "exit":
-              self.write('bool exit = false;')
-              self.write('if (_exit.compare_exchange_strong(exit, true)) {')
+              self.write('bool expected = false;')
+              self.write('if (_exit.compare_exchange_strong(expected, true)) {')
               with self.indent():
-                self.write('logger << "Exiting server." << std::endl;')
-                self.write('bool shutdown = false;')
-                self.write('if (_shutdown.compare_exchange_strong(shutdown, true)) {')
+                self.write('{')
                 with self.indent():
-                  self.write('auto loggerLock = logger.lock();')
+                  self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
+                  self.write('logger << "Exiting server." << std::endl;')
+                self.write('}')
+                self.write('expected = false;')
+                self.write('if (_shutdown.compare_exchange_strong(expected, true)) {')
+                with self.indent():
+                  self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
                   self.write('logger')
                   with self.indent():
                     self.write('<< "Server exited before being notified to shutdown!"')
                     self.write('<< std::endl;')
                 self.write('}')
-                self.write('incomingMessages.stop();')
-                self.write('requestPool.stop();')
-                self.write('workerPool.stop();')
-                self.write('requestPool.join();')
-                self.write('workerPool.join();')
-                self.write('listener.join();')
+                self.write('incomingMessages.stopNow();')
+                self.write('requestPool.stopNow();')
+                self.write('workerPool.stopNow();')
+                self.write('// TODO: Find a better way to terminate the message stream:')
+                self.write('std::cin.putback(\'\\0\');')
+                self.write('fclose(stdin);')
               self.write('}')
             case "initialized":
               self.write('// empty')
@@ -5158,7 +5341,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         with self.indent():
           self.write('RequestMessage request;')
           self.write('request.jsonrpc = JSON_RPC_VERSION;')
-          self.write('int requestId = nextId();')
+          self.write('int requestId = nextRequestId();')
           self.write('request.id = requestId;')
           self.write('{')
           with self.indent():
@@ -5170,7 +5353,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             self.write('request.params = transformer.asMessageParams(params);')
           self.write('std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);')
           self.write('const std::string message = serializer.serialize(*any);')
-          self.write('send(message);')
+          self.write('ls::LanguageServer::send(message);')
         self.write('}')
         self.newline()
         result_spec = request_spec.get("result", None)
@@ -5187,7 +5370,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         else:
           self.write(f'auto LspLanguageServer::{receive_fn(request_method)}() -> void {{')
         with self.indent():
-          self.write('auto loggerLock = logger.lock();')
+          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
           self.write(f'logger << "No handler exists for method: \\"{request_method}\\"" << std::endl;')
         self.write('}')
         self.newline()
@@ -5217,32 +5400,35 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             self.write('notification.params = transformer.asMessageParams(params);')
           self.write('std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);')
           self.write('const std::string message = serializer.serialize(*any);')
-          self.write('send(message);')
+          self.write('ls::LanguageServer::send(message);')
         self.write('}')
         self.newline()
 
   def generate_prepare(self: Self) -> None:
     self.write('auto LspLanguageServer::prepare(')
     with self.indent():
-      self.write('std::stringstream &ss,')
+      self.write('std::string &buffer,')
       self.write('const std::string &response')
     self.write(') const -> void {')
     with self.indent():
-      self.write('ss << "Content-Type: application/vscode-jsonrpc; charset=utf-8\\r\\n"')
-      self.write('   << "Content-Length: " << response.length() << "\\r\\n"')
-      self.write('   << "\\r\\n"')
-      self.write('   << response;')
+      self.write('buffer.append("Content-Type: application/vscode-jsonrpc; charset=utf-8\\r\\n");')
+      self.write('buffer.append("Content-Length: ");')
+      self.write('buffer.append(std::to_string(response.length()));')
+      self.write('buffer.append("\\r\\n");')
+      self.write('buffer.append("\\r\\n");')
+      self.write('buffer.append(response);')
     self.write('}')
     self.newline()
 
   def generate_code(self: Self) -> None:
-    print(f'Generating: {self.file_path} ...')
+    print(f'Generating: {self.file_path}')
     self.write('// -----------------------------------------------------------------------------')
     self.write('// NOTE: This file was generated from Microsoft\'s Language Server Protocol (LSP)')
     self.write('// specification. Please do not edit it by hand.')
     self.write('// -----------------------------------------------------------------------------')
     self.newline()
     self.write('#include <cctype>')
+    self.write('#include <cstdio>')
     self.write('#include <iostream>')
     self.write('#include <stdexcept>')
     self.newline()
@@ -5255,7 +5441,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     self.newline()
     with self.indent():
       self.generate_constructor()
-      self.generate_next_id()
+      self.generate_join()
+      self.generate_listen()
+      self.generate_notify_sent()
+      self.generate_synchronized_send()
       self.generate_handle()
       self.generate_is_initialized()
       self.generate_is_shutdown()
