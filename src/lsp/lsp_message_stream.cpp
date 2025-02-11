@@ -180,8 +180,31 @@ namespace LCompilers::LanguageServerProtocol {
     {
       std::unique_lock<std::mutex> loggerLock(logger.mutex());
       logger
-        << "<<< INCOMING:" << std::endl
-        << message << std::endl;
+        << std::endl
+        << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl
+        << "<<<<<<<<<<<<<<  INCOMING  <<<<<<<<<<<<<<" << std::endl
+        << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+      std::string::size_type position = 0;
+      std::string::size_type index = message.find('\n', position);
+      if (index != std::string::npos) {
+        std::string::size_type length = (index - position) - 1;
+        std::string_view line(message.data() + position, length);
+        logger << "<<< " << line << std::endl;
+        position = index + 1;
+        while ((index = message.find('\n', position)) != std::string::npos) {
+          length = (index - position) - 1;
+          line = std::string_view(message.data() + position, length);
+          logger << "<<< " << line << std::endl;
+          position = index + 1;
+        }
+        length = (message.length() - position);
+        if (length > 0) {
+          line = std::string_view(message.data() + position, length);
+          logger << "<<< " << line << std::endl;
+        }
+      } else {
+        logger << "<<< " << message << std::endl;
+      }
     }
     message.clear();
     position = 0;
