@@ -238,18 +238,6 @@ namespace  LCompilers::LanguageServer::Interface {
     return ExitCode::SUCCESS;
   }
 
-  auto CommandLineInterface::validateAndSetInteractive() -> ExitCode {
-    if (!args.interactive ||
-        (opts.communicationProtocol == CommunicationProtocol::STDIO)) {
-      opts.interactive = args.interactive;
-      return ExitCode::SUCCESS;
-    }
-    std::cerr
-      << "Only --communication-protocol=stdio supports --interactive"
-      << std::endl;
-    return ExitCode::BAD_ARG_COMBO;
-  }
-
   auto CommandLineInterface::validateAndSetNumRequestThreads() -> ExitCode {
     opts.numRequestThreads = args.numRequestThreads;
     return ExitCode::SUCCESS;
@@ -343,11 +331,6 @@ namespace  LCompilers::LanguageServer::Interface {
         ss.str()
       )->capture_default_str();
     }
-
-    server.add_flag(
-      "--interactive", args.interactive,
-      "Whether to serve stdio requests from an interactive shell (REPL, only useful for development)."
-    );
 
     {
       ss.str("");

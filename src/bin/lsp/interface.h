@@ -93,7 +93,6 @@ namespace LCompilers::LanguageServer::Interface {
     std::string communicationProtocol =
       CommunicationProtocolValues.at(CommunicationProtocol::STDIO);
     std::string serverProtocol = ServerProtocolValues.at(ServerProtocol::LSP);
-    bool interactive = false;
     std::size_t numRequestThreads = 5;
     std::size_t numWorkerThreads;
     std::string logPath = "llanguage-server.log";
@@ -108,7 +107,6 @@ namespace LCompilers::LanguageServer::Interface {
     DataFormat dataFormat;
     CommunicationProtocol communicationProtocol;
     ServerProtocol serverProtocol;
-    bool interactive;
     std::size_t numRequestThreads;
     std::size_t numWorkerThreads;
     fs::path logPath;
