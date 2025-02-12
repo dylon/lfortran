@@ -72,6 +72,91 @@ namespace LCompilers::LanguageServer::Logging {
     );
   }
 
+  Formatter::Formatter(Logger &logger, Level level, const std::string &prompt)
+    : logger(logger)
+    , lock(logger.mutex(), std::defer_lock)
+  {
+    if (logger.level() >= level) {
+      lock.lock();
+      if (logger.level() >= level) {
+        enabled = true;
+        logger << '[' << prompt << "] ";
+      } else {
+        lock.unlock();
+      }
+    }
+  }
+
+  auto Formatter::operator<<(unsigned char c) -> Formatter & {
+    if (enabled) {
+      logger << c;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(char c) -> Formatter & {
+    if (enabled) {
+      logger << c;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(short unsigned int value) -> Formatter & {
+    if (enabled) {
+      logger << value;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(int value) -> Formatter & {
+    if (enabled) {
+      logger << value;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(unsigned int value) -> Formatter & {
+    if (enabled) {
+      logger << value;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(std::size_t value) -> Formatter & {
+    if (enabled) {
+      logger << value;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(const char *str) -> Formatter & {
+    if (enabled) {
+      logger << str;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(const std::string &str) -> Formatter & {
+    if (enabled) {
+      logger << str;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(const std::string_view &view) -> Formatter & {
+    if (enabled) {
+      logger << view;
+    }
+    return *this;
+  }
+
+  auto Formatter::operator<<(std::ostream& (*manip)(std::ostream&)) -> Formatter & {
+    if (enabled) {
+      logger << manip;
+    }
+    return *this;
+  }
+
   auto Logger::setLevel(Level level) -> void {
     Level prevLevel = _level;
     while (!_level.compare_exchange_strong(prevLevel, level)) {

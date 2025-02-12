@@ -59,12 +59,12 @@ namespace LCompilers::LanguageServerProtocol {
             try {
               handle(message, sendId);
             } catch (std::exception &e) {
-              std::unique_lock<std::mutex> loggerLock(logger.mutex());
-              logger
+              std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
+              logger.error()
                 << "[" << threadName << "_" << threadId << "] "
                 << "Failed to handle message: " << message
                 << std::endl;
-              logger
+              logger.error()
                 << "[" << threadName << "_" << threadId << "] "
                 << "Caught unhandled exception: " << e.what()
                 << std::endl;
@@ -73,18 +73,14 @@ namespace LCompilers::LanguageServerProtocol {
         }
       }
     } catch (std::exception &e) {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger
+      logger.warn()
         << "[LspLanguageServer] Interrupted while dequeuing messages: "
         << e.what()
         << std::endl;
     }
-    {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger
-        << "[LspLanguageServer] Incoming-message listener terminated."
-        << std::endl;
-    }
+    logger.debug()
+      << "[LspLanguageServer] Incoming-message listener terminated."
+      << std::endl;
   }
 
   auto LspLanguageServer::notifySent() -> void {
@@ -204,13 +200,10 @@ namespace LCompilers::LanguageServerProtocol {
         );
       }
     } catch (const LspException &e) {
-      {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
-          << "[" << e.file() << ":" << e.line() << "] "
-          << e.what()
-          << std::endl;
-      }
+      logger.error()
+        << "[" << e.file() << ":" << e.line() << "] "
+        << e.what()
+        << std::endl;
       std::unique_ptr<ResponseError> error =
         std::make_unique<ResponseError>();
       switch (static_cast<ErrorCodeType>(e.code().index())) {
@@ -229,12 +222,9 @@ namespace LCompilers::LanguageServerProtocol {
       error->message = e.what();
       response.error = std::move(error);
     } catch (const std::exception &e) {
-      {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
-          << "Caught unhandled exception: "
-          << e.what() << std::endl;
-      }
+      logger.error()
+        << "Caught unhandled exception: "
+        << e.what() << std::endl;
       std::unique_ptr<ResponseError> error =
         std::make_unique<ResponseError>();
       error->code = static_cast<int>(ErrorCodes::INTERNAL_ERROR);
@@ -1025,8 +1015,7 @@ namespace LCompilers::LanguageServerProtocol {
     ResponseIdType responseIdType =
       static_cast<ResponseIdType>(response.id.index());
     if (responseIdType != ResponseIdType::INTEGER_TYPE) {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger
+      logger.error()
         << "Cannot dispatch response with id of type ResponseIdType::"
         << ResponseIdTypeNames.at(responseIdType)
         << std::endl;
@@ -1042,8 +1031,7 @@ namespace LCompilers::LanguageServerProtocol {
         method = iter->second;
         callbacksById.erase(iter);
       } else {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger << "Cannot locate request with id: " << responseId << std::endl;
+        logger.error() << "Cannot locate request with id: " << responseId << std::endl;
         return;
       }
     }
@@ -1058,8 +1046,7 @@ namespace LCompilers::LanguageServerProtocol {
     switch (request) {
     case OutgoingRequest::WORKSPACE_WORKSPACE_FOLDERS: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/workspaceFolders\": result"
           << std::endl;
         return;
@@ -1072,8 +1059,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_CONFIGURATION: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/configuration\": result"
           << std::endl;
         return;
@@ -1086,8 +1072,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_FOLDING_RANGE_REFRESH: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/foldingRange/refresh\": result"
           << std::endl;
         return;
@@ -1100,8 +1085,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WINDOW_WORK_DONE_PROGRESS_CREATE: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"window/workDoneProgress/create\": result"
           << std::endl;
         return;
@@ -1114,8 +1098,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_SEMANTIC_TOKENS_REFRESH: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/semanticTokens/refresh\": result"
           << std::endl;
         return;
@@ -1128,8 +1111,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WINDOW_SHOW_DOCUMENT: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"window/showDocument\": result"
           << std::endl;
         return;
@@ -1142,8 +1124,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_INLINE_VALUE_REFRESH: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/inlineValue/refresh\": result"
           << std::endl;
         return;
@@ -1156,8 +1137,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_INLAY_HINT_REFRESH: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/inlayHint/refresh\": result"
           << std::endl;
         return;
@@ -1170,8 +1150,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_DIAGNOSTIC_REFRESH: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/diagnostic/refresh\": result"
           << std::endl;
         return;
@@ -1184,8 +1163,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::CLIENT_REGISTER_CAPABILITY: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"client/registerCapability\": result"
           << std::endl;
         return;
@@ -1198,8 +1176,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::CLIENT_UNREGISTER_CAPABILITY: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"client/unregisterCapability\": result"
           << std::endl;
         return;
@@ -1212,8 +1189,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WINDOW_SHOW_MESSAGE_REQUEST: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"window/showMessageRequest\": result"
           << std::endl;
         return;
@@ -1226,8 +1202,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_CODE_LENS_REFRESH: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/codeLens/refresh\": result"
           << std::endl;
         return;
@@ -1240,8 +1215,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case OutgoingRequest::WORKSPACE_APPLY_EDIT: {
       if (!response.result.has_value()) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Missing required attribute for method \"workspace/applyEdit\": result"
           << std::endl;
         return;
@@ -1254,8 +1228,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     default: {
     invalidMethod:
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger << "Unsupported request method: \"" << method << "\"";
+      logger.error() << "Unsupported request method: \"" << method << "\"";
     }
     }
   }
@@ -1575,8 +1548,7 @@ namespace LCompilers::LanguageServerProtocol {
     bool expected = false;
     if (_shutdown.compare_exchange_strong(expected, true)) {
       {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger << "Shutting down server." << std::endl;
+        logger.info() << "Shutting down server." << std::endl;
       }
     }
     return nullptr;
@@ -1928,13 +1900,11 @@ namespace LCompilers::LanguageServerProtocol {
     bool expected = false;
     if (_exit.compare_exchange_strong(expected, true)) {
       {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger << "Exiting server." << std::endl;
+        logger.info() << "Exiting server." << std::endl;
       }
       expected = false;
       if (_shutdown.compare_exchange_strong(expected, true)) {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
+        logger.error()
           << "Server exited before being notified to shutdown!"
           << std::endl;
       }
@@ -2052,8 +2022,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_workspaceFolders(
     WorkspaceWorkspaceFoldersResult &/*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/workspaceFolders\""
       << std::endl;
   }
@@ -2082,8 +2051,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_configuration(
     WorkspaceConfigurationResult &/*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/configuration\""
       << std::endl;
   }
@@ -2109,8 +2077,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_foldingRange_refresh(
     WorkspaceFoldingRangeRefreshResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/foldingRange/refresh\""
       << std::endl;
   }
@@ -2139,8 +2106,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWindow_workDoneProgress_create(
     WindowWorkDoneProgressCreateResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"window/workDoneProgress/create\""
       << std::endl;
   }
@@ -2166,8 +2132,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_semanticTokens_refresh(
     WorkspaceSemanticTokensRefreshResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/semanticTokens/refresh\""
       << std::endl;
   }
@@ -2196,8 +2161,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWindow_showDocument(
     WindowShowDocumentResult &/*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"window/showDocument\""
       << std::endl;
   }
@@ -2223,8 +2187,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_inlineValue_refresh(
     WorkspaceInlineValueRefreshResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/inlineValue/refresh\""
       << std::endl;
   }
@@ -2250,8 +2213,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_inlayHint_refresh(
     WorkspaceInlayHintRefreshResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/inlayHint/refresh\""
       << std::endl;
   }
@@ -2277,8 +2239,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_diagnostic_refresh(
     WorkspaceDiagnosticRefreshResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/diagnostic/refresh\""
       << std::endl;
   }
@@ -2307,8 +2268,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveClient_registerCapability(
     ClientRegisterCapabilityResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"client/registerCapability\""
       << std::endl;
   }
@@ -2337,8 +2297,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveClient_unregisterCapability(
     ClientUnregisterCapabilityResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"client/unregisterCapability\""
       << std::endl;
   }
@@ -2367,8 +2326,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWindow_showMessageRequest(
     WindowShowMessageRequestResult &/*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"window/showMessageRequest\""
       << std::endl;
   }
@@ -2394,8 +2352,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_codeLens_refresh(
     WorkspaceCodeLensRefreshResult /*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/codeLens/refresh\""
       << std::endl;
   }
@@ -2424,8 +2381,7 @@ namespace LCompilers::LanguageServerProtocol {
   auto LspLanguageServer::receiveWorkspace_applyEdit(
     WorkspaceApplyEditResult &/*params*/
   ) -> void {
-    std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger
+    logger.warn()
       << "No handler exists for method: \"workspace/applyEdit\""
       << std::endl;
   }

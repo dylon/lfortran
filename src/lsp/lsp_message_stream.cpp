@@ -83,8 +83,8 @@ namespace LCompilers::LanguageServerProtocol {
         view = std::string_view(message.data() + start, length);
         c = nextUpper();
         if (c != '\n') {
-          std::unique_lock<std::mutex> loggerLock(logger.mutex());
-          logger << "Expected \\r to be followed by \\n, not '";
+          std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
+          logger.warn() << "Expected \\r to be followed by \\n, not '";
           logEscaped(c);
           logger << "\'" << std::endl;
           goto parse_header_name;
@@ -92,25 +92,17 @@ namespace LCompilers::LanguageServerProtocol {
         if ((view.length() == 0) && hasContentLength) {
           goto parse_body;
         }
-        {
-          std::unique_lock<std::mutex> loggerLock(logger.mutex());
-          logger
-            << "Reached out-of-sequence newline while parsing header name."
-            << std::endl;
-          return "";
-        }
+        logger.warn()
+          << "Reached out-of-sequence newline while parsing header name."
+          << std::endl;
         goto parse_header_name;
       }
       case '\n': {
         length = (position - start) - 1;
         view = std::string_view(message.data() + start, length);
-        {
-          std::unique_lock<std::mutex> loggerLock(logger.mutex());
-          logger
-            << "Reached out-of-sequence newline while parsing header name."
-            << std::endl;
-          return "";
-        }
+        logger.warn()
+          << "Reached out-of-sequence newline while parsing header name."
+          << std::endl;
         goto parse_header_name;
       }
       case ':': {
@@ -141,8 +133,8 @@ namespace LCompilers::LanguageServerProtocol {
         c = nextChar();
         if (c != '\n') {
           {
-            std::unique_lock<std::mutex> loggerLock(logger.mutex());
-            logger << "Expected \\r to be followed by \\n, not '";
+            std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
+            logger.warn() << "Expected \\r to be followed by \\n, not '";
             logEscaped(c);
             logger << "\': " << view << std::endl;
           }
@@ -156,12 +148,9 @@ namespace LCompilers::LanguageServerProtocol {
       case '\n': {
         length = (position - start) - 1;
         view = std::string_view(message.data() + start, length);
-        {
-          std::unique_lock<std::mutex> loggerLock(logger.mutex());
-          logger
-            << "Reached out-of-sequence newline while parsing header value."
-            << std::endl;
-        }
+        logger.warn()
+          << "Reached out-of-sequence newline while parsing header value."
+          << std::endl;
         goto parse_header_name;
       }
       default: {
@@ -178,34 +167,14 @@ namespace LCompilers::LanguageServerProtocol {
     length = (position - start);
     std::string body = message.substr(start, length);
     if (logger.isTraceEnabled()) {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
+      std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
       if (logger.isTraceEnabled()) {
         logger
           << std::endl
           << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl
           << "<<<<<<<<<<<<<<  INCOMING  <<<<<<<<<<<<<<" << std::endl
-          << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-        std::string::size_type position = 0;
-        std::string::size_type index = message.find('\n', position);
-        if (index != std::string::npos) {
-          std::string::size_type length = (index - position) - 1;
-          std::string_view line(message.data() + position, length);
-          logger << "<<< " << line << std::endl;
-          position = index + 1;
-          while ((index = message.find('\n', position)) != std::string::npos) {
-            length = (index - position) - 1;
-            line = std::string_view(message.data() + position, length);
-            logger << "<<< " << line << std::endl;
-            position = index + 1;
-          }
-          length = (message.length() - position);
-          if (length > 0) {
-            line = std::string_view(message.data() + position, length);
-            logger << "<<< " << line << std::endl;
-          }
-        } else {
-          logger << "<<< " << message << std::endl;
-        }
+          << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl
+          << message << std::endl;
       }
     }
     message.clear();

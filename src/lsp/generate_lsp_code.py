@@ -4668,13 +4668,13 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                 self.write('handle(message, sendId);')
               self.write('} catch (std::exception &e) {')
               with self.indent():
-                self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-                self.write('logger')
+                self.write('std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());')
+                self.write('logger.error()')
                 with self.indent():
                   self.write('<< "[" << threadName << "_" << threadId << "] "')
                   self.write('<< "Failed to handle message: " << message')
                   self.write('<< std::endl;')
-                self.write('logger')
+                self.write('logger.error()')
                 with self.indent():
                   self.write('<< "[" << threadName << "_" << threadId << "] "')
                   self.write('<< "Caught unhandled exception: " << e.what()')
@@ -4685,21 +4685,16 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('}')
       self.write('} catch (std::exception &e) {')
       with self.indent():
-        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-        self.write('logger')
+        self.write('logger.warn()')
         with self.indent():
           self.write('<< "[LspLanguageServer] Interrupted while dequeuing messages: "')
           self.write('<< e.what()')
           self.write('<< std::endl;')
       self.write('}')
-      self.write('{')
+      self.write('logger.debug()')
       with self.indent():
-        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-        self.write('logger')
-        with self.indent():
-          self.write('<< "[LspLanguageServer] Incoming-message listener terminated."')
-          self.write('<< std::endl;')
-      self.write('}')
+        self.write('<< "[LspLanguageServer] Incoming-message listener terminated."')
+        self.write('<< std::endl;')
     self.write('}')
     self.newline()
 
@@ -4858,15 +4853,11 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('}')
       self.write('} catch (const LspException &e) {')
       with self.indent():
-        self.write('{')
+        self.write('logger.error()')
         with self.indent():
-          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-          self.write('logger')
-          with self.indent():
-            self.write('<< "[" << e.file() << ":" << e.line() << "] "')
-            self.write('<< e.what()')
-            self.write('<< std::endl;')
-        self.write('}')
+          self.write('<< "[" << e.file() << ":" << e.line() << "] "')
+          self.write('<< e.what()')
+          self.write('<< std::endl;')
         self.write('std::unique_ptr<ResponseError> error =')
         with self.indent():
           self.write('std::make_unique<ResponseError>();')
@@ -4890,14 +4881,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('response.error = std::move(error);')
       self.write('} catch (const std::exception &e) {')
       with self.indent():
-        self.write('{')
+        self.write('logger.error()')
         with self.indent():
-          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-          self.write('logger')
-          with self.indent():
-            self.write('<< "Caught unhandled exception: "')
-            self.write('<< e.what() << std::endl;')
-        self.write('}')
+          self.write('<< "Caught unhandled exception: "')
+          self.write('<< e.what() << std::endl;')
         self.write('std::unique_ptr<ResponseError> error =')
         with self.indent():
           self.write('std::make_unique<ResponseError>();')
@@ -5116,8 +5103,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('static_cast<ResponseIdType>(response.id.index());')
       self.write(f'if (responseIdType != ResponseIdType::{rename_enum("integer")}) {{')
       with self.indent():
-        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-        self.write('logger')
+        self.write('logger.error()')
         with self.indent():
           self.write('<< "Cannot dispatch response with id of type ResponseIdType::"')
           self.write('<< ResponseIdTypeNames.at(responseIdType)')
@@ -5137,8 +5123,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           self.write('callbacksById.erase(iter);')
         self.write('} else {')
         with self.indent():
-          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-          self.write('logger << "Cannot locate request with id: " << responseId << std::endl;')
+          self.write('logger.error() << "Cannot locate request with id: " << responseId << std::endl;')
           self.write('return;')
         self.write('}')
       self.write('}')
@@ -5164,8 +5149,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
             if result_spec is not None:
               self.write('if (!response.result.has_value()) {')
               with self.indent():
-                self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-                self.write(f'logger')
+                self.write(f'logger.error()')
                 with self.indent():
                   self.write(f'<< "Missing required attribute for method \\"{request_method}\\": result"')
                   self.write('<< std::endl;')
@@ -5195,8 +5179,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('default: {')
       self.write('invalidMethod:')
       with self.indent():
-        self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-        self.write(f'logger << "Unsupported request method: \\"" << method << "\\"";')
+        self.write(f'logger.error() << "Unsupported request method: \\"" << method << "\\"";')
       self.write('}')
       self.write('}')
     self.write('}')
@@ -5276,8 +5259,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               with self.indent():
                 self.write('{')
                 with self.indent():
-                  self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-                  self.write('logger << "Shutting down server." << std::endl;')
+                  self.write('logger.info() << "Shutting down server." << std::endl;')
                 self.write('}')
               self.write('}')
               self.write('return nullptr;')
@@ -5315,14 +5297,12 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
               with self.indent():
                 self.write('{')
                 with self.indent():
-                  self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-                  self.write('logger << "Exiting server." << std::endl;')
+                  self.write('logger.info() << "Exiting server." << std::endl;')
                 self.write('}')
                 self.write('expected = false;')
                 self.write('if (_shutdown.compare_exchange_strong(expected, true)) {')
                 with self.indent():
-                  self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-                  self.write('logger')
+                  self.write('logger.error()')
                   with self.indent():
                     self.write('<< "Server exited before being notified to shutdown!"')
                     self.write('<< std::endl;')
@@ -5397,8 +5377,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         else:
           self.write(f'auto LspLanguageServer::{receive_fn(request_method)}() -> void {{')
         with self.indent():
-          self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-          self.write(f'logger')
+          self.write(f'logger.warn()')
           with self.indent():
             self.write(f'<< "No handler exists for method: \\"{request_method}\\""')
             self.write(f'<< std::endl;')

@@ -31,12 +31,33 @@ namespace LCompilers::LanguageServer::Logging {
   auto levelByValue(const std::string &value) -> Level;
   auto levelByValue(int value) -> Level;
 
+  class Logger;
+
+  class Formatter {
+  public:
+    Formatter(Logger &logger, Level level, const std::string &prompt);
+    auto operator<<(unsigned char c) -> Formatter &;
+    auto operator<<(char c) -> Formatter &;
+    auto operator<<(short unsigned int value) -> Formatter &;
+    auto operator<<(int value) -> Formatter &;
+    auto operator<<(unsigned int value) -> Formatter &;
+    auto operator<<(std::size_t value) -> Formatter &;
+    auto operator<<(const char *str) -> Formatter &;
+    auto operator<<(const std::string &str) -> Formatter &;
+    auto operator<<(const std::string_view &view) -> Formatter &;
+    auto operator<<(std::ostream& (*manip)(std::ostream&)) -> Formatter &;
+  private:
+    Logger &logger;
+    bool enabled = false;
+    std::unique_lock<std::recursive_mutex> lock;
+  };
+
   class Logger {
   public:
     Logger(const fs::path &logPath);
     ~Logger();
 
-    inline auto mutex() -> std::mutex & {
+    inline auto mutex() -> std::recursive_mutex & {
       return _mutex;
     }
 
@@ -81,6 +102,30 @@ namespace LCompilers::LanguageServer::Logging {
       return _level == Level::ALL;
     }
 
+    inline auto fatal() -> Formatter {
+      return Formatter(*this, Level::FATAL, "FATAL");
+    }
+
+    inline auto error() -> Formatter {
+      return Formatter(*this, Level::ERROR, "ERROR");
+    }
+
+    inline auto warn() -> Formatter {
+      return Formatter(*this, Level::WARN, "WARN");
+    }
+
+    inline auto info() -> Formatter {
+      return Formatter(*this, Level::INFO, "INFO");
+    }
+
+    inline auto debug() -> Formatter {
+      return Formatter(*this, Level::DEBUG, "DEBUG");
+    }
+
+    inline auto trace() -> Formatter {
+      return Formatter(*this, Level::TRACE, "TRACE");
+    }
+
     auto operator<<(unsigned char c) -> Logger &;
     auto operator<<(char c) -> Logger &;
     auto operator<<(short unsigned int value) -> Logger &;
@@ -94,7 +139,7 @@ namespace LCompilers::LanguageServer::Logging {
   private:
     fs::path _logPath;
     std::ofstream logFile;
-    std::mutex _mutex;
+    std::recursive_mutex _mutex;
     std::atomic<Level> _level{Level::INFO};
   };
 

@@ -90,10 +90,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_lock<std::shared_mutex> writeLock(configMutex);
       configsByUri.clear();
     }
-    {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger << "Invalidated document configuration cache." << std::endl;
-    }
+    logger.debug() << "Invalidated document configuration cache." << std::endl;
   }
 
   // ================= //
@@ -241,36 +238,31 @@ namespace LCompilers::LanguageServerProtocol {
                   break;
                 }
                 default: {
-                  std::unique_lock<std::mutex> loggerLock(logger.mutex());
-                  logger
+                  logger.error()
                     << "Unable to update log level of type LSPAnyType::"
                     << LSPAnyTypeNames.at(levelType)
                     << std::endl;
                 }
                 }
               } else {
-                std::unique_lock<std::mutex> loggerLock(logger.mutex());
-                logger << "Config does not have required section: log.level" << std::endl;
+                logger.error() << "Config does not have required section: log.level" << std::endl;
               }
               break;
             }
             default: {
-              std::unique_lock<std::mutex> loggerLock(logger.mutex());
-              logger
+              logger.error()
                 << "Unsupported log configuration type: LSPAnyType::"
                 << LSPAnyTypeNames.at(logType)
                 << std::endl;
             }
             }
           } else {
-            std::unique_lock<std::mutex> loggerLock(logger.mutex());
-            logger << "Config does not have required section: log" << std::endl;
+            logger.error() << "Config does not have required section: log" << std::endl;
           }
           break;
         }
         default: {
-          std::unique_lock<std::mutex> loggerLock(logger.mutex());
-          logger
+          logger.error()
             << "Cannot update log level from config of type LSPAnyType::"
             << LSPAnyTypeNames.at(configType)
             << std::endl;
@@ -278,8 +270,7 @@ namespace LCompilers::LanguageServerProtocol {
         }
       }
     } catch (std::exception &e) {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger
+      logger.error()
         << "Caught unhandled exception while updating log level: " << e.what()
         << std::endl;
     }
@@ -303,8 +294,7 @@ namespace LCompilers::LanguageServerProtocol {
         }
         updateLogLevel();
       } else {
-        std::unique_lock<std::mutex> loggerLock;
-        logger
+        logger.warn()
           << "Unable to locate configuration settings for section: "
           << configSection
           << std::endl;
@@ -312,8 +302,7 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::unique_lock<std::mutex> loggerLock;
-      logger
+      logger.error()
         << "Unsupported settings type: LSPAnyType::"
         << LSPAnyTypeNames.at(settingsType)
         << std::endl;

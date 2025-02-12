@@ -35,10 +35,7 @@ namespace LCompilers::LanguageServerProtocol {
       std::unique_lock<std::shared_mutex> writeLock(optionMutex);
       optionsByUri.clear();
     }
-    {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger << "Invalidated compiler options cache." << std::endl;
-    }
+    logger.debug() << "Invalidated compiler options cache." << std::endl;
   }
 
   auto LFortranLspLanguageServer::getCompilerOptions(
@@ -132,7 +129,7 @@ namespace LCompilers::LanguageServerProtocol {
               }
               int exitCode = lcli::init_compiler_options(compiler_options, argc, argv);
               if (exitCode != 0) {
-                std::unique_lock<std::mutex> loggerLock(logger.mutex());
+                std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
                 logger
                   << "Failed to initialize compiler options for document with uri: " << uri
                   << std::endl;
@@ -147,7 +144,7 @@ namespace LCompilers::LanguageServerProtocol {
               break;
             }
             default: {
-              std::unique_lock<std::mutex> loggerLock(logger.mutex());
+              std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
               logger
                 << "Unsupported type of compiler flags: LSPAnyType::"
                 << LSPAnyTypeNames.at(flagsType)
@@ -158,7 +155,7 @@ namespace LCompilers::LanguageServerProtocol {
           break;
         }
         default: {
-          std::unique_lock<std::mutex> loggerLock(logger.mutex());
+          std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
           logger
             << "Unsupported type of compiler options: LSPAnyType::"
             << LSPAnyTypeNames.at(compilerType)
@@ -169,7 +166,7 @@ namespace LCompilers::LanguageServerProtocol {
       break;
     }
     default: {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
+      std::unique_lock<std::recursive_mutex> loggerLock(logger.mutex());
       logger
         << "Unsupported type of config: LSPAnyType::"
         << LSPAnyTypeNames.at(configType)
@@ -238,14 +235,14 @@ namespace LCompilers::LanguageServerProtocol {
           params.diagnostics = std::move(diagnostics);
           sendTextDocument_publishDiagnostics(params);
         } catch (std::exception &e) {
-          logger
+          logger.error()
             << "[" << threadName << "_" << threadId << "] "
             << "Failed to validate document (uri=\""
             << uri << "\"): " << e.what()
             << std::endl;
         }
       } catch (std::exception &e) {
-        logger
+        logger.error()
           << "[" << threadName << "_" << threadId << "] "
           << "Failed to read document attributes: " << e.what()
           << std::endl;

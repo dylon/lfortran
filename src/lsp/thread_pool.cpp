@@ -16,10 +16,9 @@ namespace LCompilers::LanguageServer::Threading {
     , logger(logger)
   {
     for (std::size_t threadId = 0; threadId < numThreads; ++threadId) {
-      {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger << "Starting thread " << name << "_" << threadId << std::endl;
-      }
+      logger.debug()
+        << "Starting thread " << name << "_" << threadId
+        << std::endl;
       workers.emplace_back([this, threadId]() {
         run(threadId);
       });
@@ -40,23 +39,17 @@ namespace LCompilers::LanguageServer::Threading {
   }
 
   auto ThreadPool::stop() -> void {
-    {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger
-        << "Thread pool [" << _name << "] will no longer accept new tasks and "
-        << "will shut down once those pending have returned."
-        << std::endl;
-    }
+    logger.debug()
+      << "Thread pool [" << _name << "] will no longer accept new tasks and "
+      << "will shut down once those pending have returned."
+      << std::endl;
     stopRunning = true;
   }
 
   auto ThreadPool::stopNow() -> void {
-    {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger
-        << "Stopping thread pool [" << _name << "] as quickly as possible."
-        << std::endl;
-    }
+    logger.debug()
+      << "Stopping thread pool [" << _name << "] as quickly as possible."
+      << std::endl;
     stopRunning = true;
     stopRunningNow = true;
     {
@@ -90,24 +83,19 @@ namespace LCompilers::LanguageServer::Threading {
           try {
             task(_name, threadId);
           } catch (std::exception &e) {
-            std::unique_lock<std::mutex> loggerLock(logger.mutex());
-            logger
+            logger.error()
               << "[" << _name << "_" << threadId << "] "
               << "Failed to execute task: " << e.what()
               << std::endl;
           }
         }
       }
-      {
-        std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger
-          << "[" << _name << "_" << threadId << "] "
-          << "Terminated."
-          << std::endl;
-      }
+      logger.debug()
+        << "[" << _name << "_" << threadId << "] "
+        << "Terminated."
+        << std::endl;
     } catch (std::exception &e) {
-      std::unique_lock<std::mutex> loggerLock(logger.mutex());
-      logger
+      logger.error()
         << "[" << _name << "_" << threadId << "] "
         << "Unhandled exception caught: " << e.what()
         << std::endl;
