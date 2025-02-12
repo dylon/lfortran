@@ -4391,9 +4391,9 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
         if params_spec is not None:
           self.write(f'virtual auto {send_fn(request_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
-          self.write(f') -> void;')
+          self.write(f') -> int;')
         else:
-          self.write(f'virtual auto {send_fn(request_method)}() -> void;')
+          self.write(f'virtual auto {send_fn(request_method)}() -> int;')
         self.newline()
         self.generate_docstring(request_spec.get("documentation", None))
         result_spec = request_spec.get("result", None)
@@ -4479,6 +4479,27 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
     self.write('}')
     self.newline()
 
+  def generate_is_initialized(self: Self) -> None:
+    self.write('inline auto isInitialized() const -> bool {')
+    with self.indent():
+      self.write('return _initialized;')
+    self.write('}')
+    self.newline()
+
+  def generate_is_shutdown(self: Self) -> None:
+    self.write('inline auto isShutdown() const -> bool {')
+    with self.indent():
+      self.write('return _shutdown;')
+    self.write('}')
+    self.newline()
+
+  def generate_is_running(self: Self) -> None:
+    self.write('inline auto isRunning() const -> bool {')
+    with self.indent():
+      self.write('return !_shutdown;')
+    self.write('}')
+    self.newline()
+
   def generate_code(self: Self) -> None:
     print(f'Generating: {self.file_path}')
     self.write('// -----------------------------------------------------------------------------')
@@ -4518,10 +4539,11 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
           self.write('lsl::Logger &logger,')
           self.write('const std::string &configSection')
         self.write(');')
-        self.write('auto isInitialized() const -> bool;')
-        self.write('auto isShutdown() const -> bool;')
+        self.newline()
+        self.generate_is_initialized();
+        self.generate_is_shutdown();
+        self.generate_is_running()
         self.write('bool isTerminated() const override;')
-        self.write('auto isRunning() const -> bool;')
       self.write('protected:')
       with self.indent():
         self.write('const std::string configSection;')
@@ -4547,8 +4569,16 @@ class CPlusPlusLspLanguageServerHeaderGenerator(CPlusPlusFileGenerator):
         self.write('void join() override;')
         self.write('auto listen() -> void;')
         self.write('auto notifySent() -> void;')
-        self.write('auto send(const std::string &request, std::size_t sendId) -> void;')
-        self.write('auto handle(const std::string &request, std::size_t sendId) -> void;')
+        self.write('auto send(')
+        with self.indent():
+          self.write('const std::string &request,')
+          self.write('std::size_t sendId')
+        self.write(') -> void;')
+        self.write('auto handle(')
+        with self.indent():
+          self.write('const std::string &request,')
+          self.write('std::size_t sendId')
+        self.write(') -> void;')
         self.write('auto initializeParams() const -> const InitializeParams &;')
         self.write('auto assertInitialized() -> void;')
         self.write('auto assertRunning() -> void;')
@@ -4607,7 +4637,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
   def generate_join(self: Self) -> None:
     self.write('auto LspLanguageServer::join() -> void {')
     with self.indent():
-      self.write('listener.join();')
+      self.write('if (listener.joinable()) {')
+      with self.indent():
+        self.write('listener.join();')
+      self.write('}')
       self.write('requestPool.join();')
       self.write('workerPool.join();')
     self.write('}')
@@ -4696,15 +4729,15 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('// to implement a sort of dependency graph. Without knowledge of their')
       self.write('// dependencies, we must respond to all requests in order of receipt.')
       self.write('// -------------------------------------------------------------------------')
-      self.write('while ((pendingSendId < sendId) && !_exit) {')
+      self.write('{')
       with self.indent():
         self.write('std::unique_lock<std::mutex> sentLock(sentMutex);')
-        self.write('if ((pendingSendId < sendId) && !_exit) {')
+        self.write('sent.wait(sentLock, [this, sendId]{')
         with self.indent():
-          self.write('sent.wait(sentLock);')
-        self.write('}')
+          self.write('return (pendingSendId == sendId) || _exit;')
+        self.write('});')
       self.write('}')
-      self.write('if (!_exit) {')
+      self.write('if ((pendingSendId == sendId) && !_exit) {')
       with self.indent():
         self.write('ls::LanguageServer::send(message);')
         self.write('notifySent();')
@@ -4846,7 +4879,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('}')
         self.write('case ErrorCodeType::LSP_ERROR_CODES: {')
         with self.indent():
-          self.write('LSPErrorCodes errorCode = std::get<LSPErrorCodes>(e.code());')
+          self.write('LSPErrorCodes errorCode =')
+          with self.indent():
+            self.write('std::get<LSPErrorCodes>(e.code());')
           self.write('error->code = static_cast<int>(errorCode);')
           self.write('break;')
         self.write('}')
@@ -4858,7 +4893,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('{')
         with self.indent():
           self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-          self.write('logger << "Caught unhandled exception: " << e.what() << std::endl;')
+          self.write('logger')
+          with self.indent():
+            self.write('<< "Caught unhandled exception: "')
+            self.write('<< e.what() << std::endl;')
         self.write('}')
         self.write('std::unique_ptr<ResponseError> error =')
         with self.indent():
@@ -4866,26 +4904,15 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         self.write('error->code = static_cast<int>(ErrorCodes::INTERNAL_ERROR);')
         self.write('error->message =')
         with self.indent():
-          self.write('"An unexpected exception occurred. If it continues, please file a ticket.";')
+          self.write('("An unexpected exception occurred. If it continues, "')
+          self.write(' "please file a ticket.");')
         self.write('response.error = std::move(error);')
       self.write('}')
-      self.write('std::unique_ptr<LSPAny> any = transformer.responseMessageToAny(response);')
+      self.write('std::unique_ptr<LSPAny> any =')
+      with self.indent():
+        self.write('transformer.responseMessageToAny(response);')
       self.write('const std::string message = serializer.serialize(*any);')
       self.write('send(message, sendId);')
-    self.write('}')
-    self.newline()
-
-  def generate_is_initialized(self: Self) -> None:
-    self.write('auto LspLanguageServer::isInitialized() const -> bool {')
-    with self.indent():
-      self.write('return _initialized;')
-    self.write('}')
-    self.newline()
-
-  def generate_is_shutdown(self: Self) -> None:
-    self.write('auto LspLanguageServer::isShutdown() const -> bool {')
-    with self.indent():
-      self.write('return _shutdown;')
     self.write('}')
     self.newline()
 
@@ -4896,24 +4923,15 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
     self.write('}')
     self.newline()
 
-  def generate_is_running(self: Self) -> None:
-    self.write('auto LspLanguageServer::isRunning() const -> bool {')
-    with self.indent():
-      self.write('return !_shutdown;')
-    self.write('}')
-    self.newline()
-
   def generate_initialize_params(self: Self) -> None:
-    self.write('auto LspLanguageServer::initializeParams() const -> const InitializeParams & {')
+    self.write('auto LspLanguageServer::initializeParams(')
+    self.write(') const -> const InitializeParams & {')
     with self.indent():
       self.write('if (_initializeParams) {')
       with self.indent():
         self.write('return *_initializeParams;')
       self.write('}')
-      self.write('throw std::logic_error(')
-      with self.indent():
-        self.write('"LspLanguageServer::initialize must be called before LspLanguageServer::initializeParams"')
-      self.write(');')
+      self.write('throw std::logic_error("Server has not been initialized.");')
     self.write('}')
     self.newline()
 
@@ -4996,7 +5014,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                 with self.indent(): self.write(f'transformer.as{request_name}Params(messageParams);')
                 self.write(f'{result_name} result =')
                 with self.indent(): self.write(f'{receive_fn(request_method)}(*requestParams);')
-                self.write(f'response.result = transformer.{lower_first(result_name)}ToAny(result);')
+                self.write(f'response.result =')
+                with self.indent():
+                  self.write(f'transformer.{lower_first(result_name)}ToAny(result);')
                 if is_initialize:
                   self.write('_initializeParams = std::move(requestParams);')
               if is_initialize:
@@ -5015,7 +5035,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
                 self.write('}')
             else:
               self.write(f'{result_name} result = {receive_fn(request_method)}();')
-              self.write(f'response.result = transformer.{lower_first(result_name)}ToAny(result);')
+              self.write(f'response.result =')
+              with self.indent():
+                self.write(f'transformer.{lower_first(result_name)}ToAny(result);')
             self.write('break;')
           self.write('}')
       self.write('default: {')
@@ -5084,6 +5106,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('}')
       self.write('}')
     self.write('}')
+    self.newline()
 
   def generate_dispatch_response(self: Self) -> None:
     self.write('auto LspLanguageServer::dispatch(ResponseMessage &response) -> void {')
@@ -5177,6 +5200,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.write('}')
       self.write('}')
     self.write('}')
+    self.newline()
 
   def generate_require_request_params(self: Self) -> None:
     self.write('auto LspLanguageServer::requireMessageParams(')
@@ -5335,9 +5359,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
         if params_spec is not None:
           self.write(f'auto LspLanguageServer::{send_fn(request_method)}(')
           with self.indent(): self.write(f'{params_spec["name"]} &params')
-          self.write(f') -> void {{')
+          self.write(f') -> int {{')
         else:
-          self.write(f'auto LspLanguageServer::{send_fn(request_method)}() -> void {{')
+          self.write(f'auto LspLanguageServer::{send_fn(request_method)}() -> int {{')
         with self.indent():
           self.write('RequestMessage request;')
           self.write('request.jsonrpc = JSON_RPC_VERSION;')
@@ -5351,9 +5375,12 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           self.write(f'request.method = "{request_method}";')
           if params_spec is not None:
             self.write('request.params = transformer.asMessageParams(params);')
-          self.write('std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);')
+          self.write('std::unique_ptr<LSPAny> any =')
+          with self.indent():
+            self.write('transformer.requestMessageToAny(request);')
           self.write('const std::string message = serializer.serialize(*any);')
           self.write('ls::LanguageServer::send(message);')
+          self.write('return requestId;')
         self.write('}')
         self.newline()
         result_spec = request_spec.get("result", None)
@@ -5371,7 +5398,10 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           self.write(f'auto LspLanguageServer::{receive_fn(request_method)}() -> void {{')
         with self.indent():
           self.write('std::unique_lock<std::mutex> loggerLock(logger.mutex());')
-          self.write(f'logger << "No handler exists for method: \\"{request_method}\\"" << std::endl;')
+          self.write(f'logger')
+          with self.indent():
+            self.write(f'<< "No handler exists for method: \\"{request_method}\\""')
+            self.write(f'<< std::endl;')
         self.write('}')
         self.newline()
 
@@ -5398,7 +5428,9 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
           self.write(f'notification.method = "{notification_method}";')
           if params_spec is not None:
             self.write('notification.params = transformer.asMessageParams(params);')
-          self.write('std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);')
+          self.write('std::unique_ptr<LSPAny> any =')
+          with self.indent():
+            self.write('transformer.notificationMessageToAny(notification);')
           self.write('const std::string message = serializer.serialize(*any);')
           self.write('ls::LanguageServer::send(message);')
         self.write('}')
@@ -5446,10 +5478,7 @@ class CPlusPlusLspLanguageServerSourceGenerator(CPlusPlusFileGenerator):
       self.generate_notify_sent()
       self.generate_synchronized_send()
       self.generate_handle()
-      self.generate_is_initialized()
-      self.generate_is_shutdown()
       self.generate_is_terminated()
-      self.generate_is_running()
       self.generate_initialize_params()
       self.generate_assert_initialized()
       self.generate_assert_running();

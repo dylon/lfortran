@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include <filesystem>
-#include <mutex>
+#include <shared_mutex>
 #include <regex>
 #include <string>
 #include <vector>
@@ -51,7 +51,10 @@ namespace LCompilers::LanguageServerProtocol {
       return _text;
     }
 
-    auto setText(const std::string &text) -> void;
+    inline auto mutex() -> std::shared_mutex & {
+      return _mutex;
+    }
+
     auto apply(
       std::vector<TextDocumentContentChangeEvent> &changes,
       int version
@@ -65,7 +68,7 @@ namespace LCompilers::LanguageServerProtocol {
     fs::path _path;
     std::string buffer;
     std::vector<std::size_t> lineIndices;
-    std::recursive_mutex reentrantMutex;
+    std::shared_mutex _mutex;
 
     auto validateUriAndSetPath() -> void;
     auto indexLines() -> void;

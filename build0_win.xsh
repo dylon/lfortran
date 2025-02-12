@@ -10,4 +10,4 @@ pushd src/lfortran/parser && re2c -W -b tokenizer.re -o tokenizer.cpp && popd
 pushd src/lfortran/parser && re2c -W -b preprocessor.re -o preprocessor.cpp && popd
 pushd src/lfortran/parser && bison -Wall -d -r all parser.yy && popd
 python src/libasr/wasm_instructions_visitor.py
-python generate_lsp_code.py --schema src/lsp/metaModel.json --target-language c++ --output-dir src/lsp
+python src/lsp/generate_lsp_code.py --schema src/lsp/metaModel.json --target-language c++ --output-dir src/lsp

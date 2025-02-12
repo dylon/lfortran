@@ -1,8 +1,15 @@
 #pragma once
 
+#include <libasr/utils.h>
+
 #include <lsp/logger.h>
 #include <lsp/base_lsp_language_server.h>
 #include <lsp/message_queue.h>
+#include <map>
+#include <shared_mutex>
+
+#include <libasr/utils.h>
+
 #include <lsp/specification.h>
 
 #include "bin/lsp/lfortran_accessor.h"
@@ -22,6 +29,8 @@ namespace LCompilers::LanguageServerProtocol {
       const std::string &configSection
     );
   protected:
+
+    auto invalidateConfigCache() -> void override;
 
     // ================= //
     // Incoming Requests //
@@ -58,7 +67,11 @@ namespace LCompilers::LanguageServerProtocol {
   private:
     const std::string source = "lfortran";
     ls::LFortranAccessor lfortran;
-    auto validate(const TextDocument &document) -> void;
+    std::map<DocumentUri, CompilerOptions> optionsByUri;
+    std::shared_mutex optionMutex;
+
+    auto validate(TextDocument &document) -> void;
+    auto getCompilerOptions(const DocumentUri &uri) -> const CompilerOptions &;
   };
 
 } // namespace LCompilers::LanguageServerProtocol

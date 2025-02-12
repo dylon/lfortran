@@ -1,5 +1,4 @@
 #include <stdexcept>
-#include <sstream>
 
 #include <lsp/logger.h>
 
@@ -19,6 +18,64 @@ namespace LCompilers::LanguageServer::Logging {
   Logger::~Logger() {
     if (isOpen()) {
       close();
+    }
+  }
+
+  std::map<Level, std::string> LevelNames = {
+    {Level::OFF, "OFF"},
+    {Level::FATAL, "FATAL"},
+    {Level::ERROR, "ERROR"},
+    {Level::WARN, "WARN"},
+    {Level::INFO, "INFO"},
+    {Level::DEBUG, "DEBUG"},
+    {Level::TRACE, "TRACE"},
+    {Level::ALL, "ALL"},
+  };
+
+  std::map<Level, std::string> LevelValues = {
+    {Level::OFF, "off"},
+    {Level::FATAL, "fatal"},
+    {Level::ERROR, "error"},
+    {Level::WARN, "warn"},
+    {Level::INFO, "info"},
+    {Level::DEBUG, "debug"},
+    {Level::TRACE, "trace"},
+    {Level::ALL, "all"},
+  };
+
+  auto levelByName(const std::string &name) -> Level {
+    for (const auto &[enum_name, enum_value] : LevelNames) {
+      if (name == enum_value) {
+        return enum_name;
+      }
+    }
+    throw std::invalid_argument("Invalid Level name: " + name);
+  }
+
+  auto levelByValue(const std::string &value) -> Level {
+    for (const auto &[enum_name, enum_value] : LevelValues) {
+      if (value == enum_value) {
+        return enum_name;
+      }
+    }
+    throw std::invalid_argument("Invalid Level value: " + value);
+  }
+
+  auto levelByValue(int value) -> Level {
+    for (const auto &[enum_name, enum_value] : LevelNames) {
+      if (value == static_cast<int>(enum_name)) {
+        return enum_name;
+      }
+    }
+    throw std::invalid_argument(
+      "Invalid Level value: " + std::to_string(value)
+    );
+  }
+
+  auto Logger::setLevel(Level level) -> void {
+    Level prevLevel = _level;
+    while (!_level.compare_exchange_strong(prevLevel, level)) {
+      prevLevel = _level;
     }
   }
 

@@ -4,6 +4,8 @@
 #include <lsp/specification.h>
 #include <lsp/lsp_exception.h>
 #include <lsp/base_lsp_language_server.h>
+#include <shared_mutex>
+#include <stdexcept>
 
 namespace LCompilers::LanguageServerProtocol {
 
@@ -24,6 +26,74 @@ namespace LCompilers::LanguageServerProtocol {
     )
   {
     // empty
+  }
+
+  auto BaseLspLanguageServer::getConfig(
+    const DocumentUri &uri,
+    const std::string &configSection
+  ) -> const LSPAny & {
+    std::shared_lock<std::shared_mutex> readLock(configMutex);
+    auto configIter = configsByUri.find(uri);
+    if (configIter != configsByUri.end()) {
+      return *configIter->second;
+    }
+
+    readLock.unlock();
+
+    std::unique_ptr<ConfigurationItem> item =
+      std::make_unique<ConfigurationItem>();
+    item->scopeUri = uri;
+    item->section = configSection;
+
+    ConfigurationParams params;
+    params.items.push_back(std::move(item));
+
+    std::unique_lock<std::shared_mutex> writeLock(configMutex);
+    configIter = configsByUri.find(uri);
+    if (configIter != configsByUri.end()) {
+      return *configIter->second;
+    }
+
+    std::shared_future<std::reference_wrapper<std::unique_ptr<LSPAny>>> future;
+
+    auto pendingIter = pendingConfigsByUri.find(uri);
+    if (pendingIter != pendingConfigsByUri.end()) {
+      future = pendingIter->second.second;
+    } else {
+      int requestId = sendWorkspace_configuration(params);
+      std::promise<std::reference_wrapper<std::unique_ptr<LSPAny>>> promise;
+      future = promise.get_future().share();
+      pendingConfigs.emplace(uri, requestId, std::move(promise));
+      pendingConfigsByUri.emplace(
+        std::piecewise_construct,
+        std::make_tuple(uri),
+        std::make_tuple(requestId, future)
+      );
+    }
+
+    writeLock.unlock();
+
+    if (future.valid()) {
+      future.wait();
+      if (future.valid()) {
+        return *future.get().get();
+      }
+    }
+
+    throw std::runtime_error(
+      "Future config became invalid while waiting for it."
+    );
+  }
+
+  auto BaseLspLanguageServer::invalidateConfigCache() -> void {
+    {
+      std::unique_lock<std::shared_mutex> writeLock(configMutex);
+      configsByUri.clear();
+    }
+    {
+      std::unique_lock<std::mutex> loggerLock(logger.mutex());
+      logger << "Invalidated document configuration cache." << std::endl;
+    }
   }
 
   // ================= //
@@ -94,12 +164,22 @@ namespace LCompilers::LanguageServerProtocol {
     LspLanguageServer::receiveInitialized(params);
     if (clientSupportsWorkspaceDidChangeConfigurationNotifications) {
       const std::string method = "workspace/didChangeConfiguration";
+
+      LSPObject configOptions;
+      configOptions.emplace("section", transformer.stringToAny(configSection));
+
+      std::unique_ptr<LSPAny> options = std::make_unique<LSPAny>();
+      (*options) = std::move(configOptions);
+
       std::unique_ptr<Registration> registration =
         std::make_unique<Registration>();
       registration->id = method;
       registration->method = method;
+      registration->registerOptions = std::move(options);
+
       RegistrationParams params;
       params.registrations.push_back(std::move(registration));
+
       sendClient_registerCapability(params);
     }
   }
@@ -111,24 +191,134 @@ namespace LCompilers::LanguageServerProtocol {
     for (const std::unique_ptr<FileRename> &param : params.files) {
       const std::string &oldUri = param->oldUri;
       const std::string &newUri = param->newUri;
-      std::shared_lock<std::shared_mutex> readLock(documentMutex);
-      auto iter = documentsByUri.find(oldUri);
-      if (iter != documentsByUri.end()) {
-        readLock.unlock();
-        std::unique_lock<std::shared_mutex> writeLock(documentMutex);
-        TextDocument &textDocument = iter->second;
-        documentsByUri.emplace(newUri, std::move(textDocument));
-        documentsByUri.erase(iter);
+      {
+        std::shared_lock<std::shared_mutex> readLock(documentMutex);
+        auto iter = documentsByUri.find(oldUri);
+        if (iter != documentsByUri.end()) {
+          readLock.unlock();
+          std::unique_lock<std::shared_mutex> writeLock(documentMutex);
+          TextDocument &textDocument = iter->second;
+          documentsByUri.emplace(newUri, std::move(textDocument));
+          documentsByUri.erase(iter);
+        }
       }
+    }
+  }
+
+  auto BaseLspLanguageServer::updateLogLevel() -> void {
+    try {
+      std::shared_lock<std::shared_mutex> readLock(workspaceMutex);
+      if (workspaceConfig) {
+        LSPAnyType configType = static_cast<LSPAnyType>(workspaceConfig->index());
+        switch (configType) {
+        case LSPAnyType::OBJECT_TYPE: {
+          const LSPObject &config = std::get<LSPObject>(*workspaceConfig);
+          auto iter = config.find("log");
+          if (iter != config.end()) {
+            LSPAnyType logType = static_cast<LSPAnyType>(iter->second->index());
+            switch (logType) {
+            case LSPAnyType::OBJECT_TYPE: {
+              const LSPObject &logConfig = std::get<LSPObject>(*iter->second);
+              if ((iter = logConfig.find("level")) != logConfig.end()) {
+                LSPAnyType levelType = static_cast<LSPAnyType>(iter->second->index());
+                switch (levelType) {
+                case LSPAnyType::STRING_TYPE: {
+                  const string_t &value = transformer.anyToString(*iter->second);
+                  lsl::Level level = lsl::levelByValue(value);
+                  logger.setLevel(level);
+                  break;
+                }
+                case LSPAnyType::INTEGER_TYPE: {
+                  integer_t value = transformer.anyToInteger(*iter->second);
+                  lsl::Level level = lsl::levelByValue(value);
+                  logger.setLevel(level);
+                  break;
+                }
+                case LSPAnyType::UINTEGER_TYPE: {
+                  uinteger_t value = transformer.anyToUInteger(*iter->second);
+                  lsl::Level level = lsl::levelByValue(static_cast<int>(value));
+                  logger.setLevel(level);
+                  break;
+                }
+                default: {
+                  std::unique_lock<std::mutex> loggerLock(logger.mutex());
+                  logger
+                    << "Unable to update log level of type LSPAnyType::"
+                    << LSPAnyTypeNames.at(levelType)
+                    << std::endl;
+                }
+                }
+              } else {
+                std::unique_lock<std::mutex> loggerLock(logger.mutex());
+                logger << "Config does not have required section: log.level" << std::endl;
+              }
+              break;
+            }
+            default: {
+              std::unique_lock<std::mutex> loggerLock(logger.mutex());
+              logger
+                << "Unsupported log configuration type: LSPAnyType::"
+                << LSPAnyTypeNames.at(logType)
+                << std::endl;
+            }
+            }
+          } else {
+            std::unique_lock<std::mutex> loggerLock(logger.mutex());
+            logger << "Config does not have required section: log" << std::endl;
+          }
+          break;
+        }
+        default: {
+          std::unique_lock<std::mutex> loggerLock(logger.mutex());
+          logger
+            << "Cannot update log level from config of type LSPAnyType::"
+            << LSPAnyTypeNames.at(configType)
+            << std::endl;
+        }
+        }
+      }
+    } catch (std::exception &e) {
+      std::unique_lock<std::mutex> loggerLock(logger.mutex());
+      logger
+        << "Caught unhandled exception while updating log level: " << e.what()
+        << std::endl;
     }
   }
 
   // notification: "workspace/didChangeConfiguration"
   auto BaseLspLanguageServer::receiveWorkspace_didChangeConfiguration(
-    DidChangeConfigurationParams &/*params*/
+    DidChangeConfigurationParams &params
   ) -> void {
-    std::unique_lock<std::shared_mutex> writeLock(configMutex);
-    configsByUri.clear();
+    invalidateConfigCache();
+    LSPAny &settings = *params.settings;
+    LSPAnyType settingsType = static_cast<LSPAnyType>(settings.index());
+    switch (settingsType) {
+    case LSPAnyType::OBJECT_TYPE: {
+      LSPObject &object = std::get<LSPObject>(settings);
+      auto iter = object.find(configSection);
+      if (iter != object.end()) {
+        {
+          std::unique_lock<std::shared_mutex> writeLock(workspaceMutex);
+          workspaceConfig = transformer.copy(iter->second);
+        }
+        updateLogLevel();
+      } else {
+        std::unique_lock<std::mutex> loggerLock;
+        logger
+          << "Unable to locate configuration settings for section: "
+          << configSection
+          << std::endl;
+      }
+      break;
+    }
+    default: {
+      std::unique_lock<std::mutex> loggerLock;
+      logger
+        << "Unsupported settings type: LSPAnyType::"
+        << LSPAnyTypeNames.at(settingsType)
+        << std::endl;
+    }
+    }
   }
 
   // notification: "textDocument/didOpen"
@@ -147,6 +337,32 @@ namespace LCompilers::LanguageServerProtocol {
         std::forward_as_tuple(uri),
         std::forward_as_tuple(uri, languageId, version, text, logger)
       );
+    }
+  }
+
+  // request: "workspace/configuration"
+  auto BaseLspLanguageServer::receiveWorkspace_configuration(
+    WorkspaceConfigurationResult &params
+  ) -> void {
+    for (std::unique_ptr<LSPAny> &config : params) {
+      std::unique_lock<std::shared_mutex> writeLock(configMutex);
+      if (pendingConfigs.empty()) {
+        throw LSP_EXCEPTION(
+          ErrorCodes::INTERNAL_ERROR,
+          "No record exists of this config being requested. Please file a ticket."
+        );
+      }
+      auto &triple = pendingConfigs.front();
+      const DocumentUri &uri = std::get<0>(triple);
+      // const int requestId = std::get<1>(triple);
+      auto &promise = std::get<2>(triple);
+      auto record = configsByUri.emplace(uri, std::move(config));
+      promise.set_value(std::ref(record.first->second));
+      auto pendingIter = pendingConfigsByUri.find(uri);
+      if (pendingIter != pendingConfigsByUri.end()) {
+        pendingConfigsByUri.erase(pendingIter);
+      }
+      pendingConfigs.pop();
     }
   }
 
@@ -173,8 +389,8 @@ namespace LCompilers::LanguageServerProtocol {
     {
       std::shared_lock<std::shared_mutex> readLock(documentMutex);
       auto pos = documentsByUri.find(uri);
-      readLock.unlock();
       if (pos != documentsByUri.end()) {
+        readLock.unlock();
         std::unique_lock<std::shared_mutex> writeLock(documentMutex);
         pos = documentsByUri.find(uri);
         if (pos != documentsByUri.end()) {

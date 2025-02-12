@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <mutex>
 #include <stdexcept>
 
 #include <lsp/lsp_exception.h>
@@ -43,12 +42,6 @@ namespace LCompilers::LanguageServerProtocol {
     _path = fs::canonical(path);
   }
 
-  auto TextDocument::setText(const std::string &text) -> void {
-    std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
-    _text = text;
-    indexLines();
-  }
-
   auto TextDocument::apply(
     std::vector<TextDocumentContentChangeEvent> &changes,
     int version
@@ -61,28 +54,27 @@ namespace LCompilers::LanguageServerProtocol {
       }
     );
 
-    {
-      std::unique_lock<std::recursive_mutex> reentrantock(reentrantMutex);
+    std::unique_lock<std::shared_mutex> writeLock(_mutex);
 
-      buffer.clear();
-      std::size_t i = 0;
-      for (const auto &change : changes) {
-        std::size_t j;
-        std::size_t k;
-        std::string patch;
-        decompose(change, j, k, patch);
-        if (i < _text.length()) {
-          buffer.append(_text.substr(i, (j - i)));
-        }
-        buffer.append(patch);
-        i = k;
-      }
+    buffer.clear();
+    std::size_t i = 0;
+    for (const auto &change : changes) {
+      std::size_t j;
+      std::size_t k;
+      std::string patch;
+      decompose(change, j, k, patch);
       if (i < _text.length()) {
-        buffer.append(_text.substr(i, (_text.length() - i)));
+        buffer.append(_text.substr(i, (j - i)));
       }
-      setText(buffer);
-      _version = version;
+      buffer.append(patch);
+      i = k;
     }
+    if (i < _text.length()) {
+      buffer.append(_text.substr(i, (_text.length() - i)));
+    }
+    _text = buffer;
+    indexLines();
+    _version = version;
   }
 
   auto TextDocument::indexLines() -> void {

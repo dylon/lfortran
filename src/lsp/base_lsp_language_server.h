@@ -1,7 +1,12 @@
 #pragma once
 
+#include <functional>
+#include <future>
 #include <map>
+#include <queue>
 #include <shared_mutex>
+#include <tuple>
+#include <utility>
 
 #include <lsp/logger.h>
 #include <lsp/lsp_language_server.h>
@@ -24,10 +29,33 @@ namespace LCompilers::LanguageServerProtocol {
     std::map<DocumentUri, TextDocument> documentsByUri;
     std::shared_mutex documentMutex;
     std::map<DocumentUri, std::unique_ptr<LSPAny>> configsByUri;
+    std::map<
+      DocumentUri,
+      std::pair<int, std::shared_future<std::reference_wrapper<std::unique_ptr<LSPAny>>>>
+    > pendingConfigsByUri;
+    std::queue<
+      std::tuple<DocumentUri, int, std::promise<std::reference_wrapper<std::unique_ptr<LSPAny>>>>
+    > pendingConfigs;
     std::shared_mutex configMutex;
+    std::unique_ptr<LSPAny> workspaceConfig;
+    std::shared_mutex workspaceMutex;
 
     bool clientSupportsWorkspaceDidChangeConfigurationNotifications = false;
     bool clientSupportsWorkspaceConfigurationRequests = false;
+
+    auto getConfig(
+      const DocumentUri &uri,
+      const std::string &configSection
+    ) -> const LSPAny &;
+
+    inline auto getConfig(
+      const DocumentUri &uri
+    ) -> const LSPAny & {
+      return getConfig(uri, configSection);
+    }
+
+    virtual auto invalidateConfigCache() -> void;
+    auto updateLogLevel() -> void;
 
     // ================= //
     // Incoming Requests //
@@ -51,6 +79,10 @@ namespace LCompilers::LanguageServerProtocol {
 
     void receiveWorkspace_didChangeConfiguration(
       DidChangeConfigurationParams &params
+    ) override;
+
+    void receiveWorkspace_configuration(
+      WorkspaceConfigurationResult &params
     ) override;
 
     void receiveTextDocument_didOpen(

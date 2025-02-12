@@ -22,4 +22,3 @@ set(LCOMPILERS_LSP_SRC
 add_library(lcompilers_lsp STATIC ${LCOMPILERS_LSP_SRC})
 target_include_directories(lcompilers_lsp BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_include_directories(lcompilers_lsp BEFORE PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/..)
-target_link_libraries(lcompilers_lsp asr)

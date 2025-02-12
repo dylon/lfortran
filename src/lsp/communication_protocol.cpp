@@ -30,33 +30,35 @@ namespace LCompilers::LanguageServer {
     try {
       do {
         const std::string message = incomingMessages.dequeue();
-        {
+        if (logger.isTraceEnabled()) {
           std::unique_lock<std::mutex> loggerLock(logger.mutex());
-          logger
-            << std::endl
-            << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl
-            << ">>>>>>>>>>>>>>  OUTGOING  >>>>>>>>>>>>>>" << std::endl
-            << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-          std::string::size_type position = 0;
-          std::string::size_type index = message.find('\n', position);
-          if (index != std::string::npos) {
-            std::string::size_type length = (index - position) - 1;
-            std::string_view line(message.data() + position, length);
-            logger << ">>> " << line << std::endl;
-            position = index + 1;
-            while ((index = message.find('\n', position)) != std::string::npos) {
-              length = (index - position) - 1;
-              line = std::string_view(message.data() + position, length);
+          if (logger.isTraceEnabled()) {
+            logger
+              << std::endl
+              << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl
+              << ">>>>>>>>>>>>>>  OUTGOING  >>>>>>>>>>>>>>" << std::endl
+              << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+            std::string::size_type position = 0;
+            std::string::size_type index = message.find('\n', position);
+            if (index != std::string::npos) {
+              std::string::size_type length = (index - position) - 1;
+              std::string_view line(message.data() + position, length);
               logger << ">>> " << line << std::endl;
               position = index + 1;
+              while ((index = message.find('\n', position)) != std::string::npos) {
+                length = (index - position) - 1;
+                line = std::string_view(message.data() + position, length);
+                logger << ">>> " << line << std::endl;
+                position = index + 1;
+              }
+              length = (message.length() - position);
+              if (length > 0) {
+                line = std::string_view(message.data() + position, length);
+                logger << ">>> " << line << std::endl;
+              }
+            } else {
+              logger << ">>> " << message << std::endl;
             }
-            length = (message.length() - position);
-            if (length > 0) {
-              line = std::string_view(message.data() + position, length);
-              logger << ">>> " << line << std::endl;
-            }
-          } else {
-            logger << ">>> " << message << std::endl;
           }
         }
         std::cout << message << std::flush;
@@ -103,7 +105,9 @@ namespace LCompilers::LanguageServer {
     running = false;
     incomingMessages.stopNow();
     languageServer.join();
-    listener.join();
+    if (listener.joinable()) {
+      listener.join();
+    }
     {
       std::unique_lock<std::mutex> loggerLock(logger.mutex());
       logger << "[CommunicationProtocol] Terminated." << std::endl;

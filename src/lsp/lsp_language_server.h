@@ -32,10 +32,20 @@ namespace LCompilers::LanguageServerProtocol {
       lsl::Logger &logger,
       const std::string &configSection
     );
-    auto isInitialized() const -> bool;
-    auto isShutdown() const -> bool;
+
+    inline auto isInitialized() const -> bool {
+      return _initialized;
+    }
+
+    inline auto isShutdown() const -> bool {
+      return _shutdown;
+    }
+
+    inline auto isRunning() const -> bool {
+      return !_shutdown;
+    }
+
     bool isTerminated() const override;
-    auto isRunning() const -> bool;
   protected:
     const std::string configSection;
     std::thread listener;
@@ -66,8 +76,14 @@ namespace LCompilers::LanguageServerProtocol {
     void join() override;
     auto listen() -> void;
     auto notifySent() -> void;
-    auto send(const std::string &request, std::size_t sendId) -> void;
-    auto handle(const std::string &request, std::size_t sendId) -> void;
+    auto send(
+      const std::string &request,
+      std::size_t sendId
+    ) -> void;
+    auto handle(
+      const std::string &request,
+      std::size_t sendId
+    ) -> void;
     auto initializeParams() const -> const InitializeParams &;
     auto assertInitialized() -> void;
     auto assertRunning() -> void;
@@ -770,7 +786,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * The `workspace/workspaceFolders` is sent from the server to the client to fetch the open workspace folders.
      */
-    virtual auto sendWorkspace_workspaceFolders() -> void;
+    virtual auto sendWorkspace_workspaceFolders() -> int;
 
     /**
      * The `workspace/workspaceFolders` is sent from the server to the client to fetch the open workspace folders.
@@ -790,7 +806,7 @@ namespace LCompilers::LanguageServerProtocol {
      */
     virtual auto sendWorkspace_configuration(
       ConfigurationParams &params
-    ) -> void;
+    ) -> int;
 
     /**
      * The 'workspace/configuration' request is sent from the server to the client to fetch a certain
@@ -809,7 +825,7 @@ namespace LCompilers::LanguageServerProtocol {
      * @since 3.18.0
      * @proposed
      */
-    virtual auto sendWorkspace_foldingRange_refresh() -> void;
+    virtual auto sendWorkspace_foldingRange_refresh() -> int;
 
     /**
      * @since 3.18.0
@@ -825,7 +841,7 @@ namespace LCompilers::LanguageServerProtocol {
      */
     virtual auto sendWindow_workDoneProgress_create(
       WorkDoneProgressCreateParams &params
-    ) -> void;
+    ) -> int;
 
     /**
      * The `window/workDoneProgress/create` request is sent from the server to the client to initiate progress
@@ -838,7 +854,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * @since 3.16.0
      */
-    virtual auto sendWorkspace_semanticTokens_refresh() -> void;
+    virtual auto sendWorkspace_semanticTokens_refresh() -> int;
 
     /**
      * @since 3.16.0
@@ -857,7 +873,7 @@ namespace LCompilers::LanguageServerProtocol {
      */
     virtual auto sendWindow_showDocument(
       ShowDocumentParams &params
-    ) -> void;
+    ) -> int;
 
     /**
      * A request to show a document. This request might open an
@@ -874,7 +890,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * @since 3.17.0
      */
-    virtual auto sendWorkspace_inlineValue_refresh() -> void;
+    virtual auto sendWorkspace_inlineValue_refresh() -> int;
 
     /**
      * @since 3.17.0
@@ -886,7 +902,7 @@ namespace LCompilers::LanguageServerProtocol {
     /**
      * @since 3.17.0
      */
-    virtual auto sendWorkspace_inlayHint_refresh() -> void;
+    virtual auto sendWorkspace_inlayHint_refresh() -> int;
 
     /**
      * @since 3.17.0
@@ -900,7 +916,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.17.0
      */
-    virtual auto sendWorkspace_diagnostic_refresh() -> void;
+    virtual auto sendWorkspace_diagnostic_refresh() -> int;
 
     /**
      * The diagnostic refresh request definition.
@@ -917,7 +933,7 @@ namespace LCompilers::LanguageServerProtocol {
      */
     virtual auto sendClient_registerCapability(
       RegistrationParams &params
-    ) -> void;
+    ) -> int;
 
     /**
      * The `client/registerCapability` request is sent from the server to the client to register a new capability
@@ -933,7 +949,7 @@ namespace LCompilers::LanguageServerProtocol {
      */
     virtual auto sendClient_unregisterCapability(
       UnregistrationParams &params
-    ) -> void;
+    ) -> int;
 
     /**
      * The `client/unregisterCapability` request is sent from the server to the client to unregister a previously registered capability
@@ -949,7 +965,7 @@ namespace LCompilers::LanguageServerProtocol {
      */
     virtual auto sendWindow_showMessageRequest(
       ShowMessageRequestParams &params
-    ) -> void;
+    ) -> int;
 
     /**
      * The show message request is sent from the server to the client to show a message
@@ -964,7 +980,7 @@ namespace LCompilers::LanguageServerProtocol {
      *
      * @since 3.16.0
      */
-    virtual auto sendWorkspace_codeLens_refresh() -> void;
+    virtual auto sendWorkspace_codeLens_refresh() -> int;
 
     /**
      * A request to refresh all code actions
@@ -980,7 +996,7 @@ namespace LCompilers::LanguageServerProtocol {
      */
     virtual auto sendWorkspace_applyEdit(
       ApplyWorkspaceEditParams &params
-    ) -> void;
+    ) -> int;
 
     /**
      * A request sent from the server to the client to modified certain resources.

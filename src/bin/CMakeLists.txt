@@ -1,4 +1,5 @@
 set(LFORTRAN_SRC
+  utils.cpp
   lfortran.cpp
 )
 set(LFORTRAN_LINK_LIBRARIES
@@ -17,7 +18,6 @@ if (WITH_LSP)
   )
   set(LFORTRAN_LINK_LIBRARIES
     ${LFORTRAN_LINK_LIBRARIES}
-    asr
     lcompilers_lsp
   )
 endif()

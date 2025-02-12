@@ -8,7 +8,7 @@ namespace LCompilers::LanguageServerProtocol {
 
   std::string LspJsonSerializer::serialize(const LSPAny &any) const {
     std::string buffer;
-    buffer.reserve(32768);
+    buffer.reserve(4096);
     LSPAnyType anyType = static_cast<LSPAnyType>(any.index());
     switch (anyType) {
     case LSPAnyType::OBJECT_TYPE: {

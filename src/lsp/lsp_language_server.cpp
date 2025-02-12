@@ -39,7 +39,9 @@ namespace LCompilers::LanguageServerProtocol {
   }
 
   auto LspLanguageServer::join() -> void {
-    listener.join();
+    if (listener.joinable()) {
+      listener.join();
+    }
     requestPool.join();
     workerPool.join();
   }
@@ -104,13 +106,13 @@ namespace LCompilers::LanguageServerProtocol {
     // to implement a sort of dependency graph. Without knowledge of their
     // dependencies, we must respond to all requests in order of receipt.
     // -------------------------------------------------------------------------
-    while ((pendingSendId < sendId) && !_exit) {
+    {
       std::unique_lock<std::mutex> sentLock(sentMutex);
-      if ((pendingSendId < sendId) && !_exit) {
-        sent.wait(sentLock);
-      }
+      sent.wait(sentLock, [this, sendId]{
+        return (pendingSendId == sendId) || _exit;
+      });
     }
-    if (!_exit) {
+    if ((pendingSendId == sendId) && !_exit) {
       ls::LanguageServer::send(message);
       notifySent();
     }
@@ -218,7 +220,8 @@ namespace LCompilers::LanguageServerProtocol {
         break;
       }
       case ErrorCodeType::LSP_ERROR_CODES: {
-        LSPErrorCodes errorCode = std::get<LSPErrorCodes>(e.code());
+        LSPErrorCodes errorCode =
+          std::get<LSPErrorCodes>(e.code());
         error->code = static_cast<int>(errorCode);
         break;
       }
@@ -228,43 +231,34 @@ namespace LCompilers::LanguageServerProtocol {
     } catch (const std::exception &e) {
       {
         std::unique_lock<std::mutex> loggerLock(logger.mutex());
-        logger << "Caught unhandled exception: " << e.what() << std::endl;
+        logger
+          << "Caught unhandled exception: "
+          << e.what() << std::endl;
       }
       std::unique_ptr<ResponseError> error =
         std::make_unique<ResponseError>();
       error->code = static_cast<int>(ErrorCodes::INTERNAL_ERROR);
       error->message =
-        "An unexpected exception occurred. If it continues, please file a ticket.";
+        ("An unexpected exception occurred. If it continues, "
+         "please file a ticket.");
       response.error = std::move(error);
     }
-    std::unique_ptr<LSPAny> any = transformer.responseMessageToAny(response);
+    std::unique_ptr<LSPAny> any =
+      transformer.responseMessageToAny(response);
     const std::string message = serializer.serialize(*any);
     send(message, sendId);
-  }
-
-  auto LspLanguageServer::isInitialized() const -> bool {
-    return _initialized;
-  }
-
-  auto LspLanguageServer::isShutdown() const -> bool {
-    return _shutdown;
   }
 
   auto LspLanguageServer::isTerminated() const -> bool {
     return _exit;
   }
 
-  auto LspLanguageServer::isRunning() const -> bool {
-    return !_shutdown;
-  }
-
-  auto LspLanguageServer::initializeParams() const -> const InitializeParams & {
+  auto LspLanguageServer::initializeParams(
+  ) const -> const InitializeParams & {
     if (_initializeParams) {
       return *_initializeParams;
     }
-    throw std::logic_error(
-      "LspLanguageServer::initialize must be called before LspLanguageServer::initializeParams"
-    );
+    throw std::logic_error("Server has not been initialized.");
   }
 
   auto LspLanguageServer::assertInitialized() -> void{
@@ -326,7 +320,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentImplementationParams(messageParams);
       TextDocumentImplementationResult result =
         receiveTextDocument_implementation(*requestParams);
-      response.result = transformer.textDocumentImplementationResultToAny(result);
+      response.result =
+        transformer.textDocumentImplementationResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_TYPE_DEFINITION: {
@@ -335,7 +330,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentTypeDefinitionParams(messageParams);
       TextDocumentTypeDefinitionResult result =
         receiveTextDocument_typeDefinition(*requestParams);
-      response.result = transformer.textDocumentTypeDefinitionResultToAny(result);
+      response.result =
+        transformer.textDocumentTypeDefinitionResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_DOCUMENT_COLOR: {
@@ -344,7 +340,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentDocumentColorParams(messageParams);
       TextDocumentDocumentColorResult result =
         receiveTextDocument_documentColor(*requestParams);
-      response.result = transformer.textDocumentDocumentColorResultToAny(result);
+      response.result =
+        transformer.textDocumentDocumentColorResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_COLOR_PRESENTATION: {
@@ -353,7 +350,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentColorPresentationParams(messageParams);
       TextDocumentColorPresentationResult result =
         receiveTextDocument_colorPresentation(*requestParams);
-      response.result = transformer.textDocumentColorPresentationResultToAny(result);
+      response.result =
+        transformer.textDocumentColorPresentationResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_FOLDING_RANGE: {
@@ -362,7 +360,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentFoldingRangeParams(messageParams);
       TextDocumentFoldingRangeResult result =
         receiveTextDocument_foldingRange(*requestParams);
-      response.result = transformer.textDocumentFoldingRangeResultToAny(result);
+      response.result =
+        transformer.textDocumentFoldingRangeResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_DECLARATION: {
@@ -371,7 +370,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentDeclarationParams(messageParams);
       TextDocumentDeclarationResult result =
         receiveTextDocument_declaration(*requestParams);
-      response.result = transformer.textDocumentDeclarationResultToAny(result);
+      response.result =
+        transformer.textDocumentDeclarationResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_SELECTION_RANGE: {
@@ -380,7 +380,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentSelectionRangeParams(messageParams);
       TextDocumentSelectionRangeResult result =
         receiveTextDocument_selectionRange(*requestParams);
-      response.result = transformer.textDocumentSelectionRangeResultToAny(result);
+      response.result =
+        transformer.textDocumentSelectionRangeResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_PREPARE_CALL_HIERARCHY: {
@@ -389,7 +390,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentPrepareCallHierarchyParams(messageParams);
       TextDocumentPrepareCallHierarchyResult result =
         receiveTextDocument_prepareCallHierarchy(*requestParams);
-      response.result = transformer.textDocumentPrepareCallHierarchyResultToAny(result);
+      response.result =
+        transformer.textDocumentPrepareCallHierarchyResultToAny(result);
       break;
     }
     case IncomingRequest::CALL_HIERARCHY_INCOMING_CALLS: {
@@ -398,7 +400,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asCallHierarchyIncomingCallsParams(messageParams);
       CallHierarchyIncomingCallsResult result =
         receiveCallHierarchy_incomingCalls(*requestParams);
-      response.result = transformer.callHierarchyIncomingCallsResultToAny(result);
+      response.result =
+        transformer.callHierarchyIncomingCallsResultToAny(result);
       break;
     }
     case IncomingRequest::CALL_HIERARCHY_OUTGOING_CALLS: {
@@ -407,7 +410,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asCallHierarchyOutgoingCallsParams(messageParams);
       CallHierarchyOutgoingCallsResult result =
         receiveCallHierarchy_outgoingCalls(*requestParams);
-      response.result = transformer.callHierarchyOutgoingCallsResultToAny(result);
+      response.result =
+        transformer.callHierarchyOutgoingCallsResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL: {
@@ -416,7 +420,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentSemanticTokensFullParams(messageParams);
       TextDocumentSemanticTokensFullResult result =
         receiveTextDocument_semanticTokens_full(*requestParams);
-      response.result = transformer.textDocumentSemanticTokensFullResultToAny(result);
+      response.result =
+        transformer.textDocumentSemanticTokensFullResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_SEMANTIC_TOKENS_FULL_DELTA: {
@@ -425,7 +430,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentSemanticTokensFullDeltaParams(messageParams);
       TextDocumentSemanticTokensFullDeltaResult result =
         receiveTextDocument_semanticTokens_full_delta(*requestParams);
-      response.result = transformer.textDocumentSemanticTokensFullDeltaResultToAny(result);
+      response.result =
+        transformer.textDocumentSemanticTokensFullDeltaResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_SEMANTIC_TOKENS_RANGE: {
@@ -434,7 +440,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentSemanticTokensRangeParams(messageParams);
       TextDocumentSemanticTokensRangeResult result =
         receiveTextDocument_semanticTokens_range(*requestParams);
-      response.result = transformer.textDocumentSemanticTokensRangeResultToAny(result);
+      response.result =
+        transformer.textDocumentSemanticTokensRangeResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_LINKED_EDITING_RANGE: {
@@ -443,7 +450,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentLinkedEditingRangeParams(messageParams);
       TextDocumentLinkedEditingRangeResult result =
         receiveTextDocument_linkedEditingRange(*requestParams);
-      response.result = transformer.textDocumentLinkedEditingRangeResultToAny(result);
+      response.result =
+        transformer.textDocumentLinkedEditingRangeResultToAny(result);
       break;
     }
     case IncomingRequest::WORKSPACE_WILL_CREATE_FILES: {
@@ -452,7 +460,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asWorkspaceWillCreateFilesParams(messageParams);
       WorkspaceWillCreateFilesResult result =
         receiveWorkspace_willCreateFiles(*requestParams);
-      response.result = transformer.workspaceWillCreateFilesResultToAny(result);
+      response.result =
+        transformer.workspaceWillCreateFilesResultToAny(result);
       break;
     }
     case IncomingRequest::WORKSPACE_WILL_RENAME_FILES: {
@@ -461,7 +470,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asWorkspaceWillRenameFilesParams(messageParams);
       WorkspaceWillRenameFilesResult result =
         receiveWorkspace_willRenameFiles(*requestParams);
-      response.result = transformer.workspaceWillRenameFilesResultToAny(result);
+      response.result =
+        transformer.workspaceWillRenameFilesResultToAny(result);
       break;
     }
     case IncomingRequest::WORKSPACE_WILL_DELETE_FILES: {
@@ -470,7 +480,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asWorkspaceWillDeleteFilesParams(messageParams);
       WorkspaceWillDeleteFilesResult result =
         receiveWorkspace_willDeleteFiles(*requestParams);
-      response.result = transformer.workspaceWillDeleteFilesResultToAny(result);
+      response.result =
+        transformer.workspaceWillDeleteFilesResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_MONIKER: {
@@ -479,7 +490,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentMonikerParams(messageParams);
       TextDocumentMonikerResult result =
         receiveTextDocument_moniker(*requestParams);
-      response.result = transformer.textDocumentMonikerResultToAny(result);
+      response.result =
+        transformer.textDocumentMonikerResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_PREPARE_TYPE_HIERARCHY: {
@@ -488,7 +500,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentPrepareTypeHierarchyParams(messageParams);
       TextDocumentPrepareTypeHierarchyResult result =
         receiveTextDocument_prepareTypeHierarchy(*requestParams);
-      response.result = transformer.textDocumentPrepareTypeHierarchyResultToAny(result);
+      response.result =
+        transformer.textDocumentPrepareTypeHierarchyResultToAny(result);
       break;
     }
     case IncomingRequest::TYPE_HIERARCHY_SUPERTYPES: {
@@ -497,7 +510,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTypeHierarchySupertypesParams(messageParams);
       TypeHierarchySupertypesResult result =
         receiveTypeHierarchy_supertypes(*requestParams);
-      response.result = transformer.typeHierarchySupertypesResultToAny(result);
+      response.result =
+        transformer.typeHierarchySupertypesResultToAny(result);
       break;
     }
     case IncomingRequest::TYPE_HIERARCHY_SUBTYPES: {
@@ -506,7 +520,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTypeHierarchySubtypesParams(messageParams);
       TypeHierarchySubtypesResult result =
         receiveTypeHierarchy_subtypes(*requestParams);
-      response.result = transformer.typeHierarchySubtypesResultToAny(result);
+      response.result =
+        transformer.typeHierarchySubtypesResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_INLINE_VALUE: {
@@ -515,7 +530,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentInlineValueParams(messageParams);
       TextDocumentInlineValueResult result =
         receiveTextDocument_inlineValue(*requestParams);
-      response.result = transformer.textDocumentInlineValueResultToAny(result);
+      response.result =
+        transformer.textDocumentInlineValueResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_INLAY_HINT: {
@@ -524,7 +540,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentInlayHintParams(messageParams);
       TextDocumentInlayHintResult result =
         receiveTextDocument_inlayHint(*requestParams);
-      response.result = transformer.textDocumentInlayHintResultToAny(result);
+      response.result =
+        transformer.textDocumentInlayHintResultToAny(result);
       break;
     }
     case IncomingRequest::INLAY_HINT_RESOLVE: {
@@ -533,7 +550,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asInlayHintResolveParams(messageParams);
       InlayHintResolveResult result =
         receiveInlayHint_resolve(*requestParams);
-      response.result = transformer.inlayHintResolveResultToAny(result);
+      response.result =
+        transformer.inlayHintResolveResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_DIAGNOSTIC: {
@@ -542,7 +560,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentDiagnosticParams(messageParams);
       TextDocumentDiagnosticResult result =
         receiveTextDocument_diagnostic(*requestParams);
-      response.result = transformer.textDocumentDiagnosticResultToAny(result);
+      response.result =
+        transformer.textDocumentDiagnosticResultToAny(result);
       break;
     }
     case IncomingRequest::WORKSPACE_DIAGNOSTIC: {
@@ -551,7 +570,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asWorkspaceDiagnosticParams(messageParams);
       WorkspaceDiagnosticResult result =
         receiveWorkspace_diagnostic(*requestParams);
-      response.result = transformer.workspaceDiagnosticResultToAny(result);
+      response.result =
+        transformer.workspaceDiagnosticResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_INLINE_COMPLETION: {
@@ -560,7 +580,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentInlineCompletionParams(messageParams);
       TextDocumentInlineCompletionResult result =
         receiveTextDocument_inlineCompletion(*requestParams);
-      response.result = transformer.textDocumentInlineCompletionResultToAny(result);
+      response.result =
+        transformer.textDocumentInlineCompletionResultToAny(result);
       break;
     }
     case IncomingRequest::INITIALIZE: {
@@ -570,7 +591,8 @@ namespace LCompilers::LanguageServerProtocol {
           transformer.asInitializeParams(messageParams);
         InitializeResult result =
           receiveInitialize(*requestParams);
-        response.result = transformer.initializeResultToAny(result);
+        response.result =
+          transformer.initializeResultToAny(result);
         _initializeParams = std::move(requestParams);
       } catch (LspException &e) {
         bool expected = true;
@@ -586,7 +608,8 @@ namespace LCompilers::LanguageServerProtocol {
     }
     case IncomingRequest::SHUTDOWN: {
       ShutdownResult result = receiveShutdown();
-      response.result = transformer.shutdownResultToAny(result);
+      response.result =
+        transformer.shutdownResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_WILL_SAVE_WAIT_UNTIL: {
@@ -595,7 +618,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentWillSaveWaitUntilParams(messageParams);
       TextDocumentWillSaveWaitUntilResult result =
         receiveTextDocument_willSaveWaitUntil(*requestParams);
-      response.result = transformer.textDocumentWillSaveWaitUntilResultToAny(result);
+      response.result =
+        transformer.textDocumentWillSaveWaitUntilResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_COMPLETION: {
@@ -604,7 +628,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentCompletionParams(messageParams);
       TextDocumentCompletionResult result =
         receiveTextDocument_completion(*requestParams);
-      response.result = transformer.textDocumentCompletionResultToAny(result);
+      response.result =
+        transformer.textDocumentCompletionResultToAny(result);
       break;
     }
     case IncomingRequest::COMPLETION_ITEM_RESOLVE: {
@@ -613,7 +638,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asCompletionItemResolveParams(messageParams);
       CompletionItemResolveResult result =
         receiveCompletionItem_resolve(*requestParams);
-      response.result = transformer.completionItemResolveResultToAny(result);
+      response.result =
+        transformer.completionItemResolveResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_HOVER: {
@@ -622,7 +648,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentHoverParams(messageParams);
       TextDocumentHoverResult result =
         receiveTextDocument_hover(*requestParams);
-      response.result = transformer.textDocumentHoverResultToAny(result);
+      response.result =
+        transformer.textDocumentHoverResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_SIGNATURE_HELP: {
@@ -631,7 +658,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentSignatureHelpParams(messageParams);
       TextDocumentSignatureHelpResult result =
         receiveTextDocument_signatureHelp(*requestParams);
-      response.result = transformer.textDocumentSignatureHelpResultToAny(result);
+      response.result =
+        transformer.textDocumentSignatureHelpResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_DEFINITION: {
@@ -640,7 +668,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentDefinitionParams(messageParams);
       TextDocumentDefinitionResult result =
         receiveTextDocument_definition(*requestParams);
-      response.result = transformer.textDocumentDefinitionResultToAny(result);
+      response.result =
+        transformer.textDocumentDefinitionResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_REFERENCES: {
@@ -649,7 +678,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentReferencesParams(messageParams);
       TextDocumentReferencesResult result =
         receiveTextDocument_references(*requestParams);
-      response.result = transformer.textDocumentReferencesResultToAny(result);
+      response.result =
+        transformer.textDocumentReferencesResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_DOCUMENT_HIGHLIGHT: {
@@ -658,7 +688,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentDocumentHighlightParams(messageParams);
       TextDocumentDocumentHighlightResult result =
         receiveTextDocument_documentHighlight(*requestParams);
-      response.result = transformer.textDocumentDocumentHighlightResultToAny(result);
+      response.result =
+        transformer.textDocumentDocumentHighlightResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_DOCUMENT_SYMBOL: {
@@ -667,7 +698,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentDocumentSymbolParams(messageParams);
       TextDocumentDocumentSymbolResult result =
         receiveTextDocument_documentSymbol(*requestParams);
-      response.result = transformer.textDocumentDocumentSymbolResultToAny(result);
+      response.result =
+        transformer.textDocumentDocumentSymbolResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_CODE_ACTION: {
@@ -676,7 +708,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentCodeActionParams(messageParams);
       TextDocumentCodeActionResult result =
         receiveTextDocument_codeAction(*requestParams);
-      response.result = transformer.textDocumentCodeActionResultToAny(result);
+      response.result =
+        transformer.textDocumentCodeActionResultToAny(result);
       break;
     }
     case IncomingRequest::CODE_ACTION_RESOLVE: {
@@ -685,7 +718,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asCodeActionResolveParams(messageParams);
       CodeActionResolveResult result =
         receiveCodeAction_resolve(*requestParams);
-      response.result = transformer.codeActionResolveResultToAny(result);
+      response.result =
+        transformer.codeActionResolveResultToAny(result);
       break;
     }
     case IncomingRequest::WORKSPACE_SYMBOL: {
@@ -694,7 +728,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asWorkspaceSymbolParams(messageParams);
       WorkspaceSymbolResult result =
         receiveWorkspace_symbol(*requestParams);
-      response.result = transformer.workspaceSymbolResultToAny(result);
+      response.result =
+        transformer.workspaceSymbolResultToAny(result);
       break;
     }
     case IncomingRequest::WORKSPACE_SYMBOL_RESOLVE: {
@@ -703,7 +738,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asWorkspaceSymbolResolveParams(messageParams);
       WorkspaceSymbolResolveResult result =
         receiveWorkspaceSymbol_resolve(*requestParams);
-      response.result = transformer.workspaceSymbolResolveResultToAny(result);
+      response.result =
+        transformer.workspaceSymbolResolveResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_CODE_LENS: {
@@ -712,7 +748,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentCodeLensParams(messageParams);
       TextDocumentCodeLensResult result =
         receiveTextDocument_codeLens(*requestParams);
-      response.result = transformer.textDocumentCodeLensResultToAny(result);
+      response.result =
+        transformer.textDocumentCodeLensResultToAny(result);
       break;
     }
     case IncomingRequest::CODE_LENS_RESOLVE: {
@@ -721,7 +758,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asCodeLensResolveParams(messageParams);
       CodeLensResolveResult result =
         receiveCodeLens_resolve(*requestParams);
-      response.result = transformer.codeLensResolveResultToAny(result);
+      response.result =
+        transformer.codeLensResolveResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_DOCUMENT_LINK: {
@@ -730,7 +768,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentDocumentLinkParams(messageParams);
       TextDocumentDocumentLinkResult result =
         receiveTextDocument_documentLink(*requestParams);
-      response.result = transformer.textDocumentDocumentLinkResultToAny(result);
+      response.result =
+        transformer.textDocumentDocumentLinkResultToAny(result);
       break;
     }
     case IncomingRequest::DOCUMENT_LINK_RESOLVE: {
@@ -739,7 +778,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asDocumentLinkResolveParams(messageParams);
       DocumentLinkResolveResult result =
         receiveDocumentLink_resolve(*requestParams);
-      response.result = transformer.documentLinkResolveResultToAny(result);
+      response.result =
+        transformer.documentLinkResolveResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_FORMATTING: {
@@ -748,7 +788,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentFormattingParams(messageParams);
       TextDocumentFormattingResult result =
         receiveTextDocument_formatting(*requestParams);
-      response.result = transformer.textDocumentFormattingResultToAny(result);
+      response.result =
+        transformer.textDocumentFormattingResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_RANGE_FORMATTING: {
@@ -757,7 +798,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentRangeFormattingParams(messageParams);
       TextDocumentRangeFormattingResult result =
         receiveTextDocument_rangeFormatting(*requestParams);
-      response.result = transformer.textDocumentRangeFormattingResultToAny(result);
+      response.result =
+        transformer.textDocumentRangeFormattingResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_RANGES_FORMATTING: {
@@ -766,7 +808,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentRangesFormattingParams(messageParams);
       TextDocumentRangesFormattingResult result =
         receiveTextDocument_rangesFormatting(*requestParams);
-      response.result = transformer.textDocumentRangesFormattingResultToAny(result);
+      response.result =
+        transformer.textDocumentRangesFormattingResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_ON_TYPE_FORMATTING: {
@@ -775,7 +818,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentOnTypeFormattingParams(messageParams);
       TextDocumentOnTypeFormattingResult result =
         receiveTextDocument_onTypeFormatting(*requestParams);
-      response.result = transformer.textDocumentOnTypeFormattingResultToAny(result);
+      response.result =
+        transformer.textDocumentOnTypeFormattingResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_RENAME: {
@@ -784,7 +828,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentRenameParams(messageParams);
       TextDocumentRenameResult result =
         receiveTextDocument_rename(*requestParams);
-      response.result = transformer.textDocumentRenameResultToAny(result);
+      response.result =
+        transformer.textDocumentRenameResultToAny(result);
       break;
     }
     case IncomingRequest::TEXT_DOCUMENT_PREPARE_RENAME: {
@@ -793,7 +838,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asTextDocumentPrepareRenameParams(messageParams);
       TextDocumentPrepareRenameResult result =
         receiveTextDocument_prepareRename(*requestParams);
-      response.result = transformer.textDocumentPrepareRenameResultToAny(result);
+      response.result =
+        transformer.textDocumentPrepareRenameResultToAny(result);
       break;
     }
     case IncomingRequest::WORKSPACE_EXECUTE_COMMAND: {
@@ -802,7 +848,8 @@ namespace LCompilers::LanguageServerProtocol {
         transformer.asWorkspaceExecuteCommandParams(messageParams);
       WorkspaceExecuteCommandResult result =
         receiveWorkspace_executeCommand(*requestParams);
-      response.result = transformer.workspaceExecuteCommandResultToAny(result);
+      response.result =
+        transformer.workspaceExecuteCommandResultToAny(result);
       break;
     }
     default: {
@@ -973,6 +1020,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     }
   }
+
   auto LspLanguageServer::dispatch(ResponseMessage &response) -> void {
     ResponseIdType responseIdType =
       static_cast<ResponseIdType>(response.id.index());
@@ -1211,6 +1259,7 @@ namespace LCompilers::LanguageServerProtocol {
     }
     }
   }
+
   auto LspLanguageServer::requireMessageParams(
     RequestMessage &request
   ) const -> MessageParams & {
@@ -1983,7 +2032,7 @@ namespace LCompilers::LanguageServerProtocol {
   // ================= //
 
   // request: "workspace/workspaceFolders"
-  auto LspLanguageServer::sendWorkspace_workspaceFolders() -> void {
+  auto LspLanguageServer::sendWorkspace_workspaceFolders() -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -1993,22 +2042,26 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/workspaceFolders");
     }
     request.method = "workspace/workspaceFolders";
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_workspaceFolders(
     WorkspaceWorkspaceFoldersResult &/*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/workspaceFolders\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/workspaceFolders\""
+      << std::endl;
   }
 
   // request: "workspace/configuration"
   auto LspLanguageServer::sendWorkspace_configuration(
     ConfigurationParams &params
-  ) -> void {
+  ) -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2019,20 +2072,24 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "workspace/configuration";
     request.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_configuration(
     WorkspaceConfigurationResult &/*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/configuration\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/configuration\""
+      << std::endl;
   }
 
   // request: "workspace/foldingRange/refresh"
-  auto LspLanguageServer::sendWorkspace_foldingRange_refresh() -> void {
+  auto LspLanguageServer::sendWorkspace_foldingRange_refresh() -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2042,22 +2099,26 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/foldingRange/refresh");
     }
     request.method = "workspace/foldingRange/refresh";
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_foldingRange_refresh(
     WorkspaceFoldingRangeRefreshResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/foldingRange/refresh\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/foldingRange/refresh\""
+      << std::endl;
   }
 
   // request: "window/workDoneProgress/create"
   auto LspLanguageServer::sendWindow_workDoneProgress_create(
     WorkDoneProgressCreateParams &params
-  ) -> void {
+  ) -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2068,20 +2129,24 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "window/workDoneProgress/create";
     request.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWindow_workDoneProgress_create(
     WindowWorkDoneProgressCreateResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"window/workDoneProgress/create\"" << std::endl;
+    logger
+      << "No handler exists for method: \"window/workDoneProgress/create\""
+      << std::endl;
   }
 
   // request: "workspace/semanticTokens/refresh"
-  auto LspLanguageServer::sendWorkspace_semanticTokens_refresh() -> void {
+  auto LspLanguageServer::sendWorkspace_semanticTokens_refresh() -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2091,22 +2156,26 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/semanticTokens/refresh");
     }
     request.method = "workspace/semanticTokens/refresh";
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_semanticTokens_refresh(
     WorkspaceSemanticTokensRefreshResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/semanticTokens/refresh\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/semanticTokens/refresh\""
+      << std::endl;
   }
 
   // request: "window/showDocument"
   auto LspLanguageServer::sendWindow_showDocument(
     ShowDocumentParams &params
-  ) -> void {
+  ) -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2117,20 +2186,24 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "window/showDocument";
     request.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWindow_showDocument(
     WindowShowDocumentResult &/*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"window/showDocument\"" << std::endl;
+    logger
+      << "No handler exists for method: \"window/showDocument\""
+      << std::endl;
   }
 
   // request: "workspace/inlineValue/refresh"
-  auto LspLanguageServer::sendWorkspace_inlineValue_refresh() -> void {
+  auto LspLanguageServer::sendWorkspace_inlineValue_refresh() -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2140,20 +2213,24 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/inlineValue/refresh");
     }
     request.method = "workspace/inlineValue/refresh";
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_inlineValue_refresh(
     WorkspaceInlineValueRefreshResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/inlineValue/refresh\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/inlineValue/refresh\""
+      << std::endl;
   }
 
   // request: "workspace/inlayHint/refresh"
-  auto LspLanguageServer::sendWorkspace_inlayHint_refresh() -> void {
+  auto LspLanguageServer::sendWorkspace_inlayHint_refresh() -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2163,20 +2240,24 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/inlayHint/refresh");
     }
     request.method = "workspace/inlayHint/refresh";
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_inlayHint_refresh(
     WorkspaceInlayHintRefreshResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/inlayHint/refresh\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/inlayHint/refresh\""
+      << std::endl;
   }
 
   // request: "workspace/diagnostic/refresh"
-  auto LspLanguageServer::sendWorkspace_diagnostic_refresh() -> void {
+  auto LspLanguageServer::sendWorkspace_diagnostic_refresh() -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2186,22 +2267,26 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/diagnostic/refresh");
     }
     request.method = "workspace/diagnostic/refresh";
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_diagnostic_refresh(
     WorkspaceDiagnosticRefreshResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/diagnostic/refresh\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/diagnostic/refresh\""
+      << std::endl;
   }
 
   // request: "client/registerCapability"
   auto LspLanguageServer::sendClient_registerCapability(
     RegistrationParams &params
-  ) -> void {
+  ) -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2212,22 +2297,26 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "client/registerCapability";
     request.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveClient_registerCapability(
     ClientRegisterCapabilityResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"client/registerCapability\"" << std::endl;
+    logger
+      << "No handler exists for method: \"client/registerCapability\""
+      << std::endl;
   }
 
   // request: "client/unregisterCapability"
   auto LspLanguageServer::sendClient_unregisterCapability(
     UnregistrationParams &params
-  ) -> void {
+  ) -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2238,22 +2327,26 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "client/unregisterCapability";
     request.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveClient_unregisterCapability(
     ClientUnregisterCapabilityResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"client/unregisterCapability\"" << std::endl;
+    logger
+      << "No handler exists for method: \"client/unregisterCapability\""
+      << std::endl;
   }
 
   // request: "window/showMessageRequest"
   auto LspLanguageServer::sendWindow_showMessageRequest(
     ShowMessageRequestParams &params
-  ) -> void {
+  ) -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2264,20 +2357,24 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "window/showMessageRequest";
     request.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWindow_showMessageRequest(
     WindowShowMessageRequestResult &/*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"window/showMessageRequest\"" << std::endl;
+    logger
+      << "No handler exists for method: \"window/showMessageRequest\""
+      << std::endl;
   }
 
   // request: "workspace/codeLens/refresh"
-  auto LspLanguageServer::sendWorkspace_codeLens_refresh() -> void {
+  auto LspLanguageServer::sendWorkspace_codeLens_refresh() -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2287,22 +2384,26 @@ namespace LCompilers::LanguageServerProtocol {
       callbacksById.emplace(requestId, "workspace/codeLens/refresh");
     }
     request.method = "workspace/codeLens/refresh";
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_codeLens_refresh(
     WorkspaceCodeLensRefreshResult /*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/codeLens/refresh\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/codeLens/refresh\""
+      << std::endl;
   }
 
   // request: "workspace/applyEdit"
   auto LspLanguageServer::sendWorkspace_applyEdit(
     ApplyWorkspaceEditParams &params
-  ) -> void {
+  ) -> int {
     RequestMessage request;
     request.jsonrpc = JSON_RPC_VERSION;
     int requestId = nextRequestId();
@@ -2313,16 +2414,20 @@ namespace LCompilers::LanguageServerProtocol {
     }
     request.method = "workspace/applyEdit";
     request.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.requestMessageToAny(request);
+    std::unique_ptr<LSPAny> any =
+      transformer.requestMessageToAny(request);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
+    return requestId;
   }
 
   auto LspLanguageServer::receiveWorkspace_applyEdit(
     WorkspaceApplyEditResult &/*params*/
   ) -> void {
     std::unique_lock<std::mutex> loggerLock(logger.mutex());
-    logger << "No handler exists for method: \"workspace/applyEdit\"" << std::endl;
+    logger
+      << "No handler exists for method: \"workspace/applyEdit\""
+      << std::endl;
   }
 
   // ====================== //
@@ -2337,7 +2442,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "window/showMessage";
     notification.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    std::unique_ptr<LSPAny> any =
+      transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
   }
@@ -2350,7 +2456,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "window/logMessage";
     notification.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    std::unique_ptr<LSPAny> any =
+      transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
   }
@@ -2363,7 +2470,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "telemetry/event";
     notification.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    std::unique_ptr<LSPAny> any =
+      transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
   }
@@ -2376,7 +2484,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "textDocument/publishDiagnostics";
     notification.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    std::unique_ptr<LSPAny> any =
+      transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
   }
@@ -2389,7 +2498,8 @@ namespace LCompilers::LanguageServerProtocol {
     notification.jsonrpc = JSON_RPC_VERSION;
     notification.method = "$/logTrace";
     notification.params = transformer.asMessageParams(params);
-    std::unique_ptr<LSPAny> any = transformer.notificationMessageToAny(notification);
+    std::unique_ptr<LSPAny> any =
+      transformer.notificationMessageToAny(notification);
     const std::string message = serializer.serialize(*any);
     ls::LanguageServer::send(message);
   }
