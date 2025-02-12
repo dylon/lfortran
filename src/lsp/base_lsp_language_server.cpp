@@ -389,6 +389,13 @@ namespace LCompilers::LanguageServerProtocol {
     }
   }
 
+  // notification: "textDocument/didSave"
+  auto BaseLspLanguageServer::receiveTextDocument_didSave(
+    DidSaveTextDocumentParams &/*params*/
+  ) -> void {
+    // empty
+  }
+
   // notification: "$/setTrace"
   auto BaseLspLanguageServer::receiveSetTrace(
     SetTraceParams &/*params*/

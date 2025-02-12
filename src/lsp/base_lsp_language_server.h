@@ -61,45 +61,49 @@ namespace LCompilers::LanguageServerProtocol {
     // Incoming Requests //
     // ================= //
 
-    InitializeResult receiveInitialize(
+    auto receiveInitialize(
       InitializeParams &params
-    ) override;
+    ) -> InitializeResult override;
 
-    void receiveInitialized(
+    auto receiveInitialized(
       InitializedParams &params
-    ) override;
+    ) -> void override;
 
     // ====================== //
     // Incoming Notifications //
     // ====================== //
 
-    void receiveWorkspace_didRenameFiles(
+    auto receiveWorkspace_didRenameFiles(
       RenameFilesParams &params
-    ) override;
+    ) -> void override;
 
-    void receiveWorkspace_didChangeConfiguration(
+    auto receiveWorkspace_didChangeConfiguration(
       DidChangeConfigurationParams &params
-    ) override;
+    ) -> void override;
 
-    void receiveWorkspace_configuration(
+    auto receiveWorkspace_configuration(
       WorkspaceConfigurationResult &params
-    ) override;
+    ) -> void override;
 
-    void receiveTextDocument_didOpen(
+    auto receiveTextDocument_didOpen(
       DidOpenTextDocumentParams &params
-    ) override;
+    ) -> void override;
 
-    void receiveTextDocument_didChange(
+    auto receiveTextDocument_didChange(
       DidChangeTextDocumentParams &params
-    ) override;
+    ) -> void override;
 
-    void receiveTextDocument_didClose(
+    auto receiveTextDocument_didClose(
       DidCloseTextDocumentParams &params
-    ) override;
+    ) -> void override;
 
-    void receiveSetTrace(
+    auto receiveTextDocument_didSave(
+      DidSaveTextDocumentParams &params
+    ) -> void override;
+
+    auto receiveSetTrace(
       SetTraceParams &params
-    ) override;
+    ) -> void override;
 
   }; // class LspLanguageServer
 
