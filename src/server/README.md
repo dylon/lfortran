@@ -41,6 +41,7 @@ of JSON-RPC 2.0 messages (newlines are represented by `\r\n` as they are
 required to be CR-LF; the lines are broken following CR-LF for clarity):
 
 ```text
+Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n
 Content-Length: 52\r\n
 \r\n
 {"jsonrpc":"2.0","method":"initialized","params":{}}
