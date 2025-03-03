@@ -30,17 +30,17 @@ which invokes methods and responds over a network with
 [JSON](https://www.json.org/json-en.html) as its content type.
 
 Messages take a form extremely similar to [HTTP
-messages](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages), but lack
-the start line and typically contain only a `Content-Type` and `Content-Length`
-header, with the latter the only required header since the `Content-Type` is
-required to be a JSON variant. The encoding is assumed to be UTF-8. Headers are
-separated with the Windows CR-LF (`\r\n`) regardless the platform, and the JSON
-message body is separated from the headers with an extra CR-LF (i.e.
-`\r\n\r\n`). No newline follows the message body, which is why the
-`Content-Length` header is required; exactly `Content-Length` characters (bytes)
-will be read from the message body. The following demonstrates the correct form
-of JSON-RPC 2.0 messages (newlines are represented by `\r\n` as they are
-required to be CR-LF; the lines are broken following CR-LF for clarity):
+messages](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages) but lack
+the start line and typically contain just the `Content-Type` and
+`Content-Length` headers. Only the latter is required since the `Content-Type`
+must be JSON. Other headers may be included but will almost certainly be ignored
+by the server. The encoding is assumed to be UTF-8. Headers are separated with
+the Windows CR-LF (`\r\n`) regardless the platform and the JSON message body is
+separated from the headers with an extra CR-LF (i.e. `\r\n\r\n`). No newline
+follows the message body, which is why the `Content-Length` header is required;
+exactly `Content-Length` characters (bytes) will be read from the message body.
+The following demonstrates the proper form of an LSP message (newlines are
+represented by `\r\n` and lines are broken, following CR-LF, for clarity):
 
 ```text
 Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n
@@ -73,3 +73,11 @@ consumed and handled by the client. The server's error stream (standard error
 stream or stderr) should not be assumed part of the stdio communication
 protocol, but some editors will log messages written to the server's error
 stream to a debugging terminal (e.g. VSCode).
+
+## Architecture
+
+LLanguage Server is fully asynchronous. Messages are read from its input stream
+and appended to a message queue that is consumed by a pool of request threads.
+This allows multiple messages to be handled in parallel and prevents the editor
+from blocking while the user continues editing his document. Responses are
+served in the order of receipt even if one is completed before another.
