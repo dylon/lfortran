@@ -19,9 +19,11 @@ the editor while it awaits a reply.
 
 ## Language Server Protocol (LSP)
 
-Microsoft has implemented a language server protocol that describes most
-operations required by modern editors. It has become very popular and been
-adopted as a common standard for integrating language tools with said editors.
+Microsoft has implemented the [Language Server Protocol
+(LSP)](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/)
+that describes most operations required by modern editors. It has become very
+popular and been adopted as a common standard for integrating language tools
+with said editors.
 
 The protocol is based on [JSON-RPC 2.0](https://www.jsonrpc.org/specification),
 which invokes methods and responds over a network with
