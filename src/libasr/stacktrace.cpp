@@ -101,8 +101,8 @@ int shared_lib_callback(struct dl_phdr_info *info,
   StacktraceItem &item = *(StacktraceItem *)_data;
   for (int i=0; i < info->dlpi_phnum; i++) {
     if (info->dlpi_phdr[i].p_type == PT_LOAD) {
-      ElfW(Addr) min_addr = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
-      ElfW(Addr) max_addr = min_addr + info->dlpi_phdr[i].p_memsz;
+      Elf64_Addr min_addr = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
+      Elf64_Addr max_addr = min_addr + info->dlpi_phdr[i].p_memsz;
       if ((item.pc >= min_addr) && (item.pc < max_addr)) {
         item.binary_filename = info->dlpi_name;
         if (item.binary_filename == "") {

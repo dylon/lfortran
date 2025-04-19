@@ -36,14 +36,6 @@
 #ifdef HAVE_LFORTRAN_LINK
 // For dl_iterate_phdr() functionality
 #  include <link.h>
-struct dl_phdr_info {
-    ElfW(Addr) dlpi_addr;
-    const char *dlpi_name;
-    const ElfW(Phdr) *dlpi_phdr;
-    ElfW(Half) dlpi_phnum;
-};
-extern int dl_iterate_phdr (int (*__callback) (struct dl_phdr_info *,
-    size_t, void *), void *__data);
 #endif
 
 #ifdef HAVE_LFORTRAN_UNWIND
@@ -4349,8 +4341,8 @@ int shared_lib_callback(struct dl_phdr_info *info,
     struct Stacktrace *d = (struct Stacktrace *) _data;
     for (int i = 0; i < info->dlpi_phnum; i++) {
         if (info->dlpi_phdr[i].p_type == PT_LOAD) {
-            ElfW(Addr) min_addr = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
-            ElfW(Addr) max_addr = min_addr + info->dlpi_phdr[i].p_memsz;
+            Elf64_Addr min_addr = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
+            Elf64_Addr max_addr = min_addr + info->dlpi_phdr[i].p_memsz;
             if ((d->current_pc >= min_addr) && (d->current_pc < max_addr)) {
                 d->binary_filename[d->local_pc_size] = (char *)info->dlpi_name;
                 if (d->binary_filename[d->local_pc_size][0] == '\0') {

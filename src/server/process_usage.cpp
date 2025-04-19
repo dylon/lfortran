@@ -20,11 +20,6 @@
 #include <sys/resource.h>
 #include <sys/sysctl.h>
 #include <unistd.h>
-// --------------------------------------------------------------------
-// TODO: Uncomment the BSD-related sections and test them on BSD before
-// commiting them to main.
-// --------------------------------------------------------------------
-/*
 #elif defined(__FreeBSD__) \
     || defined(__OpenBSD__) \
     || defined(__NetBSD__) \
@@ -34,7 +29,8 @@
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <unistd.h>
-*/
+#include <cerrno>
+#include <cstring>
 #endif
 
 #include <server/process_usage.h>
@@ -78,12 +74,37 @@ namespace LCompilers::LLanguageServer {
             return info.resident_size;
         }
         logger.error() << "Failed to get task information" << std::endl;
-/*
-#elif defined(__FreeBSD__) \
-    || defined(__OpenBSD__) \
-    || defined(__NetBSD__) \
-    || defined(__DragonFly__) \
-    || defined(__BSD__)
+#elif defined(__OpenBSD__)
+        // MIB for KERN_PROC: query process info for the current process
+        int mib[6] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid(), sizeof(struct kinfo_proc), 1};
+        struct kinfo_proc kp;
+        size_t len = sizeof(kp);
+
+        // Query process information
+        if (sysctl(mib, 6, &kp, &len, nullptr, 0) == -1) {
+            logger.error() << "sysctl failed: " << strerror(errno) << std::endl;
+            return 0;
+        }
+
+        // Extract resident set size (RSS) in pages and convert to bytes
+        return kp.p_vm_rssize * getpagesize();
+#elif defined(__FreeBSD__)
+        int mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()};
+        struct kinfo_proc kp;
+        size_t len = sizeof(kp);
+        if (sysctl(mib, 4, &kp, &len, NULL, 0) == 0) {
+            return kp.ki_rssize * getpagesize();
+        }
+        logger.error() << "Failed to get process information" << std::endl;
+#elif defined(__NetBSD__)
+        int mib[] = {CTL_KERN, KERN_PROC2, KERN_PROC_PID, getpid(), sizeof(struct kinfo_proc2), 1};
+        struct kinfo_proc2 kp;
+        size_t len = sizeof(kp);
+        if (sysctl(mib, 6, &kp, &len, NULL, 0) == 0) {
+            return kp.p_vm_rssize * getpagesize();
+        }
+        logger.error() << "Failed to get process information" << std::endl;
+#elif defined(__DragonFly__)
         int mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()};
         struct kinfo_proc kp;
         size_t len = sizeof(kp);
@@ -91,7 +112,6 @@ namespace LCompilers::LLanguageServer {
             return kp.kp_vm_rssize * getpagesize();
         }
         logger.error() << "Failed to get process information" << std::endl;
-*/
 #else
         logger.error() << "Operating system is not supported" << std::endl;
 #endif
@@ -124,7 +144,6 @@ namespace LCompilers::LLanguageServer {
                 - (boottime.tv_sec + boottime.tv_usec / 1'000'000.0);
         }
         logger.error() << "Failed to get system uptime" << std::endl;
-/*
 #elif defined(__FreeBSD__) \
     || defined(__OpenBSD__) \
     || defined(__NetBSD__) \
@@ -139,7 +158,6 @@ namespace LCompilers::LLanguageServer {
                 - (boottime.tv_sec + boottime.tv_usec / 1'000'000.0);
         }
         logger.error() << "Failed to get system uptime" << std::endl;
-*/
 #else
         logger.error() << "Operating system is not supported" << std::endl;
 #endif
@@ -218,7 +236,6 @@ namespace LCompilers::LLanguageServer {
             return totalCpuTime;
         }
         logger.error() << "Failed to get thread list" << std::endl;
-/*
 #elif defined(__FreeBSD__) \
     || defined(__OpenBSD__) \
     || defined(__NetBSD__) \
@@ -231,7 +248,6 @@ namespace LCompilers::LLanguageServer {
                 + (usage.ru_stime.tv_sec + usage.ru_stime.tv_usec / 1'000'000.0);
         }
         logger.error() << "Failed to get rusage" << std::endl;
-*/
 #else
         logger.error() << "Operating system is not supported" << std::endl;
 #endif
@@ -253,9 +269,7 @@ namespace LCompilers::LLanguageServer {
             return cores;
         }
         logger.error() << "Failed to get number of CPU cores" << std::endl;
-/*
 #elif defined(__FreeBSD__) \
-    || defined(__OpenBSD__) \
     || defined(__NetBSD__) \
     || defined(__DragonFly__) \
     || defined(__BSD__)
@@ -265,7 +279,14 @@ namespace LCompilers::LLanguageServer {
             return cores;
         }
         logger.error() << "Failed to get number of CPU cores" << std::endl;
-*/
+#elif defined(__OpenBSD__)
+        int cores;
+        size_t len = sizeof(cores);
+        int mib[2] = { CTL_HW, HW_NCPU };
+        if (sysctl(mib, 2, &cores, &len, nullptr, 0) == 0) {
+            return cores;
+        }
+        logger.error() << "Failed to get number of CPU cores" << std::endl;
 #else
         logger.error() << "Operating system is not supported" << std::endl;
 #endif
